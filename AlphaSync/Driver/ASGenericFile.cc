@@ -58,6 +58,7 @@ namespace ts
 
     bool ASGenericFile::importText(const uint16_t* text, unsigned textSize)
     {
+        if ((textSize & 1) || (textSize && !text)) return false;
         bool result = false;
 
         // (crudely) convert the input to plain ASCII
@@ -65,7 +66,7 @@ namespace ts
         if (!input) return false;
 
         const uint16_t* src = text;
-        const uint16_t* end = text + (textSize / 2);
+        const uint16_t* end = textSize ? text + (textSize / 2) : text;
         char* dst = input;
         while (src < end)
         {
@@ -128,7 +129,7 @@ namespace ts
         *text = 0;
         *textSize = 0;
 
-        if (!fileData()) return false;
+        if (fileSize() && !fileData()) return false;
 
         // Estimate the total size of the character data. Total headers and tags allows 1k. The data size
         // is calculated based on the 2 charters per byte plus indent and newline characters.
@@ -200,7 +201,7 @@ namespace ts
      */
     void ASGenericFile::appendToExport(const char* string) const
     {
-        unsigned len = strlen(string);
+        size_t len = strlen(string);
         assert(len + m_exportSize <= m_exportAllocation);
         if (len + m_exportSize <= m_exportAllocation)
         {
@@ -210,7 +211,7 @@ namespace ts
             {
                 *dst ++ = (*src++) & 0x00ff;
             }
-            m_exportSize += len;
+            m_exportSize += static_cast<unsigned>(len);
         }
     }
 
@@ -232,10 +233,10 @@ namespace ts
         const char* start = strstr(buffer, startTag);
         if (!start) return 0;
         start += strlen(startTag);
-        while (isspace(*start)) start ++;                       // always remove white space immediately following the start tag
+        while (isspace(static_cast<unsigned char>(*start))) start ++;                       // always remove white space immediately following the start tag
         const char* end = strstr(start, endTag);
         if (!end) return 0;
-        while (end != start && isspace(*(end - 1))) end --;     // always remove white space immediate preceding the end tag
+        while (end != start && isspace(static_cast<unsigned char>(*(end - 1)))) end --;     // always remove white space immediate preceding the end tag
 
         unsigned len = unsigned(end - start);
         char* result = (char*)malloc(len + 1);
@@ -252,7 +253,7 @@ namespace ts
                 char* dst = result;
                 while (src != end)
                 {
-                    if (!isspace(*src)) *dst ++ = *src;
+                    if (!isspace(static_cast<unsigned char>(*src))) *dst ++ = *src;
                     src ++;
                 }
                 *dst = 0;
@@ -326,14 +327,16 @@ namespace ts
         snprintf(startTag, sizeof startTag, "<%s>", key);
         snprintf(endTag, sizeof endTag, "</%s>", key);
 
-        const char* start = strstr(buffer, startTag) + strlen(startTag);
+        const char* start = strstr(buffer, startTag);
         if (!start) return false;
+        start += strlen(startTag);
         const char* end = strstr(start, endTag);
         if (!end) return false;
 
         assert(end >= start);
         unsigned len = unsigned(end - start);
-        if (len) *value = (uint8_t*)malloc((len + 1) / 2);
+        // An empty data tag represents a valid empty file.
+        *value = (uint8_t*)malloc(len ? (len + 1) / 2 : 1);
         if (*value)
         {
             result = true;
@@ -344,7 +347,7 @@ namespace ts
 
             while (src != end)
             {
-                char ch = tolower(*src);
+                int ch = tolower(static_cast<unsigned char>(*src));
                 if (ch >= 'a' && ch <= 'f')
                 {
                     assembly = (assembly << 4);
@@ -370,6 +373,13 @@ namespace ts
                 src ++;
             }
 
+            // A final single hex digit is truncated data, rather than a complete byte.
+            if (result && !byteReady)
+            {
+                free(*value);
+                *value = 0;
+                result = false;
+            }
             if (result) *size = unsigned(dst - *value);
         }
 

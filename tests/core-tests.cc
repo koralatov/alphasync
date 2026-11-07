@@ -80,10 +80,33 @@ static void testSettingsBounds()
     CHECK(!settings.appendItemData(uint8_t(0x78)));
 }
 
+static void testMalformedGenericFiles()
+{
+    const char* invalid[] = {"hello", "<data>", "</data>", "<data>0</data>",
+                             "<data>01f</data>", "<data>xy</data>"};
+    for (const char* text : invalid)
+    {
+        std::u16string input(text, text + std::strlen(text));
+        ts::ASGenericFile file;
+        CHECK(!file.importText(reinterpret_cast<const uint16_t*>(input.data()), input.size() * 2));
+    }
+    std::u16string empty = u"<data></data>";
+    ts::ASGenericFile file;
+    CHECK(file.importText(reinterpret_cast<const uint16_t*>(empty.data()), empty.size() * 2));
+    CHECK(file.fileSize() == 0);
+    const uint16_t* output = nullptr;
+    unsigned size = 0;
+    CHECK(file.exportText(&output, &size));
+    ts::ASGenericFile target;
+    CHECK(target.importText(output, size));
+    CHECK(target.fileSize() == 0);
+}
+
 int main()
 {
     testAlphaWordRoundTrip();
     testGenericRoundTrip();
     testSettingsBounds();
+    testMalformedGenericFiles();
     std::puts("All core tests passed.");
 }
