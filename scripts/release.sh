@@ -3,6 +3,11 @@ set -euo pipefail
 
 repository=$(cd "$(dirname "$0")/.." && pwd)
 cd "$repository"
+if [[ $# -gt 2 ]]; then
+    printf 'Usage: %s [universal|modern] [output-directory]\n' "$0" >&2
+    exit 1
+fi
+source "$repository/scripts/build-profile.sh" "${1:-universal}"
 : "${ALPHASYNC_SIGNING_IDENTITY:?Set the Developer ID Application certificate name.}"
 : "${ALPHASYNC_TEAM_ID:?Set the Apple developer team identifier.}"
 : "${ALPHASYNC_NOTARY_PROFILE:?Set a notarytool keychain profile name.}"
@@ -14,18 +19,22 @@ if [[ -n "$(git status --porcelain --untracked-files=normal)" ]]; then
     printf 'Commit or set aside source changes before making a release.\n' >&2
     exit 1
 fi
-expected_xcode=$(cat .xcode-version)
-if [[ -z "${DEVELOPER_DIR:-}" && -d "/Applications/Xcode_$expected_xcode.app/Contents/Developer" ]]; then
-    export DEVELOPER_DIR="/Applications/Xcode_$expected_xcode.app/Contents/Developer"
+if [[ -z "${DEVELOPER_DIR:-}" && -d "/Applications/Xcode_$profile_xcode.app/Contents/Developer" ]]; then
+    export DEVELOPER_DIR="/Applications/Xcode_$profile_xcode.app/Contents/Developer"
 fi
-scripts/check-toolchain.sh
+scripts/check-toolchain.sh "$profile_variant"
 make test sanitize
 
-mkdir -p build
-output=$(mktemp -d "$repository/build/release-XXXXXX")
+if [[ $# -eq 2 ]]; then
+    mkdir "$2"
+    output=$(cd "$2" && pwd)
+else
+    mkdir -p build
+    output=$(mktemp -d "$repository/build/release-$profile_variant-XXXXXX")
+fi
 archive="$output/AlphaSync.xcarchive"
-xcodebuild -project AlphaSync/AlphaSync.xcodeproj -scheme AlphaSync \
-    -configuration Release -destination 'generic/platform=macOS' \
+xcodebuild -project AlphaSync/AlphaSync.xcodeproj -scheme "$profile_scheme" \
+    -configuration "$profile_release" -destination 'generic/platform=macOS' \
     -archivePath "$archive" -derivedDataPath "$output/DerivedData" \
     CODE_SIGN_IDENTITY="$ALPHASYNC_SIGNING_IDENTITY" \
     DEVELOPMENT_TEAM="$ALPHASYNC_TEAM_ID" CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO \
@@ -35,7 +44,7 @@ xcodebuild -project AlphaSync/AlphaSync.xcodeproj -scheme AlphaSync \
         exit 1
     }
 app="$archive/Products/Applications/AlphaSync.app"
-scripts/verify-app.sh "$app"
+scripts/verify-app.sh "$app" "$profile_variant"
 for bundle in "$app" "$app/Contents/Library/LoginItems/AlphaSyncLauncher.app"; do
     details=$(codesign -d --verbose=4 "$bundle" 2>&1)
     actual_team=$(printf '%s\n' "$details" | sed -n 's/^TeamIdentifier=//p')
@@ -65,19 +74,5 @@ xcrun stapler validate "$app"
 spctl --assess --type execute --verbose=2 "$app"
 codesign --verify --deep --strict "$app"
 
-version=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$app/Contents/Info.plist")
-build_number=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$app/Contents/Info.plist")
-filename="AlphaSync-$version-$build_number.zip"
-ditto -c -k --keepParent "$app" "$output/$filename"
-(
-    cd "$output"
-    shasum -a 256 "$filename" > "$filename.sha256"
-)
-{
-    printf 'Source commit: %s\n' "$(git rev-parse HEAD)"
-    printf 'Version: %s\nBuild: %s\nMinimum macOS: 11.0\n' "$version" "$build_number"
-    scripts/check-toolchain.sh
-    sw_vers
-    uname -m
-} > "$output/build-information.txt"
-printf 'Signed and notarised app: %s\n' "$output/$filename"
+scripts/package-app.sh "$app" "$profile_variant" "$output/assets" notarised
+printf 'Signed and notarised %s files: %s\n' "$profile_variant" "$output/assets"
