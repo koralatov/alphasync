@@ -97,30 +97,12 @@ namespace ts
         if (size && !copy) return false;
         // Copy before releasing the old buffer, because the caller may be loading from it.
         if (size) memcpy(copy, data, size);
-        void* previousData = m_fileData;
-        unsigned previousSize = m_fileSize;
-        m_fileData = copy;
-        m_fileSize = size;
-        if (confirmLoad())
-        {
-            free(previousData);
-            return true;
-        }
-
-        // A rejected file must not replace the last valid data or its decoded metadata.
-        free(m_fileData);
-        m_fileData = previousData;
-        m_fileSize = previousSize;
-        confirmLoad();
-        return false;
+        return replaceData(copy, size);
     }
 
 
     bool ASFile::load(ASDevice* device, const ASApplet* applet, int fileIndex, unsigned maxBytes)
     {
-        setFileSize(0);                     // release any existing memory
-        assert(0 == m_fileData);
-
         if (maxBytes != 0)
         {
             if (minimumLoadSize() > maxBytes) return false;   // requested load size is not permitted
@@ -131,7 +113,7 @@ namespace ts
 
         unsigned rawSize = attr.allocSize();
         if (maxBytes != 0 && rawSize > maxBytes) rawSize = maxBytes;
-        uint8_t* rawData = (uint8_t*)malloc(rawSize);
+        uint8_t* rawData = (uint8_t*)malloc(rawSize ? rawSize : 1);
         if (0 == rawData) return false;     // out of memory
 
         unsigned actualRawSize = 0;
@@ -141,10 +123,7 @@ namespace ts
             return false;                   // error reading file from device
         }
 
-        m_fileData = rawData;
-        m_fileSize = actualRawSize;
-
-        return confirmLoad();               // allow specialisation to determine if data was valid
+        return replaceData(rawData, actualRawSize);
     }
 
 
@@ -332,6 +311,27 @@ namespace ts
 
 
 #pragma mark    --------  Private Methods  --------
+
+
+    bool ASFile::replaceData(void* data, unsigned size)
+    {
+        void* previousData = m_fileData;
+        unsigned previousSize = m_fileSize;
+        m_fileData = data;
+        m_fileSize = size;
+        if (confirmLoad())
+        {
+            free(previousData);
+            return true;
+        }
+
+        // A rejected file must not replace the last valid data or its decoded metadata.
+        free(m_fileData);
+        m_fileData = previousData;
+        m_fileSize = previousSize;
+        confirmLoad();
+        return false;
+    }
 
 
 }   // namespace

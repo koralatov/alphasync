@@ -306,6 +306,9 @@ namespace ts
 
     private:
 
+        // Take ownership of this buffer, and restore the previous file if validation fails.
+        bool replaceData(void* data, unsigned size);
+
         ASAppletID m_appletID;
         int m_appletVersionMajor;
         int m_appletVersionMinor;

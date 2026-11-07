@@ -125,7 +125,7 @@ public:
         (void)timeout;
         CHECK(reads < replies.size());
         const auto& data = replies[reads++];
-        CHECK(length == data.size());
+        CHECK(actual ? data.size() <= length : data.size() == length);
         std::memcpy(buffer, data.data(), data.size());
         if (actual) *actual = data.size();
         return true;
@@ -192,6 +192,42 @@ static void testRejectedLoadPreservesData()
     ValidatedFile file;
     CHECK(file.load(original, sizeof original));
     CHECK(!file.load(invalid, sizeof invalid));
+    CHECK(file.fileSize() == sizeof original);
+    CHECK(std::memcmp(file.fileData(), original, sizeof original) == 0);
+}
+
+static void replyHandshake(MockDevice& device)
+{
+    device.replies.push_back({0x02, 0x30});
+    device.replies.push_back({'S', 'w', 'i', 't', 'c', 'h', 'e', 'd'});
+}
+
+static void testFailedDeviceLoadPreservesData()
+{
+    const uint8_t original[] = {1, 2, 3};
+    ValidatedFile file;
+    CHECK(file.load(original, sizeof original));
+
+    MockDevice missing;
+    replyHandshake(missing);
+    missing.reply(ASMESSAGE_ERROR_PARAMETER);
+    ts::ASApplet applet;
+    CHECK(!file.load(&missing, &applet, 0));
+    CHECK(file.fileSize() == sizeof original);
+    CHECK(std::memcmp(file.fileData(), original, sizeof original) == 0);
+
+    MockDevice failedTransfer;
+    replyHandshake(failedTransfer);
+    ts::ASFileAttributes attributes;
+    attributes.setAllocSize(4);
+    unsigned checksum = 0;
+    for (unsigned i = 0; i < kASFileAttributesSize; ++i) checksum += attributes.rawData()[i];
+    failedTransfer.reply(ASMESSAGE_RESPONSE_GET_FILE_ATTRIBUTES, kASFileAttributesSize, checksum);
+    failedTransfer.replies.emplace_back(attributes.rawData(), attributes.rawData() + kASFileAttributesSize);
+    replyHandshake(failedTransfer);
+    failedTransfer.reply(ASMESSAGE_RESPONSE_BLOCK_READ);
+    failedTransfer.reply(ASMESSAGE_ERROR_PROTOCOL);
+    CHECK(!file.load(&failedTransfer, &applet, 0));
     CHECK(file.fileSize() == sizeof original);
     CHECK(std::memcmp(file.fileData(), original, sizeof original) == 0);
 }
@@ -310,6 +346,7 @@ int main()
     testUSBReadBounds();
     testFileBufferFailures();
     testRejectedLoadPreservesData();
+    testFailedDeviceLoadPreservesData();
     testUnicodeByteOrder();
     testMalformedDictionaries();
     testDictionaryAccents();
