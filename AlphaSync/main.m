@@ -73,6 +73,23 @@ static void captureWindow(NSWindow* window, NSString* directory, NSString* name)
     [window makeKeyAndOrderFront:nil];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
     [window displayIfNeeded];
+    NSString* path = [directory stringByAppendingPathComponent:[name stringByAppendingPathExtension:@"png"]];
+    // Window Server captures include composited native materials such as Liquid
+    // Glass, which cacheDisplayInRect cannot always render accurately.
+    NSTask* capture = [[[NSTask alloc] init] autorelease];
+    [capture setExecutableURL:[NSURL fileURLWithPath:@"/usr/sbin/screencapture"]];
+    [capture setArguments:@[@"-x", @"-o", @"-l", [NSString stringWithFormat:@"%ld", (long)[window windowNumber]], path]];
+    NSError* captureError = nil;
+    if ([capture launchAndReturnError:&captureError])
+    {
+        [capture waitUntilExit];
+        if ([capture terminationStatus] == 0 && [[NSFileManager defaultManager] fileExistsAtPath:path])
+        {
+            printf("Captured %s with Window Server.\n", [name UTF8String]);
+            return;
+        }
+    }
+    fprintf(stderr, "Window capture unavailable for %s; using the AppKit bitmap fallback.\n", [name UTF8String]);
     NSView* frame = [[window contentView] superview];
     [frame layoutSubtreeIfNeeded];
     NSBitmapImageRep* bitmap = [frame bitmapImageRepForCachingDisplayInRect:[frame bounds]];
@@ -80,8 +97,7 @@ static void captureWindow(NSWindow* window, NSString* directory, NSString* name)
     [frame cacheDisplayInRect:[frame bounds] toBitmapImageRep:bitmap];
     NSData* png = [bitmap representationUsingType:NSBitmapImageFileTypePNG properties:@{}];
     NSError* error = nil;
-    requireInterface([png writeToFile:[directory stringByAppendingPathComponent:[name stringByAppendingPathExtension:@"png"]]
-                            options:NSDataWritingAtomic error:&error], [error localizedDescription] ?: @"A screenshot could not be saved.");
+    requireInterface([png writeToFile:path options:NSDataWritingAtomic error:&error], [error localizedDescription] ?: @"A screenshot could not be saved.");
 }
 
 static void checkAppearances(id controller, NSWindowController* backup, NSString* directory)
