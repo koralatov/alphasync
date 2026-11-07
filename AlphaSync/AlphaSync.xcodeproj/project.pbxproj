@@ -68,6 +68,7 @@
         C01100000000000000000001 /* UniformTypeIdentifiers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01100000000000000000002 /* UniformTypeIdentifiers.framework */; };
         C01100000000000000000004 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
         C01100000000000000000005 /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01100000000000000000006 /* ServiceManagement.framework */; };
+		4ABCBDDC395974B75A43B8E8 /* ASBackupReport.mm in Sources */ = {isa = PBXBuildFile; fileRef = E41551F125E170A143893D41 /* ASBackupReport.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -186,6 +187,8 @@
 		A9E5D3700F12BD5B002A9EC3 /* ASFileCell.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASFileCell.mm; sourceTree = "<group>"; };
         C01100000000000000000002 /* UniformTypeIdentifiers.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UniformTypeIdentifiers.framework; path = System/Library/Frameworks/UniformTypeIdentifiers.framework; sourceTree = SDKROOT; };
         C01100000000000000000006 /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
+		62623E530502DA726AF5AC00 /* ASBackupReport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASBackupReport.h; sourceTree = "<group>"; };
+		E41551F125E170A143893D41 /* ASBackupReport.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ASBackupReport.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -386,6 +389,8 @@
 				A99A543B0F0D39E400BC68F1 /* ASApplicationContoller.mm */,
 				A99A543C0F0D39E400BC68F1 /* ASBackupController.h */,
 				A99A543D0F0D39E400BC68F1 /* ASBackupController.mm */,
+				62623E530502DA726AF5AC00 /* ASBackupReport.h */,
+				E41551F125E170A143893D41 /* ASBackupReport.mm */,
 				A99A543E0F0D39E400BC68F1 /* ASDeviceAccessProtocol.h */,
 				A99A54410F0D39E400BC68F1 /* ASDeviceController.h */,
 				A99A54420F0D39E400BC68F1 /* ASDeviceController.mm */,
@@ -551,6 +556,7 @@
 				A99A54540F0D39E400BC68F1 /* ASAppletNode.mm in Sources */,
 				A99A54550F0D39E400BC68F1 /* ASApplicationContoller.mm in Sources */,
 				A99A54560F0D39E400BC68F1 /* ASBackupController.mm in Sources */,
+				4ABCBDDC395974B75A43B8E8 /* ASBackupReport.mm in Sources */,
 				A99A54580F0D39E400BC68F1 /* ASDeviceController.mm in Sources */,
 				A99A54590F0D39E400BC68F1 /* ASInspectorWindowController.mm in Sources */,
 				A99A545A0F0D39E400BC68F1 /* ASDeviceNode.mm in Sources */,

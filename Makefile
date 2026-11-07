@@ -26,8 +26,8 @@ clean:
 	rm -rf build
 
 ifeq ($(shell uname -s),Darwin)
-.PHONY: test-xml test-files
-test: test-xml test-files
+.PHONY: test-xml test-files test-reports
+test: test-xml test-files test-reports
 
 test-xml: build/xml-tests
 	./build/xml-tests
@@ -44,4 +44,13 @@ test-files: build/file-tests
 build/file-tests: tests/file-tests.mm AlphaSync/Library/AQFileUtilities.m AlphaSync/Library/AQFileUtilities.h Makefile
 	@mkdir -p build
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -fblocks -x objective-c++ tests/file-tests.mm AlphaSync/Library/AQFileUtilities.m -framework Cocoa -o $@
+endif
+
+ifeq ($(shell uname -s),Darwin)
+test-reports: build/report-tests
+	./build/report-tests
+
+build/report-tests: tests/report-tests.mm AlphaSync/Application/ASBackupReport.mm AlphaSync/Application/ASBackupReport.h Makefile
+	@mkdir -p build
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) tests/report-tests.mm AlphaSync/Application/ASBackupReport.mm -framework Foundation -o $@
 endif
