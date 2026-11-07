@@ -11,7 +11,42 @@ Each release provides two downloads built from the same source and version:
 
 Both include the matching bundled launcher and use Apple’s public frameworks and the standard C++ library.  There are no third-party runtime libraries, package managers, or separately installed USB drivers.  Deployment targets set the minimum system; the download labels describe the supported range.
 
-Install the app for your Mac.  Both downloads contain **AlphaSync.app** and use the same preferences and bundle identifiers, so replace the existing app when changing versions.
+## Download and run on a Mac
+
+Choose **Universal** for macOS 11 through 26, including Monterey 12.7.5.  Choose **Modern** for macOS 27 and later on Apple Silicon.  You can check your macOS version and processor in **Apple menu → About This Mac**.
+
+### Download
+
+Published downloads appear on the [Releases page](https://github.com/koralatov/alphasync/releases).  To get a development build:
+
+1. Sign in to GitHub and open the repository’s [Actions page](https://github.com/koralatov/alphasync/actions).
+2. Choose a successful **Build and test** run for the branch or commit you want.
+3. In **Artifacts**, download `AlphaSync-release-<source commit>`.  It contains both app downloads, their checksums, and build information.
+4. Double-click the downloaded archive to extract it, then double-click the **Universal** or **Modern** app ZIP for your Mac.
+
+See GitHub’s [artifact download instructions](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/download-workflow-artifacts) if you need help finding the download.
+
+### Install and open
+
+1. Quit any copy of AlphaSync that is already running.
+2. Drag the extracted **AlphaSync.app** into **Applications**.  Both versions use the same preferences and bundle identifiers, so replace the existing app when changing versions.
+3. Open **Applications**, then double-click **AlphaSync**.  If macOS blocks the first launch, follow the steps below.
+4. Connect your NEO with a USB cable.  Its files appear in the main window.  Drag files to Finder to copy them to your Mac, or drag text files into AlphaSync to send them to the NEO.
+
+Keep **AlphaSync.app** intact.  Its automatic-launch helper is already inside the app.  Move it to Applications before enabling automatic launching in Preferences.
+
+### If macOS blocks the first launch
+
+For an unidentified-developer or verification warning, dismiss the warning and open the settings for your macOS version:
+
+| macOS | Settings |
+|---|---|
+| 11 and 12 | **System Preferences → Security & Privacy → General** |
+| 13 and later | **System Settings → Privacy & Security**, then scroll to **Security** |
+
+Find the message about AlphaSync and choose **Open Anyway**.  If an **Open** button appears first, click it to reach **Open Anyway**.  Follow the confirmation prompts, entering your Mac login password or using Touch ID if asked.
+
+macOS saves an exception for this copy of the app.  Later launches can use the usual double-click.  Apple’s [instructions for opening downloaded apps](https://support.apple.com/en-gb/102445) explain this approval process.
 
 ## Build
 
