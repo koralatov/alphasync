@@ -112,50 +112,9 @@ USB commands and connection callbacks run on one background queue.  The interfac
 
 Exports are written and synchronised in a hidden temporary file before their final name appears.  Existing files are preserved.  Each backup keeps an atomic property-list report in its destination’s **Backup Reports** folder, recording saved filenames, failures, and pending files.  A cancelled, disconnected, or interrupted backup remains distinguishable from a completed backup.  Hidden temporary files left by an interrupted write can be removed after checking the report.
 
-## Signing and distribution
+## Versioning
 
-Local builds use an ad hoc signature and the hardened runtime.  They do not need the original developer’s certificate, a Developer ID, or a notarisation ticket.  Workflow artifacts use ad hoc signatures for development and testing.
-
-For a local signed build, install your Developer ID Application certificate and create a [notarytool Keychain profile](https://developer.apple.com/documentation/security/customizing-the-notarization-workflow).  Run from a clean checkout on a Mac compatible with the chosen compiler and app:
-
-```sh
-ALPHASYNC_SIGNING_IDENTITY='Developer ID Application: Your Name (TEAMID)' \
-ALPHASYNC_TEAM_ID=TEAMID \
-ALPHASYNC_NOTARY_PROFILE=AlphaSync-notary \
-scripts/release.sh universal build/release-universal
-```
-
-Use `modern build/release-modern` for the other download, with the same environment variables and source commit, on macOS 27 or later.  Each output directory must be new.  Omitting the output directory creates a fresh directory under `build`.
-
-The script runs the tests, archives the app, verifies both Developer ID signatures and the signing team, and submits the ZIP to Apple.  It requires an accepted notarisation result, staples and validates the ticket, checks Gatekeeper, and creates the final ZIP, SHA-256 checksum, and build report in its **assets** subdirectory.  Credentials stay in your Keychain.  The parent directory retains the archive log and Apple’s result.  Signed builds contain time-dependent signatures and notarisation tickets.
-
-Bring the two assets directories to one checkout, then collect them:
-
-```sh
-python3 scripts/collect-release.py \
-  --universal build/release-universal/assets \
-  --modern build/release-modern/assets \
-  --output build/release-assets --require-notarised --tag v1.4.0
-```
-
-### One GitHub release
-
-The **Prepare a release** workflow builds and notarises both downloads on their respective Mac runners, then creates **one draft GitHub release** containing both ZIPs, their checksums, and build reports.  It resolves the selected tag to one commit before either build starts and checks that both packages match it.  It leaves publication to the maintainer.
-
-Once the workflow is on the default branch, create and push a tag matching the shared version, such as `v1.4.0`, then run **Prepare a release** with that existing tag.  The tagged commit must contain the two-build release tooling.  Configure these repository secrets first:
-
-| Secret | Value |
-|---|---|
-| `ALPHASYNC_CERTIFICATE_P12` | Base64-encoded Developer ID Application certificate and private key, exported as `.p12` |
-| `ALPHASYNC_CERTIFICATE_PASSWORD` | Password for that `.p12` file |
-| `ALPHASYNC_SIGNING_IDENTITY` | Full Developer ID Application certificate name |
-| `ALPHASYNC_TEAM_ID` | Apple developer team identifier |
-| `ALPHASYNC_APPLE_ID` | Apple account used for notarisation |
-| `ALPHASYNC_APP_PASSWORD` | Its app-specific password |
-
-See GitHub’s [certificate setup instructions](https://docs.github.com/en/actions/how-tos/deploy/deploy-to-third-party-platforms/sign-xcode-applications).  The workflow imports credentials into a temporary Keychain on each runner and removes it after the build.  Only its final job has permission to write a release.  Existing releases are not overwritten.
-
-Both downloads and their helpers share **version 1.4.0, build 140**, read from [Version.xcconfig](AlphaSync/Build/Version.xcconfig).  Increase the build number for each distributed revision and set the version before creating its release tag.  App Store distribution and sandboxing are outside the current scope.
+Both downloads and their helpers share **version 1.4.0, build 140**, read from [Version.xcconfig](AlphaSync/Build/Version.xcconfig).  Increase the build number for each distributed revision and set the version before creating its release tag.
 
 ## Hardware checks before a release
 
