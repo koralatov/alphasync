@@ -29,7 +29,6 @@
  *
  */
 
-#import <Carbon/Carbon.h>           // Required for AHLookupAnchor
 #import "ASPreferenceController.h"
 #import "ASApplicationContoller.h"
 
@@ -220,7 +219,7 @@
         if (bookName && CFGetTypeID(bookName) == CFStringGetTypeID())
         {
             // Display the help.
-            AHLookupAnchor((CFStringRef)bookName, kASPreferenceHelpAnchor);
+            [[NSHelpManager sharedHelpManager] openHelpAnchor:(NSString*)kASPreferenceHelpAnchor inBook:(NSString*)bookName];
         }
     }
 }
