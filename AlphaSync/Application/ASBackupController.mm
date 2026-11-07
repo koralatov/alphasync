@@ -112,6 +112,7 @@ using namespace ts;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [backupTimer invalidate];
     [backupItems release];
+    [backupReport release];
     [currentSessionPath release];
     [super dealloc];
 }
@@ -120,7 +121,7 @@ using namespace ts;
 {
     (void)notification;
     // The driver frees the device after this notification.  Stop before the next timer tick.
-    if (backupItems) [self stopBackup:@"Backup stopped because a NEO was disconnected."];
+    if (backupItems) [self stopBackup:@"Backup stopped because a NEO was disconnected." status:@"disconnected"];
 }
 
 /** Make a new device session path and create the necessary directories.
@@ -172,7 +173,7 @@ using namespace ts;
 
 /** Initialise a backup.
  */
-- (void)initBackup:(ASNode*)root
+- (BOOL)initBackup:(ASNode*)root
 {
     assert(!backupItems);
 
@@ -203,19 +204,38 @@ using namespace ts;
         }
     }
 
+    NSMutableArray* entries = [NSMutableArray arrayWithCapacity:[backupItems count]];
+    for (ASBackupItem* item in backupItems)
+        [entries addObject:@{@"device": [item deviceName] ?: @"", @"applet": [item appletName] ?: @"",
+                             @"file": [[item fileNode] displayName] ?: @""}];
+    NSString* folder = [[NSUserDefaults standardUserDefaults] stringForKey:kASPreferenceKeyBackupFolder];
+    NSError* error = nil;
+    backupReport = [[ASBackupReport alloc] initWithFolder:folder files:entries error:&error];
+    if (!backupReport)
+    {
+        [self stopBackup:[NSString stringWithFormat:@"Backup could not start: %@", [error localizedDescription]] status:@"failed"];
+        return NO;
+    }
+
     [outletFilesRemaining setStringValue:[NSString stringWithFormat:@"Backing up %ld items", (unsigned long)[backupItems count]]];
     [outletBackupItem setStringValue:@""];
     [outletProgressIndicator setDoubleValue:0.0];
     [outletProgressIndicator startAnimation:self];
     [outletStopDoneButton setTitle:@"Stop"];
     [outletStopDoneButton setKeyEquivalent:@"\033"];  // use escape to stop
+    return YES;
 }
 
 
 /** Stop the backup running.
  */
-- (void)stopBackup:(NSString*)message
+- (void)stopBackup:(NSString*)message status:(NSString*)status
 {
+    NSError* reportError = nil;
+    if (backupReport && ![backupReport finishWithStatus:status message:message error:&reportError])
+        message = [message stringByAppendingFormat:@"  The final report could not be saved: %@", [reportError localizedDescription]];
+    [backupReport release];
+    backupReport = nil;
     [backupItems release];
     backupItems = nil;
     nextBackupItem = 0;
@@ -243,7 +263,7 @@ using namespace ts;
     {
         [outletProgressIndicator setDoubleValue:100.0];
         NSString* message = failedFiles ? [NSString stringWithFormat:@"Backup finished with %lu failed files.", (unsigned long)failedFiles] : @"Backup complete";
-        [self stopBackup:message];
+        [self stopBackup:message status:@"complete"];
     }
     else
     {
@@ -255,22 +275,38 @@ using namespace ts;
         [outletFilesRemaining setStringValue:[NSString stringWithFormat:@"Backing up %d items",(int)([backupItems count] - nextBackupItem)]];
         [outletBackupItem setStringValue:[NSString stringWithFormat:@"%@: %@: %@", deviceName, appletName, [fileNode displayName]]];
 
+        NSString* savedPath = nil;
+        NSString* failure = nil;
         if ([backupItem newDevice]) [self makeNewDeviceSessionPath:(NSString*)deviceName];
         if (!currentSessionPath)
         {
             failedFiles++;
+            failure = @"Unable to create the backup folder.";
             NSLog(@"Unable to create backup folder for file %@/%@/%@", deviceName, appletName, [fileNode displayName]);
         }
         else
         {
             NSString* path = [currentSessionPath stringByAppendingPathComponent:[appletName stringByReplacingOccurrencesOfString:@"/" withString:@"_"]];
-            if (!aq_FileUtilitiesCreateDirectoriesForPath(path) || ![fileNode saveUnderPath:path])
+            if (aq_FileUtilitiesCreateDirectoriesForPath(path))
+            {
+                NSString* filename = [fileNode saveUnderPath:path error:&failure];
+                if (filename) savedPath = [path stringByAppendingPathComponent:filename];
+            }
+            else failure = @"Unable to create the applet backup folder.";
+            if (!savedPath)
             {
                 failedFiles++;
-                NSLog(@"Error backing up file %@/%@/%@", deviceName, appletName, [fileNode displayName]);
+                failure = failure ?: @"The file could not be exported.";
+                NSLog(@"Error backing up file %@/%@/%@: %@", deviceName, appletName, [fileNode displayName], failure);
             }
         }
 
+        NSError* reportError = nil;
+        if (![backupReport recordFileAtIndex:nextBackupItem savedPath:savedPath error:failure saveError:&reportError])
+        {
+            [self stopBackup:[NSString stringWithFormat:@"Backup stopped because its report could not be saved: %@", [reportError localizedDescription]] status:@"failed"];
+            return;
+        }
         bytesSoFar += static_cast<uint64_t>(MAX([fileNode fileSize], 0));
         nextBackupItem ++;
 
@@ -287,7 +323,7 @@ using namespace ts;
     if (backupTimer)
     {
         // Backup still running
-        [self stopBackup:@"Cancelled"];
+        [self stopBackup:@"Cancelled" status:@"cancelled"];
     }
     else
     {
@@ -306,7 +342,7 @@ using namespace ts;
     NSWindow* sheet = [self window];
     [window beginSheet:sheet completionHandler:nil];
 
-    [self initBackup:root];
+    if (![self initBackup:root]) return;
     backupTimer = [NSTimer scheduledTimerWithTimeInterval:0.01 target:self selector:@selector(backupOneItem:) userInfo:nil repeats:YES];
 }
 

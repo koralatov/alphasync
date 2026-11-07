@@ -514,7 +514,17 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
 
 - (NSString*)saveUnderPath:(NSString*)path
 {
-    if (![path isAbsolutePath]) return nil;
+    return [self saveUnderPath:path error:NULL];
+}
+
+- (NSString*)saveUnderPath:(NSString*)path error:(NSString**)errorMessage
+{
+    if (errorMessage) *errorMessage = nil;
+    if (![path isAbsolutePath])
+    {
+        if (errorMessage) *errorMessage = @"The destination path is not absolute.";
+        return nil;
+    }
     id accessDelegate = [self delegate];
     BOOL hasDelegate = [accessDelegate conformsToProtocol:@protocol(ASDeviceAccessProtocol)];
     if (hasDelegate && ![accessDelegate deviceWillSave:self to:path sender:self]) return nil;
@@ -541,6 +551,7 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
         result = aq_WriteUniqueFile(path, basename, extension, data, &writeError);
         if (!result) error = [writeError localizedDescription] ?: @"Unable to finish writing the file.";
     }
+    if (errorMessage) *errorMessage = error;
     if (hasDelegate) [accessDelegate deviceDidSave:self error:error sender:self];
     return result;
 }

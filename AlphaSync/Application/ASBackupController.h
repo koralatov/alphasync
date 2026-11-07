@@ -30,6 +30,7 @@
  */
 #import <Cocoa/Cocoa.h>
 #import "ASNode.h"
+#import "ASBackupReport.h"
 
 @interface ASBackupController : NSWindowController
 {
@@ -40,6 +41,7 @@
 
     NSString* currentSessionPath;
     NSMutableArray* backupItems;
+    ASBackupReport* backupReport;
     NSUInteger nextBackupItem;
     uint64_t bytesToBackup;
     uint64_t bytesSoFar;
