@@ -26,12 +26,12 @@
 - (NSInteger)outlineView:(NSOutlineView*)view numberOfChildrenOfItem:(id)item
 {
     (void)view;
-    return [(item ? [item valueForKey:@"children"] : _roots) count];
+    return (NSInteger)[(item ? [item valueForKey:@"children"] : _roots) count];
 }
 - (id)outlineView:(NSOutlineView*)view child:(NSInteger)index ofItem:(id)item
 {
     (void)view;
-    return [(item ? [item valueForKey:@"children"] : _roots) objectAtIndex:index];
+    return [(item ? [item valueForKey:@"children"] : _roots) objectAtIndex:(NSUInteger)index];
 }
 - (BOOL)outlineView:(NSOutlineView*)view isItemExpandable:(id)item
 {
@@ -127,8 +127,9 @@ static void checkAppearances(id controller, NSWindowController* backup, NSString
                      [[fileCell textField] isMemberOfClass:[NSTextField class]], @"The file row is not made of standard AppKit views.");
     requireInterface([[fileCell textField] isEditable] && ![[deviceCell textField] isEditable], @"The wrong rows allow renaming.");
     id<NSTextFieldDelegate> editing = controller;
-    requireInterface([editing control:[fileCell textField] textShouldBeginEditing:nil] &&
-                     ![editing control:[deviceCell textField] textShouldBeginEditing:nil], @"Row editing permissions changed.");
+    NSTextView* editor = [[[NSTextView alloc] initWithFrame:NSZeroRect] autorelease];
+    requireInterface([editing control:[fileCell textField] textShouldBeginEditing:editor] &&
+                     ![editing control:[deviceCell textField] textShouldBeginEditing:editor], @"Row editing permissions changed.");
     [[fileCell textField] setStringValue:@"Cancelled name"];
     [editing controlTextDidEndEditing:[NSNotification notificationWithName:NSControlTextDidEndEditingNotification object:[fileCell textField]
                                                                 userInfo:@{@"NSTextMovement": @(NSCancelTextMovement)}]];
@@ -176,7 +177,7 @@ static void checkAppearances(id controller, NSWindowController* backup, NSString
             for (NSUInteger panel = 0; panel < 3; ++panel)
             {
                 BOOL show = panel == index;
-                [invocation setArgument:&show atIndex:panel + 2];
+                [invocation setArgument:&show atIndex:(NSInteger)panel + 2];
             }
             [invocation invokeWithTarget:inspector];
             captureWindow([inspector window], directory, [NSString stringWithFormat:@"%@-inspector-%@", mode, panels[index]]);
