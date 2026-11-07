@@ -238,6 +238,7 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
         NSImage* fileIcon;
         delete fileData;
         fileData = nullptr;
+        fileIsSynchronised = NO;
 
         switch (applet->appletID())
         {
@@ -683,7 +684,7 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
     if (shouldProceed)
     {
         NSString* error = nil;
-        [self setFileData:@"" error:&error];
+        didDeleteFile = [self setFileData:@"" error:&error];
         [self reload];
 
         if ([accessDelegate conformsToProtocol:@protocol(ASDeviceAccessProtocol)])
