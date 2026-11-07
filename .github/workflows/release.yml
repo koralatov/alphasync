@@ -32,6 +32,16 @@ jobs:
           commit=$(gh api "repos/$GITHUB_REPOSITORY/commits/$RELEASE_TAG" --jq .sha)
           [[ "$commit" =~ ^[0-9a-f]{40}$ ]]
           printf 'commit=%s\n' "$commit" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ steps.source.outputs.commit }}
+          persist-credentials: false
+      - name: Check the version before signing
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          version=$(sed -n 's/^MARKETING_VERSION *= *//p' AlphaSync/Build/Version.xcconfig)
+          test "$RELEASE_TAG" = "v$version"
 
   sign:
     name: Sign and notarise ${{ matrix.variant }}
