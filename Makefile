@@ -60,7 +60,11 @@ QUEUE_SOURCES := $(addprefix AlphaSync/Application/,ASDeviceController.mm ASDevi
 test-queue: build/queue-tests
 	./build/queue-tests
 
-build/queue-tests: tests/queue-tests.mm $(QUEUE_SOURCES) $(CORE_SOURCES) $(CORE_HEADERS) AlphaSync/Driver/ASDeviceFactory.cc AlphaSync/Library/AQTreeNode.m AlphaSync/Library/AQFileUtilities.m Makefile
+build/device-factory.o: AlphaSync/Driver/ASDeviceFactory.cc $(CORE_HEADERS) Makefile
 	@mkdir -p build
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -fblocks -x objective-c++ tests/queue-tests.mm $(QUEUE_SOURCES) $(CORE_SOURCES) AlphaSync/Driver/ASDeviceFactory.cc AlphaSync/Library/AQTreeNode.m AlphaSync/Library/AQFileUtilities.m -framework Cocoa -framework IOKit -framework ServiceManagement -framework UniformTypeIdentifiers -o $@
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+
+build/queue-tests: tests/queue-tests.mm $(QUEUE_SOURCES) $(CORE_SOURCES) $(CORE_HEADERS) build/device-factory.o AlphaSync/Library/AQTreeNode.m AlphaSync/Library/AQFileUtilities.m Makefile
+	@mkdir -p build
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -fblocks -x objective-c++ tests/queue-tests.mm $(QUEUE_SOURCES) $(CORE_SOURCES) AlphaSync/Library/AQTreeNode.m AlphaSync/Library/AQFileUtilities.m -x none build/device-factory.o -framework Cocoa -framework IOKit -framework ServiceManagement -framework UniformTypeIdentifiers -o $@
 endif
