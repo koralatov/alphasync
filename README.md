@@ -1,47 +1,57 @@
 # AlphaSync
 
-AlphaSync is a native Mac file manager for AlphaSmart NEO devices.  It copies text files in both directions, backs up named files and file spaces, and can open automatically when a NEO is connected.
+AlphaSync copies text files between your Mac and an AlphaSmart NEO.  It can also back up the files on your NEO and open automatically when you connect it.
 
-Each release provides two downloads built from the same source and version:
+## Download
 
-| Download | Supported macOS | Processors |
+Open the [Releases page](https://github.com/koralatov/alphasync/releases) and choose the download for your Mac:
+
+| Download | macOS version | Mac |
 |---|---|---|
-| Universal | 11 through 26 | Intel and Apple Silicon |
+| Universal | 11 through 26 | Intel or Apple Silicon |
 | Modern | 27 and later | Apple Silicon |
 
-## Download and run on a Mac
+You can find your macOS version and your Mac’s chip or processor in **Apple menu → About This Mac**.
 
-Choose **Universal** for macOS 11 through 26.  Choose **Modern** for macOS 27 and later on Apple Silicon.  You can check your macOS version and processor in **Apple menu → About This Mac**.
+If the download you need is not available yet, see [development downloads](TECHNICAL.md#development-downloads).
 
-### Download
+## Install
 
-Published downloads appear on the [Releases page](https://github.com/koralatov/alphasync/releases).  For development downloads, see the [technical guide](TECHNICAL.md#development-downloads).
+1. Double-click the downloaded ZIP file to unpack it.
+2. Quit AlphaSync if it is already running.
+3. Drag the **AlphaSync** app into your **Applications** folder.  If you are updating an older copy, replace it when Finder asks.
+4. Open **Applications**, then double-click **AlphaSync**.
 
-### Install and open
+## If your Mac blocks AlphaSync
 
-1. Quit any copy of AlphaSync that is already running.
-2. Drag the extracted **AlphaSync.app** into **Applications**.  Both versions use the same preferences and bundle identifiers, so replace the existing app when changing versions.
-3. Open **Applications**, then double-click **AlphaSync**.  If macOS blocks the first launch, follow the steps below.
-4. Connect your NEO with a USB cable.  Its files appear in the main window.  Drag files to Finder to copy them to your Mac, or drag text files into AlphaSync to send them to the NEO.
+Your Mac may say that it cannot verify AlphaSync.  Dismiss the warning, then open the settings for your macOS version:
 
-Keep **AlphaSync.app** intact.  Its automatic-launch helper is already inside the app.  Move it to Applications before enabling automatic launching in Preferences.
-
-### If macOS blocks the first launch
-
-For an unidentified-developer or verification warning, dismiss the warning and open the settings for your macOS version:
-
-| macOS | Settings |
+| macOS | Where to go |
 |---|---|
 | 11 and 12 | **System Preferences → Security & Privacy → General** |
 | 13 and later | **System Settings → Privacy & Security**, then scroll to **Security** |
 
-Find the message about AlphaSync and choose **Open Anyway**.  If an **Open** button appears first, click it to reach **Open Anyway**.  Follow the confirmation prompts, entering your Mac login password or using Touch ID if asked.
+Find the message about AlphaSync and click **Open Anyway**.  If you see an **Open** button first, click it to reach **Open Anyway**.  Follow the prompts, using your Mac login password or Touch ID if asked.
 
-macOS saves an exception for this copy of the app.  Later launches can use the usual double-click.  Apple’s [instructions for opening downloaded apps](https://support.apple.com/en-gb/102445) explain this approval process.
+Your Mac remembers that you allowed this copy of AlphaSync.  You can then open it by double-clicking it as usual.  Apple has [more help with opening downloaded apps](https://support.apple.com/en-gb/102445).
 
-## Technical guide
+## Use AlphaSync
 
-For development downloads, build instructions, tests, file formats, and implementation details, see the [technical guide](TECHNICAL.md).
+Open AlphaSync and connect your NEO with a USB cable.  Your NEO’s files appear in the window.
+
+- **Copy files to your Mac:** drag them from AlphaSync into a Finder folder.
+- **Copy text files to your NEO:** drag them from Finder into AlphaSync.
+- **Back up your files:** click **Backup**.  You can choose where backups are saved in **Preferences**.
+
+Back up the files on your NEO before sending new files to it.
+
+To have AlphaSync open whenever you connect your NEO, turn on automatic opening in **Preferences**.  Keep the app in Applications, and follow any approval prompts shown in Preferences.
+
+AlphaSync follows your Mac’s Light or Dark appearance automatically.
+
+## Advanced users
+
+For development downloads, build instructions, tests, supported text formats, and implementation notes, see the [technical guide](TECHNICAL.md).
 
 ## Licence
 

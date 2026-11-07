@@ -98,7 +98,7 @@ This check uses cached sample rows without connecting to a NEO or changing login
 
 GitHub Actions builds the universal app on Intel and Apple Silicon runners with macOS 15 and 26.  A required macOS 27 Apple Silicon job builds and launches the modern app.  Both profiles receive Debug, Release, archive, dependency, signature, and window checks.  These checks run on the runners’ macOS versions, so they do not establish that every feature works on macOS 11.
 
-A final job collects the two canonical development downloads into the **AlphaSync-release-<source commit>** artifact, with checksums, build reports, and shared release notes.  It rejects missing packages and mismatched versions, build numbers, source commits, profiles, and signing states.  The collector uses Python 3’s standard library; Python is not required to run AlphaSync.
+A final job collects the two canonical development downloads into the `AlphaSync-release-<source commit>` artifact, with checksums, build reports, and shared release notes.  It rejects missing packages and mismatched versions, build numbers, source commits, profiles, and signing states.  The collector uses Python 3’s standard library; Python is not required to run AlphaSync.
 
 A separate advisory job checks the modern app with the runner’s default Xcode.  It uploads no app.  This reveals changes needed for newer SDKs while release builds retain their pinned compilers.
 
