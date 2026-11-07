@@ -191,6 +191,7 @@
 		E41551F125E170A143893D41 /* ASBackupReport.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ASBackupReport.mm; sourceTree = "<group>"; };
 		E7E3978206CD4AB3E5F1B4CD /* Universal.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Universal.xcconfig; sourceTree = "<group>"; };
 		D7B4C96AC8AF0BF3C8619F8B /* Modern.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Modern.xcconfig; sourceTree = "<group>"; };
+		85CDB32AAC2D3B860B22908E /* Version.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Version.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -420,6 +421,7 @@
 		34A6F206D8A48389402ABBA3 /* Build */ = {
 			isa = PBXGroup;
 			children = (
+				85CDB32AAC2D3B860B22908E /* Version.xcconfig */,
 				E7E3978206CD4AB3E5F1B4CD /* Universal.xcconfig */,
 				D7B4C96AC8AF0BF3C8619F8B /* Modern.xcconfig */,
 			);
@@ -879,8 +881,6 @@
 				GCC_WARN_UNUSED_PARAMETER = YES;
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MARKETING_VERSION = 1.4.0;
-				CURRENT_PROJECT_VERSION = 140;
 				STRIP_INSTALLED_PRODUCT = NO;
 			};
 			name = Debug;
@@ -924,8 +924,6 @@
 				GCC_WARN_UNUSED_PARAMETER = YES;
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MARKETING_VERSION = 1.4.0;
-				CURRENT_PROJECT_VERSION = 140;
 				STRIP_INSTALLED_PRODUCT = NO;
 			};
 			name = DebugModern;
@@ -969,8 +967,6 @@
 				GCC_WARN_UNUSED_PARAMETER = YES;
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MARKETING_VERSION = 1.4.0;
-				CURRENT_PROJECT_VERSION = 140;
 				STRIP_INSTALLED_PRODUCT = NO;
 			};
 			name = Release;
@@ -1014,8 +1010,6 @@
 				GCC_WARN_UNUSED_PARAMETER = YES;
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MARKETING_VERSION = 1.4.0;
-				CURRENT_PROJECT_VERSION = 140;
 				STRIP_INSTALLED_PRODUCT = NO;
 			};
 			name = ReleaseModern;
