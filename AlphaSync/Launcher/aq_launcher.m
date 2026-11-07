@@ -514,44 +514,55 @@ static Boolean setLegacyLoginItem(Boolean enabled)
 }
 #pragma clang diagnostic pop
 
-int aq_LauncherIsInstalled(AQLauncherRef lh)
+AQLauncherStatus aq_LauncherGetStatus(AQLauncherRef lh)
 {
+    if (!lh || !lh->m_path) return AQLauncherStatusUnavailable;
     if (@available(macOS 13.0, *))
     {
         SMAppService* service = [SMAppService loginItemServiceWithIdentifier:(NSString*)kAQLauncherBundleID];
-        return service.status == SMAppServiceStatusEnabled || service.status == SMAppServiceStatusRequiresApproval;
+        switch (service.status)
+        {
+            case SMAppServiceStatusNotRegistered: return AQLauncherStatusDisabled;
+            case SMAppServiceStatusEnabled: return AQLauncherStatusEnabled;
+            case SMAppServiceStatusRequiresApproval: return AQLauncherStatusRequiresApproval;
+            case SMAppServiceStatusNotFound: return AQLauncherStatusUnavailable;
+            default: return AQLauncherStatusUnknown;
+        }
     }
-    return aq_launcherServerConnect(lh);
+    return aq_launcherServerConnect(lh) ? AQLauncherStatusEnabled : AQLauncherStatusUnknown;
 }
 
-int aq_LauncherInstall(AQLauncherRef lh)
+static void copyLauncherError(CFStringRef* message, NSString* description)
 {
-    if (!lh->m_path) return 0;
+    if (message) *message = CFRetain((CFStringRef)description);
+}
+
+int aq_LauncherInstall(AQLauncherRef lh, CFStringRef* errorMessage)
+{
+    if (errorMessage) *errorMessage = NULL;
+    if (!lh || !lh->m_path)
+    {
+        copyLauncherError(errorMessage, @"The bundled launcher is missing.");
+        return 0;
+    }
     aq_LauncherFlushLaunchItems(lh);
     if (@available(macOS 13.0, *))
     {
         SMAppService* service = [SMAppService loginItemServiceWithIdentifier:(NSString*)kAQLauncherBundleID];
-        if (service.status == SMAppServiceStatusEnabled) return 1;
-        if (service.status == SMAppServiceStatusRequiresApproval)
-        {
-            NSLog(@"Allow AlphaSync’s launcher in System Settings to enable automatic launching.");
-            return 0;
-        }
+        if (service.status == SMAppServiceStatusEnabled || service.status == SMAppServiceStatusRequiresApproval) return 1;
         NSError* error = nil;
-        if (![service registerAndReturnError:&error])
-        {
-            NSLog(@"Unable to register AlphaSync’s launcher: %@", error);
-            return 0;
-        }
-        return 1;
+        if ([service registerAndReturnError:&error]) return 1;
+        copyLauncherError(errorMessage, [error localizedDescription] ?: @"macOS could not register the launcher.");
+        return 0;
     }
-    return setLegacyLoginItem(true);
+    if (setLegacyLoginItem(true)) return 1;
+    copyLauncherError(errorMessage, @"macOS could not enable the launcher at login.");
+    return 0;
 }
 
-void aq_LauncherUninstall(AQLauncherRef lh)
+int aq_LauncherUninstall(AQLauncherRef lh, CFStringRef* errorMessage)
 {
-    aq_launcherServerQuit(lh);
-    aq_launcherServerDisconnect(lh);
+    if (errorMessage) *errorMessage = NULL;
     if (@available(macOS 13.0, *))
     {
         SMAppService* service = [SMAppService loginItemServiceWithIdentifier:(NSString*)kAQLauncherBundleID];
@@ -559,13 +570,20 @@ void aq_LauncherUninstall(AQLauncherRef lh)
         {
             NSError* error = nil;
             if (![service unregisterAndReturnError:&error])
-                NSLog(@"Unable to unregister AlphaSync’s launcher: %@", error);
+            {
+                copyLauncherError(errorMessage, [error localizedDescription] ?: @"macOS could not unregister the launcher.");
+                return 0;
+            }
         }
     }
-    else
+    else if (!setLegacyLoginItem(false))
     {
-        setLegacyLoginItem(false);
+        copyLauncherError(errorMessage, @"macOS could not disable the launcher at login.");
+        return 0;
     }
+    aq_launcherServerQuit(lh);
+    aq_launcherServerDisconnect(lh);
+    return 1;
 }
 
 

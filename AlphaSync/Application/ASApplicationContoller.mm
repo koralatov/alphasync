@@ -124,6 +124,7 @@ static const NSInteger kMenuItemTagBackup   = 100;
     [deviceController release];
     [statusDisplayTimer invalidate];
     [launcherInstallPath release];
+    [automaticLaunchError release];
     [super dealloc];
 }
 
@@ -936,6 +937,8 @@ static const NSInteger kMenuItemTagBackup   = 100;
     if (!launcherInstallPath) launcherInstallPath = [[self launcherInstallPath] retain];
     if (!launcherInstallPath) return;
 
+    [automaticLaunchError release];
+    automaticLaunchError = nil;
     AQLauncherRef launcher = aq_LauncherOpen((CFStringRef)launcherInstallPath);
     if (launcher)
     {
@@ -945,24 +948,59 @@ static const NSInteger kMenuItemTagBackup   = 100;
             aq_LauncherClearLaunchItems(launcher);
             aq_LauncherAddLaunchItem(launcher, (CFStringRef)appID, 0x081e, 0xbd04);    // REVIEW: symbolic constants for the USB IDs and remove
             aq_LauncherAddLaunchItem(launcher, (CFStringRef)appID, 0x081e, 0xbd01);    // REVIEW: duplication with the USB device factory
-            if (!aq_LauncherInstall(launcher))
+            CFStringRef errorMessage = NULL;
+            if (!aq_LauncherInstall(launcher, &errorMessage))
             {
-                [self setStatusError:@"Automatic launching needs permission in System Settings."];
+                automaticLaunchError = [(NSString*)errorMessage copy];
+                if (errorMessage) CFRelease(errorMessage);
+                [self setStatusError:automaticLaunchError];
                 aq_LauncherClose(launcher);
                 return;
             }
 
+            if (aq_LauncherGetStatus(launcher) == AQLauncherStatusRequiresApproval)
+            {
+                [self setStatusError:@"Automatic launching is awaiting approval in System Settings."];
+                aq_LauncherClose(launcher);
+                return;
+            }
             if (secondsToWait <= 0.0) aq_LauncherStart(launcher);
             else aq_LauncherPause(launcher, secondsToWait);
         }
         else
         {
             aq_LauncherStop(launcher);          // stop existing application launching
-            aq_LauncherUninstall(launcher);     // remove from login items
+            CFStringRef errorMessage = NULL;
+            if (!aq_LauncherUninstall(launcher, &errorMessage))
+            {
+                automaticLaunchError = [(NSString*)errorMessage copy];
+                if (errorMessage) CFRelease(errorMessage);
+                [self setStatusError:automaticLaunchError];
+            }
         }
 
         aq_LauncherClose(launcher);
     }
+}
+
+
+- (NSString*)automaticLaunchStatus
+{
+    if (automaticLaunchError) return [@"Automatic launching failed: " stringByAppendingString:automaticLaunchError];
+    AQLauncherRef launcher = aq_LauncherOpen((CFStringRef)[self launcherInstallPath]);
+    AQLauncherStatus status = aq_LauncherGetStatus(launcher);
+    aq_LauncherClose(launcher);
+    switch (status)
+    {
+        case AQLauncherStatusEnabled: return @"Automatic launching is enabled.";
+        case AQLauncherStatusRequiresApproval: return @"Automatic launching is awaiting approval in System Settings.";
+        case AQLauncherStatusUnavailable: return @"The bundled launcher could not be found.  Keep the app bundle intact.";
+        case AQLauncherStatusDisabled: return @"Automatic launching is off.";
+        case AQLauncherStatusUnknown:
+            return [[NSUserDefaults standardUserDefaults] boolForKey:kASPreferenceKeyAutoRun] ?
+                @"Automatic launching is selected.  The launcher is not running yet." : @"Automatic launching is off.";
+    }
+    return @"The automatic-launch status is unavailable.";
 }
 
 
@@ -995,7 +1033,7 @@ static const NSInteger kMenuItemTagBackup   = 100;
     AQLauncherRef launcher = aq_LauncherOpen((CFStringRef)launcherPath);
     if (launcher)
     {
-        aq_LauncherUninstall(launcher);
+        aq_LauncherUninstall(launcher, NULL);
         aq_LauncherClose(launcher);
     }
 

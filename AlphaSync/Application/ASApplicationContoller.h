@@ -61,6 +61,7 @@
     NSImage* iconToolbarDeleteFiles;
 
     NSString* launcherInstallPath;
+    NSString* automaticLaunchError;
 
     ASPreferenceController* preferenceController;
     ASBackupController* backupController;
@@ -86,5 +87,6 @@
 - (IBAction)reloadDeviceData:(id)sender;
 
 - (void)setupAutoRun:(float)secondsToWait;
+- (NSString*)automaticLaunchStatus;
 
 @end
