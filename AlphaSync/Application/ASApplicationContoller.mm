@@ -163,7 +163,7 @@ static const NSInteger kMenuItemTagBackup   = 100;
     [tc setDataCell:fs];
 
     // Setup drag and drop.
-    [outletFileView registerForDraggedTypes:[NSArray arrayWithObjects:NSPasteboardTypeString, NSFilenamesPboardType, nil]];
+    [outletFileView registerForDraggedTypes:[NSArray arrayWithObjects:NSPasteboardTypeString, NSPasteboardTypeFileURL, nil]];
     [outletFileView setDraggingSourceOperationMask:NSDragOperationEvery forLocal:YES];
     [outletFileView setDraggingSourceOperationMask:NSDragOperationEvery forLocal:NO];
     [outletFileView setAutoresizesOutlineColumn:NO];

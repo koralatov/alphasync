@@ -34,7 +34,6 @@
 @interface ASNodeDataSource : NSObject <NSOutlineViewDataSource>
 {
     ASDeviceController* deviceController;
-    NSArray* draggedNodes;
     NSArray* openItems;
 }
 
