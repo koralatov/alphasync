@@ -100,6 +100,81 @@ static void captureWindow(NSWindow* window, NSString* directory, NSString* name)
     requireInterface([png writeToFile:path options:NSDataWritingAtomic error:&error], [error localizedDescription] ?: @"A screenshot could not be saved.");
 }
 
+static void checkPreferenceLayout(id preferences)
+{
+    NSView* content = [[preferences window] contentView];
+    [content layoutSubtreeIfNeeded];
+    for (NSString* key in @[@"outletFilterOption", @"outputFormatField", @"backupFolderPath", @"chooseFolderButton",
+                             @"outletAutoRun", @"automaticLaunchStatusField", @"loginItemsButton"])
+    {
+        NSView* view = [preferences valueForKey:key];
+        if ([view isHiddenOrHasHiddenAncestor]) continue;
+        NSRect frame = [view convertRect:[view bounds] toView:content];
+        requireInterface(NSContainsRect(NSInsetRect([content bounds], -1, -1), frame),
+                         [NSString stringWithFormat:@"The Preferences control %@ is outside the window.", key]);
+    }
+    NSTextField* status = [preferences valueForKey:@"automaticLaunchStatusField"];
+    NSSize needed = [[status cell] cellSizeForBounds:NSMakeRect(0, 0, NSWidth([status bounds]), 10000)];
+    requireInterface(NSHeight([status bounds]) >= needed.height - 1, @"The automatic-launch status is clipped.");
+}
+
+static void checkPreferences(id controller)
+{
+    id preferences = [controller valueForKey:@"preferenceController"];
+    NSWindow* window = [preferences window];
+    NSPopUpButton* filter = [preferences valueForKey:@"outletFilterOption"];
+    NSPathControl* path = [preferences valueForKey:@"backupFolderPath"];
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    requireInterface([window isMemberOfClass:[NSWindow class]], @"Preferences is not a standard Mac window.");
+    requireInterface([filter selectedTag] == [defaults integerForKey:@"FilterMode"], @"Preferences did not load the saved file filter.");
+    requireInterface([[[path URL] path] isEqualToString:[defaults stringForKey:@"BackupFolder"]], @"Preferences did not load the saved backup folder.");
+    requireInterface([window initialFirstResponder] == filter, @"The initial keyboard focus is not the file filter.");
+    if ([NSApp isFullKeyboardAccessEnabled])
+        requireInterface([window makeFirstResponder:filter], @"The file filter cannot receive keyboard focus.");
+    checkPreferenceLayout(preferences);
+
+    NSURL* originalFolder = [[path URL] retain];
+    [[preferences valueForKey:@"chooseFolderButton"] performClick:nil];
+    NSOpenPanel* panel = (NSOpenPanel*)[window attachedSheet];
+    requireInterface([panel isKindOfClass:[NSOpenPanel class]] && [panel canChooseDirectories] && ![panel canChooseFiles],
+                     @"The backup folder chooser is not a native folder sheet.");
+    [panel cancel:nil];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.4]];
+    requireInterface([window attachedSheet] == nil && [[path URL] isEqual:originalFolder] &&
+                     [[defaults stringForKey:@"BackupFolder"] isEqualToString:[originalFolder path]], @"Cancelling the folder chooser changed the backup folder.");
+    [originalFolder release];
+    [preferences close];
+    [preferences showWindow:nil];
+    requireInterface([preferences window] == window && [filter selectedTag] == [defaults integerForKey:@"FilterMode"],
+                     @"Closing and reopening Preferences lost its settings.");
+}
+
+static void capturePreferenceStatus(id controller, NSString* directory, NSString* mode)
+{
+    id preferences = [controller valueForKey:@"preferenceController"];
+    NSPathControl* path = [preferences valueForKey:@"backupFolderPath"];
+    NSURL* originalFolder = [[path URL] retain];
+    id originalError = [[controller valueForKey:@"automaticLaunchError"] retain];
+    @try
+    {
+        // Display samples only.  Do not alter saved preferences or login-item registration.
+        [path setURL:[NSURL fileURLWithPath:@"/Users/Example/Documents/Writing and notes/AlphaSmart NEO backups/An unusually long backup folder name" isDirectory:YES]];
+        [controller setValue:@"The system could not register the automatic-launch helper.  Check the app’s location and permissions, then try again.  If approval is needed, open Login Items Settings and allow AlphaSync to run in the background."
+                      forKey:@"automaticLaunchError"];
+        [preferences performSelector:NSSelectorFromString(@"refreshAutomaticLaunchStatus:") withObject:nil];
+        checkPreferenceLayout(preferences);
+        captureWindow([preferences window], directory, [mode stringByAppendingString:@"-preferences-status"]);
+    }
+    @finally
+    {
+        [path setURL:originalFolder];
+        [controller setValue:originalError forKey:@"automaticLaunchError"];
+        [preferences performSelector:NSSelectorFromString(@"refreshAutomaticLaunchStatus:") withObject:nil];
+        [originalFolder release];
+        [originalError release];
+    }
+}
+
 static void checkAppearances(id controller, NSWindowController* backup, NSString* directory)
 {
     requireInterface([NSApp appearance] == nil, @"The app overrides the system appearance.");
@@ -180,6 +255,7 @@ static void checkAppearances(id controller, NSWindowController* backup, NSString
         [outline selectRowIndexes:[NSIndexSet indexSetWithIndex:1] byExtendingSelection:NO];
         captureWindow(main, directory, [mode stringByAppendingString:@"-selection"]);
         [outline deselectAll:nil];
+        capturePreferenceStatus(controller, directory, mode);
 
         NSTextField* preview = [inspector valueForKey:@"outletPreviewAsText"];
         [preview setStringValue:@"A text preview with £, café, and curly quotes: ‘Hello’.\nThe same native field follows each appearance change."];
@@ -227,6 +303,7 @@ static int checkInterface(void)
             NSWindowController* windowController = [controller valueForKey:key];
             if (![windowController window]) return 1;
         }
+        checkPreferences(controller);
         NSWindowController* backup = [[NSClassFromString(@"ASBackupController") alloc] init];
         BOOL loaded = [backup window] != nil;
         NSArray* arguments = [[NSProcessInfo processInfo] arguments];
