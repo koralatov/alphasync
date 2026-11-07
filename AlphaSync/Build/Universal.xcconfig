@@ -1,0 +1,3 @@
+// One app for Intel and Apple Silicon on macOS 11 through 26.
+ARCHS = x86_64 arm64
+MACOSX_DEPLOYMENT_TARGET = 11.0
