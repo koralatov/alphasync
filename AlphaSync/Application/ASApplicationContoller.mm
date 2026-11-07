@@ -989,10 +989,9 @@ static const NSInteger kMenuItemTagBackup   = 100;
  */
 - (void)setupAutoRun:(float)secondsToWait
 {
+    if (!launcherInstallPath) launcherInstallPath = [[self launcherInstallPath] retain];
     if ([[[NSProcessInfo processInfo] arguments] containsObject:@"--smoke-test"]) return;
     BOOL shouldAutoRun = [[NSUserDefaults standardUserDefaults] boolForKey:kASPreferenceKeyAutoRun];
-
-    if (!launcherInstallPath) launcherInstallPath = [[self launcherInstallPath] retain];
     if (!launcherInstallPath) return;
 
     [automaticLaunchError release];

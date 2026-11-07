@@ -141,6 +141,9 @@ static void checkAppearances(id controller, NSWindowController* backup, NSString
     NSArray* appearances = @[NSAppearanceNameAqua, NSAppearanceNameDarkAqua, NSAppearanceNameAqua];
     for (NSUInteger pass = 0; pass < [appearances count]; ++pass)
     {
+        [[inspector valueForKey:@"outletShowPreviewDisclosure"] setState:NSControlStateValueOff];
+        [[inspector valueForKey:@"outletShowDetailDisclosure"] setState:NSControlStateValueOff];
+        [inspector performSelector:NSSelectorFromString(@"actionPreviewDisclosure:") withObject:nil];
         NSString* appearanceName = appearances[pass];
         NSAppearance* appearance = [NSAppearance appearanceNamed:appearanceName];
         // Only the test sets an appearance.  Production windows inherit macOS settings.
