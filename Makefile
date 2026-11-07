@@ -2,7 +2,7 @@ CXX ?= c++
 CPPFLAGS += -IAlphaSync/Driver -IAlphaSync/Library
 CXXFLAGS ?= -std=c++17 -Wall -Wextra -Wpedantic -Wno-unknown-pragmas -g
 
-CORE_SOURCES := $(filter-out AlphaSync/Driver/ASDeviceFactory.cc,$(wildcard AlphaSync/Driver/*.cc)) AlphaSync/Library/AQContainer.cc
+CORE_SOURCES := $(filter-out AlphaSync/Driver/ASDeviceFactory.cc,$(wildcard AlphaSync/Driver/*.cc))
 CORE_HEADERS := $(wildcard AlphaSync/Driver/*.h AlphaSync/Library/*.h)
 TEST_SOURCES := $(wildcard tests/*.cc)
 

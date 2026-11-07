@@ -46,12 +46,7 @@ namespace ts
      */
     void ASDevice::clearEnumeratedApplets()
     {
-        for (unsigned i = 0; i < m_applets.count(); i++)
-        {
-            delete m_applets.itemAtIndex(i);
-        }
-
-        m_applets.removeAllItems();
+        m_applets.clear();
     }
 
 
@@ -63,7 +58,7 @@ namespace ts
      */
     void ASDevice::initialise()
     {
-        assert(0 == m_applets.count());
+        assert(m_applets.empty());
 
         bool result = dialogueStart();
         if (!result) return;
@@ -85,9 +80,9 @@ namespace ts
              */
             for (unsigned i = 0; i < headerCount; i++)
             {
-                ASApplet* applet = new ASApplet;
+                auto applet = std::make_unique<ASApplet>();
                 applet->loadHeader(&buffer[i * kASAppletHeaderSize]);
-                m_applets.appendItem(applet);
+                m_applets.push_back(std::move(applet));
             }
 
             appletCount += headerCount;
@@ -419,7 +414,7 @@ namespace ts
      */
     const ASApplet* ASDevice::appletAtIndex(int appletIndex)
     {
-        return m_applets.itemAtIndex((unsigned)appletIndex);
+        return appletIndex >= 0 && static_cast<size_t>(appletIndex) < m_applets.size() ? m_applets[appletIndex].get() : nullptr;
     }
 
 
@@ -427,12 +422,9 @@ namespace ts
      */
     const ASApplet* ASDevice::appletForID(ASAppletID appletID)
     {
-        int index = 0;
-        const ASApplet* applet;
-        while ((applet = m_applets.itemAtIndex((unsigned)index)))
+        for (const auto& applet : m_applets)
         {
-            if (applet->appletID() == appletID) return applet;
-            ++ index;
+            if (applet->appletID() == appletID) return applet.get();
         }
         return 0;
     }

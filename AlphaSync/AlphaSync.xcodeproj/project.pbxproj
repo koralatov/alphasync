@@ -53,7 +53,6 @@
 		A99A545E0F0D39E400BC68F1 /* ASNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = A99A544E0F0D39E400BC68F1 /* ASNode.mm */; };
 		A99A545F0F0D39E400BC68F1 /* ASNodeDataSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = A99A54500F0D39E400BC68F1 /* ASNodeDataSource.mm */; };
 		A99A54600F0D39E400BC68F1 /* ASPreferenceController.mm in Sources */ = {isa = PBXBuildFile; fileRef = A99A54520F0D39E400BC68F1 /* ASPreferenceController.mm */; };
-		A99A54630F0D39F400BC68F1 /* AQContainer.cc in Sources */ = {isa = PBXBuildFile; fileRef = A99A54610F0D39F400BC68F1 /* AQContainer.cc */; };
 		A99A54750F0D39FF00BC68F1 /* ASAlphaWordFile.cc in Sources */ = {isa = PBXBuildFile; fileRef = A99A54640F0D39FF00BC68F1 /* ASAlphaWordFile.cc */; };
 		A99A54760F0D39FF00BC68F1 /* ASApplet.cc in Sources */ = {isa = PBXBuildFile; fileRef = A99A54660F0D39FF00BC68F1 /* ASApplet.cc */; };
 		A99A54770F0D39FF00BC68F1 /* ASDevice.cc in Sources */ = {isa = PBXBuildFile; fileRef = A99A54690F0D39FF00BC68F1 /* ASDevice.cc */; };
@@ -162,8 +161,6 @@
 		A99A54500F0D39E400BC68F1 /* ASNodeDataSource.mm */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.objcpp; path = ASNodeDataSource.mm; sourceTree = "<group>"; };
 		A99A54510F0D39E400BC68F1 /* ASPreferenceController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ASPreferenceController.h; sourceTree = "<group>"; };
 		A99A54520F0D39E400BC68F1 /* ASPreferenceController.mm */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.objcpp; path = ASPreferenceController.mm; sourceTree = "<group>"; };
-		A99A54610F0D39F400BC68F1 /* AQContainer.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = AQContainer.cc; sourceTree = "<group>"; };
-		A99A54620F0D39F400BC68F1 /* AQContainer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = AQContainer.h; sourceTree = "<group>"; };
 		A99A54640F0D39FF00BC68F1 /* ASAlphaWordFile.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = ASAlphaWordFile.cc; sourceTree = "<group>"; };
 		A99A54650F0D39FF00BC68F1 /* ASAlphaWordFile.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ASAlphaWordFile.h; sourceTree = "<group>"; };
 		A99A54660F0D39FF00BC68F1 /* ASApplet.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = ASApplet.cc; sourceTree = "<group>"; };
@@ -372,8 +369,6 @@
 		A99A54300F0D39A400BC68F1 /* Library */ = {
 			isa = PBXGroup;
 			children = (
-				A99A54610F0D39F400BC68F1 /* AQContainer.cc */,
-				A99A54620F0D39F400BC68F1 /* AQContainer.h */,
 				A96033A10F15D66B0046DBC1 /* AQTreeNode.h */,
 				A96033A20F15D66B0046DBC1 /* AQTreeNode.m */,
 				A95EFD2A0F17D06000E1BDA9 /* AQFileUtilities.h */,
@@ -564,7 +559,6 @@
 				A99A545E0F0D39E400BC68F1 /* ASNode.mm in Sources */,
 				A99A545F0F0D39E400BC68F1 /* ASNodeDataSource.mm in Sources */,
 				A99A54600F0D39E400BC68F1 /* ASPreferenceController.mm in Sources */,
-				A99A54630F0D39F400BC68F1 /* AQContainer.cc in Sources */,
 				A99A54750F0D39FF00BC68F1 /* ASAlphaWordFile.cc in Sources */,
 				A99A54760F0D39FF00BC68F1 /* ASApplet.cc in Sources */,
 				A99A54770F0D39FF00BC68F1 /* ASDevice.cc in Sources */,
