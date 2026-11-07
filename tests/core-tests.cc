@@ -28,6 +28,25 @@ static void testAlphaWordRoundTrip()
     CHECK(std::memcmp(input, output, size) == 0);
 }
 
+static void testAlphaWordLineEndings()
+{
+    const uint16_t input[] = {'A', '\r', '\n', 'B', '\n', 'C', '\r', 'D', '\r', '\n', '\r', '\n', 'E'};
+    const uint16_t expected[] = {'A', '\r', 'B', '\r', 'C', '\r', 'D', '\r', '\r', 'E'};
+    for (bool swapped : {false, true})
+    {
+        std::vector<uint16_t> text = {swapped ? uint16_t(0xfffe) : uint16_t(0xfeff)};
+        for (uint16_t character : input)
+            text.push_back(swapped ? uint16_t((character >> 8) | (character << 8)) : character);
+        ts::ASAlphaWordFile file;
+        CHECK(file.importText(text.data(), text.size() * sizeof(uint16_t)));
+        const uint16_t* output = nullptr;
+        unsigned size = 0;
+        CHECK(file.exportText(&output, &size));
+        CHECK(size == sizeof expected);
+        CHECK(std::memcmp(output, expected, size) == 0);
+    }
+}
+
 static void testGenericRoundTrip()
 {
     const uint8_t input[] = {0, 1, 2, 0x7f, 0xff};
@@ -386,6 +405,7 @@ static void testFullDictionaryImportPreservesData()
 int main()
 {
     testAlphaWordRoundTrip();
+    testAlphaWordLineEndings();
     testGenericRoundTrip();
     testSettingsBounds();
     testMalformedGenericFiles();

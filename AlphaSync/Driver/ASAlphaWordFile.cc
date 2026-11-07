@@ -157,7 +157,14 @@ namespace ts
             // Miscellaneous re-mapping.
             if (c == 0x81) c = 0xac;        // Re-map the "not" alternate character (to not clash with line-break hint)
 
-            // REVIEW: should we explicitly handle DOS CR+LF endings?
+            // Windows uses two characters for one line ending.  Preserve real blank lines,
+            // but consume the LF paired with this CR before creating a NEO paragraph break.
+            if (unicode == '\r' && uni != endu)
+            {
+                uint16_t next = *uni;
+                if (swapped) next = (next >> 8) | (next << 8);
+                if (next == '\n') ++uni;
+            }
             if (c >= 0xa1 && c <= 0xbf)     { escape = true;    code = c; }
             else if (0x09 == c)             { escape = true;    code = c; }
             else if (0x0a == c)             { escape = true;    code = c; }
