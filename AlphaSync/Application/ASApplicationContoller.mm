@@ -181,6 +181,9 @@ static const NSInteger kMenuItemTagBackup   = 100;
     [nc addObserver:self selector:@selector(deviceControllerNotification:) name:kASDeviceControllerDeviceDetected object:nil];
     [nc addObserver:self selector:@selector(deviceControllerNotification:) name:kASDeviceControllerDeviceConnected object:nil];
     [nc addObserver:self selector:@selector(deviceControllerNotification:) name:kASDeviceControllerDeviceDisconnected object:nil];
+    [nc addObserver:self selector:@selector(deviceControllerNotification:) name:kASDeviceControllerDataChanged object:nil];
+    [nc addObserver:self selector:@selector(deviceControllerNotification:) name:kASDeviceControllerTaskChanged object:nil];
+    [nc addObserver:self selector:@selector(deviceControllerNotification:) name:kASDeviceControllerError object:nil];
 
     dataSource = [[ASNodeDataSource alloc] init];
     [dataSource setDeviceController:deviceController];
@@ -220,11 +223,14 @@ static const NSInteger kMenuItemTagBackup   = 100;
         [self setStatusIdle];
         [dataSource reloadData:outletFileView];
     }
-    else
+    else if ([name isEqualToString:kASDeviceControllerDataChanged])
     {
-        NSLog(@"ASApplicationController: ignoring unknown device message: %@", name);
+        [dataSource reloadData:outletFileView];
+        [self updateInspectorDisplay];
     }
+    else if ([name isEqualToString:kASDeviceControllerError]) [self setStatusError:[notification object]];
 
+    [outletFileView setEnabled:![deviceController isBusy]];
     [toolbar validateVisibleItems];
 }
 
@@ -256,19 +262,15 @@ static const NSInteger kMenuItemTagBackup   = 100;
 {
     (void)sender;
 
-    if ([outletFileView numberOfSelectedRows] == 1)
-    {
-        id selectedItem = [outletFileView itemAtRow:[outletFileView selectedRow]];
-        if ([selectedItem conformsToProtocol:@protocol(ASDeleteProtocol)])
-        {
-            [selectedItem deleteSelf];      // Delete the item (will invoke deviceWillDelete delegate, if appropriate).
-
-            ASAppletNode* modifiedApplet = [selectedItem ancestorOfClass:[ASAppletNode class]];
-            if (modifiedApplet) [modifiedApplet reload];
-        }
-
-        [outletFileView reloadData];
-    }
+    if ([deviceController isBusy] || [outletFileView numberOfSelectedRows] != 1) return;
+    ASNode* selected = [outletFileView itemAtRow:[outletFileView selectedRow]];
+    if (![selected conformsToProtocol:@protocol(ASDeleteProtocol)] || ![self deviceWillDelete:selected sender:selected]) return;
+    [deviceController performTaskForNode:selected refresh:YES task:^id(ASNode* working) {
+        return @([(id<ASDeleteProtocol>)working deleteSelf]);
+    } completion:^(id result, NSString* error) {
+        (void)result;
+        [self deviceDidDelete:selected error:error sender:selected];
+    }];
 }
 
 
@@ -287,7 +289,7 @@ static const NSInteger kMenuItemTagBackup   = 100;
     (void)sender;
 
     if (!backupController) backupController = [[ASBackupController alloc] init];
-    [backupController runBackupFor:[deviceController systemRoot] modalForWindow:outletMainWindow];
+    [backupController runBackupFor:[deviceController systemRoot] controller:deviceController modalForWindow:outletMainWindow];
 }
 
 
@@ -598,6 +600,7 @@ static const NSInteger kMenuItemTagBackup   = 100;
 
 - (BOOL)validateToolbarItem:(NSToolbarItem*)toolbarItem
 {
+    if ([deviceController isBusy]) return NO;
     BOOL enable = NO;
 
     if ([[toolbarItem itemIdentifier] isEqual:kToolbarItemIdentifierInfo])
@@ -650,6 +653,9 @@ static const NSInteger kMenuItemTagBackup   = 100;
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem
 {
+    SEL action = [menuItem action];
+    if ([deviceController isBusy] && (action == @selector(actionDelete:) || action == @selector(actionBackup:) ||
+        action == @selector(reloadDeviceData:) || action == @selector(actionUninstall:))) return NO;
     BOOL enable = TRUE;
     if ([menuItem tag] == kMenuItemTagBackup)
     {
@@ -1013,9 +1019,15 @@ static const NSInteger kMenuItemTagBackup   = 100;
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication*)sender
 {
     (void)sender;
-    if (!appIsUninstalling) [self setupAutoRun:8.0];    // disable launch requests to prevent immediate application re-open
-    [deviceController closeAllDevices];
-    return NSTerminateNow;
+    if (terminationPending) return NSTerminateLater;
+    terminationPending = YES;
+    if (!appIsUninstalling) [self setupAutoRun:60.0];
+    [backupController requestStopForTermination];
+    [deviceController shutdownWithCompletion:^{
+        if (!appIsUninstalling) [self setupAutoRun:8.0];
+        [NSApp replyToApplicationShouldTerminate:YES];
+    }];
+    return NSTerminateLater;
 }
 
 

@@ -35,6 +35,7 @@
 #import "ASDeviceNode.h"
 #import "ASAppletNode.h"
 #import "ASFileNode.h"
+#import "ASDeviceAccessProtocol.h"
 #import "ASDevice.h"
 #import "ASApplet.h"
 #import "ASFileAttributes.h"
@@ -115,7 +116,7 @@ using namespace ts;
 - (NSOperationQueue*)operationQueueForFilePromiseProvider:(NSFilePromiseProvider*)provider
 {
     (void)provider;
-    // Device callbacks and transfers share the main thread.  Two USB requests must not overlap.
+    // Capture Finder’s request on the main thread, then send its device work to the serial queue.
     return [NSOperationQueue mainQueue];
 }
 
@@ -123,29 +124,29 @@ using namespace ts;
          completionHandler:(void (^)(NSError*))completionHandler
 {
     (void)provider;
-    if (![[[controller systemRoot] children] containsObject:owner])
-    {
-        completionHandler([NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadNoSuchFileError
-                                          userInfo:@{NSLocalizedDescriptionKey: @"The NEO has been disconnected."}]);
-        return;
-    }
-    NSFileManager* manager = [NSFileManager defaultManager];
-    NSError* error = nil;
-    NSURL* staging = [manager URLForDirectory:NSItemReplacementDirectory inDomain:NSUserDomainMask
-                            appropriateForURL:url create:YES error:&error];
-    if (staging)
-    {
-        // Stage the export first, so Finder receives the exact filename it was promised.
-        NSString* saved = [node saveUnderPath:[staging path]];
-        if (saved)
+    [controller performTaskForNode:node refresh:NO task:^id(ASNode* working) {
+        NSFileManager* manager = [NSFileManager defaultManager];
+        NSError* error = nil;
+        NSURL* staging = [manager URLForDirectory:NSItemReplacementDirectory inDomain:NSUserDomainMask
+                                appropriateForURL:url create:YES error:&error];
+        if (staging)
         {
-            NSString* savedPath = [saved isAbsolutePath] ? saved : [[staging path] stringByAppendingPathComponent:saved];
-            [manager moveItemAtURL:[NSURL fileURLWithPath:savedPath] toURL:url error:&error];
+            NSString* saved = [working saveUnderPath:[staging path]];
+            if (saved)
+            {
+                NSString* savedPath = [saved isAbsolutePath] ? saved : [[staging path] stringByAppendingPathComponent:saved];
+                [manager moveItemAtURL:[NSURL fileURLWithPath:savedPath] toURL:url error:&error];
+            }
+            else error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:nil];
+            [manager removeItemAtURL:staging error:nil];
         }
-        else error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:nil];
-        [manager removeItemAtURL:staging error:nil];
-    }
-    completionHandler(error);
+        [working setOperationError:[error localizedDescription]];
+        return error ? nil : @YES;
+    } completion:^(id result, NSString* message) {
+        (void)result;
+        completionHandler(message ? [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError
+                                                    userInfo:@{NSLocalizedDescriptionKey: message}] : nil);
+    }];
 }
 @end
 
@@ -250,8 +251,16 @@ static NSArray* filePathsFromPasteboard(NSPasteboard* pasteboard)
     if ([item isMemberOfClass:[ASFileNode class]])
     {
         ASFileNode* node = (ASFileNode*)item;
-        [node setFileName:object];
-        [outlineView reloadData];
+        if ([deviceController isBusy]) return;
+        [deviceController performTaskForNode:node refresh:YES task:^id(ASNode* working) {
+            return [(ASFileNode*)working setFileName:object];
+        } completion:^(id result, NSString* error) {
+            (void)result;
+            id delegate = [node delegate];
+            if ([delegate conformsToProtocol:@protocol(ASDeviceAccessProtocol)])
+                [delegate deviceDidReplace:node error:error sender:node];
+            [outlineView reloadData];
+        }];
     }
 }
 
@@ -267,7 +276,7 @@ static NSArray* filePathsFromPasteboard(NSPasteboard* pasteboard)
 - (id<NSPasteboardWriting>)outlineView:(NSOutlineView*)outlineView pasteboardWriterForItem:(id)item
 {
     (void)outlineView;
-    if (![item conformsToProtocol:@protocol(ASSaveProtocol)]) return nil;
+    if ([deviceController isBusy] || ![item conformsToProtocol:@protocol(ASSaveProtocol)]) return nil;
     return [[[ASFilePromise alloc] initWithNode:item controller:deviceController] autorelease];
 }
 
@@ -277,6 +286,7 @@ static NSArray* filePathsFromPasteboard(NSPasteboard* pasteboard)
     (void)childIndex;
 
     NSDragOperation result = NSDragOperationNone;
+    if ([deviceController isBusy]) return result;
 
     NSPasteboard* pasteboard = [info draggingPasteboard];
     NSArray* filePaths = filePathsFromPasteboard(pasteboard);
@@ -295,24 +305,29 @@ static NSArray* filePathsFromPasteboard(NSPasteboard* pasteboard)
 {
     (void)childIndex;
 
-    BOOL result = FALSE;
-
-    NSPasteboard* pasteboard = [info draggingPasteboard];
-    NSArray* filePaths = filePathsFromPasteboard(pasteboard);
-    if ([filePaths count])
+    if ([deviceController isBusy]) return NO;
+    NSArray* paths = filePathsFromPasteboard([info draggingPasteboard]);
+    if (![paths count] || ![item conformsToProtocol:@protocol(ASLoadProtocol)] || ![item loadPermittedFromPaths:paths]) return NO;
+    id delegate = [item delegate];
+    BOOL replace = [item isKindOfClass:[ASFileNode class]];
+    if ([delegate conformsToProtocol:@protocol(ASDeviceAccessProtocol)])
     {
-        if ([item conformsToProtocol:@protocol(ASLoadProtocol)] && [item loadPermittedFromPaths:filePaths])
-        {
-            result = ([item loadFromPaths:filePaths] > 0);      // return success if at least one file was loaded successfully
-            if (result)
-            {
-                [item reload];
-                [outlineView reloadData];
-            }
-        }
+        BOOL allowed = replace ? [delegate deviceWillReplace:item with:paths[0] sender:item] :
+                                 [delegate deviceWillLoad:paths[0] sender:item];
+        if (!allowed) return NO;
     }
-
-    return result;
+    [deviceController performTaskForNode:item refresh:YES task:^id(ASNode* working) {
+        return @([(id<ASLoadProtocol>)working loadFromPaths:paths] > 0);
+    } completion:^(id result, NSString* error) {
+        (void)result;
+        if ([delegate conformsToProtocol:@protocol(ASDeviceAccessProtocol)])
+        {
+            if (replace) [delegate deviceDidReplace:item error:error sender:item];
+            else [delegate deviceDidLoad:paths[0] error:error sender:item];
+        }
+        [outlineView reloadData];
+    }];
+    return YES;
 }
 
 @end

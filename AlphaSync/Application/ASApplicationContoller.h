@@ -72,6 +72,7 @@
     NSToolbar* toolbar;
 
     BOOL appIsUninstalling;
+    BOOL terminationPending;
 }
 
 - (id)init;

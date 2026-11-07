@@ -32,6 +32,8 @@
 #import "ASNode.h"
 #import "ASBackupReport.h"
 
+@class ASDeviceController;
+
 @interface ASBackupController : NSWindowController
 {
     IBOutlet NSTextField* outletBackupItem;
@@ -46,10 +48,14 @@
     uint64_t bytesToBackup;
     uint64_t bytesSoFar;
     NSUInteger failedFiles;
-    NSTimer* backupTimer;
+    ASDeviceController* deviceController;
+    BOOL backupInFlight;
+    NSString* pendingStopMessage;
+    NSString* pendingStopStatus;
 }
 
-- (void)runBackupFor:(ASNode*)root modalForWindow:(NSWindow*)window;
+- (void)runBackupFor:(ASNode*)root controller:(ASDeviceController*)controller modalForWindow:(NSWindow*)window;
+- (void)requestStopForTermination;
 
 - (IBAction)actionStopDone:(id)sender;
 
