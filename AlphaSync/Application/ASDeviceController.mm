@@ -127,8 +127,10 @@ static void deviceDisconnect(class ASDeviceFactory* factory, void* context, unsi
     {
         if ([deviceNode device] == device)
         {
+            [deviceNode retain];
             [rootNode removeChild:deviceNode];
             [notificationCenter postNotificationName:kASDeviceControllerDeviceDisconnected object:deviceNode];
+            [deviceNode release];
             break;
         }
     }
@@ -172,8 +174,9 @@ static void deviceDisconnect(class ASDeviceFactory* factory, void* context, unsi
  */
 - (void)dealloc
 {
-    [rootNode release];     // will invoke the destructors for each contained device node, reseting the devices
+    // Disconnect callbacks still need the root node while the factory shuts down.
     if (deviceFactory) delete deviceFactory;
+    [rootNode release];
     [super dealloc];
 }
 

@@ -95,6 +95,7 @@ namespace ts
         io_service_t m_service;                         /**< The service handle. */
         IOUSBDeviceInterface245** m_device;             /**< The device handle. */
         IOUSBInterfaceInterface245** m_interface;       /**< The interface handle. */
+        bool m_deviceOpened;
         unsigned m_pipeOut;                             /**< The output pipe. */
         unsigned m_pipeIn;                              /**< The input pipe. */
         unsigned m_timeout;                             /**< Timeout for IO operations, in ms. */
@@ -115,8 +116,9 @@ namespace ts
         m_service(0),
         m_device(0),
         m_interface(0),
-        m_pipeIn(0),
+        m_deviceOpened(false),
         m_pipeOut(0),
+        m_pipeIn(0),
         m_timeout(20000),
         m_debugRead(0),
         m_debugWrite(0)
@@ -140,6 +142,7 @@ namespace ts
      */
     bool ASDeviceUSB::init(io_service_t serviceHandle)
     {
+        if (IOObjectRetain(serviceHandle) != KERN_SUCCESS) return false;
         m_service = serviceHandle;
         return open();
     }
@@ -162,6 +165,12 @@ namespace ts
         UInt16 maxPacketSize;
         HRESULT result;
         kern_return_t status;
+        bool deviceOpened = false;
+        bool interfaceOpened = false;
+        IOCFPlugInInterface** iodev = nullptr;
+        io_service_t usbInterface = IO_OBJECT_NULL;
+        IOUSBFindInterfaceRequest interfaceRequest;
+        io_iterator_t interfaceIterator;
 
         status = IOCreatePlugInInterfaceForService(m_service, kIOUSBDeviceUserClientTypeID, kIOCFPlugInInterfaceID, &plugInInterface, &score);
         if ((kIOReturnSuccess != status) || !plugInInterface)
@@ -182,14 +191,11 @@ namespace ts
         m_identity = aq_deviceIdent(dev);
 
 
-        /* The following tries to open the device and configure it.
-         * Under MacOSX 10.4, nothing grabs the comms device, and it will remain unconfigured. In this case, the
-         * open and subsequent configuration attempt should succeed. Under 10.5, however, the USB class drivers
-         * grab the interface and the open will fail (but subsequent IO will work because the device is configured...)
-         */
+        // macOS may already own the device configuration.  The interface can still be opened.
         status = (*dev)->USBDeviceOpen(dev);
         if (kIOReturnSuccess == status)
         {
+            deviceOpened = true;
             IOUSBConfigurationDescriptorPtr	confDesc;
             status = (*dev)->GetConfigurationDescriptorPtr(dev, 0, &confDesc);
             if (kIOReturnSuccess == status) status = (*dev)->SetConfiguration(dev, confDesc->bConfigurationValue);
@@ -203,16 +209,11 @@ namespace ts
 
         /* Open the interface.
          */
-        IOUSBFindInterfaceRequest interfaceRequest;
         interfaceRequest.bInterfaceClass = kIOUSBFindInterfaceDontCare;         // requested class
         interfaceRequest.bInterfaceSubClass = kIOUSBFindInterfaceDontCare;      // requested subclass
         interfaceRequest.bInterfaceProtocol = kIOUSBFindInterfaceDontCare;      // requested protocol
         interfaceRequest.bAlternateSetting = kIOUSBFindInterfaceDontCare;       // requested alt setting
 
-        io_service_t usbInterface;
-        IOCFPlugInInterface **iodev;
-
-        io_iterator_t interfaceIterator;
         status = (*dev)->CreateInterfaceIterator(dev, &interfaceRequest, &interfaceIterator);
         if (kIOReturnSuccess != status)
         {
@@ -230,9 +231,10 @@ namespace ts
         }
 
         status = IOCreatePlugInInterfaceForService(usbInterface, kIOUSBInterfaceUserClientTypeID, kIOCFPlugInInterfaceID, &iodev, &score);
-        if (!status) status = (*iodev)->QueryInterface(iodev, CFUUIDGetUUIDBytes(kIOUSBInterfaceInterfaceID245), (LPVOID*)&intf);
-        IODestroyPlugInInterface(iodev);
-        if (status)
+        IOObjectRelease(usbInterface);
+        if (!status && iodev) status = (*iodev)->QueryInterface(iodev, CFUUIDGetUUIDBytes(kIOUSBInterfaceInterfaceID245), (LPVOID*)&intf);
+        if (iodev) IODestroyPlugInInterface(iodev);
+        if (status || !intf)
         {
             fprintf(stderr, "ASDeviceUSB::init: error at line %d: status %08x\n", __LINE__, status);
             goto error;
@@ -245,6 +247,7 @@ namespace ts
             goto error;
         }
 
+        interfaceOpened = true;
         status = (*intf)->GetNumEndpoints(intf, &numPipes);
         if (status)
         {
@@ -281,9 +284,16 @@ namespace ts
 
 
 
+        if (!pipeIn || !pipeOut)
+        {
+            status = kIOReturnNotFound;
+            goto error;
+        }
+
         /* It worked.
          */
         m_device = dev;
+        m_deviceOpened = deviceOpened;
         m_interface = intf;
         m_pipeOut = pipeOut;
         m_pipeIn = pipeIn;
@@ -297,14 +307,14 @@ namespace ts
          */
     error:
         fprintf(stderr, "ASDeviceUSB::init: exit with error %08x\n", status);
-        assert(kIOReturnSuccess != status);
         if (intf)
         {
-            (*intf)->USBInterfaceClose(intf);
+            if (interfaceOpened) (*intf)->USBInterfaceClose(intf);
             (*intf)->Release(intf);
         }
         if (dev)
         {
+            if (deviceOpened) (*dev)->USBDeviceClose(dev);
             (*dev)->Release(dev);
         }
         return false;
@@ -324,9 +334,15 @@ namespace ts
 
         if (m_device)
         {
-            (*m_device)->USBDeviceClose(m_device);
+            if (m_deviceOpened) (*m_device)->USBDeviceClose(m_device);
             (*m_device)->Release(m_device);
             m_device = 0;
+            m_deviceOpened = false;
+        }
+        if (m_service)
+        {
+            IOObjectRelease(m_service);
+            m_service = 0;
         }
     }
 
@@ -378,7 +394,7 @@ namespace ts
                 (*m_interface)->ClearPipeStallBothEnds(m_interface, m_pipeIn);
                 break;
             }
-            assert(blocksize <= remaining);
+            if (blocksize > remaining) return false;
             remaining -= blocksize;
             ptr += blocksize;
 
@@ -533,10 +549,10 @@ namespace ts
     ASDeviceFactoryUSB::~ASDeviceFactoryUSB()
     {
         // Terminate notification handling.
-        // IOObjectRelease(m_comDeviceRemovedIter);
-        // IOObjectRelease(m_comDeviceAddedIter);
-        // IOObjectRelease(m_hidDeviceAddedIter);
-        IONotificationPortDestroy(m_notifyPort);
+        if (m_comDeviceRemovedIter) IOObjectRelease(m_comDeviceRemovedIter);
+        if (m_comDeviceAddedIter) IOObjectRelease(m_comDeviceAddedIter);
+        if (m_hidDeviceAddedIter) IOObjectRelease(m_hidDeviceAddedIter);
+        if (m_notifyPort) IONotificationPortDestroy(m_notifyPort);
 
         // Clear out any active devices.
         for (int i = 0; i < kAQMaxDevices; i++)
@@ -544,7 +560,7 @@ namespace ts
             ASDeviceUSB* device = m_deviceList[i];
             if (device)
             {
-                m_callbackDisconnect(m_factory, m_callbackContext, device->identity(), device);
+                if (m_callbackDisconnect) m_callbackDisconnect(m_factory, m_callbackContext, device->identity(), device);
                 m_deviceList[i] = 0;
                 delete device;
             }
@@ -593,11 +609,7 @@ namespace ts
         m_callbackConnect = connect;
         m_callbackDisconnect = disconnect;
 
-        /* Create a master_port for the task.
-         */
-        status = IOMasterPort(MACH_PORT_NULL, &masterPort);
-        if (status || MACH_PORT_NULL == masterPort) goto error;
-
+        // A null port selects the system default and does not need a separate Mach port reference.
         hidMatchingDict = IOServiceMatching(kIOUSBDeviceClassName);
         comMatchingDict = IOServiceMatching(kIOUSBDeviceClassName);
         if (!hidMatchingDict || !comMatchingDict) goto error;
@@ -618,22 +630,23 @@ namespace ts
         CFRelease(comProductID);
 
         notifyPort = IONotificationPortCreate(masterPort);
+        if (!notifyPort) goto error;
         runLoopSource = IONotificationPortGetRunLoopSource(notifyPort);
         CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSource, kCFRunLoopDefaultMode);    // notification callbacks will be run here
 
-        comMatchingDict = (CFMutableDictionaryRef) CFRetain(comMatchingDict);
 
         status = IOServiceAddMatchingNotification(
             notifyPort,
             kIOFirstMatchNotification,
             hidMatchingDict, aq_hidDeviceAdded, this, &hidDeviceAddedIter);
+        hidMatchingDict = nullptr;
         assert(!status);
         if (status) goto error;
 
         status = IOServiceAddMatchingNotification(
             notifyPort,
             kIOFirstMatchNotification,
-            comMatchingDict, aq_comDeviceAdded, this, &comDeviceAddedIter);
+            (CFMutableDictionaryRef)CFRetain(comMatchingDict), aq_comDeviceAdded, this, &comDeviceAddedIter);
         assert(!status);
         if (status) goto error;
 
@@ -641,6 +654,7 @@ namespace ts
             notifyPort,
             kIOTerminatedNotification,
             comMatchingDict, aq_comDeviceRemoved, this, &comDeviceRemovedIter);
+        comMatchingDict = nullptr;
         assert(!status);
         if (status) goto error;
 
@@ -661,20 +675,16 @@ namespace ts
         aq_comDeviceAdded(this, m_comDeviceAddedIter);
         aq_comDeviceRemoved(this, m_comDeviceRemovedIter);
 
-        // Now done with the master_port
-        mach_port_deallocate(mach_task_self(), masterPort);
-        masterPort = MACH_PORT_NULL;
         return true;
 
 
         /* Jump here if there is a failure in setup.
          */
     error:
-        // if (0 != comDeviceRemovedIter) IOObjectRelease(comDeviceRemovedIter);
-        // if (0 != comDeviceAddedIter) IOObjectRelease(comDeviceAddedIter);
-        // if (0 != hidDeviceAddedIter) IOObjectRelease(hidDeviceAddedIter);
+        if (comDeviceRemovedIter) IOObjectRelease(comDeviceRemovedIter);
+        if (comDeviceAddedIter) IOObjectRelease(comDeviceAddedIter);
+        if (hidDeviceAddedIter) IOObjectRelease(hidDeviceAddedIter);
         if (0 != notifyPort) IONotificationPortDestroy(notifyPort);
-        if (MACH_PORT_NULL != masterPort) mach_port_deallocate(mach_task_self(), masterPort);
         if (0 != comMatchingDict) CFRelease(comMatchingDict);
         if (0 != hidMatchingDict) CFRelease(hidMatchingDict);
         return false;
