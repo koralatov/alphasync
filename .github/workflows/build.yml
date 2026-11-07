@@ -74,20 +74,72 @@ jobs:
           scripts/verify-app.sh build/AlphaSync.xcarchive/Products/Applications/AlphaSync.app
           test ! -e build/AlphaSync.xcarchive/Products/Applications/AlphaSyncLauncher.app
       - name: Package the universal app
-        run: |
-          app=build/DerivedData/Build/Products/Release/AlphaSync.app
-          version=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$app/Contents/Info.plist")
-          build_number=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$app/Contents/Info.plist")
-          ditto -c -k --keepParent "$app" "build/AlphaSync-$version-$build_number-macOS-11.zip"
+        run: scripts/package-app.sh build/DerivedData/Build/Products/Release/AlphaSync.app universal build/downloads
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: AlphaSync-${{ matrix.runner }}-${{ github.sha }}
-          path: build/AlphaSync-*-macOS-11.zip
+          name: AlphaSync-universal-${{ matrix.runner }}-${{ github.sha }}
+          path: build/downloads/*
+          if-no-files-found: error
+
+  modern:
+    name: Apple Silicon, macOS 27, pinned Xcode
+    runs-on: xcode-27
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Select the modern compiler
+        run: |
+          version=$(cat .xcode-version-modern)
+          selected_developer="/Applications/Xcode_$version.app/Contents/Developer"
+          test -d "$selected_developer"
+          printf 'DEVELOPER_DIR=%s\n' "$selected_developer" >> "$GITHUB_ENV"
+      - name: Verify the modern toolchain
+        run: scripts/check-toolchain.sh modern
+      - name: Run the core and native regression tests
+        run: make test sanitize
+      - name: Build the modern release app
+        run: >-
+          xcodebuild -project AlphaSync/AlphaSync.xcodeproj -scheme AlphaSync-Modern
+          -configuration ReleaseModern -destination 'generic/platform=macOS'
+          -derivedDataPath build/ModernData build
+      - name: Verify the modern app and reject a universal label
+        run: |
+          app=build/ModernData/Build/Products/ReleaseModern/AlphaSync.app
+          scripts/verify-app.sh "$app" modern
+          if scripts/verify-app.sh "$app" universal --skip-launch; then
+            printf 'A modern app was incorrectly accepted as universal.\n' >&2
+            exit 1
+          fi
+      - name: Build the modern debug app
+        run: >-
+          xcodebuild -project AlphaSync/AlphaSync.xcodeproj -scheme AlphaSync-Modern
+          -configuration DebugModern -destination 'generic/platform=macOS'
+          -derivedDataPath build/ModernData build
+      - name: Build the modern diagnostic tool
+        run: >-
+          xcodebuild -project AlphaSync/AlphaSync.xcodeproj -target AppletDump
+          -configuration ReleaseModern SYMROOT="$PWD/build/ModernProducts" build
+      - name: Check the modern distribution archive
+        run: |
+          xcodebuild -project AlphaSync/AlphaSync.xcodeproj -scheme AlphaSync-Modern \
+            -configuration ReleaseModern -destination 'generic/platform=macOS' \
+            -archivePath build/Modern.xcarchive -derivedDataPath build/ModernArchiveData \
+            CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO archive
+          scripts/verify-app.sh build/Modern.xcarchive/Products/Applications/AlphaSync.app modern
+          test ! -e build/Modern.xcarchive/Products/Applications/AlphaSyncLauncher.app
+      - name: Package the modern app
+        run: scripts/package-app.sh build/ModernData/Build/Products/ReleaseModern/AlphaSync.app modern build/downloads
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: AlphaSync-modern-${{ github.sha }}
+          path: build/downloads/*
           if-no-files-found: error
 
   default-xcode:
     name: Default Xcode source check, separate from releases
-    runs-on: macos-26
+    runs-on: xcode-27
     timeout-minutes: 15
     continue-on-error: true
     steps:
@@ -98,12 +150,40 @@ jobs:
         run: xcodebuild -version
       - name: Run the core and native regression tests
         run: make test sanitize
-      # New Xcode versions can stop supporting macOS 11.  This lane checks source
-      # compatibility with a newer SDK and must never supply a release artifact.
-      - name: Build against the default SDK with a macOS 12 minimum
+      # The default SDK can change independently of the pinned release compiler.
+      # This advisory job must never supply either release artifact.
+      - name: Build the modern app against the default SDK
         run: >-
-          xcodebuild -project AlphaSync/AlphaSync.xcodeproj -scheme AlphaSync
-          -configuration Release -destination 'generic/platform=macOS'
-          -derivedDataPath build/DefaultXcode MACOSX_DEPLOYMENT_TARGET=12.0 build
+          xcodebuild -project AlphaSync/AlphaSync.xcodeproj -scheme AlphaSync-Modern
+          -configuration ReleaseModern -destination 'generic/platform=macOS'
+          -derivedDataPath build/DefaultXcode build
       - name: Verify this compatibility build
-        run: scripts/verify-app.sh build/DefaultXcode/Build/Products/Release/AlphaSync.app 12.0
+        run: scripts/verify-app.sh build/DefaultXcode/Build/Products/ReleaseModern/AlphaSync.app modern
+
+  collect:
+    name: Collect both downloads for one release
+    needs: [macos, modern]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Check release pairing
+        run: python3 tests/release-tests.py
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: AlphaSync-universal-macos-26-${{ github.sha }}
+          path: incoming/universal
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: AlphaSync-modern-${{ github.sha }}
+          path: incoming/modern
+      - name: Collect matching downloads
+        run: >-
+          python3 scripts/collect-release.py --universal incoming/universal
+          --modern incoming/modern --output build/release-assets
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: AlphaSync-release-${{ github.sha }}
+          path: build/release-assets/*
+          if-no-files-found: error
