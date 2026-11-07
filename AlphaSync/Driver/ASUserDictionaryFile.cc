@@ -216,7 +216,7 @@ namespace ts
 
     bool ASUserDictionaryFile::importText(const uint16_t* text, unsigned textSize)
     {
-        if ((textSize & 1) || (textSize && !text)) return false;
+        if (!canRepresentText(text, textSize)) return false;
         unsigned characterCount = textSize / 2;
         std::vector<uint8_t> neoText(characterCount + 1);
         characterCount = unicodeToNeo(neoText.data(), text, characterCount);

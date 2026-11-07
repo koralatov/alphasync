@@ -47,6 +47,32 @@ static void testAlphaWordLineEndings()
     }
 }
 
+static void testUnsupportedTextPreservesData()
+{
+    const uint16_t valid[] = {'k', 'e', 'e', 'p'};
+    const std::vector<std::vector<uint16_t>> invalid = {{'A', 0x4e2d}, {0xd83d, 0xde42}, {0xd800}, {0xdc00}};
+    ts::ASAlphaWordFile alphaWord;
+    ts::ASUserDictionaryFile dictionary;
+    for (ts::ASFile* file : {static_cast<ts::ASFile*>(&alphaWord), static_cast<ts::ASFile*>(&dictionary)})
+    {
+        CHECK(file->importText(valid, sizeof valid));
+        const uint8_t* bytes = static_cast<const uint8_t*>(file->fileData());
+        const std::vector<uint8_t> original(bytes, bytes + file->fileSize());
+        for (const auto& input : invalid)
+        {
+            for (bool swapped : {false, true})
+            {
+                std::vector<uint16_t> text = {swapped ? uint16_t(0xfffe) : uint16_t(0xfeff)};
+                for (uint16_t character : input)
+                    text.push_back(swapped ? uint16_t((character >> 8) | (character << 8)) : character);
+                CHECK(!file->importText(text.data(), text.size() * sizeof(uint16_t)));
+                CHECK(file->fileSize() == original.size());
+                CHECK(std::memcmp(file->fileData(), original.data(), original.size()) == 0);
+            }
+        }
+    }
+}
+
 static void testGenericRoundTrip()
 {
     const uint8_t input[] = {0, 1, 2, 0x7f, 0xff};
@@ -406,6 +432,7 @@ int main()
 {
     testAlphaWordRoundTrip();
     testAlphaWordLineEndings();
+    testUnsupportedTextPreservesData();
     testGenericRoundTrip();
     testSettingsBounds();
     testMalformedGenericFiles();

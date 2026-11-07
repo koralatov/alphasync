@@ -184,6 +184,10 @@ namespace ts
          */
         virtual bool importText(const uint16_t* text, unsigned textSize);
 
+        // Check the complete input before replacing any existing text.  A NEO cannot
+        // store arbitrary Unicode, so an unsupported character must be reported rather than substituted.
+        bool canRepresentText(const uint16_t* text, unsigned textSize) const;
+
 
         /** Export the data as plain (unicode) text. By default, this will return failure.
          *  A derived class should override this with appropriate logic.

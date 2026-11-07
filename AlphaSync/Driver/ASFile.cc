@@ -183,6 +183,21 @@ namespace ts
 #pragma mark    --------  Protected Methods  --------
 
 
+    bool ASFile::canRepresentText(const uint16_t* text, unsigned textSize) const
+    {
+        if ((textSize & 1) || (textSize && !text)) return false;
+        const unsigned count = textSize / sizeof(uint16_t);
+        const bool swapped = count && text[0] == 0xfffe;
+        for (unsigned index = swapped ? 1 : 0; index < count; ++index)
+        {
+            uint16_t character = text[index];
+            if (swapped) character = (character >> 8) | (character << 8);
+            if (character != 0xfeff && unicodeToNeo(character) == kNeoCodeUnknown) return false;
+        }
+        return true;
+    }
+
+
     int ASFile::unicodeToNeo(uint16_t uni) const
     {
         if (0x0009 == uni) return kNeoCodeTab;

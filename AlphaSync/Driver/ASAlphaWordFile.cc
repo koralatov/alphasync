@@ -119,7 +119,7 @@ namespace ts
 
     bool ASAlphaWordFile::importText(const uint16_t* text, unsigned textSize)
     {
-        if ((textSize & 1) || (textSize && !text)) return false;
+        if (!canRepresentText(text, textSize)) return false;
         if (textSize > 1024*1024*1024) return false;                        // Implausibly large text (may cause overflow later)
 
         unsigned inputCharacterCount = (textSize / 2);                      // Number of input characters
