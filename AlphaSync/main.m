@@ -127,6 +127,8 @@ static void checkPreferences(id controller)
     NSPopUpButton* filter = [preferences valueForKey:@"outletFilterOption"];
     NSPathControl* path = [preferences valueForKey:@"backupFolderPath"];
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    [window makeKeyAndOrderFront:nil];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
     requireInterface([window isMemberOfClass:[NSWindow class]], @"Preferences is not a standard Mac window.");
     requireInterface([filter selectedTag] == [defaults integerForKey:@"FilterMode"], @"Preferences did not load the saved file filter.");
     requireInterface([[[path URL] path] isEqualToString:[defaults stringForKey:@"BackupFolder"]], @"Preferences did not load the saved backup folder.");
@@ -139,7 +141,8 @@ static void checkPreferences(id controller)
     [[preferences valueForKey:@"chooseFolderButton"] performClick:nil];
     NSOpenPanel* panel = (NSOpenPanel*)[window attachedSheet];
     requireInterface([panel isKindOfClass:[NSOpenPanel class]] && [panel canChooseDirectories] && ![panel canChooseFiles],
-                     @"The backup folder chooser is not a native folder sheet.");
+                     [NSString stringWithFormat:@"The backup folder chooser did not attach as an NSOpenPanel (found %@, app active: %@).",
+                         panel ? NSStringFromClass([panel class]) : @"no sheet", [NSApp isActive] ? @"yes" : @"no"]);
     [panel cancel:nil];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.4]];
     requireInterface([window attachedSheet] == nil && [[path URL] isEqual:originalFolder] &&
@@ -294,6 +297,11 @@ static int checkInterface(void)
         NSNib* nib = [[[NSNib alloc] initWithNibNamed:@"MainMenu" bundle:[NSBundle mainBundle]] autorelease];
         NSArray* objects = nil;
         if (![nib instantiateWithOwner:NSApp topLevelObjects:&objects]) return 1;
+        // Native file panels need the same AppKit startup as a normal app launch.
+        [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
+        [NSApp finishLaunching];
+        if (@available(macOS 14.0, *)) [NSApp activate];
+        else [NSApp activateIgnoringOtherApps:YES];
         id controller = [NSApp delegate];
         if (!controller || ![controller valueForKey:@"outletMainWindow"] || ![controller valueForKey:@"outletFileView"]) return 1;
 
