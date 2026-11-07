@@ -116,6 +116,8 @@ static void checkPreferenceLayout(id preferences)
     NSTextField* status = [preferences valueForKey:@"automaticLaunchStatusField"];
     NSSize needed = [[status cell] cellSizeForBounds:NSMakeRect(0, 0, NSWidth([status bounds]), 10000)];
     requireInterface(NSHeight([status bounds]) >= needed.height - 1, @"The automatic-launch status is clipped.");
+    NSButton* choose = [preferences valueForKey:@"chooseFolderButton"];
+    requireInterface(NSWidth([choose bounds]) <= [choose intrinsicContentSize].width + 1, @"The folder button is stretched beyond its native size.");
 }
 
 static void checkPreferences(id controller)

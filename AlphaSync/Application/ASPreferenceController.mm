@@ -156,6 +156,7 @@ static NSBox* ASPreferenceSeparator(void)
     [files setColumnSpacing:12];
     [files setRowSpacing:6];
     [files setRowAlignment:NSGridRowAlignmentFirstBaseline];
+    [[files columnAtIndex:0] setWidth:64];
     [[files columnAtIndex:0] setXPlacement:NSGridCellPlacementTrailing];
     [[files columnAtIndex:1] setXPlacement:NSGridCellPlacementFill];
     [[files rowAtIndex:1] setBottomPadding:8];
@@ -170,6 +171,7 @@ static NSBox* ASPreferenceSeparator(void)
     [[backupFolderPath widthAnchor] constraintGreaterThanOrEqualToConstant:100].active = YES;
     chooseFolderButton = [NSButton buttonWithTitle:@"Choose…" target:self action:@selector(actionBackupFolder:)];
     [chooseFolderButton setAccessibilityLabel:@"Choose a Quick Backup folder"];
+    [chooseFolderButton setContentHuggingPriority:NSLayoutPriorityRequired forOrientation:NSLayoutConstraintOrientationHorizontal];
     [chooseFolderButton setContentCompressionResistancePriority:NSLayoutPriorityRequired forOrientation:NSLayoutConstraintOrientationHorizontal];
     NSStackView* folder = [NSStackView stackViewWithViews:@[backupFolderPath, chooseFolderButton]];
     [folder setOrientation:NSUserInterfaceLayoutOrientationHorizontal];
