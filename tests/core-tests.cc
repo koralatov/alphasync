@@ -286,6 +286,21 @@ static void testMalformedDictionaries()
     CHECK(file.wordCount() == 1 && file.containsWord("ab"));
 }
 
+static void testDictionaryAccents()
+{
+    const std::vector<std::vector<uint16_t>> words = {{'c', 'a', 'f', 0x00e9}, {0x00f8, 'l'}};
+    for (const auto& word : words)
+    {
+        ts::ASUserDictionaryFile dictionary;
+        CHECK(dictionary.importText(word.data(), word.size() * sizeof(uint16_t)));
+        const uint16_t* output = nullptr;
+        unsigned size = 0;
+        CHECK(dictionary.exportText(&output, &size));
+        CHECK(size == word.size() * sizeof(uint16_t));
+        CHECK(std::memcmp(output, word.data(), size) == 0);
+    }
+}
+
 int main()
 {
     testAlphaWordRoundTrip();
@@ -297,5 +312,6 @@ int main()
     testRejectedLoadPreservesData();
     testUnicodeByteOrder();
     testMalformedDictionaries();
+    testDictionaryAccents();
     std::puts("All core tests passed.");
 }
