@@ -32,18 +32,8 @@ jobs:
           xcodebuild -project AlphaSync/AlphaSync.xcodeproj -scheme AlphaSync
           -configuration Release -destination 'generic/platform=macOS'
           -derivedDataPath build/DerivedData build
-      - name: Check the executable architectures
-        run: |
-          lipo build/DerivedData/Build/Products/Release/AlphaSync.app/Contents/MacOS/AlphaSync -verify_arch x86_64 arm64
-          lipo build/DerivedData/Build/Products/Release/AlphaSyncLauncher.app/Contents/MacOS/AlphaSyncLauncher -verify_arch x86_64 arm64
-      - name: Check the app bundle and load every window
-        run: |
-          app=build/DerivedData/Build/Products/Release/AlphaSync.app
-          helper="$app/Contents/Library/LoginItems/AlphaSyncLauncher.app"
-          test "$(/usr/libexec/PlistBuddy -c 'Print :LSMinimumSystemVersion' "$app/Contents/Info.plist")" = 11.0
-          test "$(/usr/libexec/PlistBuddy -c 'Print :LSMinimumSystemVersion' "$helper/Contents/Info.plist")" = 11.0
-          codesign --verify --deep --strict "$app"
-          "$app/Contents/MacOS/AlphaSync" --smoke-test
+      - name: Check architectures, deployment targets, dependencies, signatures, and windows
+        run: scripts/verify-app.sh
       - name: Build the debug app
         run: >-
           xcodebuild -project AlphaSync/AlphaSync.xcodeproj -scheme AlphaSync
