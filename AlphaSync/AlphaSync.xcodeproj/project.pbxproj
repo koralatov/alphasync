@@ -62,7 +62,6 @@
 		A99A547B0F0D39FF00BC68F1 /* ASUserDictionaryFile.cc in Sources */ = {isa = PBXBuildFile; fileRef = A99A54730F0D39FF00BC68F1 /* ASUserDictionaryFile.cc */; };
 		A99A549A0F0D3AB700BC68F1 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A99A54990F0D3AB700BC68F1 /* IOKit.framework */; };
 		A99A54B60F0D43D900BC68F1 /* Backup.nib in Resources */ = {isa = PBXBuildFile; fileRef = A99A54B40F0D43D900BC68F1 /* Backup.nib */; };
-		A99A54EF0F0D474F00BC68F1 /* Preferences.nib in Resources */ = {isa = PBXBuildFile; fileRef = A99A54ED0F0D474F00BC68F1 /* Preferences.nib */; };
 		A99A54FA0F0D5F5100BC68F1 /* Inspector.nib in Resources */ = {isa = PBXBuildFile; fileRef = A99A54F80F0D5F5100BC68F1 /* Inspector.nib */; };
         C01100000000000000000001 /* UniformTypeIdentifiers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01100000000000000000002 /* UniformTypeIdentifiers.framework */; };
         C01100000000000000000004 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -180,7 +179,6 @@
 		A99A54740F0D39FF00BC68F1 /* ASUserDictionaryFile.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ASUserDictionaryFile.h; sourceTree = "<group>"; };
 		A99A54990F0D3AB700BC68F1 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		A99A54B50F0D43D900BC68F1 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/Backup.nib; sourceTree = "<group>"; };
-		A99A54EE0F0D474F00BC68F1 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/Preferences.nib; sourceTree = "<group>"; };
 		A99A54F90F0D5F5100BC68F1 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/Inspector.nib; sourceTree = "<group>"; };
         C01100000000000000000002 /* UniformTypeIdentifiers.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UniformTypeIdentifiers.framework; path = System/Library/Frameworks/UniformTypeIdentifiers.framework; sourceTree = SDKROOT; };
         C01100000000000000000006 /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
@@ -305,7 +303,6 @@
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
 				29B97318FDCFA39411CA2CEA /* MainMenu.nib */,
 				A99A54B40F0D43D900BC68F1 /* Backup.nib */,
-				A99A54ED0F0D474F00BC68F1 /* Preferences.nib */,
 				A99A54F80F0D5F5100BC68F1 /* Inspector.nib */,
 			);
 			name = Resources;
@@ -514,7 +511,6 @@
 				8D11072A0486CEB800E47090 /* MainMenu.nib in Resources */,
 				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
 				A99A54B60F0D43D900BC68F1 /* Backup.nib in Resources */,
-				A99A54EF0F0D474F00BC68F1 /* Preferences.nib in Resources */,
 				A99A54FA0F0D5F5100BC68F1 /* Inspector.nib in Resources */,
 				4D962E180F1C9EF60018CDAA /* icon-file-bin.pdf in Resources */,
 				4D962E450F1CA50D0018CDAA /* icon-applet.pdf in Resources */,
@@ -631,14 +627,6 @@
 				A99A54B50F0D43D900BC68F1 /* English */,
 			);
 			name = Backup.nib;
-			sourceTree = "<group>";
-		};
-		A99A54ED0F0D474F00BC68F1 /* Preferences.nib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				A99A54EE0F0D474F00BC68F1 /* English */,
-			);
-			name = Preferences.nib;
 			sourceTree = "<group>";
 		};
 		A99A54F80F0D5F5100BC68F1 /* Inspector.nib */ = {

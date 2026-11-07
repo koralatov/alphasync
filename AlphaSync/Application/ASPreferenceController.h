@@ -50,10 +50,11 @@
 
 @interface ASPreferenceController : NSWindowController
 {
-    IBOutlet NSPopUpButton* outletFilterOption;
-    IBOutlet NSPopUpButton* outletTextEncoding;
-    IBOutlet NSButton* outletBackupFolder;
-    IBOutlet NSButton* outletAutoRun;
+    NSPopUpButton* outletFilterOption;
+    NSTextField* outputFormatField;
+    NSPathControl* backupFolderPath;
+    NSButton* chooseFolderButton;
+    NSButton* outletAutoRun;
 
     NSTextField* automaticLaunchStatusField;
     NSButton* loginItemsButton;
@@ -64,7 +65,6 @@
 - (id)initWithAppController:(ASApplicationController*)controller;
 - (IBAction)actionFilterOption:(id)sender;
 - (IBAction)actionBackupFolder:(id)sender;
-- (IBAction)actionTextEncoding:(id)sender;
 - (IBAction)actionAutoRun:(id)sender;
 - (IBAction)actionPreferenceHelp:(id)sender;
 
