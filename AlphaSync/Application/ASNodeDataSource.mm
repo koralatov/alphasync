@@ -63,9 +63,8 @@ using namespace ts;
 {
     BOOL isFile = [item isKindOfClass:[ASFileNode class]];
     NSString* type = isFile ? ([(ASFileNode*)item fileIsPlainText] ? UTTypePlainText.identifier : UTTypeXML.identifier) : UTTypeFolder.identifier;
-    if ((self = [super initWithFileType:type delegate:nil]))
+    if ((self = [super initWithFileType:type delegate:self]))
     {
-        self.delegate = self;
         node = [item retain];
         controller = [deviceController retain];
         owner = [([item isKindOfClass:[ASDeviceNode class]] ? item :

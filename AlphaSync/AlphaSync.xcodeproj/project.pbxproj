@@ -732,6 +732,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = YES;
+                CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+                GCC_TREAT_WARNINGS_AS_ERRORS = YES;
 				ARCHS = "x86_64 arm64";
 				ALWAYS_SEARCH_USER_PATHS = NO;
                 CLANG_CXX_LANGUAGE_STANDARD = "c++17";
@@ -774,6 +776,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = YES;
+                CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+                GCC_TREAT_WARNINGS_AS_ERRORS = YES;
 				ARCHS = "x86_64 arm64";
 				ALWAYS_SEARCH_USER_PATHS = NO;
                 CLANG_CXX_LANGUAGE_STANDARD = "c++17";

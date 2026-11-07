@@ -198,7 +198,7 @@ using namespace ts;
                                                                   deviceName:[deviceNode displayName]] autorelease];
                 [backupItems addObject:backupItem];
                 newDevice = FALSE;
-                bytesToBackup += [fileNode fileSize];
+                bytesToBackup += static_cast<uint64_t>(MAX([fileNode fileSize], 0));
             }
         }
     }
@@ -271,7 +271,7 @@ using namespace ts;
             }
         }
 
-        bytesSoFar += [fileNode fileSize];
+        bytesSoFar += static_cast<uint64_t>(MAX([fileNode fileSize], 0));
         nextBackupItem ++;
 
         double progress = bytesToBackup ? double(bytesSoFar) / double(bytesToBackup) : double(nextBackupItem) / double([backupItems count]);
