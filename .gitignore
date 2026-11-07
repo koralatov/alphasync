@@ -7,3 +7,8 @@
 
 # Xcode user-specific state
 *.xcuserdatad
+
+# Local builds and test results.
+build/
+DerivedData/
+*.xcresult
