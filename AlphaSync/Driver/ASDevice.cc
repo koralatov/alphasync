@@ -414,7 +414,9 @@ namespace ts
      */
     const ASApplet* ASDevice::appletAtIndex(int appletIndex)
     {
-        return appletIndex >= 0 && static_cast<size_t>(appletIndex) < m_applets.size() ? m_applets[appletIndex].get() : nullptr;
+        if (appletIndex < 0) return nullptr;
+        size_t index = static_cast<size_t>(appletIndex);
+        return index < m_applets.size() ? m_applets[index].get() : nullptr;
     }
 
 
