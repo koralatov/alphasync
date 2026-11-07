@@ -1,0 +1,42 @@
+name: Build and test
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  macos:
+    name: macOS on ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [macos-15, macos-15-intel]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 15
+    env:
+      # Xcode 16.4 supports macOS 11 deployment targets on both architectures.
+      DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Show the build tools
+        run: xcodebuild -version
+      - name: Test the portable core
+        run: make test sanitize
+      - name: Build a universal release app
+        run: >-
+          xcodebuild -project AlphaSync/AlphaSync.xcodeproj -scheme AlphaSync
+          -configuration Release -destination 'generic/platform=macOS'
+          -derivedDataPath build/DerivedData build
+      - name: Check the executable architectures
+        run: |
+          lipo -verify_arch x86_64 arm64 build/DerivedData/Build/Products/Release/AlphaSync.app/Contents/MacOS/AlphaSync
+          lipo -verify_arch x86_64 arm64 build/DerivedData/Build/Products/Release/AlphaSyncLauncher.app/Contents/MacOS/AlphaSyncLauncher
+      - name: Build the diagnostic tool
+        run: >-
+          xcodebuild -project AlphaSync/AlphaSync.xcodeproj -target AppletDump
+          -configuration Release build
