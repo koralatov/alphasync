@@ -186,7 +186,9 @@ static const NSInteger kMenuItemTagBackup   = 100;
     [outletFileView setDataSource:dataSource];
     [outletFileView setDelegate:self];
 
-    [deviceController enable];      // this may trigger an immediate notification (eg for device connect)
+    // Interface checks must not capture a connected NEO or change login-item registration.
+    if (![[[NSProcessInfo processInfo] arguments] containsObject:@"--smoke-test"])
+        [deviceController enable];
     [dataSource reloadData:outletFileView];
 
     [self displayMemoryStatus];
@@ -928,6 +930,7 @@ static const NSInteger kMenuItemTagBackup   = 100;
  */
 - (void)setupAutoRun:(float)secondsToWait
 {
+    if ([[[NSProcessInfo processInfo] arguments] containsObject:@"--smoke-test"]) return;
     BOOL shouldAutoRun = [[NSUserDefaults standardUserDefaults] boolForKey:kASPreferenceKeyAutoRun];
 
     if (!launcherInstallPath) launcherInstallPath = [[self launcherInstallPath] retain];
