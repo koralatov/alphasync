@@ -77,6 +77,14 @@ scripts/verify-app.sh build/ModernData/Build/Products/ReleaseModern/AlphaSync.ap
 
 This checks the exact architectures, executable deployment targets, system-only dependencies, matching app and helper versions, nested signatures, and every interface window.  It does not capture USB devices or change login items.  An alternative app path can be passed as its first argument.  An explicit `--skip-launch` third argument permits binary inspection on an older host; it does not establish runtime compatibility.
 
+The interface uses standard AppKit controls and follows the macOS appearance automatically, including changes while the app is running.  Toolbar symbols, file rows, the Inspector, and Apple Help use system styling and adaptive colours.  To check both appearances and save screenshots of each window and Help page on a Mac, run:
+
+```sh
+scripts/check-appearance.sh build/DerivedData/Build/Products/Release/AlphaSync.app build/appearance
+```
+
+This check uses cached sample rows without connecting to a NEO or changing login items.  It checks native row components, rename permissions and cancellation, text contrast, appearance inheritance, and switching from Light to Dark and back to Light.  Help pages are rendered with the system WebKit.  CI retains the screenshots separately from the app downloads.
+
 GitHub Actions builds the universal app on Intel and Apple Silicon runners with macOS 15 and 26.  A required macOS 27 Apple Silicon job builds and launches the modern app.  Both profiles receive Debug, Release, archive, dependency, signature, and window checks.  These checks run on the runners’ macOS versions, so they do not establish that every feature works on macOS 11.
 
 A final job collects the two canonical development downloads into the **AlphaSync-release-<source commit>** artifact, with checksums, build reports, and shared release notes.  It rejects missing packages and mismatched versions, build numbers, source commits, profiles, and signing states.  The collector uses Python 3’s standard library; Python is not required to run AlphaSync.

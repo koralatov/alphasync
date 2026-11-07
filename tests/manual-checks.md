@@ -17,6 +17,8 @@ macOS 12.7.5 provides a useful older-system check.  Passing there does not estab
 
 Record the host with `sw_vers` and `uname -m`.  If Xcode tools are installed, run `scripts/verify-app.sh /Applications/AlphaSync.app` to check both architectures, deployment targets, versions, dependencies, signatures, and window loading on that host.
 
+With the app running, change macOS Appearance between Light, Dark, and Auto in System Settings (System Preferences on macOS 11 and 12).  Check the main list, selected and unselected rows, toolbar, Inspector previews and details, Preferences, backup sheet, alerts, file panels, and Apple Help Viewer.  Check Increase Contrast and a different accent colour too.  The app should update without restarting.  Confirm that file renaming still accepts Return, cancels with Escape, and is unavailable during a transfer.  `scripts/check-appearance.sh /Applications/AlphaSync.app build/appearance` provides automated appearance checks and screenshots without using a NEO; the system-setting and hardware checks still need a person.
+
 For the modern app, run `scripts/verify-app.sh /Applications/AlphaSync.app modern` on macOS 27 or later.  This requires exactly `arm64` in both the app and launcher, with a macOS 27 minimum.  Verify that the release contains both downloads with matching versions and source commits, and install only the app appropriate for the test Mac.
 
 ## Launcher

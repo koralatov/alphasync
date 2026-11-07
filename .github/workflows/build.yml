@@ -55,6 +55,14 @@ jobs:
           -derivedDataPath build/DerivedData build
       - name: Check architectures, deployment targets, dependencies, signatures, and windows
         run: scripts/verify-app.sh
+      - name: Check native controls and live appearance changes
+        run: scripts/check-appearance.sh build/DerivedData/Build/Products/Release/AlphaSync.app build/appearance
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: AlphaSync-appearance-${{ matrix.runner }}-${{ github.sha }}
+          path: build/appearance/*
+          if-no-files-found: warn
       - name: Build the debug app
         run: >-
           xcodebuild -project AlphaSync/AlphaSync.xcodeproj -scheme AlphaSync
@@ -117,6 +125,14 @@ jobs:
           xcodebuild -project AlphaSync/AlphaSync.xcodeproj -scheme AlphaSync-Modern
           -configuration DebugModern -destination 'generic/platform=macOS'
           -derivedDataPath build/ModernData build
+      - name: Check native controls and live appearance changes
+        run: scripts/check-appearance.sh build/ModernData/Build/Products/ReleaseModern/AlphaSync.app build/appearance
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: AlphaSync-appearance-modern-${{ github.sha }}
+          path: build/appearance/*
+          if-no-files-found: warn
       - name: Build the modern diagnostic tool
         run: >-
           xcodebuild -project AlphaSync/AlphaSync.xcodeproj -target AppletDump
