@@ -19,21 +19,31 @@ jobs:
           - runner: macos-15-intel
             xcode: '16.4'
           - runner: macos-26
-            xcode: '26.6'
+            xcode: pinned
+            archive: true
           - runner: macos-26-intel
-            xcode: '26.6'
+            xcode: pinned
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 15
-    env:
-      # Both toolchains support macOS 11 deployment targets.
-      DEVELOPER_DIR: /Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
+      - name: Select the checked toolchain
+        run: |
+          version='${{ matrix.xcode }}'
+          if [[ "$version" == pinned ]]; then version=$(cat .xcode-version); fi
+          selected_developer="/Applications/Xcode_$version.app/Contents/Developer"
+          test -d "$selected_developer"
+          printf 'DEVELOPER_DIR=%s\n' "$selected_developer" >> "$GITHUB_ENV"
       - name: Show the build tools
         run: xcodebuild -version
-      - name: Test the portable core
+      - name: Verify the release toolchain
+        if: matrix.xcode == 'pinned'
+        run: scripts/check-toolchain.sh
+      - name: Check shell scripts
+        run: bash -n scripts/*.sh
+      - name: Run the core and native regression tests
         run: make test sanitize
       - name: Build a universal release app
         run: >-
@@ -51,10 +61,23 @@ jobs:
         run: >-
           xcodebuild -project AlphaSync/AlphaSync.xcodeproj -target AppletDump
           -configuration Release SYMROOT="$PWD/build/Products" build
+      - name: Check the distribution archive layout
+        if: matrix.archive == true
+        run: |
+          xcodebuild -project AlphaSync/AlphaSync.xcodeproj -scheme AlphaSync \
+            -configuration Release -destination 'generic/platform=macOS' \
+            -archivePath build/AlphaSync.xcarchive -derivedDataPath build/ArchiveData \
+            CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO archive
+          scripts/verify-app.sh build/AlphaSync.xcarchive/Products/Applications/AlphaSync.app
+          test ! -e build/AlphaSync.xcarchive/Products/Applications/AlphaSyncLauncher.app
       - name: Package the universal app
-        run: ditto -c -k --keepParent build/DerivedData/Build/Products/Release/AlphaSync.app build/AlphaSync-macOS-11.zip
+        run: |
+          app=build/DerivedData/Build/Products/Release/AlphaSync.app
+          version=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$app/Contents/Info.plist")
+          build_number=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$app/Contents/Info.plist")
+          ditto -c -k --keepParent "$app" "build/AlphaSync-$version-$build_number-macOS-11.zip"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: AlphaSync-${{ matrix.runner }}
-          path: build/AlphaSync-macOS-11.zip
+          name: AlphaSync-${{ matrix.runner }}-${{ github.sha }}
+          path: build/AlphaSync-*-macOS-11.zip
           if-no-files-found: error
