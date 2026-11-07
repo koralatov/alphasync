@@ -222,55 +222,25 @@ namespace ts
     {
         if (0 == count) return 0;
 
-        bool nativeEndian;
-        if (0xfeff == *uni)
+        bool swapped = (*uni == 0xfffe);
+        if (*uni == 0xfeff || swapped)
         {
-            nativeEndian = true;    // BOM indicating native byte order
-            uni ++;
-            count --;
+            ++uni;
+            --count;
         }
-        else if (0xfffe == *uni)
+        for (unsigned i = 0; i < count; ++i)
         {
-            nativeEndian = true;    // BOM indicating reversed byte order
-            uni ++;
-            count --;
-        }
-        else
-        {
-            nativeEndian = true;    // assume native endian format
-        }
-
-
-        uint8_t* end = neo + count;
-        if (nativeEndian)
-        {
-            while (neo != end)
+            uint16_t character = uni[i];
+            if (swapped) character = (character >> 8) | (character << 8);
+            int code = unicodeToNeo(character);
+            if (code < 0 || code > 255)
             {
-                int code = unicodeToNeo(*uni ++);
-                if (code < 0 || code > 255)
-                {
-                    if (escape)     // If escaping characters, pass through tab, newline and return
-                    {
-                        if (code == kNeoCodeTab) code = 9;
-                        else if (code == kNeoCodeNewline) code = 10;
-                        else if (code == kNeoCodeReturn) code = 11;
-                        else code = kNeoUntranslatableCharacter;
-                    }
-                    else
-                    {
-                        code = kNeoUntranslatableCharacter;
-                    }
-                }
-                *neo ++ = code & 0xff;
+                if (escape && code == kNeoCodeTab) code = 9;
+                else if (escape && code == kNeoCodeNewline) code = 10;
+                else if (escape && code == kNeoCodeReturn) code = 13;
+                else code = kNeoUntranslatableCharacter;
             }
-        }
-        else
-        {
-            while (neo != end)
-            {
-                unsigned code = *uni++;
-                *neo ++ = unicodeToNeo(((code >> 8) & 0xff) | ((code << 8) & 0xff00));
-            }
+            neo[i] = static_cast<uint8_t>(code);
         }
 
         return count;

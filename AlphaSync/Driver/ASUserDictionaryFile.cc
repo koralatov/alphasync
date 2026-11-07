@@ -210,13 +210,14 @@ namespace ts
 
     bool ASUserDictionaryFile::importText(const uint16_t* text, unsigned textSize)
     {
+        if ((textSize & 1) || (textSize && !text)) return false;
         if (!clearDictionary()) return false;
 
         unsigned characterCount = textSize / 2;
 
         uint8_t* neoText = (uint8_t*)malloc(characterCount * sizeof (uint8_t) + 1);   // +1 to allow additional zero terminator at end
         if (!neoText) return false;
-        unicodeToNeo(neoText, text, characterCount);
+        characterCount = unicodeToNeo(neoText, text, characterCount);
 
         uint8_t* ptr = neoText;
         uint8_t* end = ptr + characterCount;

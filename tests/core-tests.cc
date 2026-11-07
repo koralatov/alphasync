@@ -8,6 +8,7 @@
 
 #include "ASAlphaWordFile.h"
 #include "ASGenericFile.h"
+#include "ASUserDictionaryFile.h"
 
 // Keep these checks active in release builds, too.  A failed check must stop the test.
 #define CHECK(condition) do { if (!(condition)) { \
@@ -192,6 +193,31 @@ static void testFileBufferFailures()
     CHECK(device.reads == 0);
 }
 
+static void testUnicodeByteOrder()
+{
+    const uint16_t native[] = {0xfeff, 'a', 'l', 'p', 'h', 'a', '\n', 'b', 'e', 't', 'a'};
+    std::vector<uint16_t> swapped;
+    for (uint16_t value : native) swapped.push_back((value >> 8) | (value << 8));
+    const uint16_t* inputs[] = {native, swapped.data()};
+    for (const uint16_t* input : inputs)
+    {
+        ts::ASUserDictionaryFile dictionary;
+        CHECK(dictionary.importText(input, sizeof native));
+        CHECK(dictionary.wordCount() == 2);
+        CHECK(dictionary.containsWord("alpha") && dictionary.containsWord("beta"));
+        ts::ASAlphaWordFile word;
+        CHECK(word.importText(input, sizeof native));
+        const uint16_t* output = nullptr;
+        unsigned size = 0;
+        CHECK(word.exportText(&output, &size));
+        CHECK(size == sizeof native - 2);
+        CHECK(output[0] == 'a' && output[9] == 'a');
+    }
+    ts::ASAlphaWordFile file;
+    CHECK(!file.importText(nullptr, 2));
+    CHECK(!file.importText(native, 3));
+}
+
 int main()
 {
     testAlphaWordRoundTrip();
@@ -200,5 +226,6 @@ int main()
     testMalformedGenericFiles();
     testUSBReadBounds();
     testFileBufferFailures();
+    testUnicodeByteOrder();
     std::puts("All core tests passed.");
 }
