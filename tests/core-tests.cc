@@ -176,6 +176,26 @@ public:
     using ts::ASFile::appendData;
 };
 
+class ValidatedFile : public ts::ASFile
+{
+protected:
+    bool confirmLoad() override
+    {
+        return fileSize() > 0 && byteData()[0] == 1;
+    }
+};
+
+static void testRejectedLoadPreservesData()
+{
+    const uint8_t original[] = {1, 2, 3};
+    const uint8_t invalid[] = {0, 4};
+    ValidatedFile file;
+    CHECK(file.load(original, sizeof original));
+    CHECK(!file.load(invalid, sizeof invalid));
+    CHECK(file.fileSize() == sizeof original);
+    CHECK(std::memcmp(file.fileData(), original, sizeof original) == 0);
+}
+
 static void testFileBufferFailures()
 {
     MutableFile file;
@@ -227,6 +247,7 @@ int main()
     testMalformedGenericFiles();
     testUSBReadBounds();
     testFileBufferFailures();
+    testRejectedLoadPreservesData();
     testUnicodeByteOrder();
     std::puts("All core tests passed.");
 }

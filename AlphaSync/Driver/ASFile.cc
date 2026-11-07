@@ -97,10 +97,22 @@ namespace ts
         if (size && !copy) return false;
         // Copy before releasing the old buffer, because the caller may be loading from it.
         if (size) memcpy(copy, data, size);
-        free(m_fileData);
+        void* previousData = m_fileData;
+        unsigned previousSize = m_fileSize;
         m_fileData = copy;
         m_fileSize = size;
-        return confirmLoad();
+        if (confirmLoad())
+        {
+            free(previousData);
+            return true;
+        }
+
+        // A rejected file must not replace the last valid data or its decoded metadata.
+        free(m_fileData);
+        m_fileData = previousData;
+        m_fileSize = previousSize;
+        confirmLoad();
+        return false;
     }
 
 
