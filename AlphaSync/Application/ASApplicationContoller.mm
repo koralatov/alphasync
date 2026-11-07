@@ -133,16 +133,13 @@ static const NSInteger kMenuItemTagBackup   = 100;
     [outletMainWindow setDelegate:self];
     [NSApp setDelegate:self];
 
-    NSBundle* bundle = [NSBundle mainBundle];
-    iconDisconnected = [[NSImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-status-clear" ofType:@"pdf"]];
-    iconRed = [[NSImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-status-red" ofType:@"pdf"]];
-    iconYellow = [[NSImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-status-yellow" ofType:@"pdf"]];
-    iconGreen = [[NSImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-status-green" ofType:@"pdf"]];
-    iconToolbarInfo = [[NSImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-toolbar-info" ofType:@"pdf"]];
-    iconToolbarBackup = [[NSImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-toolbar-backup" ofType:@"pdf"]];
-    iconToolbarDeleteDisabled = [[NSImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-toolbar-delete-disabled" ofType:@"pdf"]];
-    iconToolbarDeleteFile = [[NSImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-toolbar-delete-single" ofType:@"pdf"]];
-    iconToolbarDeleteFiles = [[NSImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-toolbar-delete-multiple" ofType:@"pdf"]];
+    iconDisconnected = [NSImage imageNamed:NSImageNameStatusNone];
+    iconRed = [NSImage imageNamed:NSImageNameStatusUnavailable];
+    iconYellow = [NSImage imageNamed:NSImageNameStatusPartiallyAvailable];
+    iconGreen = [NSImage imageNamed:NSImageNameStatusAvailable];
+    iconToolbarInfo = [NSImage imageWithSystemSymbolName:@"info.circle" accessibilityDescription:@"Information"];
+    iconToolbarBackup = [NSImage imageWithSystemSymbolName:@"externaldrive" accessibilityDescription:@"Back Up"];
+    iconToolbarDelete = [NSImage imageWithSystemSymbolName:@"trash" accessibilityDescription:@"Clear Files"];
 
     [outletStatusImage setImageFrameStyle:NSImageFrameNone];
     [outletStatusImage setImageAlignment:NSImageAlignCenter];
@@ -549,7 +546,7 @@ static const NSInteger kMenuItemTagBackup   = 100;
         [toolbarItem setLabel:@"Clear"];
         [toolbarItem setPaletteLabel:@"Clear"];
         [toolbarItem setToolTip:@"Clear a single file, or all files belonging to an applet"];
-        [toolbarItem setImage:iconToolbarDeleteFiles];
+        [toolbarItem setImage:iconToolbarDelete];
         [toolbarItem setTarget:self];
         [toolbarItem setAction:@selector(actionDelete:)];
     }
@@ -612,23 +609,19 @@ static const NSInteger kMenuItemTagBackup   = 100;
             if ([selectedItem isMemberOfClass:[ASFileNode class]])
             {
                 [toolbarItem setToolTip:@"Clear the contents of a single file"];
-                [toolbarItem setImage:iconToolbarDeleteFile];
             }
             else if ([selectedItem isMemberOfClass:[ASAppletNode class]])
             {
                 [toolbarItem setToolTip:@"Clear all files belonging to an applet"];
-                [toolbarItem setImage:iconToolbarDeleteFiles];
             }
             else
             {
                 [toolbarItem setToolTip:@"Clear the thing that is selected"];
-                [toolbarItem setImage:iconToolbarDeleteFile];
             }
         }
         if (!enable)
         {
             [toolbarItem setToolTip:@"Clear the contents of one or more files"];
-            [toolbarItem setImage:iconToolbarDeleteDisabled];
         }
     }
     else if ([[toolbarItem itemIdentifier] isEqual:kToolbarItemIdentifierBackup])

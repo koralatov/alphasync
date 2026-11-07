@@ -56,9 +56,7 @@
     NSImage* iconGreen;
     NSImage* iconToolbarInfo;
     NSImage* iconToolbarBackup;
-    NSImage* iconToolbarDeleteDisabled;
-    NSImage* iconToolbarDeleteFile;
-    NSImage* iconToolbarDeleteFiles;
+    NSImage* iconToolbarDelete;
 
     NSString* launcherInstallPath;
     NSString* automaticLaunchError;
