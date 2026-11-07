@@ -847,9 +847,9 @@ namespace ts
 
     /** Class constructor.
      */
-    ASDeviceFactory::ASDeviceFactory(dispatch_queue_t notificationQueue)
+    ASDeviceFactory::ASDeviceFactory(dispatch_queue_s* notificationQueue)
         :
-        m_notificationQueue(notificationQueue),
+        m_notificationQueue((dispatch_queue_t)notificationQueue),
         m_usb(0)
     {
         if (m_notificationQueue) dispatch_retain(m_notificationQueue);

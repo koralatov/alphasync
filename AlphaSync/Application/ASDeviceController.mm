@@ -73,7 +73,7 @@ static void deviceDisconnect(ASDeviceFactory* factory, void* context, unsigned i
             DISPATCH_QUEUE_SERIAL, DISPATCH_AUTORELEASE_FREQUENCY_WORK_ITEM);
         deviceQueue = dispatch_queue_create("com.tsoniq.AlphaSync.devices", attributes);
         dispatch_queue_set_specific(deviceQueue, &deviceQueueKey, self, NULL);
-        deviceFactory = new ASDeviceFactory(deviceQueue);
+        deviceFactory = new ASDeviceFactory((dispatch_queue_s*)deviceQueue);
     }
     return self;
 }

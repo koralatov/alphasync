@@ -35,6 +35,7 @@
 #include "ASDevice.h"
 #include <dispatch/dispatch.h>
 
+struct dispatch_queue_s;
 
 namespace ts
 {
@@ -84,7 +85,9 @@ namespace ts
     {
     public:
 
-        explicit ASDeviceFactory(dispatch_queue_t notificationQueue = nullptr);
+        // dispatch_queue_t has different C++ types in .cc and .mm files.  Use the
+        // same opaque C handle at this boundary so both files name one constructor.
+        explicit ASDeviceFactory(dispatch_queue_s* notificationQueue = nullptr);
         ~ASDeviceFactory();
 
         bool enable(void* context, ASDeviceFactoryDetect detect, ASDeviceFactoryConnect connect, ASDeviceFactoryDisconnect disconnect);
