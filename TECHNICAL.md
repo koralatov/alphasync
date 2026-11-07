@@ -96,6 +96,8 @@ scripts/check-appearance.sh build/DerivedData/Build/Products/Release/AlphaSync.a
 
 This check uses cached sample rows without connecting to a NEO or changing login items.  It checks native row components, rename permissions and cancellation, text contrast, appearance inheritance, and switching from Light to Dark and back to Light.  Help pages are rendered with the system WebKit.  CI retains the screenshots separately from the app downloads.
 
+Preferences uses a standard `NSWindow` with native stack and grid views, a folder path control, and Auto Layout.  The window fits its content when the automatic-launch status changes.  Interface checks verify saved settings, closing and reopening the window, folder-picker cancellation, and unclipped status messages.  Appearance captures include a long folder path and registration error in each mode.
+
 GitHub Actions builds the universal app on Intel and Apple Silicon runners with macOS 15 and 26.  A required macOS 27 Apple Silicon job builds and launches the modern app.  Both profiles receive Debug, Release, archive, dependency, signature, and window checks.  These checks run on the runners’ macOS versions, so they do not establish that every feature works on macOS 11.
 
 A final job collects the two canonical development downloads into the `AlphaSync-release-<source commit>` artifact, with checksums, build reports, and shared release notes.  It rejects missing packages and mismatched versions, build numbers, source commits, profiles, and signing states.  The collector uses Python 3’s standard library; Python is not required to run AlphaSync.

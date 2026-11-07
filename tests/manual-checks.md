@@ -21,6 +21,13 @@ With the app running, change macOS Appearance between Light, Dark, and Auto in S
 
 For the modern app, run `scripts/verify-app.sh /Applications/AlphaSync.app modern` on macOS 27 or later.  This requires exactly `arm64` in both the app and launcher, with a macOS 27 minimum.  Verify that the release contains both downloads with matching versions and source commits, and install only the app appropriate for the test Mac.
 
+## Preferences
+
+- Open Preferences, change the file filter, close the window, and reopen it.  Confirm that the selected filter and main file list agree, including after restarting the app.
+- Choose a different backup folder, and make a Quick Backup there.  Reopen the chooser and cancel it; the selected folder should stay the same.  Check a long folder path and its full-path tooltip.
+- With macOS keyboard navigation enabled, use Tab, Shift-Tab, and Space to reach and operate the controls.  Check the labels with VoiceOver and open Preferences Help using the help button.
+- Check the grouped layout and readable status text in Light and Dark Mode on an older supported Mac.  On macOS 11 and 12, the Login Items settings button should be absent.
+
 ## Launcher
 
 Move the app to its final location before enabling automatic launching.  On macOS 11 and 12, check enabling, disabling, logout and login, and reconnecting the NEO.  An unknown saved registration state is expected when the older helper is not running.
