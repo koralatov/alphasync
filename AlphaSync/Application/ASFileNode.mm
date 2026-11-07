@@ -458,10 +458,14 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
     if (error) *error = nil;
 
     fileIsSynchronised = FALSE;
-    NSData* unicodeData = [data dataUsingEncoding:NSUnicodeStringEncoding allowLossyConversion:YES];
+    NSData* unicodeData = [data dataUsingEncoding:NSUnicodeStringEncoding allowLossyConversion:NO];
     if (!unicodeData || [unicodeData length] > UINT_MAX)
     {
         if (error) *error = @"Unable to read file contents.";
+    }
+    else if (fileIsPlainText && !fileData->canRepresentText((const uint16_t*)[unicodeData bytes], static_cast<unsigned>([unicodeData length])))
+    {
+        if (error) *error = @"The NEO cannot store one or more characters in this text.  Remove unsupported characters, such as emoji, and try again.  The device file has not been changed.";
     }
     else
     {
