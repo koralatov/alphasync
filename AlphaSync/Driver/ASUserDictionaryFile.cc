@@ -32,6 +32,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <vector>
 #include "ASEndian.h"
 #include "ASUserDictionaryFile.h"
 
@@ -55,11 +56,6 @@
  *  The maximum file size is an arbitrary limit (the file could contain a very large number of
  *  20 letter length words if the file size is not constrained to a 16 bit value).
  */
-
-#define kASUserDictionaryFileMinWordLength  (2)                 /**< Smallest word that can be stored. */
-#define kASUserDictionaryFileMaxWordLength  (20)                /**< Longest word that can be stored. */
-#define kASUserDictionaryFileMinFileSize    (19*2)              /**< Smallest possible dictionary file. */
-#define kASUserDictionaryFileMaxFileSize    (64*1024)           /**< Maximum size of the dictionary file. */
 
 namespace ts
 {
@@ -161,7 +157,12 @@ namespace ts
             search += wordLength;
         }
 
-        if (wordLength + fileSize() > kASUserDictionaryFileMaxFileSize) return false;   // file full
+        if (wordLength > kASUserDictionaryFileMaxFileSize - fileSize()) return false;
+        // The final section’s inferred end may reach 65536.  Stored offsets must fit 16 bits.
+        for (unsigned length = wordLength + 1; length <= kASUserDictionaryFileMaxWordLength; ++length)
+        {
+            if (m_offsets[length] > UINT16_MAX - wordLength) return false;
+        }
 
         assert(search > byteData());
         unsigned offset = unsigned(search - byteData());            // byte offset at which to insert the new word
@@ -216,32 +217,29 @@ namespace ts
     bool ASUserDictionaryFile::importText(const uint16_t* text, unsigned textSize)
     {
         if ((textSize & 1) || (textSize && !text)) return false;
-        if (!clearDictionary()) return false;
-
         unsigned characterCount = textSize / 2;
+        std::vector<uint8_t> neoText(characterCount + 1);
+        characterCount = unicodeToNeo(neoText.data(), text, characterCount);
+        ASUserDictionaryFile replacement;
+        if (!replacement.fileData()) return false;
 
-        uint8_t* neoText = (uint8_t*)malloc(characterCount * sizeof (uint8_t) + 1);   // +1 to allow additional zero terminator at end
-        if (!neoText) return false;
-        characterCount = unicodeToNeo(neoText, text, characterCount);
-
-        uint8_t* ptr = neoText;
+        uint8_t* ptr = neoText.data();
         uint8_t* end = ptr + characterCount;
-
         while (ptr < end)
         {
-            while (ptr < end && (isspace(*ptr) || ispunct(*ptr))) ptr ++;
+            while (ptr < end && (isspace(*ptr) || ispunct(*ptr))) ++ptr;
             if (ptr == end) break;
 
             uint8_t* start = ptr;
-            while (ptr < end && !isspace(*ptr) && !ispunct(*ptr)) ptr++;
+            while (ptr < end && !isspace(*ptr) && !ispunct(*ptr)) ++ptr;
+            unsigned length = static_cast<unsigned>(ptr - start);
             *ptr = 0;
-            addWord((const char*)start);         // ignore errors adding specific words
-            if (ptr < end) ptr++;
+            // Words outside the device’s length limits are skipped.  A storage failure rejects the whole import.
+            if (length >= kASUserDictionaryFileMinWordLength && length <= kASUserDictionaryFileMaxWordLength &&
+                !replacement.addWord(reinterpret_cast<const char*>(start))) return false;
+            if (ptr < end) ++ptr;
         }
-
-        free(neoText);
-
-        return true;
+        return load(replacement.fileData(), replacement.fileSize());
     }
 
 

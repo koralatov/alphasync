@@ -337,6 +337,45 @@ static void testDictionaryAccents()
     }
 }
 
+static void testDictionaryOffsetLimits()
+{
+    auto almostFull = dictionaryBytes(65534, 65534);
+    ts::as_EndianWriteU16(almostFull.data(), 38);
+    ts::ASUserDictionaryFile dictionary;
+    CHECK(dictionary.load(almostFull.data(), almostFull.size()));
+    CHECK(!dictionary.addWord("zz"));
+    CHECK(dictionary.fileSize() == almostFull.size());
+    CHECK(std::memcmp(dictionary.fileData(), almostFull.data(), almostFull.size()) == 0);
+
+    auto roomForLastSection = dictionaryBytes(65516, 65516);
+    ts::as_EndianWriteU16(roomForLastSection.data(), 38);
+    CHECK(dictionary.load(roomForLastSection.data(), roomForLastSection.size()));
+    CHECK(dictionary.addWord("zzzzzzzzzzzzzzzzzzzz"));
+    CHECK(dictionary.fileSize() == 65536);
+    ts::ASUserDictionaryFile loaded;
+    CHECK(loaded.load(dictionary.fileData(), dictionary.fileSize()));
+    CHECK(loaded.containsWord("zzzzzzzzzzzzzzzzzzzz"));
+}
+
+static void testFullDictionaryImportPreservesData()
+{
+    ts::ASUserDictionaryFile dictionary;
+    CHECK(dictionary.addWord("original"));
+    std::vector<uint8_t> original(static_cast<const uint8_t*>(dictionary.fileData()),
+                                  static_cast<const uint8_t*>(dictionary.fileData()) + dictionary.fileSize());
+    std::vector<uint16_t> input;
+    for (unsigned i = 0; i < 7000; ++i)
+    {
+        char word[16];
+        std::snprintf(word, sizeof word, "word%06u ", i);
+        input.insert(input.end(), word, word + std::strlen(word));
+    }
+    CHECK(!dictionary.importText(input.data(), input.size() * sizeof(uint16_t)));
+    CHECK(dictionary.fileSize() == original.size());
+    CHECK(std::memcmp(dictionary.fileData(), original.data(), original.size()) == 0);
+    CHECK(dictionary.containsWord("original"));
+}
+
 int main()
 {
     testAlphaWordRoundTrip();
@@ -350,5 +389,7 @@ int main()
     testUnicodeByteOrder();
     testMalformedDictionaries();
     testDictionaryAccents();
+    testDictionaryOffsetLimits();
+    testFullDictionaryImportPreservesData();
     std::puts("All core tests passed.");
 }
