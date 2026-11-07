@@ -33,6 +33,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <stdio.h>
 #include "ASEndian.h"
 
 namespace ts
@@ -76,8 +77,8 @@ namespace ts
         const uint8_t* data() const { return m_data; }
 
         unsigned dataU8(unsigned index=0) const { return (index >= m_length) ? 0 : m_data[index]; }
-        unsigned dataU16(unsigned index=0) const { return ((index*2+2) > m_length) ? 0 : as_EndianReadU32(m_data+(index*2)); }
-        unsigned dataU32(unsigned index=0) const { return ((index*4+4) > m_length) ? 0 : as_EndianReadU32(m_data+(index*4)); }
+        unsigned dataU16(unsigned index=0) const { return (index >= m_length / 2) ? 0 : as_EndianReadU16(m_data + index * 2); }
+        unsigned dataU32(unsigned index=0) const { return (index >= m_length / 4) ? 0 : as_EndianReadU32(m_data + index * 4); }
 
     private:
         unsigned m_ident;

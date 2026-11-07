@@ -38,6 +38,12 @@ namespace ts
 #pragma mark -
 #pragma mark ASSettings : Public Methods
 
+    ASSettings::ASSettings(void* data, unsigned size)
+        : ASSettings(data, size, size)
+    {
+    }
+
+
     /** Constructor, building a writable data object.
      *
      *  @param  data            A pointer to the settings data.
@@ -126,6 +132,7 @@ namespace ts
     bool ASSettings::clearAllItems()
     {
         m_bufferDataLength = 0;
+        m_newItem = 0;
         return true;
     }
 
@@ -138,18 +145,17 @@ namespace ts
      */
     bool ASSettings::newItem(unsigned type, unsigned ident)
     {
-        unsigned roundLength = m_bufferDataLength + (m_bufferDataLength & 1);
-        if (m_bufferDataAllocation < m_bufferDataLength) return false;
-        if (m_bufferDataAllocation - m_bufferDataLength < 6) return false;
+        m_newItem = 0;
+        if (!m_bufferStart || m_bufferDataLength > m_bufferDataAllocation) return false;
+        unsigned padding = m_bufferDataLength & 1;
+        if (m_bufferDataAllocation - m_bufferDataLength < padding + 6) return false;
 
-        m_newItem = m_bufferStart + roundLength;
-
-        as_EndianWriteU16(&m_newItem[0], type);
-        as_EndianWriteU16(&m_newItem[2], ident);
-        as_EndianWriteU16(&m_newItem[4], 0); // length
-
-        m_bufferDataLength = 6 + roundLength;
-        assert(m_bufferDataLength <= m_bufferDataAllocation);
+        if (padding) m_bufferStart[m_bufferDataLength++] = 0;
+        m_newItem = m_bufferStart + m_bufferDataLength;
+        as_EndianWriteU16(m_newItem, type);
+        as_EndianWriteU16(m_newItem + 2, ident);
+        as_EndianWriteU16(m_newItem + 4, 0);
+        m_bufferDataLength += 6;
 
         return true;
     }
@@ -210,20 +216,21 @@ namespace ts
      */
     bool ASSettings::appendItemData(const void* data, unsigned length)
     {
-        if (0 == m_newItem) return false;
+        if (!m_newItem || (length && !data)) return false;
 
-        assert(m_bufferDataLength <= m_bufferDataAllocation);
+        unsigned oldSize = as_EndianReadU16(m_newItem + 4);
+        if (length > 65535 - oldSize) return false;
+        unsigned newSize = oldSize + length;
+        unsigned dataOffset = unsigned(m_newItem - m_bufferStart) + 6;
+        unsigned available = m_bufferDataAllocation - dataOffset;
+        if (newSize + (newSize & 1) > available) return false;
 
-        unsigned newItemSpace = m_bufferDataAllocation - m_bufferDataAllocation;
-        if (newItemSpace < (length + (length & 1))) return false;
+        // Each item ends on an even byte boundary.  A later append replaces any padding.
+        if (length) memcpy(m_newItem + 6 + oldSize, data, length);
+        if (newSize & 1) m_newItem[6 + newSize] = 0;
+        as_EndianWriteU16(m_newItem + 4, newSize);
+        m_bufferDataLength = dataOffset + newSize + (newSize & 1);
 
-        unsigned newItemSize = as_EndianReadU16(&m_newItem[4]);
-        assert(newItemSize + length < 65536);
-
-        memcpy(m_bufferStart + m_bufferDataLength, data, length);
-
-        as_EndianWriteU16(&m_newItem[4], newItemSize + length);
-        m_bufferDataLength += length;
         return true;
     }
 
@@ -234,7 +241,7 @@ namespace ts
      */
     void ASSettings::dump(FILE* fh) const
     {
-        fprintf(fh, "Settings object %p:\n", this);
+        fprintf(fh, "Settings object %p:\n", static_cast<const void*>(this));
 
         unsigned index = 0;
         ASSettingsItem item;
@@ -296,7 +303,10 @@ namespace ts
         assert(m_bufferDataLength <= m_bufferDataAllocation);
         assert(ptr >= m_bufferStart && ptr <= (m_bufferStart + m_bufferDataLength));
 
-        if (m_bufferDataLength < 6) return 0;   // not even space for a single header
+        if (!m_bufferStart) return 0;
+        unsigned offset = unsigned(ptr - m_bufferStart);
+        // Check the bytes left at this item, rather than the size of the whole list.
+        if (offset > m_bufferDataLength || m_bufferDataLength - offset < 6) return 0;
 
         unsigned type = as_EndianReadU16(&ptr[0]);
         unsigned ident = as_EndianReadU16(&ptr[2]);
