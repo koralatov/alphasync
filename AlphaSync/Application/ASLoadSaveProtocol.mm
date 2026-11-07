@@ -84,39 +84,6 @@ NSString* makeFilesystemPath(NSString* rootPath, NSString* extendedPath)
 
 
 
-/** Create a new file, using a unique filename. If successful, the result is an empty file on disk
- *  which is opened for writing by using the returned file handle.
- *
- *  @param  path        The directory in which to create the file.
- *  @param  basename    The name for the file, excluding the extension.
- *  @param  extension   The file extension (eg: @"txt").
- *  @param  oFilename   Returns the resulting filename.
- *  @return             If successful, a file handle that can write to the file, or nil if failed.
- */
-NSFileHandle* makeUniqueFile(NSString* path, NSString* basename, NSString* extension, NSString** oFilename)
-{
-    NSString* filename = nil;
-    int fdForWriting = -1;
-    int uniqueID = 0;
-    do
-    {
-        filename = [NSString stringWithFormat:@"%@%@.%@", basename, (uniqueID ? [NSString stringWithFormat:@" (%d)", uniqueID] : @""), extension];
-        fdForWriting = open([[NSString stringWithFormat:@"%@/%@", path, filename] fileSystemRepresentation], O_WRONLY | O_CREAT | O_EXCL, 0666);
-        uniqueID ++;
-    } while (fdForWriting < 0 && errno == EEXIST && uniqueID <= kMaxUniqueRetry);
-
-    NSFileHandle *fileHandle = nil;
-    if (fdForWriting >= 0)
-    {
-        fileHandle = [[NSFileHandle alloc] initWithFileDescriptor:fdForWriting closeOnDealloc:YES];
-    }
-
-    if (oFilename) *oFilename = (fileHandle ? filename : nil);
-    return fileHandle;
-}
-
-
-
 /** Given a file path, obtain its UTI description.
  *
  *  @param  filePath    The file to query.

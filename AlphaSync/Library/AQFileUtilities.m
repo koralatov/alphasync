@@ -28,6 +28,11 @@
  *
  */
 #include <assert.h>
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 #include "AQFileUtilities.h"
 
 /** Create a directory tree, with intermediate directories.
@@ -39,4 +44,64 @@ BOOL aq_FileUtilitiesCreateDirectoriesForPath(NSString* directoryPath)
 {
     NSFileManager* fileManager = [NSFileManager defaultManager];
     return [fileManager createDirectoryAtPath:directoryPath withIntermediateDirectories:YES attributes:nil error:nil];
+}
+
+NSString* aq_WriteUniqueFile(NSString* directory, NSString* basename, NSString* extension,
+                            NSData* data, NSError** error)
+{
+    if (error) *error = nil;
+    if (![directory isAbsolutePath] || ![basename length] || [basename containsString:@"/"] ||
+        [extension containsString:@"/"] || !data)
+    {
+        if (error) *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteInvalidFileNameError userInfo:nil];
+        return nil;
+    }
+
+    // Stage in the destination directory so publication stays on the same volume.
+    // A crash during the write can leave a hidden temporary file, never a completed-looking export.
+    NSString* temporary = [directory stringByAppendingPathComponent:@".alphasync-XXXXXX"];
+    char* temporaryPath = strdup([temporary fileSystemRepresentation]);
+    if (!temporaryPath)
+    {
+        if (error) *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:ENOMEM userInfo:nil];
+        return nil;
+    }
+    int descriptor = mkstemp(temporaryPath);
+    if (descriptor < 0)
+    {
+        if (error) *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:nil];
+        free(temporaryPath);
+        return nil;
+    }
+    NSFileHandle* handle = [[NSFileHandle alloc] initWithFileDescriptor:descriptor closeOnDealloc:YES];
+    NSError* writeError = nil;
+    BOOL written = [handle writeData:data error:&writeError] && [handle synchronizeAndReturnError:&writeError];
+    NSError* closeError = nil;
+    BOOL closed = [handle closeAndReturnError:&closeError];
+    [handle release];
+    NSString* result = nil;
+    if (written && closed)
+    {
+        for (unsigned index = 0; index <= 999; ++index)
+        {
+            NSString* suffix = index ? [NSString stringWithFormat:@" (%u)", index] : @"";
+            NSString* filename = [[basename stringByAppendingString:suffix] stringByAppendingPathExtension:extension];
+            NSString* destination = [directory stringByAppendingPathComponent:filename];
+            // Exclusive rename publishes the complete file in one step without a check-then-write race.
+            if (renamex_np(temporaryPath, [destination fileSystemRepresentation], RENAME_EXCL) == 0)
+            {
+                result = filename;
+                break;
+            }
+            if (errno != EEXIST || index == 999)
+            {
+                writeError = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:nil];
+                break;
+            }
+        }
+    }
+    unlink(temporaryPath);
+    free(temporaryPath);
+    if (!result && error) *error = writeError ?: closeError;
+    return result;
 }

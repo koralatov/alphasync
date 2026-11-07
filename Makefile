@@ -26,8 +26,8 @@ clean:
 	rm -rf build
 
 ifeq ($(shell uname -s),Darwin)
-.PHONY: test-xml
-test: test-xml
+.PHONY: test-xml test-files
+test: test-xml test-files
 
 test-xml: build/xml-tests
 	./build/xml-tests
@@ -35,4 +35,13 @@ test-xml: build/xml-tests
 build/xml-tests: $(CORE_SOURCES) $(CORE_HEADERS) tests/xml-tests.mm Makefile
 	@mkdir -p build
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(CORE_SOURCES) tests/xml-tests.mm -framework Foundation -o $@
+endif
+
+ifeq ($(shell uname -s),Darwin)
+test-files: build/file-tests
+	./build/file-tests
+
+build/file-tests: tests/file-tests.mm AlphaSync/Library/AQFileUtilities.m AlphaSync/Library/AQFileUtilities.h Makefile
+	@mkdir -p build
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -fblocks -x objective-c++ tests/file-tests.mm AlphaSync/Library/AQFileUtilities.m -framework Cocoa -o $@
 endif

@@ -38,6 +38,10 @@ extern "C" {
 
 extern BOOL aq_FileUtilitiesCreateDirectoriesForPath(NSString* directoryPath);
 
+// Return the published filename, or nil on failure.  Existing files are never replaced.
+extern NSString* aq_WriteUniqueFile(NSString* directory, NSString* basename, NSString* extension,
+                                    NSData* data, NSError** error);
+
 #ifdef __cplusplus
 }
 #endif

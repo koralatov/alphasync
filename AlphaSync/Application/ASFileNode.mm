@@ -29,6 +29,7 @@
  *
  */
 #import "ASFileNode.h"
+#import "AQFileUtilities.h"
 #include <limits.h>
 #import "ASFileAttributes.h"
 #import "ASFile.h"
@@ -536,24 +537,9 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
         NSString* extension;
         [self getFileNameBase:&basename extension:&extension];
         if (![basename length]) basename = @"unspecified";
-        NSString* targetFilename = nil;
-        NSFileHandle* handle = makeUniqueFile(path, basename, extension, &targetFilename);
-        if (!handle) error = @"Unable to create the destination file.";
-        else
-        {
-            NSError* writeError = nil;
-            NSError* closeError = nil;
-            BOOL written = [handle writeData:data error:&writeError];
-            BOOL closed = [handle closeAndReturnError:&closeError];
-            [handle release];
-            if (written && closed) result = targetFilename;
-            else
-            {
-                error = [(writeError ?: closeError) localizedDescription] ?: @"Unable to finish writing the file.";
-                // A partial file must not look like a successful backup or export.
-                [[NSFileManager defaultManager] removeItemAtPath:[path stringByAppendingPathComponent:targetFilename] error:nil];
-            }
-        }
+        NSError* writeError = nil;
+        result = aq_WriteUniqueFile(path, basename, extension, data, &writeError);
+        if (!result) error = [writeError localizedDescription] ?: @"Unable to finish writing the file.";
     }
     if (hasDelegate) [accessDelegate deviceDidSave:self error:error sender:self];
     return result;
