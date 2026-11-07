@@ -38,7 +38,6 @@
 #import "ASUserDictionaryFile.h"
 #import "ASAppletID.h"
 #import "ASDeviceAccessProtocol.h"
-#import "ASPreferenceController.h"
 
 using namespace ts;
 
@@ -555,9 +554,8 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
     if (!text) error = @"Unable to read the file data from the device.";
     else
     {
-        NSStringEncoding encoding = fileIsPlainText ? [ASPreferenceController getDefaultTextEncoding] : NSUTF8StringEncoding;
-        data = [text dataUsingEncoding:encoding allowLossyConversion:NO];
-        if (!data) error = @"The selected encoding cannot preserve this text.  Select UTF-8 in Preferences.";
+        data = [text dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:NO];
+        if (!data) error = @"Unable to encode the file as UTF-8.";
     }
 
     if (data)

@@ -26,8 +26,8 @@ clean:
 	rm -rf build
 
 ifeq ($(shell uname -s),Darwin)
-.PHONY: test-xml test-files test-reports test-queue
-test: test-xml test-files test-reports test-queue
+.PHONY: test-xml test-files test-reports test-queue test-text
+test: test-xml test-files test-reports test-queue test-text
 
 test-xml: build/xml-tests
 	./build/xml-tests
@@ -60,11 +60,14 @@ QUEUE_SOURCES := $(addprefix AlphaSync/Application/,ASDeviceController.mm ASDevi
 test-queue: build/queue-tests
 	./build/queue-tests
 
+test-text: build/text-tests
+	./build/text-tests
+
 build/device-factory.o: AlphaSync/Driver/ASDeviceFactory.cc $(CORE_HEADERS) Makefile
 	@mkdir -p build
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
-build/queue-tests: tests/queue-tests.mm $(QUEUE_SOURCES) $(CORE_SOURCES) $(CORE_HEADERS) build/device-factory.o AlphaSync/Library/AQTreeNode.m AlphaSync/Library/AQFileUtilities.m Makefile
+build/queue-tests build/text-tests: build/%: tests/%.mm $(QUEUE_SOURCES) $(wildcard AlphaSync/Application/*.h) $(CORE_SOURCES) $(CORE_HEADERS) build/device-factory.o AlphaSync/Library/AQTreeNode.m AlphaSync/Library/AQFileUtilities.m Makefile
 	@mkdir -p build
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -fblocks -x objective-c++ tests/queue-tests.mm $(QUEUE_SOURCES) $(CORE_SOURCES) AlphaSync/Library/AQTreeNode.m AlphaSync/Library/AQFileUtilities.m -x none build/device-factory.o -framework Cocoa -framework IOKit -framework ServiceManagement -framework UniformTypeIdentifiers -o $@
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -fblocks -x objective-c++ $< $(QUEUE_SOURCES) $(CORE_SOURCES) AlphaSync/Library/AQTreeNode.m AlphaSync/Library/AQFileUtilities.m -x none build/device-factory.o -framework Cocoa -framework IOKit -framework ServiceManagement -framework UniformTypeIdentifiers -o $@
 endif
