@@ -10,11 +10,14 @@ Record the exact app version, build number, source commit, macOS version, archit
 | macOS 11, Apple Silicon | Minimum runtime and older login-item API | Not run |
 | macOS 12.7.5 | Available older Mac and older login-item API | Not run |
 | macOS 13 or later | Launcher registration, approval, and settings changes | Not run |
-| Current macOS, Intel and Apple Silicon | Real USB transfers on both architectures | Not run |
+| macOS 26, Intel and Apple Silicon | Universal app, real USB transfers on both architectures | Not run |
+| macOS 27 or later, Apple Silicon | Modern app, real USB transfers, and launcher approval | Not run |
 
 macOS 12.7.5 provides a useful older-system check.  Passing there does not establish a result for macOS 11.  The automated macOS 15 and 26 builds also do not fill either macOS 11 row.
 
 Record the host with `sw_vers` and `uname -m`.  If Xcode tools are installed, run `scripts/verify-app.sh /Applications/AlphaSync.app` to check both architectures, deployment targets, versions, dependencies, signatures, and window loading on that host.
+
+For the modern app, run `scripts/verify-app.sh /Applications/AlphaSync.app modern` on macOS 27 or later.  This requires exactly `arm64` in both the app and launcher, with a macOS 27 minimum.  Verify that the release contains both downloads with matching versions and source commits, and install only the app appropriate for the test Mac.
 
 ## Launcher
 

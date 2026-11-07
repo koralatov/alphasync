@@ -2,11 +2,22 @@
 
 AlphaSync is a native Mac file manager for AlphaSmart NEO devices.  It copies text files in both directions, backs up named files and file spaces, and can open automatically when a NEO is connected.
 
-The app requires **macOS 11.0 or later**.  One universal app contains native Intel (`x86_64`) and Apple Silicon (`arm64`) executables, including its bundled launcher.  It uses Apple’s public frameworks and the standard C++ library.  There are no third-party libraries, package managers, or separately installed USB drivers.
+Each release provides two downloads built from the same source and version:
+
+| Download | Supported macOS | Processors |
+|---|---|---|
+| Universal | 11 through 26 | Intel and Apple Silicon |
+| Modern | 27 and later | Apple Silicon |
+
+Both include the matching bundled launcher and use Apple’s public frameworks and the standard C++ library.  There are no third-party runtime libraries, package managers, or separately installed USB drivers.  Deployment targets set the minimum system; the download labels describe the supported range.
+
+Install the app for your Mac.  Both downloads contain **AlphaSync.app** and use the same preferences and bundle identifiers, so replace the existing app when changing versions.
 
 ## Build
 
-Release builds use the Xcode version in [.xcode-version](.xcode-version), currently **26.6**.  CI also checks **Xcode 16.4**.  Install Xcode and its command-line tools, open `AlphaSync/AlphaSync.xcodeproj`, select the shared **AlphaSync** scheme, and build.  The project builds both architectures in Debug and Release.
+The universal build uses the Xcode version in [.xcode-version](.xcode-version), currently **26.6**.  The modern build uses [.xcode-version-modern](.xcode-version-modern), currently **27.1**.  CI also checks the universal app with **Xcode 16.4**.
+
+Install Xcode and its command-line tools, open `AlphaSync/AlphaSync.xcodeproj`, and select the shared **AlphaSync** or **AlphaSync-Modern** scheme.  The schemes share their sources and version settings.  The modern scheme uses `DebugModern` and `ReleaseModern`, and builds only `arm64` in both the app and launcher.
 
 From the repository root:
 
@@ -17,7 +28,18 @@ xcodebuild -project AlphaSync/AlphaSync.xcodeproj \
   -derivedDataPath build/DerivedData build
 ```
 
-The result is `build/DerivedData/Build/Products/Release/AlphaSync.app`.  Keep the app bundle intact, including `Contents/Library/LoginItems/AlphaSyncLauncher.app`.
+The universal result is `build/DerivedData/Build/Products/Release/AlphaSync.app`.
+
+For the modern app:
+
+```sh
+xcodebuild -project AlphaSync/AlphaSync.xcodeproj \
+  -scheme AlphaSync-Modern -configuration ReleaseModern \
+  -destination 'generic/platform=macOS' \
+  -derivedDataPath build/ModernData build
+```
+
+The modern result is `build/ModernData/Build/Products/ReleaseModern/AlphaSync.app`.  Launch it on macOS 27 or later.  Keep either app bundle intact, including `Contents/Library/LoginItems/AlphaSyncLauncher.app`.
 
 Newer Xcode releases can raise their minimum supported deployment target.  Check [Apple’s Xcode requirements](https://developer.apple.com/xcode/system-requirements) before changing the toolchain, and keep the macOS 11 checks passing.
 
@@ -34,6 +56,7 @@ The core tests need a C++17 compiler and make.  They run on macOS and Linux, wit
 ```sh
 make test
 make sanitize
+python3 tests/release-tests.py
 ```
 
 They cover text conversion, Windows line endings, unsupported characters, dictionary imports, both UTF-16 byte orders, malformed files, settings boundaries, failed buffer operations, and simulated USB replies.  Invalid-reply tests produce expected error messages before the final success message.
@@ -46,11 +69,19 @@ On a Mac, verify the built app with:
 scripts/verify-app.sh
 ```
 
-This checks both architectures, the executable deployment targets, system-only dependencies, nested signatures, and every interface window.  It does not capture USB devices or change login items.  An alternative app path can be passed as its first argument.
+For the modern build, run on macOS 27 or later:
 
-GitHub Actions runs tests and builds Debug and Release on Intel and Apple Silicon runners with macOS 15 and 26.  Each successful matrix job saves a versioned universal development app, with its source commit in the artifact name.  The pinned Apple Silicon job also checks the distribution archive layout.  These checks run on the runners’ macOS versions, so they do not establish that every feature works on macOS 11.
+```sh
+scripts/verify-app.sh build/ModernData/Build/Products/ReleaseModern/AlphaSync.app modern
+```
 
-A separate advisory job checks the runner’s default Xcode with a macOS 12 deployment target.  It uploads no app.  This reveals changes needed for newer SDKs while the pinned release toolchain continues to produce macOS 11 builds.
+This checks the exact architectures, executable deployment targets, system-only dependencies, matching app and helper versions, nested signatures, and every interface window.  It does not capture USB devices or change login items.  An alternative app path can be passed as its first argument.  An explicit `--skip-launch` third argument permits binary inspection on an older host; it does not establish runtime compatibility.
+
+GitHub Actions builds the universal app on Intel and Apple Silicon runners with macOS 15 and 26.  A required macOS 27 Apple Silicon job builds and launches the modern app.  Both profiles receive Debug, Release, archive, dependency, signature, and window checks.  These checks run on the runners’ macOS versions, so they do not establish that every feature works on macOS 11.
+
+A final job collects the two canonical development downloads into the **AlphaSync-release-<source commit>** artifact, with checksums, build reports, and shared release notes.  It rejects missing packages and mismatched versions, build numbers, source commits, profiles, and signing states.  The collector uses Python 3’s standard library; Python is not required to run AlphaSync.
+
+A separate advisory job checks the modern app with the runner’s default Xcode.  It uploads no app.  This reveals changes needed for newer SDKs while release builds retain their pinned compilers.
 
 ## Automatic launching
 
@@ -75,18 +106,46 @@ Exports are written and synchronised in a hidden temporary file before their fin
 
 Local builds use an ad hoc signature and the hardened runtime.  They do not need the original developer’s certificate, a Developer ID, or a notarisation ticket.  Workflow artifacts use ad hoc signatures for development and testing.
 
-For distribution, install your Developer ID Application certificate and create a [notarytool Keychain profile](https://developer.apple.com/documentation/security/customizing-the-notarization-workflow).  Then run from a clean checkout on the release Mac:
+For a local signed build, install your Developer ID Application certificate and create a [notarytool Keychain profile](https://developer.apple.com/documentation/security/customizing-the-notarization-workflow).  Run from a clean checkout on a Mac compatible with the chosen compiler and app:
 
 ```sh
 ALPHASYNC_SIGNING_IDENTITY='Developer ID Application: Your Name (TEAMID)' \
 ALPHASYNC_TEAM_ID=TEAMID \
 ALPHASYNC_NOTARY_PROFILE=AlphaSync-notary \
-scripts/release.sh
+scripts/release.sh universal build/release-universal
 ```
 
-The script runs the tests, archives the app, verifies both Developer ID signatures and the signing team, and submits the ZIP to Apple.  It requires an accepted notarisation result, staples and validates the ticket, checks Gatekeeper, and creates the final ZIP and SHA-256 checksum.  Credentials stay in your Keychain.  It keeps the archive log, Apple’s result, and source, compiler, and host details in a new `build/release-*` directory for every attempt.  Signed builds contain time-dependent signatures and notarisation tickets.
+Use `modern build/release-modern` for the other download, with the same environment variables and source commit, on macOS 27 or later.  Each output directory must be new.  Omitting the output directory creates a fresh directory under `build`.
 
-The app and helper share **version 1.4.0, build 140** through `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` in the project settings.  Increase the build number for each distributed revision.  App Store distribution and sandboxing are outside the current scope.
+The script runs the tests, archives the app, verifies both Developer ID signatures and the signing team, and submits the ZIP to Apple.  It requires an accepted notarisation result, staples and validates the ticket, checks Gatekeeper, and creates the final ZIP, SHA-256 checksum, and build report in its **assets** subdirectory.  Credentials stay in your Keychain.  The parent directory retains the archive log and Apple’s result.  Signed builds contain time-dependent signatures and notarisation tickets.
+
+Bring the two assets directories to one checkout, then collect them:
+
+```sh
+python3 scripts/collect-release.py \
+  --universal build/release-universal/assets \
+  --modern build/release-modern/assets \
+  --output build/release-assets --require-notarised --tag v1.4.0
+```
+
+### One GitHub release
+
+The **Prepare a release** workflow builds and notarises both downloads on their respective Mac runners, then creates **one draft GitHub release** containing both ZIPs, their checksums, and build reports.  It resolves the selected tag to one commit before either build starts and checks that both packages match it.  It leaves publication to the maintainer.
+
+Once the workflow is on the default branch, create and push a tag matching the shared version, such as `v1.4.0`, then run **Prepare a release** with that existing tag.  The tagged commit must contain the two-build release tooling.  Configure these repository secrets first:
+
+| Secret | Value |
+|---|---|
+| `ALPHASYNC_CERTIFICATE_P12` | Base64-encoded Developer ID Application certificate and private key, exported as `.p12` |
+| `ALPHASYNC_CERTIFICATE_PASSWORD` | Password for that `.p12` file |
+| `ALPHASYNC_SIGNING_IDENTITY` | Full Developer ID Application certificate name |
+| `ALPHASYNC_TEAM_ID` | Apple developer team identifier |
+| `ALPHASYNC_APPLE_ID` | Apple account used for notarisation |
+| `ALPHASYNC_APP_PASSWORD` | Its app-specific password |
+
+See GitHub’s [certificate setup instructions](https://docs.github.com/en/actions/how-tos/deploy/deploy-to-third-party-platforms/sign-xcode-applications).  The workflow imports credentials into a temporary Keychain on each runner and removes it after the build.  Only its final job has permission to write a release.  Existing releases are not overwritten.
+
+Both downloads and their helpers share **version 1.4.0, build 140**, read from [Version.xcconfig](AlphaSync/Build/Version.xcconfig).  Increase the build number for each distributed revision and set the version before creating its release tag.  App Store distribution and sandboxing are outside the current scope.
 
 ## Hardware checks before a release
 
