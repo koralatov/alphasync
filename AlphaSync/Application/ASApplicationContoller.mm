@@ -154,6 +154,14 @@ static const NSInteger kMenuItemTagBackup   = 100;
     [self setupAutoRun:0.0];
 
     [outletFileView setRowSizeStyle:NSTableViewRowSizeStyleDefault];
+    // Older nibs stored a white background instead of an adaptive AppKit colour.
+    [outletFileView setBackgroundColor:[NSColor controlBackgroundColor]];
+    [[outletFileView enclosingScrollView] setBackgroundColor:[NSColor controlBackgroundColor]];
+    for (NSTableColumn* column in [outletFileView tableColumns])
+    {
+        [[column headerCell] setTextColor:[NSColor labelColor]];
+        [[column headerCell] setBackgroundColor:[NSColor controlColor]];
+    }
 
     // Setup drag and drop.
     [outletFileView registerForDraggedTypes:[NSArray arrayWithObjects:NSPasteboardTypeString, NSPasteboardTypeFileURL, nil]];

@@ -36,6 +36,21 @@
 
 using namespace ts;
 
+// Replace colours archived by the old nib with semantic colours.  AppKit resolves
+// these again when the system appearance or accessibility settings change.
+static void useSystemColours(NSView* view)
+{
+    if ([view isKindOfClass:[NSTextField class]])
+    {
+        NSTextField* text = (NSTextField*)view;
+        [text setTextColor:[NSColor labelColor]];
+        [text setBackgroundColor:[NSColor textBackgroundColor]];
+    }
+    if ([view isKindOfClass:[NSBox class]])
+        [[(NSBox*)view titleCell] setTextColor:[NSColor labelColor]];
+    for (NSView* child in [view subviews]) useSystemColours(child);
+}
+
 @implementation ASInspectorWindowController
 
 
@@ -366,6 +381,8 @@ using namespace ts;
 
 - (void)awakeFromNib
 {
+    useSystemColours([[self window] contentView]);
+    [outletPreviewAsText setTextColor:[NSColor textColor]];
     windowFrame = [[self window] frame];
     boxes[kASInspectorBoxMain] = outletBox0;
     boxes[kASInspectorBoxShowPreview] = outletBox1;
