@@ -37,7 +37,7 @@
 #import "ASDeviceAccessProtocol.h"
 #import "ASInspectorWindowController.h"
 
-@interface ASApplicationController : NSObject <NSApplicationDelegate, ASDeviceAccessProtocol, NSWindowDelegate, NSOutlineViewDelegate, NSToolbarDelegate>
+@interface ASApplicationController : NSObject <NSApplicationDelegate, ASDeviceAccessProtocol, NSWindowDelegate, NSOutlineViewDelegate, NSToolbarDelegate, NSTextFieldDelegate>
 {
     IBOutlet NSWindow* outletMainWindow;
     IBOutlet NSOutlineView* outletFileView;

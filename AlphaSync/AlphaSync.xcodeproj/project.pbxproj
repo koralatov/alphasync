@@ -64,7 +64,6 @@
 		A99A54B60F0D43D900BC68F1 /* Backup.nib in Resources */ = {isa = PBXBuildFile; fileRef = A99A54B40F0D43D900BC68F1 /* Backup.nib */; };
 		A99A54EF0F0D474F00BC68F1 /* Preferences.nib in Resources */ = {isa = PBXBuildFile; fileRef = A99A54ED0F0D474F00BC68F1 /* Preferences.nib */; };
 		A99A54FA0F0D5F5100BC68F1 /* Inspector.nib in Resources */ = {isa = PBXBuildFile; fileRef = A99A54F80F0D5F5100BC68F1 /* Inspector.nib */; };
-		A9E5D3710F12BD5B002A9EC3 /* ASFileCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = A9E5D3700F12BD5B002A9EC3 /* ASFileCell.mm */; };
         C01100000000000000000001 /* UniformTypeIdentifiers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01100000000000000000002 /* UniformTypeIdentifiers.framework */; };
         C01100000000000000000004 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
         C01100000000000000000005 /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01100000000000000000006 /* ServiceManagement.framework */; };
@@ -183,8 +182,6 @@
 		A99A54B50F0D43D900BC68F1 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/Backup.nib; sourceTree = "<group>"; };
 		A99A54EE0F0D474F00BC68F1 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/Preferences.nib; sourceTree = "<group>"; };
 		A99A54F90F0D5F5100BC68F1 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/Inspector.nib; sourceTree = "<group>"; };
-		A9E5D36F0F12BD5B002A9EC3 /* ASFileCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASFileCell.h; sourceTree = "<group>"; };
-		A9E5D3700F12BD5B002A9EC3 /* ASFileCell.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASFileCell.mm; sourceTree = "<group>"; };
         C01100000000000000000002 /* UniformTypeIdentifiers.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UniformTypeIdentifiers.framework; path = System/Library/Frameworks/UniformTypeIdentifiers.framework; sourceTree = SDKROOT; };
         C01100000000000000000006 /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
 		62623E530502DA726AF5AC00 /* ASBackupReport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASBackupReport.h; sourceTree = "<group>"; };
@@ -412,8 +409,6 @@
 				A99A54500F0D39E400BC68F1 /* ASNodeDataSource.mm */,
 				A99A54510F0D39E400BC68F1 /* ASPreferenceController.h */,
 				A99A54520F0D39E400BC68F1 /* ASPreferenceController.mm */,
-				A9E5D36F0F12BD5B002A9EC3 /* ASFileCell.h */,
-				A9E5D3700F12BD5B002A9EC3 /* ASFileCell.mm */,
 			);
 			path = Application;
 			sourceTree = "<group>";
@@ -586,7 +581,6 @@
 				A99A54790F0D39FF00BC68F1 /* ASFile.cc in Sources */,
 				A99A547A0F0D39FF00BC68F1 /* ASFileAttributes.cc in Sources */,
 				A99A547B0F0D39FF00BC68F1 /* ASUserDictionaryFile.cc in Sources */,
-				A9E5D3710F12BD5B002A9EC3 /* ASFileCell.mm in Sources */,
 				A96033A30F15D66B0046DBC1 /* AQTreeNode.m in Sources */,
 				A95EFA5B0F17C91400E1BDA9 /* aq_launcher.m in Sources */,
 				A95EFD360F17D60F00E1BDA9 /* AQFileUtilities.m in Sources */,

@@ -32,7 +32,6 @@
 
 #import "ASApplicationContoller.h"
 #import "ASInspectorWindowController.h"
-#import "ASFileCell.h"
 #import "AQFileUtilities.h"
 #import "aq_launcher.h"
 #import "aq_launcherconfig.h"
@@ -157,11 +156,7 @@ static const NSInteger kMenuItemTagBackup   = 100;
 
     [self setupAutoRun:0.0];
 
-    // Setup custom cell for the file name and icon view.
-    NSTableColumn *tc = [outletFileView tableColumnWithIdentifier:@"Name"];
-    ASFileCell *fs = [[[ASFileCell alloc] init] autorelease];
-    [fs setEditable:YES];
-    [tc setDataCell:fs];
+    [outletFileView setRowSizeStyle:NSTableViewRowSizeStyleDefault];
 
     // Setup drag and drop.
     [outletFileView registerForDraggedTypes:[NSArray arrayWithObjects:NSPasteboardTypeString, NSPasteboardTypeFileURL, nil]];
@@ -873,25 +868,74 @@ static const NSInteger kMenuItemTagBackup   = 100;
 }
 
 
-- (BOOL)outlineView:(NSOutlineView*)outlineView shouldEditTableColumn:(NSTableColumn*)tableColumn item:(id)item
+- (NSView*)outlineView:(NSOutlineView*)outlineView viewForTableColumn:(NSTableColumn*)tableColumn item:(id)item
 {
-    (void)outlineView;
-    (void)tableColumn;
-    if ([item isMemberOfClass:[ASFileNode class]]) return YES;
-    else return NO;         // REVIEW: may allow editing of the device name in future
+    BOOL isName = [[tableColumn identifier] isEqualToString:@"Name"];
+    NSTableCellView* cell = [outlineView makeViewWithIdentifier:[tableColumn identifier] owner:self];
+    if (!cell)
+    {
+        cell = [[[NSTableCellView alloc] initWithFrame:NSZeroRect] autorelease];
+        [cell setIdentifier:[tableColumn identifier]];
+        NSTextField* text = [NSTextField labelWithString:@""];
+        [text setFont:[NSFont systemFontOfSize:[NSFont systemFontSize]]];
+        [text setLineBreakMode:NSLineBreakByTruncatingTail];
+        [text setTranslatesAutoresizingMaskIntoConstraints:NO];
+        [cell addSubview:text];
+        [cell setTextField:text];
+
+        NSLayoutXAxisAnchor* leading = [cell leadingAnchor];
+        if (isName)
+        {
+            NSImageView* image = [[[NSImageView alloc] initWithFrame:NSZeroRect] autorelease];
+            [image setImageScaling:NSImageScaleProportionallyDown];
+            [image setTranslatesAutoresizingMaskIntoConstraints:NO];
+            [cell addSubview:image];
+            [cell setImageView:image];
+            [NSLayoutConstraint activateConstraints:@[
+                [[image leadingAnchor] constraintEqualToAnchor:[cell leadingAnchor] constant:2],
+                [[image centerYAnchor] constraintEqualToAnchor:[cell centerYAnchor]],
+                [[image widthAnchor] constraintEqualToConstant:16],
+                [[image heightAnchor] constraintEqualToConstant:16]
+            ]];
+            leading = [image trailingAnchor];
+            [text setDelegate:self];
+        }
+        [NSLayoutConstraint activateConstraints:@[
+            [[text leadingAnchor] constraintEqualToAnchor:leading constant:4],
+            [[text trailingAnchor] constraintEqualToAnchor:[cell trailingAnchor] constant:-4],
+            [[text centerYAnchor] constraintEqualToAnchor:[cell centerYAnchor]]
+        ]];
+    }
+
+    [cell setObjectValue:item];
+    [[cell textField] setStringValue:[dataSource outlineView:outlineView objectValueForTableColumn:tableColumn byItem:item] ?: @""];
+    [[cell textField] setEditable:isName && [item isMemberOfClass:[ASFileNode class]]];
+    [[cell imageView] setImage:isName ? [item smallIcon] : nil];
+    return cell;
 }
 
 
-/** Delagate method used to specify the icon to show next to the file name.
- */
-- (void)outlineView:(NSOutlineView*)outlineView willDisplayCell:(NSCell*)cell forTableColumn:(NSTableColumn*)tableColumn item:(id)item
+- (BOOL)control:(NSControl*)control textShouldBeginEditing:(NSText*)editor
 {
-    (void)outlineView;
-    if ([[tableColumn identifier] isEqualToString:@"Name"])
+    (void)editor;
+    NSTableCellView* cell = (NSTableCellView*)[control superview];
+    return ![deviceController isBusy] && [[cell objectValue] isMemberOfClass:[ASFileNode class]];
+}
+
+
+- (void)controlTextDidEndEditing:(NSNotification*)notification
+{
+    NSTextField* text = [notification object];
+    NSTableCellView* cell = (NSTableCellView*)[text superview];
+    id item = [cell objectValue];
+    if ([[notification userInfo][@"NSTextMovement"] integerValue] != NSCancelTextMovement &&
+        ![[text stringValue] isEqualToString:[item displayName]])
     {
-        ASFileCell* fc = (ASFileCell*)cell;
-    	[fc setIcon:[item smallIcon]];
+        NSTableColumn* column = [outletFileView tableColumnWithIdentifier:@"Name"];
+        [dataSource outlineView:outletFileView setObjectValue:[text stringValue] forTableColumn:column byItem:item];
     }
+    // Show the cached name until the existing queued rename publishes its result.
+    [text setStringValue:[item displayName]];
 }
 
 
