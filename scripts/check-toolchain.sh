@@ -2,7 +2,8 @@
 set -euo pipefail
 
 repository=$(cd "$(dirname "$0")/.." && pwd)
-expected=$(cat "$repository/.xcode-version")
+source "$repository/scripts/build-profile.sh" "${1:-universal}"
+expected=$profile_xcode
 if ! command -v xcodebuild >/dev/null; then
     printf 'Install Xcode %s and select it with DEVELOPER_DIR.\n' "$expected" >&2
     exit 1
