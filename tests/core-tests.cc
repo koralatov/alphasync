@@ -102,11 +102,78 @@ static void testMalformedGenericFiles()
     CHECK(target.fileSize() == 0);
 }
 
+class MockDevice : public ts::ASDevice
+{
+public:
+    std::vector<std::vector<uint8_t>> replies;
+    unsigned reads = 0;
+    using ts::ASDevice::rawReadFile;
+
+    void reply(unsigned command, unsigned length = 0, unsigned checksum = 0)
+    {
+        ts::ASMessage message(command);
+        message.setArgument(length, 1, 4);
+        message.setArgument(checksum, 5, 2);
+        const uint8_t* data = static_cast<const uint8_t*>(message.rawData());
+        replies.emplace_back(data, data + message.rawSize());
+    }
+
+    bool read(void* buffer, unsigned length, unsigned* actual, unsigned timeout) override
+    {
+        (void)timeout;
+        CHECK(reads < replies.size());
+        const auto& data = replies[reads++];
+        CHECK(length == data.size());
+        std::memcpy(buffer, data.data(), data.size());
+        if (actual) *actual = data.size();
+        return true;
+    }
+    bool write(const void* buffer, unsigned length, unsigned timeout) override
+    {
+        (void)buffer;
+        (void)length;
+        (void)timeout;
+        return true;
+    }
+};
+
+static void testUSBReadBounds()
+{
+    for (unsigned length : {0u, 8u})
+    {
+        MockDevice device;
+        device.reply(ASMESSAGE_RESPONSE_BLOCK_READ);
+        device.reply(ASMESSAGE_RESPONSE_BLOCK_READ, length);
+        uint8_t output[4] = {};
+        unsigned actual = 99;
+        CHECK(!device.rawReadFile(output, sizeof output, &actual, 0, 0));
+        CHECK(actual == 0 && device.reads == 2);
+    }
+    MockDevice device;
+    device.reply(ASMESSAGE_RESPONSE_BLOCK_READ);
+    device.reply(ASMESSAGE_RESPONSE_BLOCK_READ, 2, 3);
+    device.replies.push_back({1, 2});
+    device.reply(ASMESSAGE_RESPONSE_BLOCK_READ, 2, 7);
+    device.replies.push_back({3, 4});
+    uint8_t output[4] = {};
+    unsigned actual = 0;
+    CHECK(device.rawReadFile(output, sizeof output, &actual, 0, 0));
+    CHECK(actual == sizeof output && device.reads == 5);
+    CHECK(output[0] == 1 && output[3] == 4);
+
+    MockDevice badChecksum;
+    badChecksum.reply(ASMESSAGE_RESPONSE_BLOCK_READ);
+    badChecksum.replies[0][7] ^= 1;
+    CHECK(!badChecksum.rawReadFile(output, sizeof output, &actual, 0, 0));
+    CHECK(actual == 0 && badChecksum.reads == 1);
+}
+
 int main()
 {
     testAlphaWordRoundTrip();
     testGenericRoundTrip();
     testSettingsBounds();
     testMalformedGenericFiles();
+    testUSBReadBounds();
     std::puts("All core tests passed.");
 }

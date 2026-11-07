@@ -638,7 +638,7 @@ namespace ts
      */
     bool ASDevice::getResponse(ASMessage* response)
     {
-        bool result = read(response->rawData(), response->rawSize());
+        bool result = read(response->rawData(), response->rawSize()) && response->valid();
         if (!result) fprintf(stderr, "%s: error reading from device\n", __FUNCTION__);
         return result;
     }
@@ -740,6 +740,12 @@ namespace ts
             {
                 unsigned blocksize = response.argument(1, 4);
                 unsigned checksum = response.argument(5, 2);
+                // Check the device’s length before allowing the transport to fill our buffer.
+                if (!blocksize || blocksize > remaining)
+                {
+                    ok = false;
+                    break;
+                }
                 ok = read(ptr, blocksize);
                 if (!ok)
                 {
@@ -757,6 +763,7 @@ namespace ts
                 {
                     ptr += blocksize;
                     bytesread += blocksize;
+                    remaining -= blocksize;
                 }
             }
             else
