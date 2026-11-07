@@ -239,6 +239,53 @@ static void testUnicodeByteOrder()
     CHECK(!file.importText(native, 3));
 }
 
+static std::vector<uint8_t> dictionaryBytes(unsigned size, unsigned offset)
+{
+    std::vector<uint8_t> bytes(size, 'a');
+    for (unsigned i = 0; i < 19; ++i) ts::as_EndianWriteU16(bytes.data() + i * 2, offset);
+    return bytes;
+}
+
+static void testMalformedDictionaries()
+{
+    ts::ASUserDictionaryFile file;
+    CHECK(file.addWord("original"));
+
+    auto partialWord = dictionaryBytes(39, 39);
+    ts::as_EndianWriteU16(partialWord.data(), 38);
+    CHECK(!file.load(partialWord.data(), partialWord.size()));
+    CHECK(file.wordCount() == 1 && file.containsWord("original"));
+
+    auto descending = dictionaryBytes(44, 44);
+    ts::as_EndianWriteU16(descending.data(), 40);
+    ts::as_EndianWriteU16(descending.data() + 2, 38);
+    CHECK(!file.load(descending.data(), descending.size()));
+
+    auto headerWord = dictionaryBytes(38, 0);
+    CHECK(!file.load(headerWord.data(), headerWord.size()));
+    auto outside = dictionaryBytes(38, 40);
+    CHECK(!file.load(outside.data(), outside.size()));
+
+    auto embeddedNull = dictionaryBytes(40, 40);
+    ts::as_EndianWriteU16(embeddedNull.data(), 38);
+    embeddedNull[38] = 0;
+    CHECK(!file.load(embeddedNull.data(), embeddedNull.size()));
+
+    for (unsigned size = 0; size < 38; ++size)
+    {
+        std::vector<uint8_t> shortFile(size);
+        CHECK(!file.load(shortFile.data(), size));
+    }
+    CHECK(file.wordCount() == 1 && file.containsWord("original"));
+
+    auto valid = dictionaryBytes(40, 40);
+    ts::as_EndianWriteU16(valid.data(), 38);
+    valid[38] = 'a';
+    valid[39] = 'b';
+    CHECK(file.load(valid.data(), valid.size()));
+    CHECK(file.wordCount() == 1 && file.containsWord("ab"));
+}
+
 int main()
 {
     testAlphaWordRoundTrip();
@@ -249,5 +296,6 @@ int main()
     testFileBufferFailures();
     testRejectedLoadPreservesData();
     testUnicodeByteOrder();
+    testMalformedDictionaries();
     std::puts("All core tests passed.");
 }

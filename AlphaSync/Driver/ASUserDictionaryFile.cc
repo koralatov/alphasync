@@ -120,8 +120,7 @@ namespace ts
             uint8_t* start;
             uint8_t* end;
 
-            textRegionForLength(&start, &end, wordLength);
-            assert(end >= start);
+            if (!textRegionForLength(&start, &end, wordLength)) return false;
             unsigned wordsThisLength = unsigned(end - start) / wordLength;
 
             if (index < wordsThisLength)
@@ -333,36 +332,29 @@ namespace ts
      */
     bool ASUserDictionaryFile::loadOffsets()
     {
-        for (unsigned i = 0; i < sizeof m_offsets / sizeof m_offsets[0]; i++)  m_offsets[i] = 0;
-
-        bool ok = true;
-
-        if (fileSize() > kASUserDictionaryFileMaxFileSize)
-        {
-            assert(0);
+        if (fileSize() < kASUserDictionaryFileMinFileSize || fileSize() > kASUserDictionaryFileMaxFileSize)
             return false;
-        }
 
-        if (fileSize() < (kASUserDictionaryFileMaxWordLength - kASUserDictionaryFileMinWordLength + 1) * 2)
+        unsigned offsets[kASUserDictionaryFileMaxWordLength + 2] = {};
+        unsigned previous = kASUserDictionaryFileMinFileSize;
+        for (unsigned length = kASUserDictionaryFileMinWordLength; length <= kASUserDictionaryFileMaxWordLength; ++length)
         {
-            assert(0);
-            return false;
+            unsigned offset = as_EndianReadU16(byteData() + (length - kASUserDictionaryFileMinWordLength) * 2);
+            if (offset < previous || offset > fileSize()) return false;
+            // Each section stores whole words of the preceding section’s fixed length.
+            if (length > kASUserDictionaryFileMinWordLength && (offset - previous) % (length - 1)) return false;
+            offsets[length] = offset;
+            previous = offset;
         }
+        if ((fileSize() - previous) % kASUserDictionaryFileMaxWordLength) return false;
+        offsets[kASUserDictionaryFileMaxWordLength + 1] = fileSize();
 
-        m_offsets[kASUserDictionaryFileMaxWordLength + 1] = fileSize();
+        unsigned textOffset = offsets[kASUserDictionaryFileMinWordLength];
+        if (fileSize() > textOffset && memchr(byteData() + textOffset, 0, fileSize() - textOffset)) return false;
 
-        for (unsigned i = kASUserDictionaryFileMinWordLength; i <= kASUserDictionaryFileMaxWordLength; i++)
-        {
-            m_offsets[i] = as_EndianReadU16(byteData() + ((i - kASUserDictionaryFileMinWordLength) * 2));
-            assert(m_offsets[i] <= m_offsets[kASUserDictionaryFileMaxWordLength+1]);
-            if (m_offsets[i] > fileSize())
-            {
-                m_offsets[i] = fileSize(); // catch corrupt input
-                ok = false;
-            }
-        }
-
-        return ok;
+        // Only publish decoded offsets after the complete file has passed validation.
+        memcpy(m_offsets, offsets, sizeof m_offsets);
+        return true;
     }
 
 
@@ -389,7 +381,9 @@ namespace ts
      */
     bool ASUserDictionaryFile::textRegionForLength(uint8_t** start, uint8_t** end, unsigned length) const
     {
-        if (0 == byteData() || length < kASUserDictionaryFileMinWordLength || length > kASUserDictionaryFileMaxWordLength)
+        if (!byteData() || length < kASUserDictionaryFileMinWordLength || length > kASUserDictionaryFileMaxWordLength ||
+            m_offsets[length] < kASUserDictionaryFileMinFileSize || m_offsets[length] > m_offsets[length + 1] ||
+            m_offsets[length + 1] > fileSize() || (m_offsets[length + 1] - m_offsets[length]) % length)
         {
             *start = 0;
             *end = 0;
@@ -421,7 +415,7 @@ namespace ts
         uint8_t* start;
         uint8_t* end;
 
-        textRegionForLength(&start, &end, length);
+        if (!textRegionForLength(&start, &end, length)) return nullptr;
 
         for (uint8_t* search = start; search < end; search += length)
         {
