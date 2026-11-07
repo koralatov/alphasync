@@ -203,3 +203,88 @@ jobs:
           name: AlphaSync-release-${{ github.sha }}
           path: build/release-assets/*
           if-no-files-found: error
+
+  publish:
+    name: Publish both downloads as one testing release
+    if: github.event_name == 'push' && startsWith(github.event.head_commit.message, 'Release AlphaSync ')
+    needs: collect
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+    concurrency:
+      group: publish-${{ github.ref }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Check the release request and notes
+        id: release
+        env:
+          RELEASE_MESSAGE: ${{ github.event.head_commit.message }}
+        run: |
+          version=$(sed -n 's/^MARKETING_VERSION *= *//p' AlphaSync/Build/Version.xcconfig)
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          subject=${RELEASE_MESSAGE%%$'\n'*}
+          test "$subject" = "Release AlphaSync $version"
+          test -s "releases/$version.md"
+          printf 'version=%s\ntag=v%s\n' "$version" "$version" >> "$GITHUB_OUTPUT"
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: AlphaSync-universal-macos-26-${{ github.sha }}
+          path: incoming/universal
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: AlphaSync-modern-${{ github.sha }}
+          path: incoming/modern
+      - name: Verify the release version and source before publishing
+        env:
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+          RELEASE_COMMIT: ${{ github.sha }}
+        run: >-
+          python3 scripts/collect-release.py --universal incoming/universal
+          --modern incoming/modern --output build/publish-assets
+          --tag "$RELEASE_TAG" --source-commit "$RELEASE_COMMIT"
+      - name: Create the tag and upload the draft
+        env:
+          RELEASE_VERSION: ${{ steps.release.outputs.version }}
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+          RELEASE_COMMIT: ${{ github.sha }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Creating a fresh ref fails if the tag already exists; never move a release tag.
+          gh api "repos/$GITHUB_REPOSITORY/git/refs" --method POST \
+            -f "ref=refs/tags/$RELEASE_TAG" -f "sha=$RELEASE_COMMIT"
+          gh release create "$RELEASE_TAG" build/publish-assets/*.zip \
+            build/publish-assets/*.sha256 build/publish-assets/*.build-information.txt \
+            --repo "$GITHUB_REPOSITORY" --verify-tag --draft --prerelease --latest=false \
+            --title "AlphaSync $RELEASE_VERSION" --notes-file "releases/$RELEASE_VERSION.md"
+          gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" \
+            --json assets,isDraft,isPrerelease,tagName > build/draft-release.json
+      - name: Check all six uploaded assets before publication
+        env:
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          release = json.loads(Path('build/draft-release.json').read_text())
+          expected = {p.name: p.stat().st_size for p in Path('build/publish-assets').iterdir()
+                      if p.name != 'release-notes.md'}
+          actual = {asset['name']: asset['size'] for asset in release['assets']}
+          assert len(expected) == 6 and actual == expected, 'The uploaded release assets are incomplete.'
+          assert release['isDraft'] and release['isPrerelease']
+          assert release['tagName'] == os.environ['RELEASE_TAG']
+          PY
+      - name: Publish the testing release
+        env:
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+          RELEASE_COMMIT: ${{ github.sha }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          test "$(gh api "repos/$GITHUB_REPOSITORY/commits/$RELEASE_TAG" --jq .sha)" = "$RELEASE_COMMIT"
+          gh release edit "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" \
+            --draft=false --prerelease --latest=false
+          gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" \
+            --json url,isDraft,isPrerelease,tagName
