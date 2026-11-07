@@ -60,6 +60,8 @@
     IBOutlet NSButton* outletBackupFolder;
     IBOutlet NSButton* outletAutoRun;
 
+    NSTextField* automaticLaunchStatusField;
+    NSButton* loginItemsButton;
     ASApplicationController* applicationController;
 }
 

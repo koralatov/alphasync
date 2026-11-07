@@ -31,6 +31,7 @@
 
 #import "ASPreferenceController.h"
 #import "ASApplicationContoller.h"
+#import <ServiceManagement/ServiceManagement.h>
 
 @implementation ASPreferenceController
 
@@ -88,6 +89,7 @@
 
 - (void)dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [applicationController release];
     [super dealloc];
 }
@@ -122,6 +124,48 @@
     [outletBackupFolder setTitle:[self backupFolder]];
     [outletTextEncoding selectItemWithTag:[self textEncodingOption]];
     [outletAutoRun setState:[self autoRun] ? NSControlStateValueOn : NSControlStateValueOff];
+
+    // Keep the older nib intact and add enough room for the actual system status.
+    NSWindow* window = [self window];
+    NSView* content = [window contentView];
+    NSSize size = [content frame].size;
+    [content setAutoresizesSubviews:NO];
+    [window setContentSize:NSMakeSize(size.width, size.height + 100)];
+    for (NSView* view in [content subviews])
+    {
+        NSRect frame = [view frame];
+        frame.origin.y += 100;
+        [view setFrame:frame];
+    }
+    [content setAutoresizesSubviews:YES];
+
+    automaticLaunchStatusField = [NSTextField wrappingLabelWithString:@""];
+    [automaticLaunchStatusField setFrame:NSMakeRect(20, 42, size.width - 40, 48)];
+    [automaticLaunchStatusField setFont:[NSFont systemFontOfSize:12]];
+    [automaticLaunchStatusField setAutoresizingMask:NSViewWidthSizable];
+    [content addSubview:automaticLaunchStatusField];
+    loginItemsButton = [NSButton buttonWithTitle:@"Open Login Items Settings" target:self action:@selector(openLoginItemsSettings:)];
+    [loginItemsButton setFrame:NSMakeRect(16, 8, 210, 28)];
+    [content addSubview:loginItemsButton];
+    [self refreshAutomaticLaunchStatus:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshAutomaticLaunchStatus:)
+                                                name:NSApplicationDidBecomeActiveNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshAutomaticLaunchStatus:)
+                                                name:NSWindowDidBecomeKeyNotification object:window];
+}
+
+- (void)refreshAutomaticLaunchStatus:(NSNotification*)notification
+{
+    (void)notification;
+    [automaticLaunchStatusField setStringValue:[applicationController automaticLaunchStatus]];
+    if (@available(macOS 13.0, *)) [loginItemsButton setHidden:NO];
+    else [loginItemsButton setHidden:YES];
+}
+
+- (void)openLoginItemsSettings:(id)sender
+{
+    (void)sender;
+    if (@available(macOS 13.0, *)) [SMAppService openSystemSettingsLoginItems];
 }
 
 
@@ -184,6 +228,7 @@
     [[NSUserDefaults standardUserDefaults] setBool:((NSControlStateValueOn == state) ? YES : NO) forKey:kASPreferenceKeyAutoRun];
     [outletAutoRun setState:[self autoRun] ? NSControlStateValueOn : NSControlStateValueOff];
     [applicationController setupAutoRun:0.0];
+    [self refreshAutomaticLaunchStatus:nil];
 }
 
 - (IBAction)actionTextEncoding:(id)sender
