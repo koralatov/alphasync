@@ -631,8 +631,14 @@ namespace ts
 
         notifyPort = IONotificationPortCreate(masterPort);
         if (!notifyPort) goto error;
-        runLoopSource = IONotificationPortGetRunLoopSource(notifyPort);
-        CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSource, kCFRunLoopDefaultMode);    // notification callbacks will be run here
+        // Notifications and transfers must use the same serial queue.  A disconnect
+        // callback can then release a device only after the current command has returned.
+        if (factory->m_notificationQueue) IONotificationPortSetDispatchQueue(notifyPort, factory->m_notificationQueue);
+        else
+        {
+            runLoopSource = IONotificationPortGetRunLoopSource(notifyPort);
+            CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSource, kCFRunLoopDefaultMode);
+        }
 
 
         status = IOServiceAddMatchingNotification(
@@ -841,11 +847,12 @@ namespace ts
 
     /** Class constructor.
      */
-    ASDeviceFactory::ASDeviceFactory()
+    ASDeviceFactory::ASDeviceFactory(dispatch_queue_t notificationQueue)
         :
+        m_notificationQueue(notificationQueue),
         m_usb(0)
     {
-        // Nothing.
+        if (m_notificationQueue) dispatch_retain(m_notificationQueue);
     }
 
 
@@ -854,6 +861,7 @@ namespace ts
     ASDeviceFactory::~ASDeviceFactory()
     {
         disable();
+        if (m_notificationQueue) dispatch_release(m_notificationQueue);
     }
 
 

@@ -33,6 +33,7 @@
 #define COM_TSONIQ_ASDeviceFactory_H   (1)
 
 #include "ASDevice.h"
+#include <dispatch/dispatch.h>
 
 
 namespace ts
@@ -83,7 +84,7 @@ namespace ts
     {
     public:
 
-        ASDeviceFactory();
+        explicit ASDeviceFactory(dispatch_queue_t notificationQueue = nullptr);
         ~ASDeviceFactory();
 
         bool enable(void* context, ASDeviceFactoryDetect detect, ASDeviceFactoryConnect connect, ASDeviceFactoryDisconnect disconnect);
@@ -98,6 +99,7 @@ namespace ts
 
     private:
 
+        dispatch_queue_t m_notificationQueue;
         class ASDeviceFactoryUSB* m_usb;       /**< USB context (separated to isolate this header from OS dependencies). */
 
         friend class ASDeviceFactoryUSB;
