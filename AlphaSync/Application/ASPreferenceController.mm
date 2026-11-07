@@ -70,6 +70,7 @@ static NSBox* ASPreferenceSeparator(void)
 }
 
 @interface ASPreferenceController ()
+- (void)buildWindow;
 - (void)updateBackupFolder;
 - (void)fitWindowToContent;
 @end
@@ -91,6 +92,7 @@ static NSBox* ASPreferenceSeparator(void)
     if ((self = [super initWithWindow:nil]))
     {
         applicationController = [controller retain];
+        [self buildWindow];
     }
     return self;
 }
@@ -122,7 +124,7 @@ static NSBox* ASPreferenceSeparator(void)
 
 
 
-- (void)loadWindow
+- (void)buildWindow
 {
     NSWindow* window = [[[NSWindow alloc] initWithContentRect:NSMakeRect(0, 0, 560, 600)
                                                   styleMask:NSWindowStyleMaskTitled | NSWindowStyleMaskClosable
@@ -215,11 +217,6 @@ static NSBox* ASPreferenceSeparator(void)
         [[form bottomAnchor] constraintEqualToAnchor:[content bottomAnchor] constant:-20]
     ]];
     [window setInitialFirstResponder:outletFilterOption];
-}
-
-- (void)windowDidLoad
-{
-    [super windowDidLoad];
     [outletFilterOption selectItemWithTag:[self displayOption]];
     [self updateBackupFolder];
     [outletAutoRun setState:[self autoRun] ? NSControlStateValueOn : NSControlStateValueOff];

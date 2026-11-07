@@ -301,7 +301,7 @@ static int checkInterface(void)
         for (NSString* key in @[@"preferenceController", @"inspectorController"])
         {
             NSWindowController* windowController = [controller valueForKey:key];
-            if (![windowController window]) return 1;
+            requireInterface([windowController window] != nil, [NSString stringWithFormat:@"The %@ window did not load.", key]);
         }
         checkPreferences(controller);
         NSWindowController* backup = [[NSClassFromString(@"ASBackupController") alloc] init];
