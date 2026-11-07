@@ -210,7 +210,7 @@ static NSImage* iconDeviceNeo = nil;              /**< Icon to use for Neo mk1 d
 {
     [self removeAllChildren];
 
-    int displayOption = [[NSUserDefaults standardUserDefaults] integerForKey:kASPreferenceKeyFilter];
+    NSInteger displayOption = [[NSUserDefaults standardUserDefaults] integerForKey:kASPreferenceKeyFilter];
 
     const ASApplet* systemApplet = device->appletForID(kASAppletID_System);
     if (systemApplet)

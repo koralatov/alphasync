@@ -102,7 +102,9 @@ namespace ts
 
     bool ASUserDictionaryFile::containsWord(const char* word) const
     {
-        unsigned length = strlen(word);
+        size_t count = strlen(word);
+        if (count < kASUserDictionaryFileMinWordLength || count > kASUserDictionaryFileMaxWordLength) return false;
+        unsigned length = static_cast<unsigned>(count);
         return (0 != locateWord((uint8_t*)word, length));
     }
 
@@ -141,7 +143,9 @@ namespace ts
         if (0 == byteData()) clearDictionary();
         if (0 == byteData()) return false;
 
-        unsigned wordLength = strlen(word);
+        size_t count = strlen(word);
+        if (count < kASUserDictionaryFileMinWordLength || count > kASUserDictionaryFileMaxWordLength) return false;
+        unsigned wordLength = static_cast<unsigned>(count);
 
         uint8_t* start;
         uint8_t* end;
@@ -186,7 +190,9 @@ namespace ts
         // Handle any earlier memory allocation failure.
         if (0 == byteData()) return;
 
-        size_t wordLength = strlen(word);
+        size_t count = strlen(word);
+        if (count < kASUserDictionaryFileMinWordLength || count > kASUserDictionaryFileMaxWordLength) return;
+        unsigned wordLength = static_cast<unsigned>(count);
         uint8_t* location = locateWord((uint8_t*)word, wordLength);
         if (location)
         {

@@ -94,7 +94,7 @@ namespace ts
     bool ASFileAttributes::setFileName(const char* name)
     {
         bool ok = true;
-        unsigned len = strlen(name);
+        size_t len = strlen(name);
         if (len > 15)
         {
             len = 15;
@@ -115,7 +115,7 @@ namespace ts
     bool ASFileAttributes::setPassword(const char* pass)
     {
         bool ok = true;
-        unsigned len = strlen(pass);
+        size_t len = strlen(pass);
         if (len > 6)
         {
             len = 6;

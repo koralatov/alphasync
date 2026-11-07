@@ -168,7 +168,9 @@ namespace ts
      */
     bool ASSettings::appendItemData(const char* string)
     {
-        return appendItemData(string, strlen(string) + 1);
+        size_t length = strlen(string);
+        if (length >= 65535) return false;
+        return appendItemData(string, static_cast<unsigned>(length + 1));
     }
 
 
@@ -300,10 +302,9 @@ namespace ts
      */
     unsigned ASSettings::loadItem(ASSettingsItem* item, const uint8_t* ptr) const
     {
+        if (!m_bufferStart) return 0;
         assert(m_bufferDataLength <= m_bufferDataAllocation);
         assert(ptr >= m_bufferStart && ptr <= (m_bufferStart + m_bufferDataLength));
-
-        if (!m_bufferStart) return 0;
         unsigned offset = unsigned(ptr - m_bufferStart);
         // Check the bytes left at this item, rather than the size of the whole list.
         if (offset > m_bufferDataLength || m_bufferDataLength - offset < 6) return 0;

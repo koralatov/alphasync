@@ -244,6 +244,7 @@ static void deviceAdded(void* refCon, io_iterator_t iterator)
                             NSWorkspaceOpenConfiguration* configuration = [NSWorkspaceOpenConfiguration configuration];
                             [workspace openApplicationAtURL:url configuration:configuration
                                          completionHandler:^(NSRunningApplication* app, NSError* error) {
+                                (void)app;
                                 if (error) NSLog(@"Unable to open AlphaSync: %@", error);
                             }];
                         }

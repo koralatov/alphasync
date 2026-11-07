@@ -1002,6 +1002,7 @@ static const NSInteger kMenuItemTagBackup   = 100;
     if ([[NSFileManager defaultManager] fileExistsAtPath:applicationSupportPath])
         [urls addObject:[NSURL fileURLWithPath:applicationSupportPath isDirectory:YES]];
     [workspace recycleURLs:urls completionHandler:^(NSDictionary* newURLs, NSError* error) {
+        (void)newURLs;
         if (error) [self setStatusError:[error localizedDescription]];
         else
         {

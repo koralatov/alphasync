@@ -29,6 +29,7 @@
  *
  */
 #import "ASFileNode.h"
+#include <limits.h>
 #import "ASFileAttributes.h"
 #import "ASFile.h"
 #import "ASGenericFile.h"
@@ -128,7 +129,7 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
     if (contentsOfPath)
     {
         NSData* unicodeData = [contentsOfPath dataUsingEncoding:NSUnicodeStringEncoding allowLossyConversion:YES];
-        if (unicodeData)
+        if (unicodeData && [unicodeData length] <= UINT_MAX)
         {
             switch (applet->appletID())
             {
@@ -137,7 +138,7 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
                 default:                                file = new ASGenericFile;           break;
             }
 
-            if (file->importText((const uint16_t*)[unicodeData bytes], [unicodeData length]))
+            if (file->importText((const uint16_t*)[unicodeData bytes], static_cast<unsigned>([unicodeData length])))
             {
                 NSString* deviceFilename = [[path lastPathComponent] stringByDeletingPathExtension];
                 fileNode = [ASFileNode createFileNodeOnDevice:device
@@ -458,13 +459,13 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
 
     fileIsSynchronised = FALSE;
     NSData* unicodeData = [data dataUsingEncoding:NSUnicodeStringEncoding allowLossyConversion:YES];
-    if (!unicodeData)
+    if (!unicodeData || [unicodeData length] > UINT_MAX)
     {
         if (error) *error = @"Unable to read file contents.";
     }
     else
     {
-        result = fileData->importText((const uint16_t*)[unicodeData bytes], [unicodeData length]);
+        result = fileData->importText((const uint16_t*)[unicodeData bytes], static_cast<unsigned>([unicodeData length]));
         if (!result)
         {
             if (error) *error = @"Incompatible file.";
@@ -474,6 +475,7 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
             unsigned maxFileSize = [[self appletNode] maxFileSize];
             if (fileData->fileSize() > maxFileSize)
             {
+                result = FALSE;
                 if (error) *error = [NSString stringWithFormat:@"File is too large (maximum file size is %u bytes).", maxFileSize];
             }
             else
@@ -543,7 +545,7 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
             if (written && closed) result = targetFilename;
             else
             {
-                error = [(writeError ?: closeError) localizedDescription];
+                error = [(writeError ?: closeError) localizedDescription] ?: @"Unable to finish writing the file.";
                 // A partial file must not look like a successful backup or export.
                 [[NSFileManager defaultManager] removeItemAtPath:[path stringByAppendingPathComponent:targetFilename] error:nil];
             }

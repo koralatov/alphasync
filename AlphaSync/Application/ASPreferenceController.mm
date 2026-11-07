@@ -93,7 +93,7 @@
 }
 
 
-- (int)displayOption
+- (NSInteger)displayOption
 {
     return [[NSUserDefaults standardUserDefaults] integerForKey:kASPreferenceKeyFilter];
 }
@@ -104,7 +104,7 @@
     return [[NSUserDefaults standardUserDefaults] stringForKey:kASPreferenceKeyBackupFolder];
 }
 
-- (int)textEncodingOption
+- (NSInteger)textEncodingOption
 {
     return [[NSUserDefaults standardUserDefaults] integerForKey:kASPreferenceKeyTextEncoding];
 }
@@ -130,9 +130,9 @@
 - (IBAction)actionFilterOption:(id)sender
 {
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-    int oldOption = [defaults integerForKey:kASPreferenceKeyFilter];
+    NSInteger oldOption = [defaults integerForKey:kASPreferenceKeyFilter];
 
-    int newOption;
+    NSInteger newOption;
 
     switch ([sender selectedTag])
     {
@@ -180,7 +180,7 @@
 
 - (IBAction)actionAutoRun:(id)sender
 {
-    int state = [sender state];
+    NSControlStateValue state = [(NSButton*)sender state];
     [[NSUserDefaults standardUserDefaults] setBool:((NSControlStateValueOn == state) ? YES : NO) forKey:kASPreferenceKeyAutoRun];
     [outletAutoRun setState:[self autoRun] ? NSControlStateValueOn : NSControlStateValueOff];
     [applicationController setupAutoRun:0.0];
@@ -189,8 +189,8 @@
 - (IBAction)actionTextEncoding:(id)sender
 {
     (void)sender;
-    int tag = [[outletTextEncoding selectedItem] tag];
-    int encoding;
+    NSInteger tag = [[outletTextEncoding selectedItem] tag];
+    NSInteger encoding;
     switch (tag)
     {
         case kASPreferenceTextEncodingMacASCII:
