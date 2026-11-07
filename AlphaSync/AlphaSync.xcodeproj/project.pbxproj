@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		4D2E248F18106AF7002E5E7D /* application.iconset in Resources */ = {isa = PBXBuildFile; fileRef = 4D2E248E18106AF7002E5E7D /* application.iconset */; };
-		4D4066050F1F45AA001DD407 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A95EFB980F17C9F500E1BDA9 /* Carbon.framework */; };
 		4D962E180F1C9EF60018CDAA /* icon-file-bin.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 4D962E170F1C9EF60018CDAA /* icon-file-bin.pdf */; };
 		4D962E450F1CA50D0018CDAA /* icon-applet.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 4D962E380F1CA50D0018CDAA /* icon-applet.pdf */; };
 		4D962E460F1CA50D0018CDAA /* icon-file-txt.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 4D962E390F1CA50D0018CDAA /* icon-file-txt.pdf */; };
@@ -32,14 +31,13 @@
 		8D11072A0486CEB800E47090 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 29B97318FDCFA39411CA2CEA /* MainMenu.nib */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
-		A95EFA5B0F17C91400E1BDA9 /* aq_launcher.c in Sources */ = {isa = PBXBuildFile; fileRef = A95EFA560F17C90D00E1BDA9 /* aq_launcher.c */; };
+		A95EFA5B0F17C91400E1BDA9 /* aq_launcher.m in Sources */ = {isa = PBXBuildFile; fileRef = A95EFA560F17C90D00E1BDA9 /* aq_launcher.m */; };
 		A95EFAE70F17C96A00E1BDA9 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		A95EFAE80F17C97900E1BDA9 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
-		A95EFAEA0F17C98F00E1BDA9 /* aq_launchermain.c in Sources */ = {isa = PBXBuildFile; fileRef = A95EFA590F17C90D00E1BDA9 /* aq_launchermain.c */; };
+		A95EFAEA0F17C98F00E1BDA9 /* aq_launchermain.m in Sources */ = {isa = PBXBuildFile; fileRef = A95EFA590F17C90D00E1BDA9 /* aq_launchermain.m */; };
 		A95EFAEB0F17C99500E1BDA9 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A99A54990F0D3AB700BC68F1 /* IOKit.framework */; };
 		A95EFB890F17C99600E1BDA9 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
-		A95EFB990F17C9F500E1BDA9 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A95EFB980F17C9F500E1BDA9 /* Carbon.framework */; };
-		A95EFCD90F17CA7600E1BDA9 /* AlphaSyncLauncher.app in Resources */ = {isa = PBXBuildFile; fileRef = A95EFA620F17C94B00E1BDA9 /* AlphaSyncLauncher.app */; };
+		A95EFCD90F17CA7600E1BDA9 /* AlphaSyncLauncher.app in Copy Login Items */ = {isa = PBXBuildFile; fileRef = A95EFA620F17C94B00E1BDA9 /* AlphaSyncLauncher.app */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		A95EFD2C0F17D06000E1BDA9 /* AQFileUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = A95EFD2B0F17D06000E1BDA9 /* AQFileUtilities.m */; };
 		A95EFD360F17D60F00E1BDA9 /* AQFileUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = A95EFD2B0F17D06000E1BDA9 /* AQFileUtilities.m */; };
 		A96033A30F15D66B0046DBC1 /* AQTreeNode.m in Sources */ = {isa = PBXBuildFile; fileRef = A96033A20F15D66B0046DBC1 /* AQTreeNode.m */; };
@@ -69,6 +67,8 @@
 		A99A54FA0F0D5F5100BC68F1 /* Inspector.nib in Resources */ = {isa = PBXBuildFile; fileRef = A99A54F80F0D5F5100BC68F1 /* Inspector.nib */; };
 		A9E5D3710F12BD5B002A9EC3 /* ASFileCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = A9E5D3700F12BD5B002A9EC3 /* ASFileCell.mm */; };
         C01100000000000000000001 /* UniformTypeIdentifiers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01100000000000000000002 /* UniformTypeIdentifiers.framework */; };
+        C01100000000000000000004 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+        C01100000000000000000005 /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01100000000000000000006 /* ServiceManagement.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -81,14 +81,26 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+        C01100000000000000000003 /* Copy Login Items */ = {
+            isa = PBXCopyFilesBuildPhase;
+            buildActionMask = 2147483647;
+            dstPath = Contents/Library/LoginItems;
+            dstSubfolderSpec = 1;
+            files = (A95EFCD90F17CA7600E1BDA9 /* AlphaSyncLauncher.app in Copy Login Items */, );
+            name = "Copy Login Items";
+            runOnlyForDeploymentPostprocessing = 0;
+        };
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		089C165DFE840E0CC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
-		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
+		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		29B97319FDCFA39411CA2CEA /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/MainMenu.nib; sourceTree = "<group>"; };
-		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
-		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		32CA4F630368D1EE00C91783 /* AlphaSync_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlphaSync_Prefix.pch; sourceTree = "<group>"; };
 		4D2E248E18106AF7002E5E7D /* application.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; path = application.iconset; sourceTree = "<group>"; };
 		4D962E170F1C9EF60018CDAA /* icon-file-bin.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "icon-file-bin.pdf"; path = "Graphics/icon-file-bin.pdf"; sourceTree = "<group>"; };
@@ -114,14 +126,13 @@
 		4DF7C9840F1EB42600619084 /* AlphaSync Help */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "AlphaSync Help"; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* AlphaSync.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AlphaSync.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		A95EFA560F17C90D00E1BDA9 /* aq_launcher.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = aq_launcher.c; sourceTree = "<group>"; };
+		A95EFA560F17C90D00E1BDA9 /* aq_launcher.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = aq_launcher.m; sourceTree = "<group>"; };
 		A95EFA570F17C90D00E1BDA9 /* aq_launcher.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = aq_launcher.h; sourceTree = "<group>"; };
 		A95EFA580F17C90D00E1BDA9 /* aq_launcherconfig.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = aq_launcherconfig.h; sourceTree = "<group>"; };
-		A95EFA590F17C90D00E1BDA9 /* aq_launchermain.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = aq_launchermain.c; sourceTree = "<group>"; };
+		A95EFA590F17C90D00E1BDA9 /* aq_launchermain.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = aq_launchermain.m; sourceTree = "<group>"; };
 		A95EFA5A0F17C90D00E1BDA9 /* aq_launcherprivate.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = aq_launcherprivate.h; sourceTree = "<group>"; };
 		A95EFA620F17C94B00E1BDA9 /* AlphaSyncLauncher.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AlphaSyncLauncher.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A95EFA640F17C94B00E1BDA9 /* AlphaSyncLauncher-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "AlphaSyncLauncher-Info.plist"; path = "../AlphaSyncLauncher-Info.plist"; sourceTree = "<group>"; };
-		A95EFB980F17C9F500E1BDA9 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
 		A95EFD2A0F17D06000E1BDA9 /* AQFileUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AQFileUtilities.h; sourceTree = "<group>"; };
 		A95EFD2B0F17D06000E1BDA9 /* AQFileUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AQFileUtilities.m; sourceTree = "<group>"; };
 		A96033A10F15D66B0046DBC1 /* AQTreeNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AQTreeNode.h; sourceTree = "<group>"; };
@@ -170,13 +181,14 @@
 		A99A54720F0D39FF00BC68F1 /* ASMessage.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ASMessage.h; sourceTree = "<group>"; };
 		A99A54730F0D39FF00BC68F1 /* ASUserDictionaryFile.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = ASUserDictionaryFile.cc; sourceTree = "<group>"; };
 		A99A54740F0D39FF00BC68F1 /* ASUserDictionaryFile.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ASUserDictionaryFile.h; sourceTree = "<group>"; };
-		A99A54990F0D3AB700BC68F1 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
+		A99A54990F0D3AB700BC68F1 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		A99A54B50F0D43D900BC68F1 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/Backup.nib; sourceTree = "<group>"; };
 		A99A54EE0F0D474F00BC68F1 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/Preferences.nib; sourceTree = "<group>"; };
 		A99A54F90F0D5F5100BC68F1 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/Inspector.nib; sourceTree = "<group>"; };
 		A9E5D36F0F12BD5B002A9EC3 /* ASFileCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASFileCell.h; sourceTree = "<group>"; };
 		A9E5D3700F12BD5B002A9EC3 /* ASFileCell.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASFileCell.mm; sourceTree = "<group>"; };
         C01100000000000000000002 /* UniformTypeIdentifiers.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UniformTypeIdentifiers.framework; path = System/Library/Frameworks/UniformTypeIdentifiers.framework; sourceTree = SDKROOT; };
+        C01100000000000000000006 /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -193,9 +205,9 @@
 			files = (
 				A99A549A0F0D3AB700BC68F1 /* IOKit.framework in Frameworks */,
                 C01100000000000000000001 /* UniformTypeIdentifiers.framework in Frameworks */,
+                C01100000000000000000005 /* ServiceManagement.framework in Frameworks */,
 				A95EFAE70F17C96A00E1BDA9 /* Cocoa.framework in Frameworks */,
 				A95EFAE80F17C97900E1BDA9 /* Foundation.framework in Frameworks */,
-				4D4066050F1F45AA001DD407 /* Carbon.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -204,8 +216,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				A95EFAEB0F17C99500E1BDA9 /* IOKit.framework in Frameworks */,
+                C01100000000000000000004 /* Cocoa.framework in Frameworks */,
 				A95EFB890F17C99600E1BDA9 /* Foundation.framework in Frameworks */,
-				A95EFB990F17C9F500E1BDA9 /* Carbon.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -217,6 +229,7 @@
 			children = (
 				1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */,
                 C01100000000000000000002 /* UniformTypeIdentifiers.framework */,
+                C01100000000000000000006 /* ServiceManagement.framework */,
 			);
 			name = "Linked Frameworks";
 			sourceTree = "<group>";
@@ -228,7 +241,6 @@
 				13E42FB307B3F0F600E4EEF1 /* CoreData.framework */,
 				29B97325FDCFA39411CA2CEA /* Foundation.framework */,
 				A99A54990F0D3AB700BC68F1 /* IOKit.framework */,
-				A95EFB980F17C9F500E1BDA9 /* Carbon.framework */,
 			);
 			name = "Other Frameworks";
 			sourceTree = "<group>";
@@ -319,10 +331,10 @@
 			isa = PBXGroup;
 			children = (
 				A95EFA640F17C94B00E1BDA9 /* AlphaSyncLauncher-Info.plist */,
-				A95EFA560F17C90D00E1BDA9 /* aq_launcher.c */,
+				A95EFA560F17C90D00E1BDA9 /* aq_launcher.m */,
 				A95EFA570F17C90D00E1BDA9 /* aq_launcher.h */,
 				A95EFA580F17C90D00E1BDA9 /* aq_launcherconfig.h */,
-				A95EFA590F17C90D00E1BDA9 /* aq_launchermain.c */,
+				A95EFA590F17C90D00E1BDA9 /* aq_launchermain.m */,
 				A95EFA5A0F17C90D00E1BDA9 /* aq_launcherprivate.h */,
 				4DD223AE0F1B5C8F006F004F /* launcher.icns */,
 			);
@@ -428,6 +440,7 @@
 				8D1107290486CEB800E47090 /* Resources */,
 				8D11072C0486CEB800E47090 /* Sources */,
 				8D11072E0486CEB800E47090 /* Frameworks */,
+                C01100000000000000000003 /* Copy Login Items */,
 			);
 			buildRules = (
 			);
@@ -488,7 +501,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A95EFCD90F17CA7600E1BDA9 /* AlphaSyncLauncher.app in Resources */,
+
 				8D11072A0486CEB800E47090 /* MainMenu.nib in Resources */,
 				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
 				A99A54B60F0D43D900BC68F1 /* Backup.nib in Resources */,
@@ -561,7 +574,7 @@
 				A99A547B0F0D39FF00BC68F1 /* ASUserDictionaryFile.cc in Sources */,
 				A9E5D3710F12BD5B002A9EC3 /* ASFileCell.mm in Sources */,
 				A96033A30F15D66B0046DBC1 /* AQTreeNode.m in Sources */,
-				A95EFA5B0F17C91400E1BDA9 /* aq_launcher.c in Sources */,
+				A95EFA5B0F17C91400E1BDA9 /* aq_launcher.m in Sources */,
 				A95EFD360F17D60F00E1BDA9 /* AQFileUtilities.m in Sources */,
 				A99A4DF20F18D2F400BFDBAB /* ASGenericFile.cc in Sources */,
 				4D9630AF0F1D432C0018CDAA /* ASSettings.cc in Sources */,
@@ -572,7 +585,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A95EFAEA0F17C98F00E1BDA9 /* aq_launchermain.c in Sources */,
+				A95EFAEA0F17C98F00E1BDA9 /* aq_launchermain.m in Sources */,
 				A95EFD2C0F17D06000E1BDA9 /* AQFileUtilities.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -672,6 +685,7 @@
 					Foundation,
 				);
 				PRODUCT_NAME = AlphaSyncLauncher;
+                PRODUCT_BUNDLE_IDENTIFIER = com.tsoniq.AlphaSyncLauncher;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -690,6 +704,7 @@
 					Foundation,
 				);
 				PRODUCT_NAME = AlphaSyncLauncher;
+                PRODUCT_BUNDLE_IDENTIFIER = com.tsoniq.AlphaSyncLauncher;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -702,6 +717,7 @@
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				PRODUCT_NAME = AlphaSync;
+                PRODUCT_BUNDLE_IDENTIFIER = com.tsoniq.AlphaSync;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -713,6 +729,7 @@
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				PRODUCT_NAME = AlphaSync;
+                PRODUCT_BUNDLE_IDENTIFIER = com.tsoniq.AlphaSync;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -722,7 +739,8 @@
 			buildSettings = {
 				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = YES;
 				ARCHS = "x86_64 arm64";
-				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				ALWAYS_SEARCH_USER_PATHS = NO;
+                CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
@@ -763,7 +781,8 @@
 			buildSettings = {
 				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = YES;
 				ARCHS = "x86_64 arm64";
-				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				ALWAYS_SEARCH_USER_PATHS = NO;
+                CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;

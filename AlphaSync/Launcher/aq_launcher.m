@@ -1,4 +1,4 @@
-/** @file       aq_launcher.c
+/** @file       aq_launcher.m
  *  @brief      Launcher service library.
  *
  *  Copyright (c) 2008-2013, tSoniq. http://tsoniq.com
@@ -28,7 +28,8 @@
  *
  */
 #include <CoreFoundation/CoreFoundation.h>
-#include <ApplicationServices/ApplicationServices.h>
+#import <Cocoa/Cocoa.h>
+#import <ServiceManagement/ServiceManagement.h>
 #include <assert.h>
 #include "aq_launcher.h"
 #include "aq_launcherconfig.h"
@@ -53,8 +54,6 @@ struct AQLauncher
     struct AQLaunchItem* m_items;               /**< List of launch items. */
     struct AQLaunchItem* m_nextToEnumerate;     /**< Next item in enumeration. */
     CFMessagePortRef m_controlPort;             /**< Mach message port used for client-server communication. */
-    FSRef m_pathFsRef;                          /**< FSRef for m_path. */
-    UInt8 m_pathBuffer[PATH_MAX+1];             /**< The path in file system form. */
 };
 
 
@@ -177,6 +176,7 @@ static void aq_launcherServerStop(AQLauncherRef lh)
     CFDataRef replyData = 0;
     if (0 == lh->m_controlPort) aq_launcherServerConnect(lh);
     if (0 != lh->m_controlPort) CFMessagePortSendRequest(lh->m_controlPort, kAQLauncherControlMsgID_Stop, (CFDataRef)NULL, 1.0, 1.0, kCFRunLoopDefaultMode, &replyData);
+    if (replyData) CFRelease(replyData);
 }
 
 
@@ -466,7 +466,7 @@ AQLauncherRef aq_LauncherOpen(CFStringRef path)
     {
         memset(lh, 0, sizeof *lh);
 
-        lh->m_path = CFRetain(path);
+        lh->m_path = path ? CFRetain(path) : NULL;
         lh->m_flushNeeded = 0;
         lh->m_items = 0;
         lh->m_nextToEnumerate = 0;
@@ -476,15 +476,11 @@ AQLauncherRef aq_LauncherOpen(CFStringRef path)
 
         if (lh->m_path)
         {
-            // Get an FSREF to use with open(m_path). This verifies that the target application exists.
-            OSStatus oserr = 0;
-            lh->m_pathBuffer[0] = 0;
-            if (!CFStringGetFileSystemRepresentation(lh->m_path, (char*)lh->m_pathBuffer, sizeof lh->m_pathBuffer) ||
-                ((oserr = FSPathMakeRef(lh->m_pathBuffer, &lh->m_pathFsRef, NULL))) )
+            if (![[NSFileManager defaultManager] fileExistsAtPath:(NSString*)lh->m_path])
             {
-                LOG_ERROR("Invalid path to launcher: %d: %s\n", (int)oserr, lh->m_pathBuffer);
+                NSLog(@"The bundled launcher is missing: %@", (NSString*)lh->m_path);
                 aq_LauncherClose(lh);
-                lh = 0;
+                lh = NULL;
             }
         }
     }
@@ -509,119 +505,66 @@ void aq_LauncherClose(AQLauncherRef lh)
 }
 
 
+// macOS 11 and 12 use the older public API.  Keep the deprecated call in this one fallback.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+static Boolean setLegacyLoginItem(Boolean enabled)
+{
+    return SMLoginItemSetEnabled(kAQLauncherBundleID, enabled);
+}
+#pragma clang diagnostic pop
+
 int aq_LauncherIsInstalled(AQLauncherRef lh)
 {
-    int result = 0;
-
-    LSSharedFileListRef loginItems = LSSharedFileListCreate(NULL, kLSSharedFileListSessionLoginItems, NULL);
-    if (loginItems)
+    if (@available(macOS 13.0, *))
     {
-        UInt32 seedValue = 0;
-        CFArrayRef loginItemsArray = LSSharedFileListCopySnapshot(loginItems, &seedValue);
-        if (loginItemsArray)
-        {
-            for (CFIndex index = 0; index !=  CFArrayGetCount(loginItemsArray); ++index)
-            {
-                CFURLRef url = 0;
-                LSSharedFileListItemRef item = (LSSharedFileListItemRef) CFArrayGetValueAtIndex(loginItemsArray, index);
-                if (item && 0 == LSSharedFileListItemResolve(item, 0, &url, NULL))
-                {
-                    CFStringRef path = CFURLCopyFileSystemPath(url, kCFURLPOSIXPathStyle);
-                    if (path)
-                    {
-                        if (kCFCompareEqualTo == CFStringCompare(path, lh->m_path, 0))
-                        {
-                            // Found a matching dictionary entry. If necessary, kick the launcher to get it running (eg: recover from a crash).
-                            result = 1;
-                            if (!aq_launcherServerConnect(lh)) LSOpenFSRef(&lh->m_pathFsRef, NULL);
-                            CFRelease(path);
-                            break;
-                        }
-                        CFRelease(path);
-                    }
-                }
-            }
-            CFRelease(loginItemsArray);
-        }
-        CFRelease(loginItems);
+        SMAppService* service = [SMAppService loginItemServiceWithIdentifier:(NSString*)kAQLauncherBundleID];
+        return service.status == SMAppServiceStatusEnabled || service.status == SMAppServiceStatusRequiresApproval;
     }
-
-    return result;
+    return aq_launcherServerConnect(lh);
 }
-
 
 int aq_LauncherInstall(AQLauncherRef lh)
 {
-    if (0 == lh->m_path) return -1;     // Can't install unless the client nominated a launcher application path
-
-    /* Flush preferences before starting the launcher. This ensures that the launcher is started
-     * with the most recent preference data.
-     */
+    if (!lh->m_path) return 0;
     aq_LauncherFlushLaunchItems(lh);
-
-    int result = 0;
-
-    if (!aq_LauncherIsInstalled(lh))
+    if (@available(macOS 13.0, *))
     {
-        CFURLRef url = CFURLCreateWithFileSystemPath(kCFAllocatorDefault, lh->m_path, kCFURLPOSIXPathStyle, TRUE);
-        if (url)
+        SMAppService* service = [SMAppService loginItemServiceWithIdentifier:(NSString*)kAQLauncherBundleID];
+        if (service.status == SMAppServiceStatusEnabled) return 1;
+        if (service.status == SMAppServiceStatusRequiresApproval)
         {
-            LSSharedFileListRef loginItems = LSSharedFileListCreate(NULL, kLSSharedFileListSessionLoginItems, NULL);
-            if (loginItems)
-            {
-                LSSharedFileListItemRef item = LSSharedFileListInsertItemURL(loginItems, kLSSharedFileListItemLast, NULL, NULL, url, NULL, NULL);
-                if (item)
-                {
-                    CFRelease(item);
-                    result = 1;
-                }
-                CFRelease(loginItems);
-            }
-            CFRelease(url);
+            NSLog(@"Allow AlphaSync’s launcher in System Settings to enable automatic launching.");
+            return 0;
         }
+        NSError* error = nil;
+        if (![service registerAndReturnError:&error])
+        {
+            NSLog(@"Unable to register AlphaSync’s launcher: %@", error);
+            return 0;
+        }
+        return 1;
     }
-
-    return result;
+    return setLegacyLoginItem(true);
 }
 
-
-extern void aq_LauncherUninstall(AQLauncherRef lh)
+void aq_LauncherUninstall(AQLauncherRef lh)
 {
     aq_launcherServerQuit(lh);
     aq_launcherServerDisconnect(lh);
-
-    if (0 == lh->m_path) return;
-
-    LSSharedFileListRef loginItems = LSSharedFileListCreate(NULL, kLSSharedFileListSessionLoginItems, NULL);
-    if (loginItems)
+    if (@available(macOS 13.0, *))
     {
-        UInt32 seedValue = 0;
-        CFArrayRef loginItemsArray = LSSharedFileListCopySnapshot(loginItems, &seedValue);
-        if (loginItemsArray)
+        SMAppService* service = [SMAppService loginItemServiceWithIdentifier:(NSString*)kAQLauncherBundleID];
+        if (service.status != SMAppServiceStatusNotRegistered)
         {
-            for (CFIndex index = 0; index !=  CFArrayGetCount(loginItemsArray); ++index)
-            {
-                CFURLRef url = 0;
-                LSSharedFileListItemRef item = (LSSharedFileListItemRef) CFArrayGetValueAtIndex(loginItemsArray, index);
-                if (item && 0 == LSSharedFileListItemResolve(item, 0, &url, NULL))
-                {
-                    CFStringRef path = CFURLCopyFileSystemPath(url, kCFURLPOSIXPathStyle);
-                    if (path)
-                    {
-                        if (kCFCompareEqualTo == CFStringCompare(path, lh->m_path, 0))
-                        {
-                            // Found a matching dictionary entry. Delete it.
-                            LSSharedFileListItemRemove(loginItems, item);
-                            CFRelease(path);
-                            break;
-                        }
-                        CFRelease(path);
-                    }
-                }
-            }
-            CFRelease(loginItemsArray);
+            NSError* error = nil;
+            if (![service unregisterAndReturnError:&error])
+                NSLog(@"Unable to unregister AlphaSync’s launcher: %@", error);
         }
-        CFRelease(loginItems);
+    }
+    else
+    {
+        setLegacyLoginItem(false);
     }
 }
 

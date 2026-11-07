@@ -27,8 +27,8 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *
- *  The launcher API is intended to be used with an auxillary application, typically bundled in the main
- *  application's resource directory. The auxillary application can be installed to run at login and
+ *  The launcher API is intended to be used with a helper application bundled in the main
+ *  application’s Contents/Library/LoginItems directory. The auxillary application can be installed to run at login and
  *  can be configured to start the main application when a particular USB device is connected.
  *
  *  The basic API methods are:

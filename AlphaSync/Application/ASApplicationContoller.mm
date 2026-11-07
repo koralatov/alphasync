@@ -43,8 +43,6 @@ using namespace ts;
 
 /** The launcher application name.
  */
-#define kASLauncherName         @"AlphaSyncLauncher"
-#define kASLauncherExtension    @"app"
 
 /** The application's bundle ID. This is used by the launcher to start the application
  *  when a device is connected. It must match the value in the applications info.plist file.
@@ -68,7 +66,6 @@ enum ASAlertStatus
 
 @interface ASApplicationController(PrivateAPI)
 - (void)uninstall;
-- (void)installApplicationSupport;
 - (void)deviceControllerNotification:(NSNotification*)notification;
 - (void)displayMemoryStatus;
 - (void)displayStatusTimerDone;
@@ -157,7 +154,6 @@ static const NSInteger kMenuItemTagBackup   = 100;
 
     [self setupToolbar];
 
-    [self installApplicationSupport];
     [self setupAutoRun:0.0];
 
     // Setup custom cell for the file name and icon view.
@@ -922,49 +918,9 @@ static const NSInteger kMenuItemTagBackup   = 100;
  */
 - (NSString*)launcherInstallPath
 {
-    NSString* path = [[self appSupportFolderPath] stringByAppendingPathComponent:kASLauncherName];
-    path = [path stringByAppendingPathExtension:kASLauncherExtension];
-    return path;
+    return [[[NSBundle mainBundle] bundlePath]
+            stringByAppendingPathComponent:@"Contents/Library/LoginItems/AlphaSyncLauncher.app"];
 }
-
-/** This will create an application support directory and install the launcher
- *  application there (so that the path is independent of the application's install
- *  location.
- */
-- (void)installApplicationSupport
-{
-    NSFileManager* fm = [NSFileManager defaultManager];
-
-    if (!launcherInstallPath)
-    {
-        launcherInstallPath = [[self launcherInstallPath] retain];
-        if (!launcherInstallPath) return;
-    }
-
-
-    [fm removeItemAtPath:launcherInstallPath error:nil];      // REVIEW: should we always force a reinstall?
-    if (![fm fileExistsAtPath:launcherInstallPath])
-    {
-        NSBundle* bundle = [NSBundle mainBundle];
-        NSString* launcherSourcePath = [bundle pathForResource:kASLauncherName ofType:kASLauncherExtension];
-
-        aq_FileUtilitiesCreateDirectoriesForPath([self appSupportFolderPath]);
-        if (![fm copyItemAtPath:launcherSourcePath toPath:launcherInstallPath error:nil])
-        {
-            NSLog(@"Error copying launcher to application support directory");
-        }
-        else
-        {
-            CFURLRef url = CFURLCreateWithFileSystemPath(kCFAllocatorDefault, (CFStringRef)launcherInstallPath, kCFURLPOSIXPathStyle, false);
-            if (url)
-            {
-                LSRegisterURL(url, true);
-                CFRelease(url);
-            }
-        }
-    }
-}
-
 
 /** Setup the auto-run configuration.
  *
@@ -974,7 +930,7 @@ static const NSInteger kMenuItemTagBackup   = 100;
 {
     BOOL shouldAutoRun = [[NSUserDefaults standardUserDefaults] boolForKey:kASPreferenceKeyAutoRun];
 
-    if (!launcherInstallPath) [self installApplicationSupport];
+    if (!launcherInstallPath) launcherInstallPath = [[self launcherInstallPath] retain];
     if (!launcherInstallPath) return;
 
     AQLauncherRef launcher = aq_LauncherOpen((CFStringRef)launcherInstallPath);
@@ -986,7 +942,12 @@ static const NSInteger kMenuItemTagBackup   = 100;
             aq_LauncherClearLaunchItems(launcher);
             aq_LauncherAddLaunchItem(launcher, (CFStringRef)appID, 0x081e, 0xbd04);    // REVIEW: symbolic constants for the USB IDs and remove
             aq_LauncherAddLaunchItem(launcher, (CFStringRef)appID, 0x081e, 0xbd01);    // REVIEW: duplication with the USB device factory
-            aq_LauncherInstall(launcher);
+            if (!aq_LauncherInstall(launcher))
+            {
+                [self setStatusError:@"Automatic launching needs permission in System Settings."];
+                aq_LauncherClose(launcher);
+                return;
+            }
 
             if (secondsToWait <= 0.0) aq_LauncherStart(launcher);
             else aq_LauncherPause(launcher, secondsToWait);
@@ -1011,8 +972,8 @@ static const NSInteger kMenuItemTagBackup   = 100;
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication*)sender
 {
     (void)sender;
-    [deviceController closeAllDevices];
     if (!appIsUninstalling) [self setupAutoRun:8.0];    // disable launch requests to prevent immediate application re-open
+    [deviceController closeAllDevices];
     return NSTerminateNow;
 }
 
@@ -1036,17 +997,18 @@ static const NSInteger kMenuItemTagBackup   = 100;
     }
 
     NSWorkspace* workspace = [NSWorkspace sharedWorkspace];
-    NSInteger tag;
-    NSString* applicationPath = [[NSBundle mainBundle] bundlePath];
-    NSArray* filesToTrash = [NSArray arrayWithObjects:applicationPath, applicationSupportPath, nil];
-    [workspace performFileOperation:NSWorkspaceRecycleOperation
-               source:@"/"          // source files are all absolute paths
-               destination:@""      // there is no destination
-               files:filesToTrash
-               tag:&tag];
-
-    appIsUninstalling = TRUE;
-    [NSApp terminate:self];
+    NSURL* applicationURL = [[NSBundle mainBundle] bundleURL];
+    NSMutableArray* urls = [NSMutableArray arrayWithObject:applicationURL];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:applicationSupportPath])
+        [urls addObject:[NSURL fileURLWithPath:applicationSupportPath isDirectory:YES]];
+    [workspace recycleURLs:urls completionHandler:^(NSDictionary* newURLs, NSError* error) {
+        if (error) [self setStatusError:[error localizedDescription]];
+        else
+        {
+            appIsUninstalling = YES;
+            [NSApp terminate:self];
+        }
+    }];
 }
 
 
