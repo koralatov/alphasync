@@ -41,8 +41,9 @@
     NSString* currentSessionPath;
     NSMutableArray* backupItems;
     NSUInteger nextBackupItem;
-    int bytesToBackup;
-    int bytesSoFar;
+    uint64_t bytesToBackup;
+    uint64_t bytesSoFar;
+    NSUInteger failedFiles;
     NSTimer* backupTimer;
 }
 

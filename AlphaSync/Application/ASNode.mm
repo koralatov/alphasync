@@ -363,7 +363,7 @@ static NSInteger sortFunctionDisplayKind(id node1, id node2, void* context)
     id node;
     while ((node = [enumerator nextObject]))
     {
-        if ([node conformsToProtocol:@protocol(ASSaveProtocol)])  [node saveUnderPath:directoryName];
+        if ([node conformsToProtocol:@protocol(ASSaveProtocol)] && ![node saveWillBeEmpty] && ![node saveUnderPath:directoryName]) return nil;
     }
 
     return directoryName;

@@ -33,6 +33,7 @@
 #import "ASDeviceNode.h"
 #import "ASAppletNode.h"
 #import "ASFileNode.h"
+#import "ASDeviceController.h"
 #import "ASPreferenceController.h"
 #import "AQFileUtilities.h"
 
@@ -99,11 +100,28 @@ using namespace ts;
 {
     if ((self = [super initWithWindowNibName:@"Backup"]))
     {
-        // Nothing
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceDisconnected:)
+                                                    name:kASDeviceControllerDeviceDisconnected object:nil];
     }
     return self;
 }
 
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [backupTimer invalidate];
+    [backupItems release];
+    [currentSessionPath release];
+    [super dealloc];
+}
+
+- (void)deviceDisconnected:(NSNotification*)notification
+{
+    (void)notification;
+    // The driver frees the device after this notification.  Stop before the next timer tick.
+    if (backupItems) [self stopBackup:@"Backup stopped because a NEO was disconnected."];
+}
 
 /** Make a new device session path and create the necessary directories.
  *
@@ -121,10 +139,14 @@ using namespace ts;
     NSString* rootPath = [[NSUserDefaults standardUserDefaults] stringForKey:kASPreferenceKeyBackupFolder];
     if (!rootPath) return FALSE;
 
-    NSString* dateName = [[NSDate date] descriptionWithCalendarFormat:@"%Y-%m-%d" timeZone:nil locale:[[NSUserDefaults standardUserDefaults] dictionaryRepresentation]];
+    NSDateFormatter* formatter = [[[NSDateFormatter alloc] init] autorelease];
+    [formatter setLocale:[[[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"] autorelease]];
+    [formatter setCalendar:[[[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian] autorelease]];
+    [formatter setDateFormat:@"yyyy-MM-dd"];
+    NSString* dateName = [formatter stringFromDate:[NSDate date]];
 
 
-    if (nil != deviceName) rootPath = [rootPath stringByAppendingPathComponent:deviceName];
+    if (deviceName) rootPath = [rootPath stringByAppendingPathComponent:[deviceName stringByReplacingOccurrencesOfString:@"/" withString:@"_"]];
 
     NSString* path = [rootPath stringByAppendingPathComponent:dateName];
 
@@ -156,6 +178,7 @@ using namespace ts;
 
     backupItems = [[NSMutableArray arrayWithCapacity:32] retain];
     nextBackupItem = 0;
+    failedFiles = 0;
     bytesToBackup = 0;
     bytesSoFar = 0;
 
@@ -211,14 +234,16 @@ using namespace ts;
 
 /** Backup one item.
  */
-- (void)backupOneItem
+- (void)backupOneItem:(NSTimer*)timer
 {
+    (void)timer;
     assert(backupItems);
 
     if (nextBackupItem >= [backupItems count])
     {
         [outletProgressIndicator setDoubleValue:100.0];
-        [self stopBackup:@"Backup complete"];
+        NSString* message = failedFiles ? [NSString stringWithFormat:@"Backup finished with %lu failed files.", (unsigned long)failedFiles] : @"Backup complete";
+        [self stopBackup:message];
     }
     else
     {
@@ -233,13 +258,15 @@ using namespace ts;
         if ([backupItem newDevice]) [self makeNewDeviceSessionPath:(NSString*)deviceName];
         if (!currentSessionPath)
         {
+            failedFiles++;
             NSLog(@"Unable to create backup folder for file %@/%@/%@", deviceName, appletName, [fileNode displayName]);
         }
         else
         {
-            NSString* path = [currentSessionPath stringByAppendingPathComponent:appletName];
+            NSString* path = [currentSessionPath stringByAppendingPathComponent:[appletName stringByReplacingOccurrencesOfString:@"/" withString:@"_"]];
             if (!aq_FileUtilitiesCreateDirectoriesForPath(path) || ![fileNode saveUnderPath:path])
             {
+                failedFiles++;
                 NSLog(@"Error backing up file %@/%@/%@", deviceName, appletName, [fileNode displayName]);
             }
         }
@@ -247,7 +274,8 @@ using namespace ts;
         bytesSoFar += [fileNode fileSize];
         nextBackupItem ++;
 
-        [outletProgressIndicator setDoubleValue:double(bytesSoFar)/double(bytesToBackup)*100.0];
+        double progress = bytesToBackup ? double(bytesSoFar) / double(bytesToBackup) : double(nextBackupItem) / double([backupItems count]);
+        [outletProgressIndicator setDoubleValue:progress * 100.0];
     }
 }
 
@@ -265,35 +293,21 @@ using namespace ts;
     {
         // Backup stopped
         [sheet orderOut:sender];
-        [NSApp endSheet:sheet returnCode:1];
+        [[sheet sheetParent] endSheet:sheet returnCode:NSModalResponseOK];
     }
-}
-
-
-- (void)sheetDidEnd:(NSWindow*)sheet returnCode:(int)returnCode contextInfo:(void*)contextInfo
-{
-    (void)sheet;
-    (void)returnCode;
-    (void)contextInfo;
-    // Nothing
 }
 
 
 - (void)runBackupFor:(ASNode*)root modalForWindow:(NSWindow*)window
 {
+    if (backupItems) return;
     [outletProgressIndicator setUsesThreadedAnimation:YES];
 
     NSWindow* sheet = [self window];
-    NSApplication* app = [NSApplication sharedApplication];
-
-    [app beginSheet:sheet
-         modalForWindow:window
-         modalDelegate:self
-         didEndSelector:@selector(sheetDidEnd:returnCode:contextInfo:)
-         contextInfo:self];
+    [window beginSheet:sheet completionHandler:nil];
 
     [self initBackup:root];
-    backupTimer = [NSTimer scheduledTimerWithTimeInterval:0.01 target:self selector:@selector(backupOneItem) userInfo:nil repeats:YES];
+    backupTimer = [NSTimer scheduledTimerWithTimeInterval:0.01 target:self selector:@selector(backupOneItem:) userInfo:nil repeats:YES];
 }
 
 

@@ -391,6 +391,7 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
 
     *basename = [NSString stringWithCString:deviceName encoding:NSWindowsCP1252StringEncoding];
     if (!*basename) *basename = @"";
+    *basename = [*basename stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
 
     // If the device filename already has an appropriate extension remove it (to prevent a double extension).
     if (NSOrderedSame == [*extension caseInsensitiveCompare:[*basename pathExtension]])
@@ -504,76 +505,53 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
     *totalBytes = fileAttributes->allocSize();
 }
 
-// REVIEW: this can fail after having created a file. Need to add cleanup if this happens...
 - (NSString*)saveUnderPath:(NSString*)path
 {
+    if (![path isAbsolutePath]) return nil;
+    id accessDelegate = [self delegate];
+    BOOL hasDelegate = [accessDelegate conformsToProtocol:@protocol(ASDeviceAccessProtocol)];
+    if (hasDelegate && ![accessDelegate deviceWillSave:self to:path sender:self]) return nil;
+
+    NSString* error = nil;
     NSString* result = nil;
-
-    if (![path isAbsolutePath]) return nil;     // invalid path supplied
-
-    NSString* basename;
-    NSString* extension;
-    [self getFileNameBase:&basename extension:&extension];
-
-    if (0 == [basename length]) basename = @"unspecified";     // can't make sense of device filename, so use a default
-
-    NSString* targetFilename;
-    NSFileHandle* fileHandle =  makeUniqueFile(path, basename, extension, &targetFilename);
-    if (fileHandle)
+    NSString* text = [self fileData];
+    NSData* data = nil;
+    if (!text) error = @"Unable to read the file data from the device.";
+    else
     {
-        NSData* data = nil;
-
-        id accessDelegate = [self delegate];
-        BOOL shouldProceed = YES;
-
-        if ([accessDelegate conformsToProtocol:@protocol(ASDeviceAccessProtocol)])
-        {
-            shouldProceed = [accessDelegate deviceWillSave:self to:path sender:self];
-        }
-
-        if (shouldProceed)
-        {
-            NSString* stringData = [self fileData];
-            NSString* error = nil;
-            if (!stringData)
-            {
-                error = @"Unable to read the file data from the device.";
-            }
-            else
-            {
-                NSStringEncoding encoding = [ASPreferenceController getDefaultTextEncoding];
-                data = [stringData dataUsingEncoding:encoding allowLossyConversion:YES];
-                if (!data)
-                {
-                    error = @"Unable to make sense of the data from the device.";
-                }
-                else
-                {
-                    [fileHandle writeData:data];
-                    result = targetFilename;
-                }
-            }
-
-            if ([accessDelegate conformsToProtocol:@protocol(ASDeviceAccessProtocol)])
-            {
-                [accessDelegate deviceDidSave:self error:error sender:self];
-            }
-
-        }   // shouldProceed
-
-        [fileHandle release];
-        fileHandle = nil;
+        NSStringEncoding encoding = fileIsPlainText ? [ASPreferenceController getDefaultTextEncoding] : NSUTF8StringEncoding;
+        data = [text dataUsingEncoding:encoding allowLossyConversion:NO];
+        if (!data) error = @"The selected encoding cannot preserve this text.  Select UTF-8 in Preferences.";
     }
 
+    if (data)
+    {
+        NSString* basename;
+        NSString* extension;
+        [self getFileNameBase:&basename extension:&extension];
+        if (![basename length]) basename = @"unspecified";
+        NSString* targetFilename = nil;
+        NSFileHandle* handle = makeUniqueFile(path, basename, extension, &targetFilename);
+        if (!handle) error = @"Unable to create the destination file.";
+        else
+        {
+            NSError* writeError = nil;
+            NSError* closeError = nil;
+            BOOL written = [handle writeData:data error:&writeError];
+            BOOL closed = [handle closeAndReturnError:&closeError];
+            [handle release];
+            if (written && closed) result = targetFilename;
+            else
+            {
+                error = [(writeError ?: closeError) localizedDescription];
+                // A partial file must not look like a successful backup or export.
+                [[NSFileManager defaultManager] removeItemAtPath:[path stringByAppendingPathComponent:targetFilename] error:nil];
+            }
+        }
+    }
+    if (hasDelegate) [accessDelegate deviceDidSave:self error:error sender:self];
     return result;
 }
-
-
-
-
-
-
-
 
 
 #pragma mark    --------  ASLoadProtocol  --------
