@@ -174,7 +174,7 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
  *  @param  attr                The file attributes.
  *  @return                     A pointer to self.
  */
-- (id)initWithDevice:(ts::ASDevice*)devicePtr applet:(const ts::ASApplet*)app fileIndex:(int)fin fileAttributes:(const ts::ASFileAttributes*)attr;
+- (id)initWithDevice:(ts::ASDevice*)devicePtr applet:(const ts::ASApplet*)app fileIndex:(int)fin fileAttributes:(const ts::ASFileAttributes*)attr
 {
     if ((self = [super init]))
     {

@@ -183,7 +183,7 @@ namespace ts
         IODestroyPlugInInterface(plugInInterface);
         if (result || !dev)
         {
-            fprintf(stderr, "ASDeviceUSB::init: unable to query interface: %08x, %p\n", status, dev);
+            fprintf(stderr, "ASDeviceUSB::init: unable to query interface: %08x, %p\n", status, (void*)dev);
             status = kIOReturnError;
             goto error;
         }
@@ -439,7 +439,7 @@ namespace ts
             status = (*m_interface)->WritePipeTO(m_interface, m_pipeOut, (void*) ptr, blocksize, timeout, timeout);
             if (m_debugWrite)
             {
-                fprintf(m_debugWrite, "  -->  %8p : %08x : %u  =  ", ptr, status, (unsigned)blocksize);
+                fprintf(m_debugWrite, "  -->  %8p : %08x : %u  =  ", (const void*)ptr, status, (unsigned)blocksize);
                 for (unsigned i = 0; i < 8; i++)
                 {
                     if (i < blocksize) fprintf(m_debugWrite, " %02x", ptr[i]);
