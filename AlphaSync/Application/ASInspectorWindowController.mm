@@ -65,7 +65,7 @@ static void useSystemColours(NSView* view)
     if ((self = [super initWithWindowNibName:@"Inspector"]))
     {
         displayNodes = [nodes retain];
-        iconNothing = [NSImage imageNamed:@"icon-file-noselection"];
+        iconNothing = [[NSImage imageWithSystemSymbolName:@"doc" accessibilityDescription:@"No Selection"] retain];
 
         for (int i = 0; i < kASInspectorMaxBox; i++)  showBox[i] = TRUE;
     }
@@ -76,6 +76,7 @@ static void useSystemColours(NSView* view)
 - (void)dealloc
 {
     [displayNodes release];
+    [iconNothing release];
     [super dealloc];
 }
 
