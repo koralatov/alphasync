@@ -680,6 +680,7 @@
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "AlphaSyncLauncher-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
+				SKIP_INSTALL = YES;
 				OTHER_LDFLAGS = (
 					"-framework",
 					Foundation,
@@ -699,6 +700,7 @@
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "AlphaSyncLauncher-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
+				SKIP_INSTALL = YES;
 				OTHER_LDFLAGS = (
 					"-framework",
 					Foundation,
@@ -715,7 +717,7 @@
 				COPY_PHASE_STRIP = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INFOPLIST_FILE = Info.plist;
-				INSTALL_PATH = "$(HOME)/Applications";
+				INSTALL_PATH = /Applications;
 				PRODUCT_NAME = AlphaSync;
                 PRODUCT_BUNDLE_IDENTIFIER = com.tsoniq.AlphaSync;
 				WRAPPER_EXTENSION = app;
@@ -727,7 +729,7 @@
 			buildSettings = {
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				INFOPLIST_FILE = Info.plist;
-				INSTALL_PATH = "$(HOME)/Applications";
+				INSTALL_PATH = /Applications;
 				PRODUCT_NAME = AlphaSync;
                 PRODUCT_BUNDLE_IDENTIFIER = com.tsoniq.AlphaSync;
 				WRAPPER_EXTENSION = app;
