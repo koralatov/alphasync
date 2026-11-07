@@ -87,13 +87,14 @@ static void testMalformedGenericFiles()
                              "<data>01f</data>", "<data>xy</data>"};
     for (const char* text : invalid)
     {
-        std::u16string input(text, text + std::strlen(text));
+        std::vector<uint16_t> input(text, text + std::strlen(text));
         ts::ASGenericFile file;
-        CHECK(!file.importText(reinterpret_cast<const uint16_t*>(input.data()), input.size() * 2));
+        CHECK(!file.importText(input.data(), input.size() * 2));
     }
-    std::u16string empty = u"<data></data>";
+    const std::string emptyTag = "<data></data>";
+    std::vector<uint16_t> empty(emptyTag.begin(), emptyTag.end());
     ts::ASGenericFile file;
-    CHECK(file.importText(reinterpret_cast<const uint16_t*>(empty.data()), empty.size() * 2));
+    CHECK(file.importText(empty.data(), empty.size() * 2));
     CHECK(file.fileSize() == 0);
     const uint16_t* output = nullptr;
     unsigned size = 0;
