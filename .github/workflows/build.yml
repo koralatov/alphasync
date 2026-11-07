@@ -42,7 +42,10 @@ jobs:
         if: matrix.xcode == 'pinned'
         run: scripts/check-toolchain.sh
       - name: Check shell scripts
-        run: bash -n scripts/*.sh
+        run: |
+          for script in scripts/*.sh; do
+            bash -n "$script"
+          done
       - name: Run the core and native regression tests
         run: make test sanitize
       - name: Build a universal release app
