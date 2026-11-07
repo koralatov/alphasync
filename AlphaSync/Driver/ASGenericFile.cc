@@ -153,6 +153,8 @@ namespace ts
 
 
         appendToExport("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+        // Standard XML readers need one root containing both the metadata and the file data.
+        appendToExport("<alphasync>\n");
 
         ASAppletID appletID;
         int major;
@@ -180,7 +182,7 @@ namespace ts
             appendToExport(buffer);
             bytes ++;
         }
-        appendToExport("\n</data>");
+        appendToExport("\n</data>\n</alphasync>\n");
 
         *text = (uint16_t*)m_exportBuffer;
         *textSize = m_exportSize * sizeof (uint16_t);

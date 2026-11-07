@@ -32,6 +32,8 @@ make sanitize
 
 They cover text conversion, dictionary imports, both UTF-16 byte orders, malformed files, settings boundaries, failed buffer operations, and simulated USB replies.  Invalid-reply tests produce expected error messages before the final success message.
 
+On macOS, `make test` also checks exported XML with Foundation’s parser.  Older backups without a root element remain readable by AlphaSync.
+
 On a Mac, verify the built app with:
 
 ```sh

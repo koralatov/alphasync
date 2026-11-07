@@ -24,3 +24,15 @@ build/core-tests-sanitize: $(CORE_SOURCES) $(CORE_HEADERS) $(TEST_SOURCES) Makef
 
 clean:
 	rm -rf build
+
+ifeq ($(shell uname -s),Darwin)
+.PHONY: test-xml
+test: test-xml
+
+test-xml: build/xml-tests
+	./build/xml-tests
+
+build/xml-tests: $(CORE_SOURCES) $(CORE_HEADERS) tests/xml-tests.mm Makefile
+	@mkdir -p build
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(CORE_SOURCES) tests/xml-tests.mm -framework Foundation -o $@
+endif

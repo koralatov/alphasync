@@ -42,6 +42,13 @@ static void testGenericRoundTrip()
     CHECK(target.importText(text, size));
     CHECK(target.fileSize() == sizeof input);
     CHECK(std::memcmp(target.fileData(), input, sizeof input) == 0);
+
+    const std::string legacy = "<appletID>0x1234</appletID><appletVersionMajor>1</appletVersionMajor>"
+                               "<appletVersionMinor>0</appletVersionMinor><data>0001027fff</data>";
+    std::vector<uint16_t> legacyText(legacy.begin(), legacy.end());
+    CHECK(target.importText(legacyText.data(), legacyText.size() * sizeof(uint16_t)));
+    CHECK(target.fileSize() == sizeof input);
+    CHECK(std::memcmp(target.fileData(), input, sizeof input) == 0);
 }
 
 static void testSettingsBounds()
