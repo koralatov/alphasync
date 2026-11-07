@@ -124,6 +124,13 @@ static const NSInteger kMenuItemTagBackup   = 100;
     [statusDisplayTimer invalidate];
     [launcherInstallPath release];
     [automaticLaunchError release];
+    [iconDisconnected release];
+    [iconRed release];
+    [iconYellow release];
+    [iconGreen release];
+    [iconToolbarInfo release];
+    [iconToolbarBackup release];
+    [iconToolbarDelete release];
     [super dealloc];
 }
 
@@ -133,13 +140,13 @@ static const NSInteger kMenuItemTagBackup   = 100;
     [outletMainWindow setDelegate:self];
     [NSApp setDelegate:self];
 
-    iconDisconnected = [NSImage imageNamed:NSImageNameStatusNone];
-    iconRed = [NSImage imageNamed:NSImageNameStatusUnavailable];
-    iconYellow = [NSImage imageNamed:NSImageNameStatusPartiallyAvailable];
-    iconGreen = [NSImage imageNamed:NSImageNameStatusAvailable];
-    iconToolbarInfo = [NSImage imageWithSystemSymbolName:@"info.circle" accessibilityDescription:@"Information"];
-    iconToolbarBackup = [NSImage imageWithSystemSymbolName:@"externaldrive" accessibilityDescription:@"Back Up"];
-    iconToolbarDelete = [NSImage imageWithSystemSymbolName:@"trash" accessibilityDescription:@"Clear Files"];
+    iconDisconnected = [[NSImage imageNamed:NSImageNameStatusNone] retain];
+    iconRed = [[NSImage imageNamed:NSImageNameStatusUnavailable] retain];
+    iconYellow = [[NSImage imageNamed:NSImageNameStatusPartiallyAvailable] retain];
+    iconGreen = [[NSImage imageNamed:NSImageNameStatusAvailable] retain];
+    iconToolbarInfo = [[NSImage imageWithSystemSymbolName:@"info.circle" accessibilityDescription:@"Information"] retain];
+    iconToolbarBackup = [[NSImage imageWithSystemSymbolName:@"externaldrive" accessibilityDescription:@"Back Up"] retain];
+    iconToolbarDelete = [[NSImage imageWithSystemSymbolName:@"trash" accessibilityDescription:@"Clear Files"] retain];
 
     [outletStatusImage setImageFrameStyle:NSImageFrameNone];
     [outletStatusImage setImageAlignment:NSImageAlignCenter];
