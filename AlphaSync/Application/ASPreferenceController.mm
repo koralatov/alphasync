@@ -156,40 +156,27 @@
 
 
 
-- (void)backupFolderPanelDidEnd:(NSOpenPanel*)panel returnCode:(int)returnCode  contextInfo:(void*)contextInfo
-{
-    (void)contextInfo;
-    if (NSOKButton == returnCode)
-    {
-        NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-        NSArray* filenames = [panel filenames];
-        if ([filenames count] == 1)
-        {
-            [defaults setObject:[filenames objectAtIndex:0] forKey:kASPreferenceKeyBackupFolder];
-            [outletBackupFolder setTitle:[self backupFolder]];
-        }
-    }
-}
-
 - (IBAction)actionBackupFolder:(id)sender
 {
     (void)sender;
     NSOpenPanel* panel = [NSOpenPanel openPanel];
     [panel setCanChooseFiles:NO];
     [panel setCanChooseDirectories:YES];
-    if ([panel respondsToSelector:@selector(setCanCreateDirectories:)]) [panel setCanCreateDirectories:YES];
+    [panel setCanCreateDirectories:YES];
     [panel setResolvesAliases:YES];
     [panel setAllowsMultipleSelection:NO];
     [panel setTitle:@"Select new backup folder"];
     [panel setPrompt:@"Select"];
 
-    [panel beginSheetForDirectory:[self backupFolder]
-           file:nil
-           types:nil
-           modalForWindow:[self window]
-           modalDelegate:self
-           didEndSelector:@selector(backupFolderPanelDidEnd:returnCode:contextInfo:)
-           contextInfo:nil];
+    [panel setDirectoryURL:[NSURL fileURLWithPath:[self backupFolder] isDirectory:YES]];
+    [panel beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse response) {
+        if (response == NSModalResponseOK && [panel URL])
+        {
+            [[NSUserDefaults standardUserDefaults] setObject:[[panel URL] path]
+                                                     forKey:kASPreferenceKeyBackupFolder];
+            [outletBackupFolder setTitle:[self backupFolder]];
+        }
+    }];
 }
 
 - (IBAction)actionAutoRun:(id)sender

@@ -31,6 +31,7 @@
  */
 #import <Cocoa/Cocoa.h>
 #import "ASLoadSaveProtocol.h"
+#import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 
 #define kMaxUniqueRetry (999)       /**< Try this many times to create a unique name, before giving up. */
 
@@ -65,13 +66,15 @@ NSString* makeFilesystemPath(NSString* rootPath, NSString* extendedPath)
     while ((component = [enumerator nextObject]))
     {
         int uniqueID = 1;
-        path = [rootPath stringByAppendingPathComponent:component];
+        if ([component isEqualToString:@"."] || [component isEqualToString:@".."]) return nil;
+        NSString* parentPath = path;
+        path = [parentPath stringByAppendingPathComponent:component];
 
         while ([fm fileExistsAtPath:path] || ![fm createDirectoryAtPath:path withIntermediateDirectories:YES attributes:nil error:nil])
         {
             if (uniqueID > kMaxUniqueRetry) return nil;             // bailing out - unable to make a unique name?
             NSString* uniqueSuffix = [NSString stringWithFormat:@"%@ (%d)", component, uniqueID];
-            path = [rootPath stringByAppendingPathComponent:uniqueSuffix];
+            path = [parentPath stringByAppendingPathComponent:uniqueSuffix];
             uniqueID ++;
         }
     }
@@ -98,12 +101,12 @@ NSFileHandle* makeUniqueFile(NSString* path, NSString* basename, NSString* exten
     do
     {
         filename = [NSString stringWithFormat:@"%@%@.%@", basename, (uniqueID ? [NSString stringWithFormat:@" (%d)", uniqueID] : @""), extension];
-        fdForWriting = open([[NSString stringWithFormat:@"%@/%@", path, filename] UTF8String], O_WRONLY | O_CREAT | O_EXCL, 0666);
+        fdForWriting = open([[NSString stringWithFormat:@"%@/%@", path, filename] fileSystemRepresentation], O_WRONLY | O_CREAT | O_EXCL, 0666);
         uniqueID ++;
     } while (fdForWriting < 0 && errno == EEXIST && uniqueID <= kMaxUniqueRetry);
 
     NSFileHandle *fileHandle = nil;
-    if (fdForWriting > 0)
+    if (fdForWriting >= 0)
     {
         fileHandle = [[NSFileHandle alloc] initWithFileDescriptor:fdForWriting closeOnDealloc:YES];
     }
@@ -121,36 +124,10 @@ NSFileHandle* makeUniqueFile(NSString* path, NSString* basename, NSString* exten
  */
 NSString* utiFromFilePath(NSString* filePath)
 {
-    NSString* utiString = @"";
-
-    FSRef fileRef;
-    Boolean isDirectory;
-
-    if (FSPathMakeRef((const UInt8 *)[filePath fileSystemRepresentation], &fileRef, &isDirectory) == noErr)
-    {
-        // get the content type (UTI) of this file
-        CFDictionaryRef values = NULL;
-        CFStringRef attrs[1] = { kLSItemContentType };
-        CFArrayRef attrNames = CFArrayCreate(NULL, (const void **)attrs, 1, NULL);
-
-        if (LSCopyItemAttributes(&fileRef, kLSRolesViewer, attrNames, &values) == noErr)
-        {
-            // verify that this is a file that we can use
-            if (values != NULL)
-            {
-                CFTypeRef uti = (CFStringRef)CFDictionaryGetValue(values, kLSItemContentType);
-                if (uti != NULL)
-                {
-                    utiString = [NSString stringWithString:(NSString*)uti];
-                }
-                CFRelease(values);
-            }
-        }
-
-        CFRelease(attrNames);
-    }
-
-    return utiString;
+    NSURL* url = [NSURL fileURLWithPath:filePath];
+    UTType* contentType = nil;
+    if (![url getResourceValue:&contentType forKey:NSURLContentTypeKey error:nil]) return @"";
+    return [contentType identifier] ?: @"";
 }
 
 
@@ -162,8 +139,8 @@ NSString* utiFromFilePath(NSString* filePath)
  */
 BOOL filePathConformsToUTI(NSString* filePath, NSString* uti)
 {
-    NSString* filePathUTI = utiFromFilePath(filePath);
-    if (UTTypeConformsTo((CFStringRef)filePathUTI, (CFStringRef)uti)) return TRUE;
-    else return FALSE;
+    UTType* contentType = [UTType typeWithIdentifier:utiFromFilePath(filePath)];
+    UTType* requestedType = [UTType typeWithIdentifier:uti];
+    return contentType && requestedType && [contentType conformsToType:requestedType];
 }
 

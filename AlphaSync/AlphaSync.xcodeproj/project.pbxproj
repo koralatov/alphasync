@@ -68,6 +68,7 @@
 		A99A54EF0F0D474F00BC68F1 /* Preferences.nib in Resources */ = {isa = PBXBuildFile; fileRef = A99A54ED0F0D474F00BC68F1 /* Preferences.nib */; };
 		A99A54FA0F0D5F5100BC68F1 /* Inspector.nib in Resources */ = {isa = PBXBuildFile; fileRef = A99A54F80F0D5F5100BC68F1 /* Inspector.nib */; };
 		A9E5D3710F12BD5B002A9EC3 /* ASFileCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = A9E5D3700F12BD5B002A9EC3 /* ASFileCell.mm */; };
+        C01100000000000000000001 /* UniformTypeIdentifiers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01100000000000000000002 /* UniformTypeIdentifiers.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -175,6 +176,7 @@
 		A99A54F90F0D5F5100BC68F1 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/Inspector.nib; sourceTree = "<group>"; };
 		A9E5D36F0F12BD5B002A9EC3 /* ASFileCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASFileCell.h; sourceTree = "<group>"; };
 		A9E5D3700F12BD5B002A9EC3 /* ASFileCell.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASFileCell.mm; sourceTree = "<group>"; };
+        C01100000000000000000002 /* UniformTypeIdentifiers.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UniformTypeIdentifiers.framework; path = System/Library/Frameworks/UniformTypeIdentifiers.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -190,6 +192,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A99A549A0F0D3AB700BC68F1 /* IOKit.framework in Frameworks */,
+                C01100000000000000000001 /* UniformTypeIdentifiers.framework in Frameworks */,
 				A95EFAE70F17C96A00E1BDA9 /* Cocoa.framework in Frameworks */,
 				A95EFAE80F17C97900E1BDA9 /* Foundation.framework in Frameworks */,
 				4D4066050F1F45AA001DD407 /* Carbon.framework in Frameworks */,
@@ -213,6 +216,7 @@
 			isa = PBXGroup;
 			children = (
 				1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */,
+                C01100000000000000000002 /* UniformTypeIdentifiers.framework */,
 			);
 			name = "Linked Frameworks";
 			sourceTree = "<group>";
