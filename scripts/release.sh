@@ -61,8 +61,12 @@ done
 
 # Submit an intact, signed bundle.  The final download is made after stapling.
 ditto -c -k --keepParent "$app" "$output/notarisation-upload.zip"
+notary_options=(--keychain-profile "$ALPHASYNC_NOTARY_PROFILE")
+if [[ -n "${ALPHASYNC_NOTARY_KEYCHAIN:-}" ]]; then
+    notary_options+=(--keychain "$ALPHASYNC_NOTARY_KEYCHAIN")
+fi
 xcrun notarytool submit "$output/notarisation-upload.zip" \
-    --keychain-profile "$ALPHASYNC_NOTARY_PROFILE" --wait --output-format plist \
+    "${notary_options[@]}" --wait --output-format plist \
     > "$output/notarisation.plist"
 status=$(/usr/libexec/PlistBuddy -c 'Print :status' "$output/notarisation.plist")
 if [[ "$status" != Accepted ]]; then

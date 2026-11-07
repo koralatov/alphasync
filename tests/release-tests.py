@@ -78,11 +78,12 @@ class ReleaseTests(unittest.TestCase):
         self.package('modern')
         self.collect('--require-notarised')
         self.collect('--tag', 'v1.4.1')
+        self.collect('--source-commit', 'b' * 40)
 
     def test_matching_notarised_downloads(self):
         self.package('universal', signing='notarised')
         self.package('modern', signing='notarised')
-        self.collect('--require-notarised', '--tag', 'v1.4.0', succeeds=True)
+        self.collect('--require-notarised', '--tag', 'v1.4.0', '--source-commit', 'a' * 40, succeeds=True)
 
 
 if __name__ == '__main__':

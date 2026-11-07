@@ -59,6 +59,7 @@ def main():
     parser.add_argument('--output', required=True, type=Path)
     parser.add_argument('--require-notarised', action='store_true')
     parser.add_argument('--tag', help='Require the release tag to match the shared version.')
+    parser.add_argument('--source-commit', help='Require both downloads to match this source commit.')
     args = parser.parse_args()
     try:
         packages = [read_package(getattr(args, variant), variant, args.require_notarised)
@@ -69,6 +70,8 @@ def main():
         version = packages[0][0]['Version']
         if args.tag is not None and args.tag != 'v' + version:
             raise ValueError('The release tag does not match the package version.')
+        if args.source_commit is not None and args.source_commit != packages[0][0]['Source commit']:
+            raise ValueError('The downloads do not match the selected source commit.')
         # Validate everything before creating a directory that could be published.
         args.output.mkdir(parents=True, exist_ok=False)
         for fields, files in packages:
