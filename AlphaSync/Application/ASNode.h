@@ -49,10 +49,18 @@
     int fileSpace;
     int fileSize;
     int sortKey;
+    BOOL displayOnly;
+    NSString* operationError;
 }
 
 - (id)delegate;
 - (void)setDelegate:(id)newDelegate;
+
+// Display copies contain cached values only.  Device work uses a separate tree on the serial queue.
+- (ASNode*)copyForDisplay;
+- (void)copyDisplayFieldsTo:(ASNode*)snapshot;
+- (NSString*)operationError;
+- (void)setOperationError:(NSString*)error;
 
 - (void)refresh;
 - (void)reload;

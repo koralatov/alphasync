@@ -193,8 +193,7 @@ using namespace ts;
 
     if (appletNode)
     {
-        ASDevice* device = [appletNode device];
-        const ASApplet* applet = device->appletAtIndex([appletNode appletIndex]);
+        const ASApplet* applet = [appletNode applet];
         char version[16];
         snprintf(version, sizeof version, "Version %u.%u%c", applet->appletVersionMajor(), applet->appletVersionMinor(), applet->appletVersionRevision());
         char description[256];

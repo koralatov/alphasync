@@ -35,6 +35,7 @@
 @interface ASDeviceNode : ASNode
 {
     ts::ASDevice* device;
+    NSUInteger connectionID;
     NSString* systemVersion;
     NSString* systemBuild;
     NSString* systemDate;
@@ -47,6 +48,8 @@
 - (void)dealloc;
 
 - (ts::ASDevice*)device;
+- (NSUInteger)connectionID;
+- (void)setConnectionID:(NSUInteger)value;
 
 - (NSString*)systemVersion;
 - (NSString*)systemBuild;

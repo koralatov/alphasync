@@ -97,6 +97,22 @@ static NSImage* iconDeviceNeo = nil;              /**< Icon to use for Neo mk1 d
 
 /** Return the device handle.
  */
+- (NSUInteger)connectionID { return connectionID; }
+- (void)setConnectionID:(NSUInteger)value { connectionID = value; }
+
+- (void)copyDisplayFieldsTo:(ASNode*)value
+{
+    ASDeviceNode* snapshot = (ASDeviceNode*)value;
+    snapshot->device = device;
+    snapshot->connectionID = connectionID;
+    snapshot->systemVersion = [systemVersion copy];
+    snapshot->systemBuild = [systemBuild copy];
+    snapshot->systemDate = [systemDate copy];
+    snapshot->systemInfo = [systemInfo copy];
+    snapshot->availableRam = availableRam;
+    snapshot->availableRom = availableRom;
+}
+
 - (ts::ASDevice*)device
 {
     return device;

@@ -202,6 +202,20 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
 }
 
 
+- (void)copyDisplayFieldsTo:(ASNode*)value
+{
+    ASFileNode* snapshot = (ASFileNode*)value;
+    // Cache plain text while still on the device queue.  Inspectors and pasteboards then need no USB access.
+    if (fileIsPlainText) [self fileData];
+    snapshot->device = device;
+    snapshot->applet = new ASApplet(*applet);
+    snapshot->fileAttributes = new ASFileAttributes(*fileAttributes);
+    snapshot->fileIndex = fileIndex;
+    snapshot->fileExtension = fileExtension;
+    snapshot->fileIsPlainText = fileIsPlainText;
+    snapshot->filePreview = [filePreview copy];
+}
+
 - (void)dealloc
 {
     [filePreview release];
@@ -222,6 +236,8 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
         isFirstRefresh = NO;
 
         NSImage* fileIcon;
+        delete fileData;
+        fileData = nullptr;
 
         switch (applet->appletID())
         {
@@ -417,6 +433,7 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
  */
 - (NSString*)fileData
 {
+    if (displayOnly) return filePreview;
     NSString* result = nil;
 
     if (!fileIsSynchronised)
@@ -490,6 +507,7 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
             }
         }
     }
+    [self setOperationError:error ? *error : nil];
     [self reload];
     return result;
 }
