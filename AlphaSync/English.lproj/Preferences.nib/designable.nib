@@ -377,7 +377,7 @@
 							<object class="NSTextFieldCell" key="NSCell" id="113804435">
 								<int key="NSCellFlags">67108864</int>
 								<int key="NSCellFlags2">1346371584</int>
-								<string key="NSContents">Mac ASCII generally gives best application compatiblity but does not support the full Neo character set.  The unicode options preserve all characters from the Neo, but may not work with all other programs.</string>
+								<string key="NSContents">Exports and backups use UTF-8, preserving the NEO’s accented letters, symbols, and punctuation.  Imports accept MacASCII (Mac Roman), UTF-8, and UTF-16.</string>
 								<object class="NSFont" key="NSSupport">
 									<string key="NSName">LucidaGrande</string>
 									<double key="NSSize">12</double>
