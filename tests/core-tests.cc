@@ -168,6 +168,30 @@ static void testUSBReadBounds()
     CHECK(actual == 0 && badChecksum.reads == 1);
 }
 
+class MutableFile : public ts::ASFile
+{
+public:
+    using ts::ASFile::appendData;
+};
+
+static void testFileBufferFailures()
+{
+    MutableFile file;
+    uint8_t data[] = {1, 2, 3, 4};
+    CHECK(file.load(data, sizeof data));
+    CHECK(!file.load(nullptr, 4));
+    CHECK(file.fileSize() == 4);
+    CHECK(std::memcmp(file.fileData(), data, 4) == 0);
+    CHECK(!file.appendData(data, UINT_MAX));
+    CHECK(file.fileSize() == 4);
+    CHECK(file.load(static_cast<const uint8_t*>(file.fileData()) + 1, 2));
+    CHECK(file.fileSize() == 2);
+    CHECK(static_cast<const uint8_t*>(file.fileData())[0] == 2);
+    MockDevice device;
+    CHECK(!file.load(&device, nullptr, "missing"));
+    CHECK(device.reads == 0);
+}
+
 int main()
 {
     testAlphaWordRoundTrip();
@@ -175,5 +199,6 @@ int main()
     testSettingsBounds();
     testMalformedGenericFiles();
     testUSBReadBounds();
+    testFileBufferFailures();
     std::puts("All core tests passed.");
 }

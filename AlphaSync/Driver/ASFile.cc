@@ -32,6 +32,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <limits.h>
 #include "ASFile.h"
 
 
@@ -91,8 +92,14 @@ namespace ts
 
     bool ASFile::load(const void* data, unsigned size)
     {
-        void* ptr = setFileSize(size);
-        if (ptr) memcpy(ptr, data, size);
+        if (size && !data) return false;
+        void* copy = size ? malloc(size) : nullptr;
+        if (size && !copy) return false;
+        // Copy before releasing the old buffer, because the caller may be loading from it.
+        if (size) memcpy(copy, data, size);
+        free(m_fileData);
+        m_fileData = copy;
+        m_fileSize = size;
         return confirmLoad();
     }
 
@@ -132,7 +139,7 @@ namespace ts
     bool ASFile::load(ASDevice* device, const ASApplet* applet, const char* filename)
     {
         int fileIndex = device->indexForFileWithName(applet, filename);
-        if (fileIndex < 0) return -1;       // no such file
+        if (fileIndex < 0) return false;       // no such file
 
         return load(device, applet, fileIndex);
     }
@@ -292,28 +299,27 @@ namespace ts
 
     void* ASFile::setFileSize(unsigned size)
     {
-        void* newRawData = (size > 0) ? realloc(m_fileData, size) : 0;
-        if (0 == newRawData)
+        if (!size)
         {
-            // Either size was zero or allocation failed - clear existing buffers
-            if (0 != m_fileData) free(m_fileData);
-            m_fileData = 0;
+            free(m_fileData);
+            m_fileData = nullptr;
             m_fileSize = 0;
+            return nullptr;
         }
-        else
-        {
-            // Have successfully resized to a non-zero capacity
-            m_fileData = newRawData;
-            if (size > m_fileSize) memset(((uint8_t*)m_fileData) + m_fileSize, 0, size - m_fileSize);
-            m_fileSize = size;
-        }
+        void* newRawData = realloc(m_fileData, size);
+        if (!newRawData) return nullptr;
+        m_fileData = newRawData;
+        if (size > m_fileSize) memset(byteData() + m_fileSize, 0, size - m_fileSize);
+        m_fileSize = size;
         return m_fileData;
     }
 
 
     bool ASFile::appendData(void* data, unsigned size)
     {
+        if (!size) return true;
         unsigned previousSize = fileSize();
+        if (!data || size > UINT_MAX - previousSize) return false;
         uint8_t* newData = (uint8_t*)setFileSize(previousSize + size);
         if (!newData)
         {
