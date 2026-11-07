@@ -81,3 +81,26 @@ jobs:
           name: AlphaSync-${{ matrix.runner }}-${{ github.sha }}
           path: build/AlphaSync-*-macOS-11.zip
           if-no-files-found: error
+
+  default-xcode:
+    name: Default Xcode source check, separate from releases
+    runs-on: macos-26
+    timeout-minutes: 15
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Show the runner's default Xcode
+        run: xcodebuild -version
+      - name: Run the core and native regression tests
+        run: make test sanitize
+      # New Xcode versions can stop supporting macOS 11.  This lane checks source
+      # compatibility with a newer SDK and must never supply a release artifact.
+      - name: Build against the default SDK with a macOS 12 minimum
+        run: >-
+          xcodebuild -project AlphaSync/AlphaSync.xcodeproj -scheme AlphaSync
+          -configuration Release -destination 'generic/platform=macOS'
+          -derivedDataPath build/DefaultXcode MACOSX_DEPLOYMENT_TARGET=12.0 build
+      - name: Verify this compatibility build
+        run: scripts/verify-app.sh build/DefaultXcode/Build/Products/Release/AlphaSync.app 12.0
