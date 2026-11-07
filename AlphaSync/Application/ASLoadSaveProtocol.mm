@@ -94,7 +94,8 @@ NSString* utiFromFilePath(NSString* filePath)
     NSURL* url = [NSURL fileURLWithPath:filePath];
     UTType* contentType = nil;
     if (![url getResourceValue:&contentType forKey:NSURLContentTypeKey error:nil]) return @"";
-    return [contentType identifier] ?: @"";
+    NSString* identifier = [contentType identifier];
+    return identifier ? identifier : @"";
 }
 
 

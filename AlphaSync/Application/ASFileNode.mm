@@ -568,7 +568,11 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
         if (![basename length]) basename = @"unspecified";
         NSError* writeError = nil;
         result = aq_WriteUniqueFile(path, basename, extension, data, &writeError);
-        if (!result) error = [writeError localizedDescription] ?: @"Unable to finish writing the file.";
+        if (!result)
+        {
+            error = [writeError localizedDescription];
+            if (!error) error = @"Unable to finish writing the file.";
+        }
     }
     if (errorMessage) *errorMessage = error;
     if (hasDelegate) [accessDelegate deviceDidSave:self error:error sender:self];

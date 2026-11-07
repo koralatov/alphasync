@@ -204,7 +204,10 @@ static void deviceDisconnect(ASDeviceFactory* factory, void* context, unsigned i
             [selected setOperationError:nil];
             result = task(selected);
             if (!result || ([result isKindOfClass:[NSNumber class]] && ![result boolValue]))
-                error = [selected operationError] ?: @"The device operation could not be completed.";
+            {
+                error = [selected operationError];
+                if (!error) error = @"The device operation could not be completed.";
+            }
             if (refresh)
             {
                 [live reload];

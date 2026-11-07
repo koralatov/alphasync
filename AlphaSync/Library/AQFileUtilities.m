@@ -102,6 +102,6 @@ NSString* aq_WriteUniqueFile(NSString* directory, NSString* basename, NSString* 
     }
     unlink(temporaryPath);
     free(temporaryPath);
-    if (!result && error) *error = writeError ?: closeError;
+    if (!result && error) *error = writeError ? writeError : closeError;
     return result;
 }
