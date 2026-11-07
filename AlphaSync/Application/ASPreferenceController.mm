@@ -36,38 +36,6 @@
 @implementation ASPreferenceController
 
 
-+ (NSStringEncoding)getDefaultTextEncoding
-{
-    NSStringEncoding encoding;
-    switch ([[NSUserDefaults standardUserDefaults] integerForKey:kASPreferenceKeyTextEncoding])
-    {
-        case kASPreferenceTextEncodingMacASCII:
-            encoding = NSMacOSRomanStringEncoding;
-            break;
-
-        case kASPreferenceTextEncodingPlainASCII:
-            encoding = NSASCIIStringEncoding;
-            break;
-
-        case kASPreferenceTextEncodingUTF8:
-            encoding = NSUTF8StringEncoding;
-            break;
-
-        case kASPreferenceTextEncodingUnicode:
-            encoding = NSUnicodeStringEncoding;
-            break;
-
-        default:
-            [[NSUserDefaults standardUserDefaults] setInteger:kASPreferenceTextEncodingUTF8 forKey:kASPreferenceKeyTextEncoding];
-            encoding = NSUTF8StringEncoding;
-            break;
-    }
-
-    return encoding;
-}
-
-
-
 /** Raise an error if the default constructor is used.
  */
 - (id)init
@@ -106,11 +74,6 @@
     return [[NSUserDefaults standardUserDefaults] stringForKey:kASPreferenceKeyBackupFolder];
 }
 
-- (NSInteger)textEncodingOption
-{
-    return [[NSUserDefaults standardUserDefaults] integerForKey:kASPreferenceKeyTextEncoding];
-}
-
 - (BOOL)autoRun
 {
     return [[NSUserDefaults standardUserDefaults] boolForKey:kASPreferenceKeyAutoRun];
@@ -122,7 +85,10 @@
 {
     [outletFilterOption selectItemWithTag:[self displayOption]];
     [outletBackupFolder setTitle:[self backupFolder]];
-    [outletTextEncoding selectItemWithTag:[self textEncodingOption]];
+    [outletTextEncoding removeAllItems];
+    [outletTextEncoding addItemWithTitle:@"UTF-8"];
+    [outletTextEncoding setEnabled:NO];
+    [outletTextEncoding setToolTip:@"Exported files always use UTF-8.  Imports accept MacASCII, UTF-8, and UTF-16."];
     [outletAutoRun setState:[self autoRun] ? NSControlStateValueOn : NSControlStateValueOff];
 
     // Keep the older nib intact and add enough room for the actual system status.
@@ -231,26 +197,11 @@
     [self refreshAutomaticLaunchStatus:nil];
 }
 
+// Keep the action connected by the existing nib; the format field is read-only.
 - (IBAction)actionTextEncoding:(id)sender
 {
     (void)sender;
-    NSInteger tag = [[outletTextEncoding selectedItem] tag];
-    NSInteger encoding;
-    switch (tag)
-    {
-        case kASPreferenceTextEncodingMacASCII:
-        case kASPreferenceTextEncodingPlainASCII:
-        case kASPreferenceTextEncodingUTF8:
-        case kASPreferenceTextEncodingUnicode:
-            encoding = tag;
-            break;
-
-        default:
-            encoding = kASPreferenceTextEncodingMacASCII;
-            break;
-    }
-
-    [[NSUserDefaults standardUserDefaults] setInteger:encoding forKey:kASPreferenceKeyTextEncoding];
+    [outletTextEncoding selectItemAtIndex:0];
 }
 
 - (IBAction)actionPreferenceHelp:(id)sender

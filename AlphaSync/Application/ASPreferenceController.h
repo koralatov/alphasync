@@ -36,7 +36,6 @@
 
 #define kASPreferenceKeyFilter              @"FilterMode"
 #define kASPreferenceKeyBackupFolder        @"BackupFolder"
-#define kASPreferenceKeyTextEncoding        @"TextEncoding"
 #define kASPreferenceKeyAutoRun             @"AutoRun"
 
 #define kASPreferenceDefaultFilter          kASPreferenceOptionFilterAlphawordAndDictionary
@@ -46,10 +45,6 @@
 // Create an HTML tag <a name="PrefernceWindowAnchor"></a> in the help, and re-index.
 #define kASPreferenceHelpAnchor             CFSTR("PreferenceWindowAnchor")
 
-#define kASPreferenceTextEncodingMacASCII   (0)
-#define kASPreferenceTextEncodingPlainASCII (1)
-#define kASPreferenceTextEncodingUTF8       (2)
-#define kASPreferenceTextEncodingUnicode    (3)
 
 @class ASApplicationController;
 
@@ -65,7 +60,6 @@
     ASApplicationController* applicationController;
 }
 
-+ (NSStringEncoding)getDefaultTextEncoding;
 
 - (id)initWithAppController:(ASApplicationController*)controller;
 - (IBAction)actionFilterOption:(id)sender;
