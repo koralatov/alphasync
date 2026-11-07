@@ -61,7 +61,7 @@ python3 tests/release-tests.py
 
 They cover text conversion, Windows line endings, unsupported characters, dictionary imports, both UTF-16 byte orders, malformed files, settings boundaries, failed buffer operations, and simulated USB replies.  Invalid-reply tests produce expected error messages before the final success message.
 
-On macOS, `make test` also checks exported XML with Foundation’s parser, exclusive file publication, interrupted backup reports, and background queue ordering and responsiveness.  Older backups without a root element remain readable by AlphaSync.
+On macOS, `make test` also checks exported XML with Foundation’s parser, exclusive file publication, interrupted backup reports, and background queue ordering and responsiveness.  Native filesystem tests check UTF-8 export bytes for every saved encoding preference, plus MacASCII, UTF-8, and UTF-16 imports.  Older backups without a root element remain readable by AlphaSync.
 
 On a Mac, verify the built app with:
 
@@ -95,6 +95,8 @@ AlphaSync no longer copies a launcher into Application Support.  If an older ins
 Preferences shows the actual launcher state separately from the automatic-launch setting.  It reports registration errors and approval requests, and provides a Login Items settings button on macOS 13 and later.  The older API cannot query the saved registration state, so macOS 11 and 12 report an unknown state when the helper is not running.
 
 ## Imports and backups
+
+Exports and backups always use UTF-8 without a byte-order mark.  Preferences shows the fixed output format, and encoding preferences saved by older versions do not affect it.  Imports still accept MacASCII (Mac Roman), UTF-8 with or without a byte-order mark, and UTF-16 with a byte-order mark in either byte order.
 
 Windows line endings become single paragraph breaks.  An import containing characters the NEO cannot store fails with an explanation, leaving the existing file intact.
 

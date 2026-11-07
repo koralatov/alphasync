@@ -30,6 +30,7 @@ On macOS 13 and later, check the approval-required state, the settings button, g
 Keep known-good backups before testing writes to the NEO.
 
 - Copy files in both directions, including pound signs, accented letters, and curly quotes.
+- Import matching MacASCII, UTF-8, and UTF-16 files, including both UTF-16 byte orders with byte-order marks.  Confirm that exported copies and backups use UTF-8 and preserve the text.
 - Import the same paragraphs with LF, CRLF, and CR endings.  Check for the same paragraph breaks.
 - Import unsupported characters and oversized text.  Confirm that an explanation appears and the existing device file is unchanged.
 - Export files and folders to Finder, and drop text files onto the NEO.

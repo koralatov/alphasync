@@ -11,13 +11,14 @@
 <h1>Character Set Issues</h1>
 <hr>
 
-<p>AlphaSync assumes the use of Mac Roman extended ASCII for its text file format. This gives a good compromise
-between compatibility with other Mac applications and it works with almost all Neo standard accented characters,
-punctuation and currency symbols.</p>
+<p>AlphaSync writes exported files and backups in UTF-8.  This preserves the accented letters,
+punctuation, and currency symbols supplied by the NEO.  An encoding preference saved by an older
+version does not change the output format.</p>
 
-<p>If you find that characters in a file uploaded to the Neo display differently than you expected, check that
-the file that you copied to the Neo was in Mac Roman ASCII coding. For example, you can select the encoding
-using 'save-as' from within Microsoft Word.</p>
+<p>Imports accept MacASCII (Mac Roman), UTF-8, and UTF-16, including either UTF-16 byte order with
+a byte-order mark.  AlphaSync detects the input encoding when it opens the file.</p>
+<p>The NEO has its own supported character set.  If an imported file contains characters that
+the device cannot store, AlphaSync reports the problem before replacing the device file.</p>
 
 <hr>
 <p>Copyright &copy; 2009-2013 tSoniq.</p>
