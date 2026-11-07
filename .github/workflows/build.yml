@@ -9,16 +9,24 @@ permissions:
 
 jobs:
   macos:
-    name: macOS on ${{ matrix.runner }}
+    name: ${{ matrix.runner }} with Xcode ${{ matrix.xcode }}
     strategy:
       fail-fast: false
       matrix:
-        runner: [macos-15, macos-15-intel]
+        include:
+          - runner: macos-15
+            xcode: '16.4'
+          - runner: macos-15-intel
+            xcode: '16.4'
+          - runner: macos-26
+            xcode: '26.6'
+          - runner: macos-26-intel
+            xcode: '26.6'
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 15
     env:
-      # Xcode 16.4 supports macOS 11 deployment targets on both architectures.
-      DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer
+      # Both toolchains support macOS 11 deployment targets.
+      DEVELOPER_DIR: /Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:

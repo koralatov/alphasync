@@ -6,7 +6,7 @@ The app requires **macOS 11.0 or later**.  One universal app contains native Int
 
 ## Build
 
-The checked build uses **Xcode 16.4**.  Install Xcode and its command-line tools, open `AlphaSync/AlphaSync.xcodeproj`, select the shared **AlphaSync** scheme, and build.  The project builds both architectures in Debug and Release.
+The recommended build uses **Xcode 26.6**.  CI also checks **Xcode 16.4** for builds made on an older Mac.  Install Xcode and its command-line tools, open `AlphaSync/AlphaSync.xcodeproj`, select the shared **AlphaSync** scheme, and build.  The project builds both architectures in Debug and Release.
 
 From the repository root:
 
@@ -40,7 +40,7 @@ scripts/verify-app.sh
 
 This checks both architectures, the executable deployment targets, system-only dependencies, nested signatures, and every interface window.  It does not capture USB devices or change login items.  An alternative app path can be passed as its first argument.
 
-GitHub Actions runs tests and builds Debug and Release on Intel and Apple Silicon runners.  Each successful job saves a zipped universal app as a build artifact.  These checks run on the runners’ macOS versions, so they do not establish that every feature works on macOS 11.
+GitHub Actions runs tests and builds Debug and Release on Intel and Apple Silicon runners with macOS 15 and 26.  Each successful job saves a zipped universal app as a build artifact.  These checks run on the runners’ macOS versions, so they do not establish that every feature works on macOS 11.
 
 ## Automatic launching
 
@@ -53,7 +53,7 @@ AlphaSync no longer copies a launcher into Application Support.  If an older ins
 
 ## Signing and distribution
 
-Local builds use an ad hoc signature and the hardened runtime.  They do not need the original developer’s certificate, a Developer ID, or a notarisation ticket.  Workflow artifacts are development builds, rather than Developer ID distribution builds.
+Local builds use an ad hoc signature and the hardened runtime.  They do not need the original developer’s certificate, a Developer ID, or a notarisation ticket.  Workflow artifacts use ad hoc signatures for development and testing.
 
 For distribution, supply your own identity and team when archiving:
 
