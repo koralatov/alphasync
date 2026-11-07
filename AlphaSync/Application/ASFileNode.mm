@@ -180,14 +180,12 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
         {
             NSBundle* bundle = [NSBundle mainBundle];
             iconFileTxt = [[NSImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-file-txt" ofType:@"pdf"]];
-            [iconFileTxt setDataRetained:YES];
         }
 
         if (!iconFileBin)
         {
             NSBundle* bundle = [NSBundle mainBundle];
             iconFileBin = [[NSImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-file-bin" ofType:@"pdf"]];
-            [iconFileBin setDataRetained:YES];
         }
 
         fileIndex = fin;

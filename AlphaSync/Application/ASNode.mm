@@ -171,8 +171,6 @@
     smallIcon = [value copy];
     largeIcon = [value copy];
 
-    [largeIcon setDataRetained:YES];
-    [smallIcon setDataRetained:NO];
 }
 
 - (void)setDisplayName:(NSString*)value

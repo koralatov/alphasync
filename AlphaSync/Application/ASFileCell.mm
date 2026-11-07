@@ -115,12 +115,9 @@
         imageFrame.size.height = iconHeight;
         imageFrame.size.width = iconWidth;
 
-        if ([controlView isFlipped])    imageFrame.origin.y += ceil((cellFrame.size.height + imageFrame.size.height) / 2);
-        else                            imageFrame.origin.y += ceil((cellFrame.size.height - imageFrame.size.height) / 2);
-
-    	[icon setScalesWhenResized:YES];
-        [icon setSize:imageFrame.size];
-        [icon compositeToPoint:imageFrame.origin operation:NSCompositeSourceOver];
+        imageFrame.origin.y += ceil((cellFrame.size.height - imageFrame.size.height) / 2);
+        [icon drawInRect:imageFrame fromRect:NSZeroRect operation:NSCompositingOperationSourceOver
+               fraction:1.0 respectFlipped:YES hints:nil];
     }
     [super drawWithFrame:cellFrame inView:controlView];
 }

@@ -66,7 +66,6 @@ static NSImage* iconDeviceNeo = nil;              /**< Icon to use for Neo mk1 d
         {
             NSBundle* bundle = [NSBundle mainBundle];
             iconDeviceNeo = [[NSImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-neo" ofType:@"pdf"]];
-            [iconDeviceNeo setDataRetained:YES];
         }
 
         device = dev;

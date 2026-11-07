@@ -67,7 +67,6 @@ static NSImage* iconApplet = nil;              /**< Icon to use for applets. */
         {
             NSBundle* bundle = [NSBundle mainBundle];
             iconApplet = [[NSImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-applet" ofType:@"pdf"]];
-            [iconApplet setDataRetained:YES];
         }
 
         appletIndex = appletIdx;

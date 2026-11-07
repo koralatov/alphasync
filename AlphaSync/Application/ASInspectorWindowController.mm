@@ -67,8 +67,8 @@ using namespace ts;
 
 - (void)configurePanelsToShowSystem:(BOOL)showSystem showApplet:(BOOL)showApplet showFile:(BOOL)showFile
 {
-    BOOL showPreview = ([outletShowPreviewDisclosure state] == NSOnState);
-    BOOL showDetail = ([outletShowDetailDisclosure state] == NSOnState);
+    BOOL showPreview = ([outletShowPreviewDisclosure state] == NSControlStateValueOn);
+    BOOL showDetail = ([outletShowDetailDisclosure state] == NSControlStateValueOn);
 
     for (int i = 0; i < kASInspectorMaxBox; i++)  showBox[i] = TRUE;
     showBox[kASInspectorBoxPreview] = showPreview;
