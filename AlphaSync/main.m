@@ -101,7 +101,7 @@ static void checkAppearances(id controller, NSWindowController* backup, NSString
         if ([item action]) requireInterface([item image] != nil && [[item image] isTemplate], @"A toolbar icon is not a native template image.");
 
     id device = [[[NSClassFromString(@"ASNode") alloc] init] autorelease];
-    id file = [[[NSClassFromString(@"ASFileNode") alloc] init] autorelease];
+    id file = [[[NSClassFromString(@"ASFileNode") alloc] performSelector:NSSelectorFromString(@"initForDisplay")] autorelease];
     [device setValue:@"AlphaSmart NEO" forKey:@"displayName"];
     [device setValue:@"Device" forKey:@"displayKind"];
     [device setValue:[NSImage imageWithSystemSymbolName:@"keyboard" accessibilityDescription:nil] forKey:@"icon"];
