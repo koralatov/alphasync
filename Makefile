@@ -26,8 +26,8 @@ clean:
 	rm -rf build
 
 ifeq ($(shell uname -s),Darwin)
-.PHONY: test-xml test-files test-reports
-test: test-xml test-files test-reports
+.PHONY: test-xml test-files test-reports test-queue
+test: test-xml test-files test-reports test-queue
 
 test-xml: build/xml-tests
 	./build/xml-tests
@@ -53,4 +53,14 @@ test-reports: build/report-tests
 build/report-tests: tests/report-tests.mm AlphaSync/Application/ASBackupReport.mm AlphaSync/Application/ASBackupReport.h Makefile
 	@mkdir -p build
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) tests/report-tests.mm AlphaSync/Application/ASBackupReport.mm -framework Foundation -o $@
+endif
+
+ifeq ($(shell uname -s),Darwin)
+QUEUE_SOURCES := $(addprefix AlphaSync/Application/,ASDeviceController.mm ASDeviceNode.mm ASAppletNode.mm ASFileNode.mm ASNode.mm ASLoadSaveProtocol.mm ASPreferenceController.mm)
+test-queue: build/queue-tests
+	./build/queue-tests
+
+build/queue-tests: tests/queue-tests.mm $(QUEUE_SOURCES) $(CORE_SOURCES) $(CORE_HEADERS) AlphaSync/Driver/ASDeviceFactory.cc AlphaSync/Library/AQTreeNode.m AlphaSync/Library/AQFileUtilities.m Makefile
+	@mkdir -p build
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -fblocks -x objective-c++ tests/queue-tests.mm $(QUEUE_SOURCES) $(CORE_SOURCES) AlphaSync/Driver/ASDeviceFactory.cc AlphaSync/Library/AQTreeNode.m AlphaSync/Library/AQFileUtilities.m -framework Cocoa -framework IOKit -framework ServiceManagement -framework UniformTypeIdentifiers -o $@
 endif
