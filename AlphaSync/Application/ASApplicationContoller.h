@@ -72,6 +72,17 @@
     NSTimer* statusDisplayTimer;
     NSToolbar* toolbar;
 
+    NSView* fileViewerContentView;
+    NSView* connectionContentView;
+    NSStackView* connectionStack;
+    NSImageView* connectionSymbol;
+    NSTextField* connectionTitle;
+    NSTextField* connectionMessage;
+    NSSize fileViewerWindowSize;
+    NSSize fileViewerMinSize;
+    BOOL showingFileViewer;
+    BOOL fileViewerToolbarVisible;
+
     BOOL appIsUninstalling;
     BOOL terminationPending;
 }

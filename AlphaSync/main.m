@@ -100,6 +100,102 @@ static void captureWindow(NSWindow* window, NSString* directory, NSString* name)
     requireInterface([png writeToFile:path options:NSDataWritingAtomic error:&error], [error localizedDescription] ?: @"A screenshot could not be saved.");
 }
 
+static void checkConnectionLayout(id controller)
+{
+    NSWindow* window = [controller valueForKey:@"outletMainWindow"];
+    NSView* content = [window contentView];
+    [content layoutSubtreeIfNeeded];
+    checkInheritedAppearance(content);
+    for (NSString* key in @[@"connectionSymbol", @"connectionTitle", @"connectionMessage"])
+    {
+        NSView* view = [controller valueForKey:key];
+        requireInterface(NSContainsRect(NSInsetRect([content bounds], -1, -1),
+                                         [view convertRect:[view bounds] toView:content]), @"A connection control is outside the window.");
+        if ([view isKindOfClass:[NSTextField class]])
+        {
+            NSTextField* label = (NSTextField*)view;
+            NSSize needed = [[label cell] cellSizeForBounds:NSMakeRect(0, 0, NSWidth([label bounds]), 10000)];
+            requireInterface(NSHeight([label bounds]) >= needed.height - 1, @"Connection text is clipped.");
+        }
+    }
+}
+
+static void sampleConnection(id controller, id device, BOOL connected)
+{
+    // Modify only the display tree.  --smoke-test never enables USB detection.
+    id root = [[controller valueForKey:@"deviceController"] valueForKey:@"systemRoot"];
+    [root performSelector:NSSelectorFromString(connected ? @"addChild:" : @"removeChild:") withObject:device];
+    [[NSNotificationCenter defaultCenter] postNotificationName:connected ? @"ASDeviceConnected" : @"ASDeviceDisconnected" object:device];
+}
+
+static void checkConnectionStates(id controller)
+{
+    NSWindow* window = [controller valueForKey:@"outletMainWindow"];
+    NSView* compact = [controller valueForKey:@"connectionContentView"];
+    NSView* files = [controller valueForKey:@"fileViewerContentView"];
+    NSTextField* title = [controller valueForKey:@"connectionTitle"];
+    NSTextField* message = [controller valueForKey:@"connectionMessage"];
+    NSImageView* symbol = [controller valueForKey:@"connectionSymbol"];
+    NSToolbar* toolbar = [controller valueForKey:@"toolbar"];
+    requireInterface([window contentView] == compact && [window toolbar] == nil && NSWidth([window frame]) < 480,
+                     @"Startup without a NEO did not show the compact connection window.");
+    requireInterface([NSImage imageWithSystemSymbolName:@"cable.connector" accessibilityDescription:nil] != nil &&
+                     [[symbol image] isTemplate] && [[symbol image] symbolConfiguration] != nil,
+                     @"The connection icon is not an available native SF Symbol.");
+    requireInterface([[title stringValue] isEqualToString:@"No NEO connected"], @"The disconnected title changed.");
+    checkConnectionLayout(controller);
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ASDeviceDetected" object:nil];
+    requireInterface([window contentView] == compact && [[title stringValue] isEqualToString:@"Connecting to NEO…"],
+                     @"Detecting a NEO did not keep the compact connection progress visible.");
+    NSString* error = @"The NEO could not be opened because another application is using it.  Close that application, check the USB cable, and reconnect your NEO to try again.";
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ASDeviceError" object:error];
+    requireInterface([[message stringValue] isEqualToString:error], @"The compact view hid a connection error.");
+    checkConnectionLayout(controller);
+    [controller performSelector:NSSelectorFromString(@"displayStatusTimerDone")];
+    requireInterface([[title stringValue] isEqualToString:@"No NEO connected"] && [[message stringValue] containsString:@"USB cable"],
+                     @"The waiting message did not return after a temporary error.");
+
+    id first = [[[NSClassFromString(@"ASNode") alloc] init] autorelease];
+    id second = [[[NSClassFromString(@"ASNode") alloc] init] autorelease];
+    sampleConnection(controller, first, YES);
+    requireInterface([window contentView] == files && [window toolbar] == toolbar && NSWidth([window frame]) >= 480,
+                     @"Connecting did not restore the file viewer and its toolbar.");
+    NSSize initialSize = [window frame].size;
+    NSRect resized = [window frame];
+    resized.size = NSMakeSize(620, 560);
+    [window setFrame:resized display:YES];
+    NSSize userSize = [window frame].size;
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ASDeviceDataChanged" object:nil];
+    sampleConnection(controller, second, YES);
+    sampleConnection(controller, first, NO);
+    requireInterface([window contentView] == files && NSEqualSizes([window frame].size, userSize),
+                     @"A refresh or disconnect with another NEO present changed the file viewer size.");
+
+    // A disconnect must not interrupt a backup result or a native file sheet.
+    NSWindow* sheet = [[[NSWindow alloc] initWithContentRect:NSMakeRect(0, 0, 240, 100)
+        styleMask:NSWindowStyleMaskTitled backing:NSBackingStoreBuffered defer:NO] autorelease];
+    [sheet setReleasedWhenClosed:NO];
+    [window makeKeyAndOrderFront:nil];
+    [window beginSheet:sheet completionHandler:nil];
+    sampleConnection(controller, second, NO);
+    requireInterface([window contentView] == files && [window attachedSheet] == sheet,
+                     @"The parent window shrank while its sheet was open.");
+    [window endSheet:sheet];
+    NSDate* deadline = [NSDate dateWithTimeIntervalSinceNow:2];
+    while (([window attachedSheet] || [window contentView] != compact) && [deadline timeIntervalSinceNow] > 0)
+        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.01]];
+    requireInterface([window contentView] == compact && [window toolbar] == nil, @"The last NEO disconnect did not return to the compact window.");
+    sampleConnection(controller, first, YES);
+    requireInterface([window contentView] == files && NSEqualSizes([window frame].size, userSize),
+                     @"Reconnecting lost the chosen file viewer size.");
+    resized = [window frame];
+    resized.size = initialSize;
+    [window setFrame:resized display:YES];
+    sampleConnection(controller, first, NO);
+    checkConnectionLayout(controller);
+    puts("Native connection symbol, waiting, progress, errors, reconnect sizing, multiple NEOs, and sheet deferral passed.");
+}
+
 static void checkPreferenceLayout(id preferences)
 {
     NSView* content = [[preferences window] contentView];
@@ -293,9 +389,6 @@ static void checkAppearances(id controller, NSWindowController* backup, NSString
         requireInterface([window appearance] == nil, @"A window overrides the system appearance.");
         checkInheritedAppearance([window contentView]);
     }
-    for (NSToolbarItem* item in [[main toolbar] items])
-        if ([item action]) requireInterface([item image] != nil && [[item image] isTemplate], @"A toolbar icon is not a native template image.");
-
     id device = [[[NSClassFromString(@"ASNode") alloc] init] autorelease];
     id file = [[[NSClassFromString(@"ASFileNode") alloc] performSelector:NSSelectorFromString(@"initForDisplay")] autorelease];
     [device setValue:@"AlphaSmart NEO" forKey:@"displayName"];
@@ -315,6 +408,12 @@ static void checkAppearances(id controller, NSWindowController* backup, NSString
     [outline setDataSource:rows];
     [outline reloadData];
     [outline expandItem:device];
+    id root = [[controller valueForKey:@"deviceController"] valueForKey:@"systemRoot"];
+    [root performSelector:@selector(addChild:) withObject:device];
+    [controller performSelector:NSSelectorFromString(@"setStatusImmediateIdle")];
+    checkInheritedAppearance([main contentView]);
+    for (NSToolbarItem* item in [[main toolbar] items])
+        if ([item action]) requireInterface([item image] != nil && [[item image] isTemplate], @"A toolbar icon is not a native template image.");
 
     NSTableColumn* nameColumn = [outline tableColumnWithIdentifier:@"Name"];
     NSTableCellView* fileCell = (NSTableCellView*)[[outline delegate] outlineView:outline viewForTableColumn:nameColumn item:file];
@@ -360,6 +459,12 @@ static void checkAppearances(id controller, NSWindowController* backup, NSString
         [outline selectRowIndexes:[NSIndexSet indexSetWithIndex:1] byExtendingSelection:NO];
         captureWindow(main, directory, [mode stringByAppendingString:@"-selection"]);
         [outline deselectAll:nil];
+        [root performSelector:@selector(removeChild:) withObject:device];
+        [controller performSelector:NSSelectorFromString(@"setStatusImmediateIdle")];
+        checkConnectionLayout(controller);
+        captureWindow(main, directory, [mode stringByAppendingString:@"-disconnected"]);
+        [root performSelector:@selector(addChild:) withObject:device];
+        [controller performSelector:NSSelectorFromString(@"setStatusImmediateIdle")];
         capturePreferenceStatus(controller, directory, mode);
         captureBackupResults(backup, directory, mode);
 
@@ -386,6 +491,9 @@ static void checkAppearances(id controller, NSWindowController* backup, NSString
     }
     [outline setDataSource:originalSource];
     [outline setDelegate:originalDelegate];
+    [root performSelector:@selector(removeChild:) withObject:device];
+    [outline reloadData];
+    [controller performSelector:NSSelectorFromString(@"setStatusImmediateIdle")];
     [NSApp setAppearance:nil];
     puts("Native views, editing permissions, cancelled renames, contrast, and live appearance changes passed.");
 }
@@ -418,6 +526,9 @@ static int checkInterface(void)
         else [NSApp activateIgnoringOtherApps:YES];
         id controller = [NSApp delegate];
         if (!controller || ![controller valueForKey:@"outletMainWindow"] || ![controller valueForKey:@"outletFileView"]) return 1;
+
+        fputs("Interface check: checking connection window transitions.\n", stderr);
+        checkConnectionStates(controller);
 
         // Load every window, so missing resources and broken outlet connections fail the check.
         fputs("Interface check: opening Preferences.\n", stderr);

@@ -75,6 +75,10 @@ enum ASAlertStatus
 - (void)setStatusIdle;
 - (void)setStatusImmediateIdle;
 - (void)setupToolbar;
+- (void)setupConnectionView;
+- (void)updateMainWindowConnectionState;
+- (void)resizeMainWindowToSize:(NSSize)size;
+- (void)updateInspectorDisplay;
 @end
 
 
@@ -120,6 +124,10 @@ static const NSInteger kMenuItemTagBackup   = 100;
 
 - (void)dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [fileViewerContentView release];
+    [connectionContentView release];
+    [toolbar release];
     [preferenceController release];
     [aboutController release];
     [deviceController release];
@@ -206,12 +214,119 @@ static const NSInteger kMenuItemTagBackup   = 100;
     [outletFileView setDataSource:dataSource];
     [outletFileView setDelegate:self];
 
+    [self setupConnectionView];
+    [self updateMainWindowConnectionState];
+
     // Interface checks must not capture a connected NEO or change login-item registration.
     if (![[[NSProcessInfo processInfo] arguments] containsObject:@"--smoke-test"])
         [deviceController enable];
     [dataSource reloadData:outletFileView];
 
     [self displayMemoryStatus];
+}
+
+
+/** Keep the original file viewer intact while the same window waits for a NEO.
+ */
+- (void)setupConnectionView
+{
+    fileViewerContentView = [[outletMainWindow contentView] retain];
+    fileViewerWindowSize = [outletMainWindow frame].size;
+    fileViewerMinSize = [outletMainWindow contentMinSize];
+    showingFileViewer = YES;
+    fileViewerToolbarVisible = [toolbar isVisible];
+
+    connectionContentView = [[NSView alloc] initWithFrame:NSMakeRect(0, 0, 360, 200)];
+    connectionSymbol = [[[NSImageView alloc] initWithFrame:NSZeroRect] autorelease];
+    NSImage* symbol = [NSImage imageWithSystemSymbolName:@"cable.connector" accessibilityDescription:@"USB connection"];
+    [connectionSymbol setImage:[symbol imageWithSymbolConfiguration:
+        [NSImageSymbolConfiguration configurationWithPointSize:36 weight:NSFontWeightRegular]]];
+    [connectionSymbol setContentTintColor:[NSColor secondaryLabelColor]];
+    [connectionSymbol setImageScaling:NSImageScaleProportionallyUpOrDown];
+
+    connectionTitle = [NSTextField labelWithString:@"No NEO connected"];
+    [connectionTitle setFont:[NSFont systemFontOfSize:14 weight:NSFontWeightSemibold]];
+    [connectionTitle setAlignment:NSTextAlignmentCenter];
+    connectionMessage = [NSTextField wrappingLabelWithString:@"Connect your AlphaSmart NEO\nwith a USB cable to view your files."];
+    [connectionMessage setFont:[NSFont systemFontOfSize:[NSFont systemFontSize]]];
+    [connectionMessage setTextColor:[NSColor secondaryLabelColor]];
+    [connectionMessage setAlignment:NSTextAlignmentCenter];
+    [connectionMessage setPreferredMaxLayoutWidth:312];
+
+    connectionStack = [NSStackView stackViewWithViews:@[connectionSymbol, connectionTitle, connectionMessage]];
+    [connectionStack setOrientation:NSUserInterfaceLayoutOrientationVertical];
+    [connectionStack setAlignment:NSLayoutAttributeCenterX];
+    [connectionStack setSpacing:12];
+    [connectionStack setTranslatesAutoresizingMaskIntoConstraints:NO];
+    [connectionContentView addSubview:connectionStack];
+    [NSLayoutConstraint activateConstraints:@[
+        [[connectionSymbol widthAnchor] constraintEqualToConstant:48],
+        [[connectionSymbol heightAnchor] constraintEqualToConstant:48],
+        [[connectionMessage widthAnchor] constraintEqualToConstant:312],
+        [[connectionStack widthAnchor] constraintEqualToConstant:312],
+        [[connectionStack centerXAnchor] constraintEqualToAnchor:[connectionContentView centerXAnchor]],
+        [[connectionStack centerYAnchor] constraintEqualToAnchor:[connectionContentView centerYAnchor]]
+    ]];
+}
+
+- (void)resizeMainWindowToSize:(NSSize)size
+{
+    // Keep a full-screen window in its Space until the user leaves full screen.
+    if ([outletMainWindow styleMask] & NSWindowStyleMaskFullScreen) return;
+    NSRect frame = [outletMainWindow frame];
+    if (NSEqualSizes(frame.size, size)) return;
+    frame.origin.x += (frame.size.width - size.width) / 2;
+    frame.origin.y += frame.size.height - size.height;
+    frame.size = size;
+    if ([outletMainWindow screen]) frame = [outletMainWindow constrainFrameRect:frame toScreen:[outletMainWindow screen]];
+    BOOL animate = [outletMainWindow isVisible] && ![[NSWorkspace sharedWorkspace] accessibilityDisplayShouldReduceMotion] &&
+                   ![[[NSProcessInfo processInfo] arguments] containsObject:@"--smoke-test"];
+    [outletMainWindow setFrame:frame display:YES animate:animate];
+}
+
+- (void)updateMainWindowConnectionState
+{
+    if (!connectionContentView) return;
+    BOOL connected = [[deviceController systemRoot] numberOfChildren] > 0;
+    // Let a backup result or file panel finish before shrinking its parent.
+    if (!connected && [outletMainWindow attachedSheet]) return;
+
+    if (connected != showingFileViewer)
+    {
+        [outletMainWindow makeFirstResponder:nil];
+        if (connected)
+        {
+            [outletMainWindow setContentMinSize:fileViewerMinSize];
+            [outletMainWindow setContentView:fileViewerContentView];
+            [outletMainWindow setToolbar:toolbar];
+            [toolbar setVisible:fileViewerToolbarVisible];
+        }
+        else
+        {
+            if (!([outletMainWindow styleMask] & NSWindowStyleMaskFullScreen))
+                fileViewerWindowSize = [outletMainWindow frame].size;
+            fileViewerToolbarVisible = [toolbar isVisible];
+            [outletFileView deselectAll:self];
+            [self updateInspectorDisplay];
+            [outletMainWindow setToolbar:nil];
+            [outletMainWindow setContentView:connectionContentView];
+            [outletMainWindow setContentMinSize:NSMakeSize(360, 200)];
+        }
+        showingFileViewer = connected;
+        if (connected)
+        {
+            [self resizeMainWindowToSize:fileViewerWindowSize];
+            [outletMainWindow makeFirstResponder:outletFileView];
+        }
+    }
+
+    if (!connected)
+    {
+        NSSize size = NSMakeSize(360, MAX(200.0, [connectionStack fittingSize].height + 48));
+        [outletMainWindow setContentMinSize:size];
+        NSRect frame = [outletMainWindow frameRectForContentRect:NSMakeRect(0, 0, size.width, size.height)];
+        [self resizeMainWindowToSize:frame.size];
+    }
 }
 
 
@@ -236,7 +351,7 @@ static const NSInteger kMenuItemTagBackup   = 100;
     }
     else if (NSOrderedSame == [name compare:kASDeviceControllerDeviceDisconnected])
     {
-        [self setStatusIdle];
+        [self setStatusImmediateIdle];
         [dataSource reloadData:outletFileView];
     }
     else if ([name isEqualToString:kASDeviceControllerDataChanged])
@@ -248,6 +363,7 @@ static const NSInteger kMenuItemTagBackup   = 100;
 
     [outletFileView setEnabled:![deviceController isBusy]];
     [toolbar validateVisibleItems];
+    [self updateMainWindowConnectionState];
 }
 
 
@@ -453,6 +569,15 @@ static const NSInteger kMenuItemTagBackup   = 100;
     [outletStatusImage setImage:icon];
     [outletStatusText setStringValue:actionName];
 
+    if ([[deviceController systemRoot] numberOfChildren] == 0)
+    {
+        [connectionTitle setStringValue:alertStatus == kASAlertStatusYellow ? @"Connecting to NEO…" : @"No NEO connected"];
+        [connectionMessage setStringValue:alertStatus == kASAlertStatusRed ? actionName :
+            (alertStatus == kASAlertStatusYellow ? @"Wait while AlphaSync reads your files." :
+             @"Connect your AlphaSmart NEO\nwith a USB cable to view your files.")];
+        [self updateMainWindowConnectionState];
+    }
+
     [outletStatusImage display];
     [outletStatusText display];
     [outletProgressIndicator display];
@@ -486,6 +611,9 @@ static const NSInteger kMenuItemTagBackup   = 100;
  */
 - (void)setStatusImmediateIdle
 {
+    [connectionTitle setStringValue:@"No NEO connected"];
+    [connectionMessage setStringValue:@"Connect your AlphaSmart NEO\nwith a USB cable to view your files."];
+    [self updateMainWindowConnectionState];
     if (nil != statusDisplayTimer)
     {
         [statusDisplayTimer invalidate];
@@ -531,7 +659,7 @@ static const NSInteger kMenuItemTagBackup   = 100;
 
 - (void)setupToolbar
 {
-    toolbar = [[[NSToolbar alloc] initWithIdentifier: kToolbarIdentifierMainWindow] autorelease];
+    toolbar = [[NSToolbar alloc] initWithIdentifier: kToolbarIdentifierMainWindow];
 
     [toolbar setAllowsUserCustomization: YES];
     [toolbar setAutosavesConfiguration: YES];
@@ -967,6 +1095,18 @@ static const NSInteger kMenuItemTagBackup   = 100;
 #pragma mark -
 #pragma mark Window Delegate Methods
 
+
+- (void)windowDidEndSheet:(NSNotification*)notification
+{
+    (void)notification;
+    [self updateMainWindowConnectionState];
+}
+
+- (void)windowDidExitFullScreen:(NSNotification*)notification
+{
+    (void)notification;
+    [self updateMainWindowConnectionState];
+}
 
 
 - (void)windowWillClose:(NSNotification*)notification
