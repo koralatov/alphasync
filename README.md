@@ -46,6 +46,8 @@ Open AlphaSync and connect your NEO with a USB cable.  Your NEO’s files appear
 
 Back up the files on your NEO before replacing or clearing them.
 
+If a text file is too large for your NEO, AlphaSync explains the limit and leaves your files unchanged.  Shorten the text or split it into smaller files, then try again.
+
 Backup logs are off by default.  If you want a record of copied files and any errors, enable **Save a backup log** in **Preferences**.  The log is saved inside each dated backup folder.
 
 To have AlphaSync open whenever you connect your NEO, turn on automatic opening in **Preferences**.  Keep the app in Applications, and follow any approval prompts shown in Preferences.

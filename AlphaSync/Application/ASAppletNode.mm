@@ -32,7 +32,6 @@
 #import "ASAppletNode.h"
 #import "ASFileNode.h"
 #import "ASDeviceAccessProtocol.h"
-#import "ASSettings.h"
 
 
 using namespace ts;
@@ -107,6 +106,7 @@ static NSImage* iconApplet = nil;              /**< Icon to use for applets. */
     snapshot->ramUsed = ramUsed;
     snapshot->minFileSize = minFileSize;
     snapshot->maxFileSize = maxFileSize;
+    snapshot->fileSizeLimitKnown = fileSizeLimitKnown;
 }
 
 - (ASDeviceNode*)deviceNode
@@ -154,6 +154,10 @@ static NSImage* iconApplet = nil;              /**< Icon to use for applets. */
     return maxFileSize;
 }
 
+- (BOOL)fileSizeLimitKnown
+{
+    return fileSizeLimitKnown;
+}
 
 /** Return the ram usage (bytes).
  */
@@ -183,21 +187,7 @@ static NSImage* iconApplet = nil;              /**< Icon to use for applets. */
     [self setDisplayKind:@"Applet"];
     [self setDisplaySize:@""];
 
-    maxFileSize = UINT_MAX;
-    minFileSize = 0;
-
-    if (applet->appletID() == kASAppletID_AlphaWord)
-    {
-        uint8_t settingsData[8192];
-        unsigned actualBytes;
-        if (device->readSettings(settingsData, &actualBytes, sizeof settingsData, applet, 0x0b))
-        {
-            ASSettings settings(settingsData, actualBytes, sizeof settingsData);
-            ASSettingsItem item;
-            if (settings.findSettingsItem(&item, kASSettingsType_Range32, kASSettingsIdent_AlphaWord_MaxFileSize))  maxFileSize = item.dataU32();
-            if (settings.findSettingsItem(&item, kASSettingsType_Range32, kASSettingsIdent_AlphaWord_MinFileSize))  minFileSize = item.dataU32();
-        }
-    }
+    fileSizeLimitKnown = device->getFileSizeLimits(&minFileSize, &maxFileSize, applet);
 
     [[self parent] refresh];
 }
@@ -295,8 +285,10 @@ static NSImage* iconApplet = nil;              /**< Icon to use for applets. */
 
     if (shouldProceed)
     {
-        ASFileNode* fileNode = [ASFileNode createFileNodeOnDevice:device applet:applet path:path];
+        NSString* error = nil;
+        ASFileNode* fileNode = [ASFileNode createFileNodeOnDevice:device applet:applet path:path error:&error];
         result = (fileNode != 0);
+        [self setOperationError:error];
         if (result)
         {
             [self addChild:fileNode];
@@ -307,7 +299,7 @@ static NSImage* iconApplet = nil;              /**< Icon to use for applets. */
 
         if ([accessDelegate conformsToProtocol:@protocol(ASDeviceAccessProtocol)])
         {
-            [accessDelegate deviceDidLoad:path error:(result)?nil:@"Failed to create file." sender:self];
+            [accessDelegate deviceDidLoad:path error:error sender:self];
         }
     }
 

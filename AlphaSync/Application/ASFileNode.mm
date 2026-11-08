@@ -41,6 +41,59 @@
 
 using namespace ts;
 
+static NSString* ASFileWriteMessage(const ASFileWriteError& error)
+{
+    switch (error.failure)
+    {
+        case ASFileWriteFailure::LimitsUnavailable:
+            return @"AlphaSync couldn’t read the NEO’s maximum file size.  Disconnect and reconnect the NEO, then try again.  No files on the NEO have been changed.";
+        case ASFileWriteFailure::FileTooLarge:
+            return [NSString stringWithFormat:@"This file needs %@ on the NEO.  The maximum file size is %@.  Shorten the text or split it into smaller files, then try again.  No files on the NEO have been changed.",
+                    aq_FormattedByteCount(error.required), aq_FormattedByteCount(error.maximum)];
+        case ASFileWriteFailure::MemoryUnavailable:
+            return @"AlphaSync couldn’t check the NEO’s available memory.  Disconnect and reconnect the NEO, then try again.  No files on the NEO have been changed.";
+        case ASFileWriteFailure::FileUnavailable:
+            return @"AlphaSync couldn’t check the existing file’s size on the NEO.  Disconnect and reconnect the NEO, then try again.  No files on the NEO have been changed.";
+        case ASFileWriteFailure::InsufficientMemory:
+            return [NSString stringWithFormat:@"There isn’t enough free memory on the NEO.  This file needs %@ after conversion; up to %@ is available for this import.  Free some space on the NEO, then try again.  No files on the NEO have been changed.",
+                    aq_FormattedByteCount(error.required), aq_FormattedByteCount(error.available)];
+        default:
+            return @"The file could not be written to the NEO.  Check the connection and try again.";
+    }
+}
+
+static NSString* ASReadTextFile(NSString* path, NSString** error)
+{
+    if (error) *error = nil;
+    NSError* readError = nil;
+    NSStringEncoding encoding;
+    NSString* text = [NSString stringWithContentsOfFile:path usedEncoding:&encoding error:&readError];
+    if (!text) text = [NSString stringWithContentsOfFile:path encoding:NSMacOSRomanStringEncoding error:&readError];
+    if (!text && error) *error = [NSString stringWithFormat:@"The text file could not be read: %@", [readError localizedDescription]];
+    return text;
+}
+
+static BOOL ASImportFileText(ASFile* file, BOOL plainText, NSString* text, NSString** error)
+{
+    NSData* unicodeData = [text dataUsingEncoding:NSUnicodeStringEncoding allowLossyConversion:NO];
+    if (!file || !unicodeData || [unicodeData length] > UINT_MAX)
+    {
+        if (error) *error = @"Unable to read file contents.";
+        return NO;
+    }
+    if (plainText && !file->canRepresentText((const uint16_t*)[unicodeData bytes], static_cast<unsigned>([unicodeData length])))
+    {
+        if (error) *error = @"The NEO cannot store one or more characters in this text.  Remove unsupported characters, such as emoji, and try again.  No files on the NEO have been changed.";
+        return NO;
+    }
+    if (!file->importText((const uint16_t*)[unicodeData bytes], static_cast<unsigned>([unicodeData length])))
+    {
+        if (error) *error = @"The file could not be converted into the NEO’s format.  No files on the NEO have been changed.";
+        return NO;
+    }
+    return YES;
+}
+
 
 @implementation ASFileNode
 
@@ -59,8 +112,9 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
  *  @param  size                The number of bytes of data.
  *  @return                     A pointer to the created node. The node will be auto-released.
  */
-+ (ASFileNode*)createFileNodeOnDevice:(ts::ASDevice*)device applet:(const ts::ASApplet*)applet filename:(NSString*)filename data:(const void*)data size:(unsigned)size
++ (ASFileNode*)createFileNodeOnDevice:(ts::ASDevice*)device applet:(const ts::ASApplet*)applet filename:(NSString*)filename data:(const void*)data size:(unsigned)size error:(NSString**)error
 {
+    if (error) *error = nil;
     // Extract from the supplied path a filename to use on the device
     char deviceFilename[kASFileAttributesFileNameMaxSize + 1];
     const char* pathName = [filename cStringUsingEncoding:NSWindowsCP1252StringEncoding];
@@ -86,7 +140,11 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
         }
 
         if (isUnique) break;
-        if (++ uniqueID > 999) return nil;      // Neo will run out of space long before this...
+        if (++ uniqueID > 999)
+        {
+            if (error) *error = @"A unique filename could not be chosen on the NEO.";
+            return nil;
+        }
 
         char buffer[8];
         snprintf(buffer, sizeof buffer, "-%d", uniqueID);
@@ -100,12 +158,14 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
     // Create the file
     ASFileNode* node = nil;
     int fileIndexNumber;
-    if (device->createFile(deviceFilename, "write", data, size, applet, &fileIndexNumber, true))
+    ASFileWriteError failure;
+    if (device->createFile(deviceFilename, "write", data, size, applet, &fileIndexNumber, true, &failure))
     {
         ASFileAttributes attr;
         device->getFileAttributes(&attr, applet, fileIndexNumber);
         node = [[[ASFileNode alloc] initWithDevice:device applet:applet fileIndex:fileIndexNumber fileAttributes:&attr] autorelease];
     }
+    else if (error) *error = ASFileWriteMessage(failure);
     return node;
 }
 
@@ -117,39 +177,27 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
  *  @param  path                The path of a file to be loaded.
  *  @return                     A pointer to the created node.
  */
-+ (ASFileNode*)createFileNodeOnDevice:(ts::ASDevice*)device applet:(const ASApplet*)applet path:(NSString*)path
++ (ASFileNode*)createFileNodeOnDevice:(ts::ASDevice*)device applet:(const ASApplet*)applet path:(NSString*)path error:(NSString**)error
 {
     ASFileNode* fileNode = nil;
     ASFile* file = 0;
-
-    NSStringEncoding encoding = NSMacOSRomanStringEncoding;
-    NSError* error = nil;
-    NSString* contentsOfPath = [NSString stringWithContentsOfFile:path usedEncoding:&encoding error:&error];
-    if (!contentsOfPath) contentsOfPath = [NSString stringWithContentsOfFile:path encoding:NSMacOSRomanStringEncoding error:&error];  // REVIEW: what encoding should be used???
+    NSString* contentsOfPath = ASReadTextFile(path, error);
     if (contentsOfPath)
     {
-        NSData* unicodeData = [contentsOfPath dataUsingEncoding:NSUnicodeStringEncoding allowLossyConversion:YES];
-        if (unicodeData && [unicodeData length] <= UINT_MAX)
+        switch (applet->appletID())
         {
-            switch (applet->appletID())
-            {
-                case kASAppletID_AlphaWord:             file = new ASAlphaWordFile;         break;
-                case kASAppletID_Dictionary:            file = new ASUserDictionaryFile;    break;
-                default:                                file = new ASGenericFile;           break;
-            }
-
-            if (file->importText((const uint16_t*)[unicodeData bytes], static_cast<unsigned>([unicodeData length])))
-            {
-                NSString* deviceFilename = [[path lastPathComponent] stringByDeletingPathExtension];
-                fileNode = [ASFileNode createFileNodeOnDevice:device
-                                       applet:applet
-                                       filename:deviceFilename
-                                       data:file->fileData()
-                                       size:file->fileSize()];
-            }
-
-            delete file;
+            case kASAppletID_AlphaWord:             file = new ASAlphaWordFile;         break;
+            case kASAppletID_Dictionary:            file = new ASUserDictionaryFile;    break;
+            default:                                file = new ASGenericFile;           break;
         }
+        BOOL plain = applet->appletID() == kASAppletID_AlphaWord || applet->appletID() == kASAppletID_Dictionary;
+        if (ASImportFileText(file, plain, contentsOfPath, error))
+        {
+            NSString* deviceFilename = [[path lastPathComponent] stringByDeletingPathExtension];
+            fileNode = [ASFileNode createFileNodeOnDevice:device applet:applet filename:deviceFilename
+                                   data:file->fileData() size:file->fileSize() error:error];
+        }
+        delete file;
     }
 
     return fileNode;
@@ -468,41 +516,16 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
 - (BOOL)setFileData:(NSString*)data error:(NSString**)error
 {
     BOOL result = FALSE;
-    if (error) *error = nil;
-
+    NSString* message = nil;
     fileIsSynchronised = FALSE;
-    NSData* unicodeData = [data dataUsingEncoding:NSUnicodeStringEncoding allowLossyConversion:NO];
-    if (!unicodeData || [unicodeData length] > UINT_MAX)
+    if (ASImportFileText(fileData, fileIsPlainText, data, &message))
     {
-        if (error) *error = @"Unable to read file contents.";
+        ASFileWriteError failure;
+        result = fileData->save(device, applet, fileIndex, &failure);
+        if (!result) message = ASFileWriteMessage(failure);
     }
-    else if (fileIsPlainText && !fileData->canRepresentText((const uint16_t*)[unicodeData bytes], static_cast<unsigned>([unicodeData length])))
-    {
-        if (error) *error = @"The NEO cannot store one or more characters in this text.  Remove unsupported characters, such as emoji, and try again.  The device file has not been changed.";
-    }
-    else
-    {
-        result = fileData->importText((const uint16_t*)[unicodeData bytes], static_cast<unsigned>([unicodeData length]));
-        if (!result)
-        {
-            if (error) *error = @"Incompatible file.";
-        }
-        else
-        {
-            unsigned maxFileSize = [[self appletNode] maxFileSize];
-            if (fileData->fileSize() > maxFileSize)
-            {
-                result = FALSE;
-                if (error) *error = [NSString stringWithFormat:@"File is too large (maximum file size is %@).", aq_FormattedByteCount(maxFileSize)];
-            }
-            else
-            {
-                result = fileData->save(device, applet, fileIndex);
-                if (!result && error) *error = @"Error writing file to the device.";
-            }
-        }
-    }
-    [self setOperationError:error ? *error : nil];
+    if (error) *error = message;
+    [self setOperationError:message];
     [self reload];
     return result;
 }
@@ -606,10 +629,9 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
 {
     BOOL result = FALSE;
 
-    NSError* err;
-    NSStringEncoding encoding;
-    NSString* contentsOfPath = [NSString stringWithContentsOfFile:path usedEncoding:&encoding error:&err];
-    if (!contentsOfPath) contentsOfPath = [NSString stringWithContentsOfFile:path encoding:NSMacOSRomanStringEncoding error:&err];  // REVIEW: what encoding should be used???
+    NSString* readError = nil;
+    NSString* contentsOfPath = ASReadTextFile(path, &readError);
+    if (!contentsOfPath) [self setOperationError:readError];
     if (contentsOfPath)
     {
         BOOL shouldProceed = TRUE;

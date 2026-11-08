@@ -51,8 +51,8 @@
     BOOL fileIsPlainText;
 }
 
-+ (ASFileNode*)createFileNodeOnDevice:(ts::ASDevice*)device applet:(const ts::ASApplet*)applet filename:(NSString*)filename data:(const void*)data size:(unsigned)size;
-+ (ASFileNode*)createFileNodeOnDevice:(ts::ASDevice*)device applet:(const ts::ASApplet*)applet path:(NSString*)path;
++ (ASFileNode*)createFileNodeOnDevice:(ts::ASDevice*)device applet:(const ts::ASApplet*)applet filename:(NSString*)filename data:(const void*)data size:(unsigned)size error:(NSString**)error;
++ (ASFileNode*)createFileNodeOnDevice:(ts::ASDevice*)device applet:(const ts::ASApplet*)applet path:(NSString*)path error:(NSString**)error;
 
 - (id)initWithDevice:(ts::ASDevice*)devicePtr applet:(const ts::ASApplet*)app fileIndex:(int)fin fileAttributes:(const ts::ASFileAttributes*)attr;
 - (void)dealloc;

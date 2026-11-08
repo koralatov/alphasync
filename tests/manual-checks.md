@@ -51,6 +51,9 @@ Keep known-good backups before testing writes to the NEO.
 - Import matching MacASCII, UTF-8, and UTF-16 files, including both UTF-16 byte orders with byte-order marks.  Confirm that exported copies and backups use UTF-8 and preserve the text.
 - Import the same paragraphs with LF, CRLF, and CR endings.  Check for the same paragraph breaks.
 - Import unsupported characters and oversized text.  Confirm that an explanation appears and the existing device file is unchanged.
+- Drop a 2 MB plain-text file onto AlphaWord and onto an existing file.  Both should reject it with the converted size and the NEO’s maximum, before changing any device file.  Also test a file above the per-file limit that still fits in the available memory, and files exactly at and just above the converted-size limit.
+- With little free memory, check that adding a file or growing an existing file reports insufficient space, while replacing a file with the same or a smaller allocation still works.  Keep a known-good backup and use disposable files.
+- If size or memory information cannot be read, check that the import is blocked with a reconnect instruction.  An unknown AlphaWord maximum should appear as ‘unavailable’ in the Inspector.  Confirm that the warnings and grouped byte counts remain readable in Light and Dark Mode.
 - Export files and folders to Finder, and drop text files onto the NEO.
 - Start a longer transfer and confirm that windows still repaint and respond.  Disconnect and reconnect, and check that queued work for the old connection fails rather than reaching the replacement connection.
 

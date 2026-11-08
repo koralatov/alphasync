@@ -139,9 +139,13 @@ Exports and backups always use UTF-8 without a byte-order mark.  Preferences sho
 
 Windows line endings become single paragraph breaks.  An import containing characters the NEO cannot store fails with an explanation, leaving the existing file intact.
 
+Creating and replacing files share validation in `ASDevice`, after conversion into the NEO’s format and before file attributes or contents are written.  Each write reads AlphaWord’s current maximum rather than relying on the cached display value.  An unreadable, missing, truncated, zero, or inconsistent limit stops the import; the Inspector shows an unavailable maximum rather than an unlimited one.  The protocol’s 24-bit length field is also enforced.
+
+Memory validation keeps 1,024 bytes in reserve and credits an existing file’s allocation for replacements.  Files that do not grow can still be replaced when free memory is low.  Failed memory and file-size queries stop the import.  User warnings distinguish a per-file limit, insufficient memory, and unavailable information, show grouped exact byte counts, and suggest how to proceed.  Protocol regression tests verify both write routes, exact limits, a 2 MB rejection, memory boundaries, failed queries, and that rejected imports issue no file-writing commands.  Native text tests exercise the actual import paths and their error messages; real USB behaviour remains in the manual checklist.
+
 USB commands and connection callbacks run on one background queue.  The interface uses independent copies of the device’s displayed data.  Cancellation finishes and records the current file before stopping, and quitting waits for pending work without blocking the interface.
 
-Exports are written and synchronised in a hidden temporary file before their final name appears.  Existing files are preserved.  Each backup keeps an atomic property-list report in its destination’s **Backup Reports** folder, recording saved filenames, failures, and pending files.  A cancelled, disconnected, or interrupted backup remains distinguishable from a completed backup.  Hidden temporary files left by an interrupted write can be removed after checking the report.
+Exports are written and synchronised in a hidden temporary file before their final name appears.  Existing files are preserved.  Optional backup logs are stored as **AlphaSync Backup Log.plist** in each NEO’s dated destination folder, recording saved filenames, failures, and pending files.  A cancelled, disconnected, or interrupted backup remains distinguishable from a completed backup when logging is enabled.  Hidden temporary files left by an interrupted write can be removed after checking the saved files and any log.
 
 ## Versioning
 

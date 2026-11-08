@@ -2,6 +2,7 @@
         "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <link rel="stylesheet" type="text/css" href="css/alphasync.css">
     <meta name="KEYWORDS" content="copy, transfer, upload, download">
 	<title>AlphaSync Copying Files</title> 
@@ -27,8 +28,14 @@ directly bound to one of the File keys on the Neo, but must be opened. When usin
 to open a file copied in this way.</p>
 <p>Dragging on to a File icon will attempt to over write the file on the Neo with the new file contents.</p>
 
-<p><b>Only plain ASCII text files may be copied to AlphaWord or to the User Dictionary.</b> To copy files from non-text applications,
-such as Microsoft Word, you must first save the file as plain ASCII text (using save-as, and with a ".txt" file extension).</p>
+<p><b>Only plain text files may be copied to AlphaWord or to the User Dictionary.</b> AlphaSync accepts
+MacASCII (Mac Roman), UTF-8, and UTF-16.  To copy a document from Microsoft Word or another word processor,
+first save it as plain text with a <code>.txt</code> extension.</p>
+<p>AlphaSync checks the file’s size in the NEO’s format before adding or replacing a file.
+If it exceeds the maximum file size or the available memory, the warning explains the limit.
+Shorten the text or split it into smaller files, then try again.  Rejected imports leave your NEO’s files unchanged.</p>
+<p>If AlphaSync cannot read the file-size limit or available memory, it stops the import.
+Disconnect and reconnect the NEO, then try again.</p>
 
 <hr>
 <p>Copyright &copy; 2009-2013 tSoniq.</p>

@@ -40,6 +40,7 @@
     ts::ASDevice* device;
     const ts::ASApplet* applet;
     unsigned maxFileSize;
+    BOOL fileSizeLimitKnown;
     unsigned minFileSize;
     unsigned ramUsed;
     unsigned fileCount;
@@ -55,6 +56,7 @@
 - (const ts::ASApplet*)applet;
 
 - (unsigned)maxFileSize;
+- (BOOL)fileSizeLimitKnown;
 - (unsigned)minFileSize;
 - (unsigned)ramUsed;
 - (unsigned)fileCount;

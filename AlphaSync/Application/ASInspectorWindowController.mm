@@ -236,8 +236,9 @@ static void useSystemColours(NSView* view)
 
         unsigned min = [appletNode minFileSize];
         unsigned max = [appletNode maxFileSize];
-        appletMinFileSize = aq_FormattedByteCount(min);
-        appletMaxFileSize = (max == UINT_MAX) ? @"unlimited" : aq_FormattedByteCount(max);
+        appletMinFileSize = [appletNode fileSizeLimitKnown] ? aq_FormattedByteCount(min) : @"unavailable";
+        appletMaxFileSize = ![appletNode fileSizeLimitKnown] ? @"unavailable" :
+                            ((max == UINT_MAX) ? @"unlimited" : aq_FormattedByteCount(max));
 
         appletROM = aq_FormattedByteCount(applet->appletRomSize());
         appletRAM1 = [NSString stringWithFormat:@"%@ (workspace)", aq_FormattedByteCount(applet->appletRamSize())];
