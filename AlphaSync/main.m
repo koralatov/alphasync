@@ -703,9 +703,21 @@ static void checkFileViewLayout(ASFileViewWindowController* viewer)
 {
     NSView* content = [[viewer window] contentView];
     [content layoutSubtreeIfNeeded];
-    checkInheritedAppearance(content);
     NSTextView* text = [viewer valueForKey:@"textView"];
     NSScrollView* scroll = [viewer valueForKey:@"scrollView"];
+    // AppKit manages appearances on private text and scroller subviews.  Check
+    // the controls we create and their effective mode, not framework internals.
+    NSArray* modes = @[NSAppearanceNameAqua, NSAppearanceNameDarkAqua];
+    NSString* expectedMode = [[[viewer window] effectiveAppearance] bestMatchFromAppearancesWithNames:modes];
+    requireInterface([[viewer window] isMemberOfClass:[NSWindow class]] && [[viewer window] appearance] == nil,
+                     @"The file viewer is not a standard window inheriting the system appearance.");
+    for (NSView* view in @[content, text, scroll, [viewer valueForKey:@"fontStyle"], [viewer valueForKey:@"statusLabel"], [viewer valueForKey:@"progress"]])
+    {
+        requireInterface([view appearance] == nil && ![NSStringFromClass([view class]) hasPrefix:@"AS"],
+                         [NSString stringWithFormat:@"The file viewer control %@ overrides its appearance or uses a custom view.", NSStringFromClass([view class])]);
+        NSString* actualMode = [[view effectiveAppearance] bestMatchFromAppearancesWithNames:modes];
+        requireInterface([actualMode isEqualToString:expectedMode], @"A file viewer control did not follow its window’s appearance.");
+    }
     requireInterface(![text isEditable] && [text isSelectable] && ![text isRichText] && ![text allowsUndo],
                      @"The file viewer permits editing or prevents text selection.");
     requireInterface(NSWidth([text frame]) <= NSWidth([[scroll contentView] bounds]) + 1 && ![scroll hasHorizontalScroller],
