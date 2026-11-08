@@ -6,9 +6,10 @@ if [[ $# -ne 2 ]]; then
     exit 1
 fi
 
-"$1/Contents/MacOS/AlphaSync" --smoke-test --appearance-snapshots "$2"
-
 repository=$(cd "$(dirname "$0")/.." && pwd)
+python3 "$repository/scripts/run-interface-check.py" --timeout 300 \
+    "$1/Contents/MacOS/AlphaSync" --smoke-test --appearance-snapshots "$2"
+
 checker="$2/../help-appearance"
 xcrun clang -fblocks -Wall -Wextra -Werror "$repository/tests/help-appearance.m" \
     -framework Cocoa -framework WebKit -o "$checker"
