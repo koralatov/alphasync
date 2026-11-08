@@ -131,7 +131,7 @@ Exports are written and synchronised in a hidden temporary file before their fin
 
 ## Versioning
 
-Both downloads and their helpers share **version 1.4.1, build 141**, read from [Version.xcconfig](AlphaSync/Build/Version.xcconfig).  Increase the build number for each distributed revision and set the version before creating its release tag.
+Both downloads and their helpers share **version 1.4.2, build 142**, read from [Version.xcconfig](AlphaSync/Build/Version.xcconfig).  Increase the build number for each distributed revision and set the version before creating its release tag.
 
 To publish a testing release, commit its notes as `releases/<version>.md`, then push a version update with the exact commit subject `Release AlphaSync <version>`.  The version must match `Version.xcconfig`.  The **Build and test** workflow builds both downloads, completes the required checks, and verifies the version, source commit, and checksums before creating a fresh tag.  It uploads both ZIPs, their checksums, and build reports to one draft, verifies all six uploaded files, then publishes it as a prerelease.  Existing tags and releases are not overwritten.  Only the publication job has release-writing permission.  Other pushes and pull requests produce build artifacts as before.
 
