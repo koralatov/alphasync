@@ -76,6 +76,7 @@ enum ASAlertStatus
 - (void)setStatusIdle;
 - (void)setStatusImmediateIdle;
 - (void)setupToolbar;
+- (void)setupStatusBar;
 - (void)setupConnectionView;
 - (void)updateMainWindowConnectionState;
 - (void)resizeMainWindowToSize:(NSSize)size;
@@ -170,6 +171,7 @@ static const NSInteger kMenuItemTagBackup   = 100;
 
     [outletProgressIndicator stopAnimation:self];
     [outletProgressIndicator setUsesThreadedAnimation:YES];
+    [self setupStatusBar];
     [self setStatusImmediateIdle];
 
     [self setupToolbar];
@@ -690,6 +692,41 @@ static const NSInteger kMenuItemTagBackup   = 100;
 #pragma mark -
 #pragma mark Toolbar handling
 
+- (void)setupStatusBar
+{
+    // Keep the progress indicator with the connection status, so a hidden
+    // spinner never leaves unused space after the right-aligned memory count.
+    NSView* spacer = [[[NSView alloc] initWithFrame:NSZeroRect] autorelease];
+    [spacer setContentHuggingPriority:1 forOrientation:NSLayoutConstraintOrientationHorizontal];
+    [spacer setContentCompressionResistancePriority:1 forOrientation:NSLayoutConstraintOrientationHorizontal];
+    [outletStatusText setLineBreakMode:NSLineBreakByTruncatingTail];
+    [outletStatusText setContentCompressionResistancePriority:NSLayoutPriorityDefaultLow forOrientation:NSLayoutConstraintOrientationHorizontal];
+    [outletAvailableMemory setAlignment:NSTextAlignmentRight];
+    [outletAvailableMemory setContentHuggingPriority:NSLayoutPriorityRequired forOrientation:NSLayoutConstraintOrientationHorizontal];
+    [outletAvailableMemory setContentCompressionResistancePriority:NSLayoutPriorityRequired forOrientation:NSLayoutConstraintOrientationHorizontal];
+    NSArray* views = @[outletStatusImage, outletStatusText, outletProgressIndicator, spacer, outletAvailableMemory];
+    for (NSView* view in views) [view setTranslatesAutoresizingMaskIntoConstraints:NO];
+    NSStackView* status = [NSStackView stackViewWithViews:views];
+    [status setOrientation:NSUserInterfaceLayoutOrientationHorizontal];
+    [status setAlignment:NSLayoutAttributeCenterY];
+    [status setDistribution:NSStackViewDistributionFill];
+    [status setSpacing:8];
+    [status setDetachesHiddenViews:YES];
+    [status setTranslatesAutoresizingMaskIntoConstraints:NO];
+    NSView* content = [outletMainWindow contentView];
+    [content addSubview:status];
+    [NSLayoutConstraint activateConstraints:@[
+        [[status leadingAnchor] constraintEqualToAnchor:[content leadingAnchor] constant:10],
+        [[status trailingAnchor] constraintEqualToAnchor:[content trailingAnchor] constant:-10],
+        [[status bottomAnchor] constraintEqualToAnchor:[content bottomAnchor] constant:-5],
+        [[status heightAnchor] constraintEqualToConstant:18],
+        [[outletStatusImage widthAnchor] constraintEqualToConstant:16],
+        [[outletStatusImage heightAnchor] constraintEqualToConstant:16],
+        [[outletProgressIndicator widthAnchor] constraintEqualToConstant:16],
+        [[outletProgressIndicator heightAnchor] constraintEqualToConstant:16]
+    ]];
+}
+
 - (void)setupToolbar
 {
     toolbar = [[NSToolbar alloc] initWithIdentifier: kToolbarIdentifierMainWindow];
@@ -698,6 +735,16 @@ static const NSInteger kMenuItemTagBackup   = 100;
     [toolbar setAutosavesConfiguration: YES];
     [toolbar setDelegate:self];
     [outletMainWindow setToolbar:toolbar];
+
+    // Upgrade the previous default while preserving any deliberate custom layout.
+    NSArray* previousDefault = @[kToolbarItemIdentifierBackup, NSToolbarFlexibleSpaceItemIdentifier,
+        kToolbarItemIdentifierDelete, NSToolbarSpaceItemIdentifier, kToolbarItemIdentifierInfo];
+    if ([[[toolbar items] valueForKey:@"itemIdentifier"] isEqualToArray:previousDefault])
+    {
+        [toolbar removeItemAtIndex:1];
+        [toolbar insertItemWithItemIdentifier:NSToolbarFlexibleSpaceItemIdentifier atIndex:0];
+        [toolbar insertItemWithItemIdentifier:NSToolbarSpaceItemIdentifier atIndex:2];
+    }
 }
 
 
@@ -755,8 +802,9 @@ static const NSInteger kMenuItemTagBackup   = 100;
     // If during the toolbar's initialization, no overriding values are found in the user defaults, or if the
     // user chooses to revert to the default items this set will be used
     return [NSArray arrayWithObjects:
-            kToolbarItemIdentifierBackup,
             NSToolbarFlexibleSpaceItemIdentifier,
+            kToolbarItemIdentifierBackup,
+            NSToolbarSpaceItemIdentifier,
             kToolbarItemIdentifierDelete,
             NSToolbarSpaceItemIdentifier,
             kToolbarItemIdentifierInfo,
@@ -777,7 +825,6 @@ static const NSInteger kMenuItemTagBackup   = 100;
             kToolbarItemIdentifierDelete,
             NSToolbarSpaceItemIdentifier,
             NSToolbarFlexibleSpaceItemIdentifier,
-            NSToolbarSpaceItemIdentifier,
             nil];
 }
 

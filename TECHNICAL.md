@@ -120,6 +120,8 @@ Preferences uses a standard `NSWindow` with native stack and grid views, a folde
 
 About uses native AppKit controls, the bundled app icon, and the shared version and build values.  Each build profile supplies its compatibility wording through `ASCompatibilityDescription` in the app’s property list.  Verification checks this against the selected profile.  The window is opened through its menu action during smoke checks and included in the Light, Dark, and Light-again captures.
 
+The main toolbar uses matching standard fixed spacers between its commands and a leading flexible spacer.  The previous default arrangement is migrated through native toolbar item insertion and removal; deliberate custom layouts are preserved.  A native `NSStackView` lays out the existing status controls, with progress beside the connection message, a flexible gap, and a right-aligned available-memory label at the trailing edge.  Appearance captures include the normal and wider main windows and the progress state in each mode.
+
 GitHub Actions builds the universal app on Intel and Apple Silicon runners with macOS 15 and 26.  A required macOS 27 Apple Silicon job builds and launches the modern app.  Both profiles receive Debug, Release, archive, dependency, signature, and window checks.  These checks run on the runners’ macOS versions, so they do not establish that every feature works on macOS 11.
 
 A final job collects the two canonical development downloads into the `AlphaSync-release-<source commit>` artifact, with checksums, build reports, and shared release notes.  It rejects missing packages and mismatched versions, build numbers, source commits, profiles, and signing states.  The collector uses Python 3’s standard library; Python is not required to run AlphaSync.

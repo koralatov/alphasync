@@ -985,6 +985,13 @@ static void checkAppearances(id controller, NSWindowController* backup, NSString
             requireInterface([actual isEqualToString:appearanceName], @"A window did not follow an appearance change.");
             captureWindow(window, directory, [NSString stringWithFormat:@"%@-%@", mode, names[index]]);
         }
+        NSSize mainSize = [[main contentView] bounds].size;
+        [main setContentSize:NSMakeSize(680, mainSize.height)];
+        captureWindow(main, directory, [mode stringByAppendingString:@"-main-wide"]);
+        [main setContentSize:mainSize];
+        [controller performSelector:NSSelectorFromString(@"setStatusBusy:") withObject:@"Reading files from the Neo…"];
+        captureWindow(main, directory, [mode stringByAppendingString:@"-main-busy"]);
+        [controller performSelector:NSSelectorFromString(@"displayStatusTimerDone")];
         [outline selectRowIndexes:[NSIndexSet indexSetWithIndex:1] byExtendingSelection:NO];
         captureWindow(main, directory, [mode stringByAppendingString:@"-selection"]);
         [outline deselectAll:nil];
