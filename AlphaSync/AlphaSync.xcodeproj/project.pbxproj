@@ -67,6 +67,7 @@
         C01100000000000000000005 /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01100000000000000000006 /* ServiceManagement.framework */; };
 		4ABCBDDC395974B75A43B8E8 /* ASBackupReport.mm in Sources */ = {isa = PBXBuildFile; fileRef = E41551F125E170A143893D41 /* ASBackupReport.mm */; };
 		4F4037857F8284AEB6168760 /* ASAboutWindowController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2988E42F47B3BF6ADF1A6831 /* ASAboutWindowController.mm */; };
+		F01100000000000000000001 /* ASFileViewWindowController.mm in Sources */ = {isa = PBXBuildFile; fileRef = F01100000000000000000003 /* ASFileViewWindowController.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -191,6 +192,8 @@
 		85CDB32AAC2D3B860B22908E /* Version.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Version.xcconfig; sourceTree = "<group>"; };
 		1D2AB5E8AD17E38DCF755E8F /* ASAboutWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASAboutWindowController.h; sourceTree = "<group>"; };
 		2988E42F47B3BF6ADF1A6831 /* ASAboutWindowController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASAboutWindowController.mm; sourceTree = "<group>"; };
+		F01100000000000000000002 /* ASFileViewWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASFileViewWindowController.h; sourceTree = "<group>"; };
+		F01100000000000000000003 /* ASFileViewWindowController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASFileViewWindowController.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -404,6 +407,8 @@
 				A99A54440F0D39E400BC68F1 /* ASInspectorWindowController.mm */,
 				A99A54450F0D39E400BC68F1 /* ASDeviceNode.h */,
 				A99A54460F0D39E400BC68F1 /* ASDeviceNode.mm */,
+				F01100000000000000000002 /* ASFileViewWindowController.h */,
+				F01100000000000000000003 /* ASFileViewWindowController.mm */,
 				A99A54490F0D39E400BC68F1 /* ASFileNode.h */,
 				A99A544A0F0D39E400BC68F1 /* ASFileNode.mm */,
 				A99A544B0F0D39E400BC68F1 /* ASLoadSaveProtocol.h */,
@@ -606,6 +611,7 @@
 				A99A54590F0D39E400BC68F1 /* ASInspectorWindowController.mm in Sources */,
 				A99A545A0F0D39E400BC68F1 /* ASDeviceNode.mm in Sources */,
 				A99A545C0F0D39E400BC68F1 /* ASFileNode.mm in Sources */,
+				F01100000000000000000001 /* ASFileViewWindowController.mm in Sources */,
 				A99A545D0F0D39E400BC68F1 /* ASLoadSaveProtocol.mm in Sources */,
 				A99A545E0F0D39E400BC68F1 /* ASNode.mm in Sources */,
 				A99A545F0F0D39E400BC68F1 /* ASNodeDataSource.mm in Sources */,

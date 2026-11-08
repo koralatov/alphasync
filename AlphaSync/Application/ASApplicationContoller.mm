@@ -33,6 +33,7 @@
 #import "ASApplicationContoller.h"
 #import "ASInspectorWindowController.h"
 #import "ASAboutWindowController.h"
+#import "ASFileViewWindowController.h"
 #import "AQFileUtilities.h"
 #import "aq_launcher.h"
 #import "aq_launcherconfig.h"
@@ -79,6 +80,8 @@ enum ASAlertStatus
 - (void)updateMainWindowConnectionState;
 - (void)resizeMainWindowToSize:(NSSize)size;
 - (void)updateInspectorDisplay;
+- (void)openFile:(ASFileNode*)file;
+- (void)fileViewWindowWillClose:(NSNotification*)notification;
 @end
 
 
@@ -118,6 +121,7 @@ static const NSInteger kMenuItemTagBackup   = 100;
     if ((self = [super init]))
     {
         appIsUninstalling = FALSE;
+        fileViewWindows = [[NSMutableArray alloc] init];
     }
     return self;
 }
@@ -131,6 +135,7 @@ static const NSInteger kMenuItemTagBackup   = 100;
     [toolbar release];
     [preferenceController release];
     [aboutController release];
+    [fileViewWindows release];
     [deviceController release];
     [statusDisplayTimer invalidate];
     [launcherInstallPath release];
@@ -172,6 +177,8 @@ static const NSInteger kMenuItemTagBackup   = 100;
     [self setupAutoRun:0.0];
 
     [outletFileView setRowSizeStyle:NSTableViewRowSizeStyleDefault];
+    [outletFileView setTarget:self];
+    [outletFileView setDoubleAction:@selector(actionOpenFile:)];
     // Older nibs stored a white background instead of an adaptive AppKit colour.
     [outletFileView setBackgroundColor:[NSColor controlBackgroundColor]];
     [[outletFileView enclosingScrollView] setBackgroundColor:[NSColor controlBackgroundColor]];
@@ -203,6 +210,7 @@ static const NSInteger kMenuItemTagBackup   = 100;
     [[deviceController systemRoot] setDelegate:self];     // This object will receive ASDeviceAccessProtocol delgate events
 
     NSNotificationCenter* nc = [NSNotificationCenter defaultCenter];
+    [nc addObserver:self selector:@selector(fileViewWindowWillClose:) name:NSWindowWillCloseNotification object:nil];
     [nc addObserver:self selector:@selector(deviceControllerNotification:) name:kASDeviceControllerDeviceDetected object:nil];
     [nc addObserver:self selector:@selector(deviceControllerNotification:) name:kASDeviceControllerDeviceConnected object:nil];
     [nc addObserver:self selector:@selector(deviceControllerNotification:) name:kASDeviceControllerDeviceDisconnected object:nil];
@@ -414,6 +422,31 @@ static const NSInteger kMenuItemTagBackup   = 100;
     if (! inspectorController) inspectorController = [[ASInspectorWindowController alloc] init];
     [self updateInspectorDisplay];
     [inspectorController showWindow:self];
+}
+
+- (IBAction)actionOpenFile:(id)sender
+{
+    if (sender != outletFileView) return;
+    NSInteger row = [outletFileView clickedRow];
+    // Headers and empty space must not open the previously selected file.
+    if (row >= 0) [self openFile:[outletFileView itemAtRow:row]];
+}
+
+- (void)openFile:(ASFileNode*)file
+{
+    if (![file isKindOfClass:[ASFileNode class]] || [deviceController isBusy]) return;
+    ASFileViewWindowController* viewer = [[[ASFileViewWindowController alloc] initWithFileName:[file displayName]] autorelease];
+    [fileViewWindows addObject:viewer];
+    fileViewCascadePoint = [[viewer window] cascadeTopLeftFromPoint:fileViewCascadePoint];
+    [viewer showWindow:self];
+    [viewer loadFile:file controller:deviceController];
+}
+
+- (void)fileViewWindowWillClose:(NSNotification*)notification
+{
+    for (ASFileViewWindowController* viewer in [[fileViewWindows copy] autorelease])
+        if ([viewer window] == [notification object])
+            [fileViewWindows removeObjectIdenticalTo:viewer];
 }
 
 

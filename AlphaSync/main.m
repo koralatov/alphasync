@@ -1,6 +1,7 @@
 #import <Cocoa/Cocoa.h>
 #import "AQFileUtilities.h"
 #import "ASNode.h"
+#import "ASFileViewWindowController.h"
 #include <math.h>
 #include <stdio.h>
 
@@ -95,6 +96,75 @@
             });
         }
     });
+}
+@end
+
+// Reader checks use a distinct worker object and complete text, with no USB access.
+@interface ASInterfaceReadFile : ASNode
+@property (copy) NSString* text;
+@property BOOL failRead;
+@property BOOL readOffMain;
+@property NSUInteger reads;
+@property NSUInteger writes;
+- (NSString*)fileData;
+- (BOOL)setFileData:(NSString*)text error:(NSString**)error;
+@end
+@implementation ASInterfaceReadFile
+- (void)dealloc { [_text release]; [super dealloc]; }
+- (NSString*)fileData
+{
+    ++_reads;
+    _readOffMain = ![NSThread isMainThread];
+    return _failRead ? nil : _text;
+}
+- (BOOL)setFileData:(NSString*)text error:(NSString**)error
+{
+    (void)text; (void)error; ++_writes; return NO;
+}
+@end
+
+@interface ASInterfaceReadQueue : NSObject
+@property (retain) ASInterfaceReadFile* worker;
+@property (retain) ASNode* systemRoot;
+@property (copy) void (^pendingRead)(void);
+@property BOOL holdRead;
+@property BOOL busy;
+@property BOOL refreshed;
+@property NSUInteger completed;
+- (BOOL)isBusy;
+- (void)finishPendingRead;
+- (void)performTaskForNode:(ASNode*)node refresh:(BOOL)refresh task:(id (^)(ASNode*))task completion:(void (^)(id, NSString*))completion;
+@end
+@implementation ASInterfaceReadQueue
+- (void)dealloc { [_worker release]; [_systemRoot release]; [_pendingRead release]; [super dealloc]; }
+- (BOOL)isBusy { return _busy; }
+- (void)performTaskForNode:(ASNode*)node refresh:(BOOL)refresh task:(id (^)(ASNode*))task completion:(void (^)(id, NSString*))completion
+{
+    (void)node;
+    _refreshed = _refreshed || refresh;
+    void (^read)(void) = ^{
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+            @autoreleasepool
+            {
+                [_worker setOperationError:nil];
+                id result = [task(_worker) retain];
+                NSString* error = result ? nil : [_worker operationError];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    completion(result, error);
+                    ++_completed;
+                    [result release];
+                });
+            }
+        });
+    };
+    if (_holdRead) [self setPendingRead:read];
+    else read();
+}
+- (void)finishPendingRead
+{
+    void (^read)(void) = [[_pendingRead copy] autorelease];
+    [self setPendingRead:nil];
+    if (read) read();
 }
 @end
 
@@ -612,6 +682,183 @@ static void capturePreferenceStatus(id controller, NSString* directory, NSString
     }
 }
 
+static NSString* sampleReadText(void)
+{
+    NSMutableString* text = [NSMutableString stringWithString:@"Notes from the Neo\n\n£, café, and curly quotes: ‘Hello’.\n\n"];
+    for (NSUInteger line = 0; line < 100; ++line)
+        [text appendString:@"The complete file remains available for reading, scrolling, and copying.\n"];
+    [text appendString:@"End of the complete file.\n"];
+    return text;
+}
+
+static void waitForRead(ASInterfaceReadQueue* queue, NSUInteger completed)
+{
+    NSDate* deadline = [NSDate dateWithTimeIntervalSinceNow:10];
+    while ([queue completed] < completed && [deadline timeIntervalSinceNow] > 0)
+        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.01]];
+    requireInterface([queue completed] == completed, @"A file read did not complete on the main thread.");
+}
+
+static void checkFileViewLayout(ASFileViewWindowController* viewer)
+{
+    NSView* content = [[viewer window] contentView];
+    [content layoutSubtreeIfNeeded];
+    checkInheritedAppearance(content);
+    NSTextView* text = [viewer valueForKey:@"textView"];
+    NSScrollView* scroll = [viewer valueForKey:@"scrollView"];
+    requireInterface(![text isEditable] && [text isSelectable] && ![text isRichText] && ![text allowsUndo],
+                     @"The file viewer permits editing or prevents text selection.");
+    requireInterface(NSWidth([text frame]) <= NSWidth([[scroll contentView] bounds]) + 1 && ![scroll hasHorizontalScroller],
+                     @"The file viewer does not wrap its text to the visible width.");
+    for (NSString* key in @[@"fontStyle", @"statusLabel"])
+    {
+        NSView* view = [viewer valueForKey:key];
+        NSRect frame = [view convertRect:[view bounds] toView:content];
+        requireInterface(NSContainsRect(NSInsetRect([content bounds], -1, -1), frame), @"A file viewer control is outside the window.");
+    }
+    NSTextField* status = [viewer valueForKey:@"statusLabel"];
+    NSSize needed = [[status cell] cellSizeForBounds:NSMakeRect(0, 0, NSWidth([status bounds]), 10000)];
+    requireInterface(NSHeight([status bounds]) >= needed.height - 1, @"A file viewer status or error is clipped.");
+}
+
+static void checkFileViews(id controller)
+{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    id originalFont = [[defaults objectForKey:@"FileViewerMonospaced"] retain];
+    id originalController = [[controller valueForKey:@"deviceController"] retain];
+    ASInterfaceReadFile* worker = [[[ASInterfaceReadFile alloc] init] autorelease];
+    [worker setText:sampleReadText()];
+    ASInterfaceReadQueue* queue = [[[ASInterfaceReadQueue alloc] init] autorelease];
+    [queue setWorker:worker];
+    [queue setSystemRoot:[originalController valueForKey:@"systemRoot"]];
+    id file = [[[NSClassFromString(@"ASFileNode") alloc] performSelector:NSSelectorFromString(@"initForDisplay")] autorelease];
+    [file setValue:@"Example document.txt" forKey:@"displayName"];
+    [file setValue:@"A shortened preview." forKey:@"filePreview"];
+    @try
+    {
+        [defaults setBool:NO forKey:@"FileViewerMonospaced"];
+        [controller setValue:queue forKey:@"deviceController"];
+        NSOutlineView* outline = [controller valueForKey:@"outletFileView"];
+        requireInterface([outline target] == controller && [outline doubleAction] == NSSelectorFromString(@"actionOpenFile:"),
+                         @"The file list has no double-click open action.");
+        NSUInteger before = [[controller valueForKey:@"fileViewWindows"] count];
+        [outline sendAction:[outline doubleAction] to:[outline target]];
+        [controller performSelector:NSSelectorFromString(@"openFile:") withObject:[queue systemRoot]];
+        [queue setBusy:YES];
+        [controller performSelector:NSSelectorFromString(@"openFile:") withObject:file];
+        requireInterface([[controller valueForKey:@"fileViewWindows"] count] == before, @"An empty row, device, or busy list opened a file.");
+        [queue setBusy:NO];
+        [controller performSelector:NSSelectorFromString(@"openFile:") withObject:file];
+        ASFileViewWindowController* first = [[[controller valueForKey:@"fileViewWindows"] lastObject] retain];
+        [first autorelease];
+        requireInterface(first && [[first window] isVisible], @"Opening a file did not show a new window.");
+        NSSize size = [[[first window] contentView] bounds].size;
+        requireInterface(fabs(size.width - 640) < 1 && fabs(size.height - 480) < 1 &&
+                         ([[first window] styleMask] & NSWindowStyleMaskResizable), @"The file viewer has the wrong initial size or cannot resize.");
+        waitForRead(queue, 1);
+        NSTextView* text = [first valueForKey:@"textView"];
+        requireInterface([[text string] isEqualToString:[worker text]] && [worker readOffMain] && ![queue refreshed],
+                         @"The viewer used a partial preview, read on the main thread, or refreshed the device.");
+        [text setSelectedRange:NSMakeRange(0, 5)];
+        NSPasteboard* copyBoard = [NSPasteboard pasteboardWithUniqueName];
+        requireInterface([text writeSelectionToPasteboard:copyBoard types:@[NSPasteboardTypeString]] &&
+                         [[copyBoard stringForType:NSPasteboardTypeString] isEqualToString:@"Notes"], @"Read-only text cannot be copied.");
+        [copyBoard releaseGlobally];
+        NSSegmentedControl* style = [first valueForKey:@"fontStyle"];
+        NSFont* regular = [NSFont systemFontOfSize:0];
+        requireInterface([style selectedSegment] == 0 && [[[text font] fontName] isEqualToString:[regular fontName]] &&
+                         fabs([[text font] pointSize] - [regular pointSize]) < 0.01, @"The regular font does not use system defaults.");
+        [style setSelectedSegment:1];
+        [style sendAction:[style action] to:[style target]];
+        NSFont* mono = [NSFont monospacedSystemFontOfSize:0 weight:NSFontWeightRegular];
+        requireInterface([[[text font] fontName] isEqualToString:[mono fontName]] && fabs([[text font] pointSize] - [mono pointSize]) < 0.01 &&
+                         [[text string] isEqualToString:[worker text]] && NSEqualRanges([text selectedRange], NSMakeRange(0, 5)),
+                         @"Changing the font changed the text, selection, or system font size.");
+        checkFileViewLayout(first);
+        [controller performSelector:NSSelectorFromString(@"openFile:") withObject:file];
+        ASFileViewWindowController* second = [[controller valueForKey:@"fileViewWindows"] lastObject];
+        waitForRead(queue, 2);
+        requireInterface(second != first && [[second valueForKey:@"fontStyle"] selectedSegment] == 1 &&
+                         !NSEqualPoints([[first window] frame].origin, [[second window] frame].origin), @"New file windows do not inherit the font choice or cascade.");
+        [style setSelectedSegment:0];
+        [style sendAction:[style action] to:[style target]];
+        requireInterface([[second valueForKey:@"fontStyle"] selectedSegment] == 1, @"One file window changed another window’s font.");
+        [first close];
+        requireInterface([[controller valueForKey:@"fileViewWindows"] count] == before + 1, @"Closing a file window did not release its owner.");
+
+        [worker setFailRead:YES];
+        [controller performSelector:NSSelectorFromString(@"openFile:") withObject:file];
+        ASFileViewWindowController* failed = [[controller valueForKey:@"fileViewWindows"] lastObject];
+        waitForRead(queue, 3);
+        [[failed window] setContentSize:NSMakeSize(400, 300)];
+        checkFileViewLayout(failed);
+        requireInterface([[[failed valueForKey:@"textView"] string] length] == 0 &&
+                         [[[failed valueForKey:@"statusLabel"] stringValue] containsString:@"couldn’t read"], @"A failed read displayed stale text or no explanation.");
+        [worker setFailRead:NO];
+        [worker setText:@""];
+        [controller performSelector:NSSelectorFromString(@"openFile:") withObject:file];
+        ASFileViewWindowController* empty = [[controller valueForKey:@"fileViewWindows"] lastObject];
+        waitForRead(queue, 4);
+        requireInterface([[[empty valueForKey:@"statusLabel"] stringValue] containsString:@"empty"], @"An empty file was treated as a read failure.");
+        [queue setHoldRead:YES];
+        [controller performSelector:NSSelectorFromString(@"openFile:") withObject:file];
+        ASFileViewWindowController* closed = [[[[controller valueForKey:@"fileViewWindows"] lastObject] retain] autorelease];
+        [closed close];
+        [queue finishPendingRead];
+        waitForRead(queue, 5);
+        requireInterface(![[closed window] isVisible] && [[[closed valueForKey:@"textView"] string] length] == 0 &&
+                         [worker writes] == 0 && [worker reads] == 5, @"A closed reader reopened, or viewing wrote to the file.");
+    }
+    @finally
+    {
+        [queue setPendingRead:nil];
+        for (NSWindowController* viewer in [[[controller valueForKey:@"fileViewWindows"] copy] autorelease]) [viewer close];
+        [controller setValue:originalController forKey:@"deviceController"];
+        if (originalFont) [defaults setObject:originalFont forKey:@"FileViewerMonospaced"];
+        else [defaults removeObjectForKey:@"FileViewerMonospaced"];
+        [originalFont release];
+        [originalController release];
+    }
+    puts("Complete background reads, read-only copying, system fonts, independent file windows, empty files, errors, and close-during-read checks passed.");
+}
+
+static void captureFileViews(NSString* directory, NSString* mode)
+{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    id original = [[defaults objectForKey:@"FileViewerMonospaced"] retain];
+    ASFileViewWindowController* viewer = [[[ASFileViewWindowController alloc] initWithFileName:@"Example document.txt"] autorelease];
+    ASInterfaceReadFile* worker = [[[ASInterfaceReadFile alloc] init] autorelease];
+    [worker setText:sampleReadText()];
+    ASInterfaceReadQueue* queue = [[[ASInterfaceReadQueue alloc] init] autorelease];
+    [queue setWorker:worker];
+    @try
+    {
+        [viewer showWindow:nil];
+        [viewer loadFile:nil controller:(ASDeviceController*)queue];
+        waitForRead(queue, 1);
+        requireInterface([[viewer window] appearance] == nil, @"A file window overrides the system appearance.");
+        [[[viewer window] effectiveAppearance] performAsCurrentDrawingAppearance:^{
+            NSTextView* text = [viewer valueForKey:@"textView"];
+            checkContrast([text textColor], [text backgroundColor]);
+        }];
+        NSSegmentedControl* style = [viewer valueForKey:@"fontStyle"];
+        for (NSInteger index = 0; index < 2; ++index)
+        {
+            [style setSelectedSegment:index];
+            [style sendAction:[style action] to:[style target]];
+            checkFileViewLayout(viewer);
+            captureWindow([viewer window], directory, [NSString stringWithFormat:@"%@-file-%@", mode, index ? @"monospaced" : @"regular"]);
+        }
+    }
+    @finally
+    {
+        [viewer close];
+        if (original) [defaults setObject:original forKey:@"FileViewerMonospaced"];
+        else [defaults removeObjectForKey:@"FileViewerMonospaced"];
+        [original release];
+    }
+}
+
 static void checkInspectorLayout(id inspector)
 {
     NSView* content = [[inspector window] contentView];
@@ -732,6 +979,7 @@ static void checkAppearances(id controller, NSWindowController* backup, NSString
         [controller performSelector:NSSelectorFromString(@"setStatusImmediateIdle")];
         capturePreferenceStatus(controller, directory, mode);
         captureBackupResults(backup, directory, mode);
+        captureFileViews(directory, mode);
 
         NSTextView* preview = [inspector valueForKey:@"outletPreviewAsText"];
         NSMutableString* text = [NSMutableString stringWithString:@"A text preview with £, café, and curly quotes: ‘Hello’.\n\n"];
@@ -852,6 +1100,8 @@ static int checkInterface(void)
             requireInterface([windowController window] != nil, [NSString stringWithFormat:@"The %@ window did not load.", key]);
         }
         checkInspectorLayout([controller valueForKey:@"inspectorController"]);
+        fputs("Interface check: checking read-only file windows.\n", stderr);
+        checkFileViews(controller);
         fputs("Interface check: checking Preferences settings and layout.\n", stderr);
         checkPreferences(controller);
         fputs("Interface check: creating the backup window.\n", stderr);

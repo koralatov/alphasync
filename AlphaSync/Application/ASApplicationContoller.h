@@ -68,6 +68,8 @@
     ASDeviceController* deviceController;
     ASInspectorWindowController* inspectorController;
     ASAboutWindowController* aboutController;
+    NSMutableArray* fileViewWindows;
+    NSPoint fileViewCascadePoint;
 
     NSTimer* statusDisplayTimer;
     NSToolbar* toolbar;
@@ -93,6 +95,7 @@
 
 - (IBAction)actionDelete:(id)sender;
 - (IBAction)actionInfo:(id)sender;
+- (IBAction)actionOpenFile:(id)sender;
 - (IBAction)actionBackup:(id)sender;
 - (IBAction)actionShowPreferences:(id)sender;
 - (IBAction)actionShowAbout:(id)sender;
