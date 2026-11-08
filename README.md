@@ -1,6 +1,6 @@
 # AlphaSync
 
-AlphaSync copies text files between your Mac and an AlphaSmart NEO.  It can also back up the files on your NEO and open automatically when you connect it.
+AlphaSync copies text files between your Mac and an AlphaSmart Neo.  It can also back up the files on your Neo and open automatically when you connect it.
 
 ## Download
 
@@ -37,20 +37,20 @@ Your Mac remembers that you allowed this copy of AlphaSync.  You can then open i
 
 ## Use AlphaSync
 
-Open AlphaSync and connect your NEO with a USB cable.  Your NEO’s files appear in the window.
+Open AlphaSync and connect your Neo with a USB cable.  Your Neo’s files appear in the window.
 
 - **Copy files to your Mac:** drag them from AlphaSync into a Finder folder.
-- **Copy text files to your NEO:** drag them from Finder into AlphaSync.
+- **Copy text files to your Neo:** drag them from Finder into AlphaSync.
 - **Back up your files:** click **Backup**.  You can choose where backups are saved in **Preferences**.
 - **Clear files:** select a file for **Clear File…**, or select **AlphaWord** for **Clear All Files…**.  The warning names what will be cleared, and **Cancel** is the default.
 
-Back up the files on your NEO before replacing or clearing them.
+Back up the files on your Neo before replacing or clearing them.
 
-If a text file is too large for your NEO, AlphaSync explains the limit and leaves your files unchanged.  Shorten the text or split it into smaller files, then try again.
+If a text file is too large for your Neo, AlphaSync explains the limit and leaves your files unchanged.  Shorten the text or split it into smaller files, then try again.
 
 Backup logs are off by default.  If you want a record of copied files and any errors, enable **Save a backup log** in **Preferences**.  The log is saved inside each dated backup folder.
 
-To have AlphaSync open whenever you connect your NEO, turn on automatic opening in **Preferences**.  Keep the app in Applications, and follow any approval prompts shown in Preferences.
+To have AlphaSync open whenever you connect your Neo, turn on automatic opening in **Preferences**.  Keep the app in Applications, and follow any approval prompts shown in Preferences.
 
 AlphaSync follows your Mac’s Light or Dark appearance automatically.
 

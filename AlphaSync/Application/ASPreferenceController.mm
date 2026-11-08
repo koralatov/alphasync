@@ -182,7 +182,7 @@ static NSBox* ASPreferenceSeparator(void)
     saveBackupLogsButton = [NSButton checkboxWithTitle:@"Save a backup log" target:self action:@selector(actionSaveBackupLogs:)];
     [saveBackupLogsButton setState:[[NSUserDefaults standardUserDefaults] boolForKey:kASPreferenceKeySaveBackupLogs] ? NSControlStateValueOn : NSControlStateValueOff];
 
-    outletAutoRun = [NSButton checkboxWithTitle:@"Open AlphaSync when a NEO is connected" target:self action:@selector(actionAutoRun:)];
+    outletAutoRun = [NSButton checkboxWithTitle:@"Open AlphaSync when a Neo is connected" target:self action:@selector(actionAutoRun:)];
 
     automaticLaunchStatusField = [NSTextField wrappingLabelWithString:@""];
     [automaticLaunchStatusField setFont:[NSFont systemFontOfSize:[NSFont smallSystemFontSize]]];

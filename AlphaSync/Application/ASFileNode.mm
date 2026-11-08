@@ -46,19 +46,19 @@ static NSString* ASFileWriteMessage(const ASFileWriteError& error)
     switch (error.failure)
     {
         case ASFileWriteFailure::LimitsUnavailable:
-            return @"AlphaSync couldn’t read the NEO’s maximum file size.  Disconnect and reconnect the NEO, then try again.  No files on the NEO have been changed.";
+            return @"AlphaSync couldn’t read the Neo’s maximum file size.  Disconnect and reconnect the Neo, then try again.  No files on the Neo have been changed.";
         case ASFileWriteFailure::FileTooLarge:
-            return [NSString stringWithFormat:@"This file needs %@ on the NEO.  The maximum file size is %@.  Shorten the text or split it into smaller files, then try again.  No files on the NEO have been changed.",
+            return [NSString stringWithFormat:@"This file needs %@ on the Neo.  The maximum file size is %@.  Shorten the text or split it into smaller files, then try again.  No files on the Neo have been changed.",
                     aq_FormattedByteCount(error.required), aq_FormattedByteCount(error.maximum)];
         case ASFileWriteFailure::MemoryUnavailable:
-            return @"AlphaSync couldn’t check the NEO’s available memory.  Disconnect and reconnect the NEO, then try again.  No files on the NEO have been changed.";
+            return @"AlphaSync couldn’t check the Neo’s available memory.  Disconnect and reconnect the Neo, then try again.  No files on the Neo have been changed.";
         case ASFileWriteFailure::FileUnavailable:
-            return @"AlphaSync couldn’t check the existing file’s size on the NEO.  Disconnect and reconnect the NEO, then try again.  No files on the NEO have been changed.";
+            return @"AlphaSync couldn’t check the existing file’s size on the Neo.  Disconnect and reconnect the Neo, then try again.  No files on the Neo have been changed.";
         case ASFileWriteFailure::InsufficientMemory:
-            return [NSString stringWithFormat:@"There isn’t enough free memory on the NEO.  This file needs %@ after conversion; up to %@ is available for this import.  Free some space on the NEO, then try again.  No files on the NEO have been changed.",
+            return [NSString stringWithFormat:@"There isn’t enough free memory on the Neo.  This file needs %@ after conversion; up to %@ is available for this import.  Free some space on the Neo, then try again.  No files on the Neo have been changed.",
                     aq_FormattedByteCount(error.required), aq_FormattedByteCount(error.available)];
         default:
-            return @"The file could not be written to the NEO.  Check the connection and try again.";
+            return @"The file could not be written to the Neo.  Check the connection and try again.";
     }
 }
 
@@ -83,12 +83,12 @@ static BOOL ASImportFileText(ASFile* file, BOOL plainText, NSString* text, NSStr
     }
     if (plainText && !file->canRepresentText((const uint16_t*)[unicodeData bytes], static_cast<unsigned>([unicodeData length])))
     {
-        if (error) *error = @"The NEO cannot store one or more characters in this text.  Remove unsupported characters, such as emoji, and try again.  No files on the NEO have been changed.";
+        if (error) *error = @"The Neo cannot store one or more characters in this text.  Remove unsupported characters, such as emoji, and try again.  No files on the Neo have been changed.";
         return NO;
     }
     if (!file->importText((const uint16_t*)[unicodeData bytes], static_cast<unsigned>([unicodeData length])))
     {
-        if (error) *error = @"The file could not be converted into the NEO’s format.  No files on the NEO have been changed.";
+        if (error) *error = @"The file could not be converted into the Neo’s format.  No files on the Neo have been changed.";
         return NO;
     }
     return YES;
@@ -142,7 +142,7 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
         if (isUnique) break;
         if (++ uniqueID > 999)
         {
-            if (error) *error = @"A unique filename could not be chosen on the NEO.";
+            if (error) *error = @"A unique filename could not be chosen on the Neo.";
             return nil;
         }
 

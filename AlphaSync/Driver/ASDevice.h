@@ -48,7 +48,7 @@ namespace ts
         FileUnavailable, InsufficientMemory, DeviceError
     };
 
-    // Validation describes the converted NEO data, before any file-writing command.
+    // Validation describes the converted Neo data, before any file-writing command.
     struct ASFileWriteError
     {
         ASFileWriteFailure failure = ASFileWriteFailure::None;

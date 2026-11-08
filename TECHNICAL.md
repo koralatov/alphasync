@@ -62,7 +62,7 @@ Testing on 12.7.5 exercises the older login-item implementation shared with macO
 
 ## Check a build
 
-The core tests need a C++17 compiler and make.  They run on macOS and Linux, without a connected NEO:
+The core tests need a C++17 compiler and make.  They run on macOS and Linux, without a connected Neo:
 
 ```sh
 make test
@@ -94,7 +94,7 @@ The interface uses standard AppKit controls and follows the macOS appearance aut
 scripts/check-appearance.sh build/DerivedData/Build/Products/Release/AlphaSync.app build/appearance
 ```
 
-This check uses cached sample rows without connecting to a NEO or changing login items.  It checks native row components, rename permissions and cancellation, text contrast, appearance inheritance, and switching from Light to Dark and back to Light.  Help pages are rendered with the system WebKit.  CI retains the screenshots separately from the app downloads.
+This check uses cached sample rows without connecting to a Neo or changing login items.  It checks native row components, rename permissions and cancellation, text contrast, appearance inheritance, and switching from Light to Dark and back to Light.  Help pages are rendered with the system WebKit.  CI retains the screenshots separately from the app downloads.
 
 The file list, Inspector summaries, device memory, and available-memory status share `NSByteCountFormatter` in file style, using bytes below 1,000 and decimal KB from 1,000 upwards.  Exact byte counts in the Inspector and file-size warning use `NSNumberFormatter` with grouping separators, for example `51,200 bytes`.  Both formatters follow the Mac’s regional settings.  Appearance captures include compact sizes and grouped byte counts in the Inspector and status bar.
 
@@ -102,15 +102,15 @@ The Inspector is built with a standard `NSWindow`, stack and grid views, native 
 
 Clear-warning checks verify that Cancel is AppKit’s default button and simulate the response codes from its native buttons to check that cancellation aborts and only OK confirms, for both file and applet warnings.  They invoke only the confirmation on display-only nodes and never clear device data.  Hosted CI does not reliably grant the test app keyboard focus, so physical Return, keypad Enter, and Escape remain in the manual checklist.
 
-Without a NEO, the main window shows a compact connection view built with native AppKit labels, a stack view, and Apple’s `cable.connector` SF Symbol loaded by `NSImage`.  The same window restores its file viewer, toolbar, and chosen size when a NEO connects, and shrinks after the last NEO disconnects.  Connection progress and errors remain visible.  A sheet can finish before its parent shrinks; full-screen windows keep their Space until the user leaves full screen.  Resizing respects Reduce Motion.  Native checks cover these connection transitions, multiple NEOs, sizing, errors, and sheet deferral, and appearance captures include the disconnected view.
+Without a Neo, the main window shows a compact connection view built with native AppKit labels, a stack view, and Apple’s `cable.connector` SF Symbol loaded by `NSImage`.  The same window restores its file viewer, toolbar, and chosen size when a Neo connects, and shrinks after the last Neo disconnects.  Connection progress and errors remain visible.  A sheet can finish before its parent shrinks; full-screen windows keep their Space until the user leaves full screen.  Resizing respects Reduce Motion.  Native checks cover these connection transitions, multiple Neos, sizing, errors, and sheet deferral, and appearance captures include the disconnected view.
 
 Interface validation logs each startup and window-check stage.  Smoke checks have a three-minute deadline, and app appearance captures have five minutes.  If a check stalls on macOS, the runner records a process sample before stopping it and failing the check.  These deadlines retain the normal validation requirements and leave useful diagnostics instead of waiting for the whole CI job to be cancelled.
 
 The macOS 26 Intel CI job uses the workaround for [runner image issue 14751](https://github.com/actions/runner-images/issues/14751): it unloads the crashing per-user icon agent so AppKit can use generic native icons.  This is confined to that disposable build machine.  All window, control, and appearance checks still run; the other Mac jobs use the normal icon service.
 
-The backup sheet uses native AppKit controls and Auto Layout at a width of 520 points.  Its height fits the result message and selectable, wrapping folder paths.  Completion shows the number of files saved and each dated backup folder; the Finder button opens those folders rather than the general backup destination.  Failed, cancelled, and empty backups have separate wording.  Interface checks cover these results, singular wording, default buttons, unclipped text, and multiple long paths.  Appearance captures include successful and incomplete backups, plus two NEO locations, in each mode.  Opening the folders in Finder remains a manual check.
+The backup sheet uses native AppKit controls and Auto Layout at a width of 520 points.  Its height fits the result message and selectable, wrapping folder paths.  Completion shows the number of files saved and each dated backup folder; the Finder button opens those folders rather than the general backup destination.  Failed, cancelled, and empty backups have separate wording.  Interface checks cover these results, singular wording, default buttons, unclipped text, and multiple long paths.  Appearance captures include successful and incomplete backups, plus two Neo locations, in each mode.  Opening the folders in Finder remains a manual check.
 
-Backup logs are opt-in through **Save a backup log** in Preferences.  `SaveBackupLogs` defaults to false, including for existing installations, and is captured when a backup starts.  When enabled, each NEO’s dated destination contains `AlphaSync Backup Log.plist`, an XML property list covering only that NEO’s files.  Initial publication is atomic and exclusive; subsequent updates are atomic.  Each device’s log is finished when its files have been processed, so a later cancellation does not change an earlier NEO’s completed log.  In-progress logs retain pending files after an interruption.  Empty backups create no log.  Existing logs are left in place.  Native checks exercise logging off and on, option changes during a backup, separate NEOs, cancellation, failed exports, empty backups, and filename collisions.
+Backup logs are opt-in through **Save a backup log** in Preferences.  `SaveBackupLogs` defaults to false, including for existing installations, and is captured when a backup starts.  When enabled, each Neo’s dated destination contains `AlphaSync Backup Log.plist`, an XML property list covering only that Neo’s files.  Initial publication is atomic and exclusive; subsequent updates are atomic.  Each device’s log is finished when its files have been processed, so a later cancellation does not change an earlier Neo’s completed log.  In-progress logs retain pending files after an interruption.  Empty backups create no log.  Existing logs are left in place.  Native checks exercise logging off and on, option changes during a backup, separate Neos, cancellation, failed exports, empty backups, and filename collisions.
 
 Preferences uses a standard `NSWindow` with native stack and grid views, a folder path control, and Auto Layout.  The window fits its content when the automatic-launch status changes.  Interface checks verify saved settings, closing and reopening the window, native button sizing, and unclipped status messages.  Appearance captures include a long folder path and registration error in each mode.  The manual checklist covers selecting and cancelling a backup folder in the system file panel, whose remote service can be unavailable on unattended runners.
 
@@ -139,15 +139,15 @@ The Universal build keeps the original icon in `application.iconset`.  The moder
 
 Exports and backups always use UTF-8 without a byte-order mark.  Preferences shows the fixed output format, and encoding preferences saved by older versions do not affect it.  Imports still accept MacASCII (Mac Roman), UTF-8 with or without a byte-order mark, and UTF-16 with a byte-order mark in either byte order.
 
-Windows line endings become single paragraph breaks.  An import containing characters the NEO cannot store fails with an explanation, leaving the existing file intact.
+Windows line endings become single paragraph breaks.  An import containing characters the Neo cannot store fails with an explanation, leaving the existing file intact.
 
-Creating and replacing files share validation in `ASDevice`, after conversion into the NEO’s format and before file attributes or contents are written.  Each write reads AlphaWord’s current maximum rather than relying on the cached display value.  An unreadable, missing, truncated, zero, or inconsistent limit stops the import; the Inspector shows an unavailable maximum rather than an unlimited one.  The protocol’s 24-bit length field is also enforced.
+Creating and replacing files share validation in `ASDevice`, after conversion into the Neo’s format and before file attributes or contents are written.  Each write reads AlphaWord’s current maximum rather than relying on the cached display value.  An unreadable, missing, truncated, zero, or inconsistent limit stops the import; the Inspector shows an unavailable maximum rather than an unlimited one.  The protocol’s 24-bit length field is also enforced.
 
 Memory validation keeps 1,024 bytes in reserve and credits an existing file’s allocation for replacements.  Files that do not grow can still be replaced when free memory is low.  Failed memory and file-size queries stop the import.  User warnings distinguish a per-file limit, insufficient memory, and unavailable information, show grouped exact byte counts, and suggest how to proceed.  Protocol regression tests verify both write routes, exact limits, a 2 MB rejection, memory boundaries, failed queries, and that rejected imports issue no file-writing commands.  Native text tests exercise the actual import paths and their error messages; real USB behaviour remains in the manual checklist.
 
 USB commands and connection callbacks run on one background queue.  The interface uses independent copies of the device’s displayed data.  Cancellation finishes and records the current file before stopping, and quitting waits for pending work without blocking the interface.
 
-Exports are written and synchronised in a hidden temporary file before their final name appears.  Existing files are preserved.  Optional backup logs are stored as **AlphaSync Backup Log.plist** in each NEO’s dated destination folder, recording saved filenames, failures, and pending files.  A cancelled, disconnected, or interrupted backup remains distinguishable from a completed backup when logging is enabled.  Hidden temporary files left by an interrupted write can be removed after checking the saved files and any log.
+Exports are written and synchronised in a hidden temporary file before their final name appears.  Existing files are preserved.  Optional backup logs are stored as **AlphaSync Backup Log.plist** in each Neo’s dated destination folder, recording saved filenames, failures, and pending files.  A cancelled, disconnected, or interrupted backup remains distinguishable from a completed backup when logging is enabled.  Hidden temporary files left by an interrupted write can be removed after checking the saved files and any log.
 
 ## Versioning
 
@@ -157,11 +157,11 @@ To publish a testing release, commit its notes as `releases/<version>.md`, then 
 
 ## Hardware checks before a release
 
-A real NEO is needed to verify USB communication.  Test on Intel and Apple Silicon, including macOS 11 where possible:
+A real Neo is needed to verify USB communication.  Test on Intel and Apple Silicon, including macOS 11 where possible:
 
-- Connect and disconnect a NEO, and confirm that its files appear correctly.
+- Connect and disconnect a Neo, and confirm that its files appear correctly.
 - Copy text in both directions, including pound signs, accented letters, and curly quotes.
-- Export files and folders to Finder, and drop text files back onto the NEO.
+- Export files and folders to Finder, and drop text files back onto the Neo.
 - Back up named files, file spaces, and empty files.  Test an unwritable destination and unplug the device between files.
 - Confirm that oversized imports fail clearly and leave the existing device file intact.
 - Check launching at login and on USB connection, including approval, disabling it, and moving the app.

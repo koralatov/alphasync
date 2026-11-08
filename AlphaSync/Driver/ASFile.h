@@ -184,7 +184,7 @@ namespace ts
          */
         virtual bool importText(const uint16_t* text, unsigned textSize);
 
-        // Check the complete input before replacing any existing text.  A NEO cannot
+        // Check the complete input before replacing any existing text.  A Neo cannot
         // store arbitrary Unicode, so an unsupported character must be reported rather than substituted.
         bool canRepresentText(const uint16_t* text, unsigned textSize) const;
 

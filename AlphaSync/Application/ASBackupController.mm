@@ -234,7 +234,7 @@ static NSTextField* ASBackupLabel(NSString* text)
 {
     (void)notification;
     // The driver frees the device after this notification.  Stop before the next timer tick.
-    if (backupItems) [self stopBackup:@"Backup stopped because a NEO was disconnected." status:@"disconnected"];
+    if (backupItems) [self stopBackup:@"Backup stopped because a Neo was disconnected." status:@"disconnected"];
 }
 
 /** Make a new device session path and create the necessary directories.
@@ -343,7 +343,7 @@ static NSTextField* ASBackupLabel(NSString* text)
     if (backupInFlight)
     {
         // Finish and record the current transfer before closing the report.  Stopping
-        // between files avoids interrupting a NEO command halfway through its protocol.
+        // between files avoids interrupting a Neo command halfway through its protocol.
         [pendingStopMessage release];
         [pendingStopStatus release];
         pendingStopMessage = [message copy];
@@ -366,9 +366,9 @@ static NSTextField* ASBackupLabel(NSString* text)
     if (successful && total)
     {
         title = @"Backup complete";
-        NSString* source = backupDeviceCount > 1 ? [NSString stringWithFormat:@"%lu NEOs", (unsigned long)backupDeviceCount] : @"your NEO";
+        NSString* source = backupDeviceCount > 1 ? [NSString stringWithFormat:@"%lu Neos", (unsigned long)backupDeviceCount] : @"your Neo";
         summary = [NSString stringWithFormat:@"AlphaSync has saved %@ of %@ from %@.  The original files on your %@ have not been changed.",
-                   saved == 1 ? @"a copy" : @"copies", ASBackupFileCount(saved), source, backupDeviceCount > 1 ? @"NEOs" : @"NEO"];
+                   saved == 1 ? @"a copy" : @"copies", ASBackupFileCount(saved), source, backupDeviceCount > 1 ? @"Neos" : @"Neo"];
     }
     else if (successful)
     {
@@ -381,7 +381,7 @@ static NSTextField* ASBackupLabel(NSString* text)
         if (failedFiles) summary = [summary stringByAppendingFormat:@"  %@ could not be backed up.", ASBackupFileCount(failedFiles)];
         if (pending) summary = [summary stringByAppendingFormat:@"  %@ %@ not copied.", ASBackupFileCount(pending), pending == 1 ? @"was" : @"were"];
         if (!completed && ![message isEqualToString:@"Cancelled"]) summary = [summary stringByAppendingFormat:@"  %@", message];
-        summary = [summary stringByAppendingFormat:@"  The original files on your %@ have not been changed.", backupDeviceCount > 1 ? @"NEOs" : @"NEO"];
+        summary = [summary stringByAppendingFormat:@"  The original files on your %@ have not been changed.", backupDeviceCount > 1 ? @"Neos" : @"Neo"];
     }
     NSError* reportError = nil;
     if (backupReport && ![backupReport finishWithStatus:status message:summary error:&reportError])
@@ -530,7 +530,7 @@ static NSTextField* ASBackupLabel(NSString* text)
         BOOL deviceFinished = nextBackupItem == [backupItems count] || [backupItems[nextBackupItem] newDevice];
         if (backupReport && deviceFinished)
         {
-            if (![backupReport finishWithStatus:@"complete" message:@"Backup finished for this NEO." error:&reportError])
+            if (![backupReport finishWithStatus:@"complete" message:@"Backup finished for this Neo." error:&reportError])
             {
                 [self stopBackup:[NSString stringWithFormat:@"Backup stopped because its log could not be saved: %@", [reportError localizedDescription]] status:@"failed"];
                 return;

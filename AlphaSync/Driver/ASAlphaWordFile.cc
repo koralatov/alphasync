@@ -158,7 +158,7 @@ namespace ts
             if (c == 0x81) c = 0xac;        // Re-map the "not" alternate character (to not clash with line-break hint)
 
             // Windows uses two characters for one line ending.  Preserve real blank lines,
-            // but consume the LF paired with this CR before creating a NEO paragraph break.
+            // but consume the LF paired with this CR before creating a Neo paragraph break.
             if (unicode == '\r' && uni != endu)
             {
                 uint16_t next = *uni;

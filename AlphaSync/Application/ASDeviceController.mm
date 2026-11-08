@@ -175,7 +175,7 @@ static void deviceDisconnect(ASDeviceFactory* factory, void* context, unsigned i
     NSString* selectedName = [node displayName];
     if (shuttingDown || !owner)
     {
-        if (completion) completion(nil, @"The NEO is no longer available.");
+        if (completion) completion(nil, @"The Neo is no longer available.");
         return;
     }
     ++pendingTaskCount;
@@ -198,7 +198,7 @@ static void deviceDisconnect(ASDeviceFactory* factory, void* context, unsigned i
         }
         id result = nil;
         NSString* error = nil;
-        if (!selected) error = @"The selected file or NEO is no longer available.  Select it again and retry.";
+        if (!selected) error = @"The selected file or Neo is no longer available.  Select it again and retry.";
         else
         {
             [selected setOperationError:nil];

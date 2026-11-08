@@ -268,7 +268,7 @@ namespace ts
         while (getWordAtIndex(word, index++))
         {
             if (index > 1) *ptr++ = 0x0020;     // prepend a separating space character
-            // NEO characters use all eight bits, even when the compiler treats char as signed.
+            // Neo characters use all eight bits, even when the compiler treats char as signed.
             const unsigned char* cptr = reinterpret_cast<const unsigned char*>(word);
             while (0 != *cptr) *ptr++ = neoToUnicode(*cptr++);
             assert(ptr <= ((uint16_t*)m_exportBuffer) + charCount);

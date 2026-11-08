@@ -218,7 +218,7 @@ static const NSInteger kMenuItemTagBackup   = 100;
     [self setupConnectionView];
     [self updateMainWindowConnectionState];
 
-    // Interface checks must not capture a connected NEO or change login-item registration.
+    // Interface checks must not capture a connected Neo or change login-item registration.
     if (![[[NSProcessInfo processInfo] arguments] containsObject:@"--smoke-test"])
         [deviceController enable];
     [dataSource reloadData:outletFileView];
@@ -227,7 +227,7 @@ static const NSInteger kMenuItemTagBackup   = 100;
 }
 
 
-/** Keep the original file viewer intact while the same window waits for a NEO.
+/** Keep the original file viewer intact while the same window waits for a Neo.
  */
 - (void)setupConnectionView
 {
@@ -245,10 +245,10 @@ static const NSInteger kMenuItemTagBackup   = 100;
     [connectionSymbol setContentTintColor:[NSColor secondaryLabelColor]];
     [connectionSymbol setImageScaling:NSImageScaleProportionallyUpOrDown];
 
-    connectionTitle = [NSTextField labelWithString:@"No NEO connected"];
+    connectionTitle = [NSTextField labelWithString:@"No Neo connected"];
     [connectionTitle setFont:[NSFont systemFontOfSize:14 weight:NSFontWeightSemibold]];
     [connectionTitle setAlignment:NSTextAlignmentCenter];
-    connectionMessage = [NSTextField wrappingLabelWithString:@"Connect your AlphaSmart NEO\nwith a USB cable to view your files."];
+    connectionMessage = [NSTextField wrappingLabelWithString:@"Connect your AlphaSmart Neo\nwith a USB cable to view your files."];
     [connectionMessage setFont:[NSFont systemFontOfSize:[NSFont systemFontSize]]];
     [connectionMessage setTextColor:[NSColor secondaryLabelColor]];
     [connectionMessage setAlignment:NSTextAlignmentCenter];
@@ -571,10 +571,10 @@ static const NSInteger kMenuItemTagBackup   = 100;
 
     if ([[deviceController systemRoot] numberOfChildren] == 0)
     {
-        [connectionTitle setStringValue:alertStatus == kASAlertStatusYellow ? @"Connecting to NEO…" : @"No NEO connected"];
+        [connectionTitle setStringValue:alertStatus == kASAlertStatusYellow ? @"Connecting to Neo…" : @"No Neo connected"];
         [connectionMessage setStringValue:alertStatus == kASAlertStatusRed ? actionName :
             (alertStatus == kASAlertStatusYellow ? @"Wait while AlphaSync reads your files." :
-             @"Connect your AlphaSmart NEO\nwith a USB cable to view your files.")];
+             @"Connect your AlphaSmart Neo\nwith a USB cable to view your files.")];
         [self updateMainWindowConnectionState];
     }
 
@@ -611,8 +611,8 @@ static const NSInteger kMenuItemTagBackup   = 100;
  */
 - (void)setStatusImmediateIdle
 {
-    [connectionTitle setStringValue:@"No NEO connected"];
-    [connectionMessage setStringValue:@"Connect your AlphaSmart NEO\nwith a USB cable to view your files."];
+    [connectionTitle setStringValue:@"No Neo connected"];
+    [connectionMessage setStringValue:@"Connect your AlphaSmart Neo\nwith a USB cable to view your files."];
     [self updateMainWindowConnectionState];
     if (nil != statusDisplayTimer)
     {

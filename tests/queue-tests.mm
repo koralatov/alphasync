@@ -21,7 +21,7 @@
     {
         device = value;
         [self setConnectionID:1];
-        [self setDisplayName:@"Test NEO"];
+        [self setDisplayName:@"Test Neo"];
     }
     return self;
 }
@@ -54,7 +54,7 @@ int main()
         ASDeviceNode* display = (ASDeviceNode*)[worker copyForDisplay];
         [[controller systemRoot] addChild:display];
         dispatch_sync(queue, ^{ nodes[@1] = worker; [worker setDisplayName:@"Changed on worker"]; });
-        CHECK([[display displayName] isEqualToString:@"Test NEO"]);
+        CHECK([[display displayName] isEqualToString:@"Test Neo"]);
         dispatch_semaphore_t entered = dispatch_semaphore_create(0);
         dispatch_semaphore_t proceed = dispatch_semaphore_create(0);
         __block NSUInteger completed = 0;

@@ -4,7 +4,7 @@
 #include <math.h>
 #include <stdio.h>
 
-// Used only by --smoke-test.  These cached sample rows never access a NEO.
+// Used only by --smoke-test.  These cached sample rows never access a Neo.
 @interface ASInterfaceRows : NSObject <NSOutlineViewDataSource>
 @property (retain) NSArray* roots;
 @property (assign) id delegate;
@@ -271,23 +271,23 @@ static void checkConnectionStates(id controller)
     NSImageView* symbol = [controller valueForKey:@"connectionSymbol"];
     NSToolbar* toolbar = [controller valueForKey:@"toolbar"];
     requireInterface([window contentView] == compact && [window toolbar] == nil && NSWidth([window frame]) < 480,
-                     @"Startup without a NEO did not show the compact connection window.");
+                     @"Startup without a Neo did not show the compact connection window.");
     requireInterface([NSImage imageWithSystemSymbolName:@"cable.connector" accessibilityDescription:nil] != nil &&
                      [[symbol image] isTemplate],
                      @"The connection icon is not an available native SF Symbol.");
     if (@available(macOS 12.0, *))
         requireInterface([[symbol image] symbolConfiguration] != nil, @"The connection symbol lost its native configuration.");
-    requireInterface([[title stringValue] isEqualToString:@"No NEO connected"], @"The disconnected title changed.");
+    requireInterface([[title stringValue] isEqualToString:@"No Neo connected"], @"The disconnected title changed.");
     checkConnectionLayout(controller);
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ASDeviceDetected" object:nil];
-    requireInterface([window contentView] == compact && [[title stringValue] isEqualToString:@"Connecting to NEO…"],
-                     @"Detecting a NEO did not keep the compact connection progress visible.");
-    NSString* error = @"The NEO could not be opened because another application is using it.  Close that application, check the USB cable, and reconnect your NEO to try again.";
+    requireInterface([window contentView] == compact && [[title stringValue] isEqualToString:@"Connecting to Neo…"],
+                     @"Detecting a Neo did not keep the compact connection progress visible.");
+    NSString* error = @"The Neo could not be opened because another application is using it.  Close that application, check the USB cable, and reconnect your Neo to try again.";
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ASDeviceError" object:error];
     requireInterface([[message stringValue] isEqualToString:error], @"The compact view hid a connection error.");
     checkConnectionLayout(controller);
     [controller performSelector:NSSelectorFromString(@"displayStatusTimerDone")];
-    requireInterface([[title stringValue] isEqualToString:@"No NEO connected"] && [[message stringValue] containsString:@"USB cable"],
+    requireInterface([[title stringValue] isEqualToString:@"No Neo connected"] && [[message stringValue] containsString:@"USB cable"],
                      @"The waiting message did not return after a temporary error.");
 
     id first = [[[NSClassFromString(@"ASNode") alloc] init] autorelease];
@@ -304,7 +304,7 @@ static void checkConnectionStates(id controller)
     sampleConnection(controller, second, YES);
     sampleConnection(controller, first, NO);
     requireInterface([window contentView] == files && NSEqualSizes([window frame].size, userSize),
-                     @"A refresh or disconnect with another NEO present changed the file viewer size.");
+                     @"A refresh or disconnect with another Neo present changed the file viewer size.");
 
     // A disconnect must not interrupt a backup result or a native file sheet.
     NSWindow* sheet = [[[NSWindow alloc] initWithContentRect:NSMakeRect(0, 0, 240, 100)
@@ -319,7 +319,7 @@ static void checkConnectionStates(id controller)
     NSDate* deadline = [NSDate dateWithTimeIntervalSinceNow:2];
     while (([window attachedSheet] || [window contentView] != compact) && [deadline timeIntervalSinceNow] > 0)
         [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.01]];
-    requireInterface([window contentView] == compact && [window toolbar] == nil, @"The last NEO disconnect did not return to the compact window.");
+    requireInterface([window contentView] == compact && [window toolbar] == nil, @"The last Neo disconnect did not return to the compact window.");
     sampleConnection(controller, first, YES);
     requireInterface([window contentView] == files && NSEqualSizes([window frame].size, userSize),
                      @"Reconnecting lost the chosen file viewer size.");
@@ -328,7 +328,7 @@ static void checkConnectionStates(id controller)
     [window setFrame:resized display:YES];
     sampleConnection(controller, first, NO);
     checkConnectionLayout(controller);
-    puts("Native connection symbol, waiting, progress, errors, reconnect sizing, multiple NEOs, and sheet deferral passed.");
+    puts("Native connection symbol, waiting, progress, errors, reconnect sizing, multiple Neos, and sheet deferral passed.");
 }
 
 static void checkPreferenceLayout(id preferences)
@@ -444,14 +444,14 @@ static void sampleBackupResult(NSWindowController* backup, NSUInteger total, NSU
 
 static void checkBackupResults(NSWindowController* backup)
 {
-    NSArray* paths = @[@"/Users/Example/Documents/AlphaSync/My NEO/2026-11-08"];
+    NSArray* paths = @[@"/Users/Example/Documents/AlphaSync/My Neo/2026-11-08"];
     sampleBackupResult(backup, 8, 8, 0, 1, paths, @"complete");
     NSTextField* title = [backup valueForKey:@"outletFilesRemaining"];
     NSTextField* summary = [backup valueForKey:@"outletBackupItem"];
     NSButton* open = [backup valueForKey:@"openBackupButton"];
     NSButton* done = [backup valueForKey:@"outletStopDoneButton"];
     requireInterface([[title stringValue] isEqualToString:@"Backup complete"] &&
-                     [[summary stringValue] containsString:@"copies of 8 files from your NEO"], @"Successful backup wording changed.");
+                     [[summary stringValue] containsString:@"copies of 8 files from your Neo"], @"Successful backup wording changed.");
     requireInterface(![open isHidden] && [open target] == backup && [open action] == NSSelectorFromString(@"actionOpenBackupFolders:"),
                      @"The backup folder button is not connected.");
     requireInterface([[done title] isEqualToString:@"Done"] && [[done keyEquivalent] isEqualToString:@"\r"], @"Done is not the default completion button.");
@@ -498,7 +498,7 @@ static void checkBackupLogs(id controller, NSWindowController* backup)
             for (NSUInteger device = 0; device < (scenario == 4 ? 0 : 2); ++device)
             {
                 ASNode* neo = [[[ASNode alloc] init] autorelease];
-                [neo setDisplayName:device == 0 ? @"First NEO" : @"Second NEO"];
+                [neo setDisplayName:device == 0 ? @"First Neo" : @"Second Neo"];
                 ASNode* applet = [[[ASNode alloc] init] autorelease];
                 [applet setDisplayName:@"AlphaWord"];
                 for (NSUInteger index = 0; index < 2; ++index)
@@ -523,7 +523,7 @@ static void checkBackupLogs(id controller, NSWindowController* backup)
             NSArray* titles = @[@"Backup complete", @"Backup complete", @"Backup stopped", @"Backup incomplete", @"No files to back up"];
             requireInterface([[[backup valueForKey:@"outletFilesRemaining"] stringValue] isEqualToString:titles[scenario]], @"A backup result changed when logging was optional.");
             NSArray* paths = [backup valueForKey:@"backupSessionPaths"];
-            requireInterface([paths count] == (scenario == 4 ? 0 : 2), @"A dated NEO backup folder is missing.");
+            requireInterface([paths count] == (scenario == 4 ? 0 : 2), @"A dated Neo backup folder is missing.");
             for (NSUInteger device = 0; device < [paths count]; ++device)
             {
                 NSString* log = [paths[device] stringByAppendingPathComponent:@"AlphaSync Backup Log.plist"];
@@ -533,11 +533,11 @@ static void checkBackupLogs(id controller, NSWindowController* backup)
                 NSArray* entries = contents[@"files"];
                 NSString* expected = scenario == 2 && device == 1 ? @"cancelled" :
                                      (scenario == 3 && device == 0 ? @"completed with failures" : @"complete");
-                requireInterface([contents[@"status"] isEqualToString:expected] && [entries count] == 2, @"A NEO log has the wrong final status or file count.");
+                requireInterface([contents[@"status"] isEqualToString:expected] && [entries count] == 2, @"A Neo log has the wrong final status or file count.");
                 for (NSDictionary* entry in entries)
                 {
-                    NSString* name = device == 0 ? @"First NEO" : @"Second NEO";
-                    requireInterface([entry[@"device"] isEqualToString:name], @"A log contains another NEO’s files.");
+                    NSString* name = device == 0 ? @"First Neo" : @"Second Neo";
+                    requireInterface([entry[@"device"] isEqualToString:name], @"A log contains another Neo’s files.");
                     if ([entry[@"status"] isEqualToString:@"saved"])
                         requireInterface([manager fileExistsAtPath:entry[@"path"]], @"A log lists a file that was not saved.");
                 }
@@ -562,26 +562,26 @@ static void checkBackupLogs(id controller, NSWindowController* backup)
         [originalLogs release];
         [manager removeItemAtPath:temporary error:nil];
     }
-    puts("Optional backup logs, dated destinations, separate NEOs, cancellation, failed exports, and empty backups passed.");
+    puts("Optional backup logs, dated destinations, separate Neos, cancellation, failed exports, and empty backups passed.");
 }
 
 static void captureBackupResults(NSWindowController* backup, NSString* directory, NSString* mode)
 {
-    NSArray* paths = @[@"/Users/Example/Documents/AlphaSync/My NEO/2026-11-08"];
+    NSArray* paths = @[@"/Users/Example/Documents/AlphaSync/My Neo/2026-11-08"];
     sampleBackupResult(backup, 8, 8, 0, 1, paths, @"complete");
     CGFloat shortHeight = NSHeight([[backup window] frame]);
     captureWindow([backup window], directory, [mode stringByAppendingString:@"-backup-complete"]);
     sampleBackupResult(backup, 8, 8, 2, 1, paths, @"complete");
     captureWindow([backup window], directory, [mode stringByAppendingString:@"-backup-incomplete"]);
     NSArray* longPaths = @[
-        @"/Users/Example/Documents/Writing and notes/AlphaSmart NEO backups/An unusually long backup folder name/My first NEO/2026-11-08",
-        @"/Users/Example/Documents/Writing and notes/AlphaSmart NEO backups/An unusually long backup folder name/My second NEO/2026-11-08 (1)"
+        @"/Users/Example/Documents/Writing and notes/AlphaSmart Neo backups/An unusually long backup folder name/My first Neo/2026-11-08",
+        @"/Users/Example/Documents/Writing and notes/AlphaSmart Neo backups/An unusually long backup folder name/My second Neo/2026-11-08 (1)"
     ];
     sampleBackupResult(backup, 16, 16, 0, 2, longPaths, @"complete");
     requireInterface(NSHeight([[backup window] frame]) > shortHeight, @"The backup sheet did not grow for multiple long locations.");
-    requireInterface([[[backup valueForKey:@"outletBackupItem"] stringValue] containsString:@"from 2 NEOs"] &&
+    requireInterface([[[backup valueForKey:@"outletBackupItem"] stringValue] containsString:@"from 2 Neos"] &&
                      [[[backup valueForKey:@"backupLocationsView"] arrangedSubviews] count] == 3 &&
-                     [[[backup valueForKey:@"openBackupButton"] title] isEqualToString:@"Open Backup Folders"], @"Multiple NEO backup locations are missing.");
+                     [[[backup valueForKey:@"openBackupButton"] title] isEqualToString:@"Open Backup Folders"], @"Multiple Neo backup locations are missing.");
     captureWindow([backup window], directory, [mode stringByAppendingString:@"-backup-locations"]);
     [backup performSelector:NSSelectorFromString(@"showBackupProgress")];
 }
@@ -595,7 +595,7 @@ static void capturePreferenceStatus(id controller, NSString* directory, NSString
     @try
     {
         // Display samples only.  Do not alter saved preferences or login-item registration.
-        [path setURL:[NSURL fileURLWithPath:@"/Users/Example/Documents/Writing and notes/AlphaSmart NEO backups/An unusually long backup folder name" isDirectory:YES]];
+        [path setURL:[NSURL fileURLWithPath:@"/Users/Example/Documents/Writing and notes/AlphaSmart Neo backups/An unusually long backup folder name" isDirectory:YES]];
         [controller setValue:@"The system could not register the automatic-launch helper.  Check the app’s location and permissions, then try again.  If approval is needed, open Login Items Settings and allow AlphaSync to run in the background."
                       forKey:@"automaticLaunchError"];
         [preferences performSelector:NSSelectorFromString(@"refreshAutomaticLaunchStatus:") withObject:nil];
@@ -656,7 +656,7 @@ static void checkAppearances(id controller, NSWindowController* backup, NSString
     }
     id device = [[[NSClassFromString(@"ASNode") alloc] init] autorelease];
     id file = [[[NSClassFromString(@"ASFileNode") alloc] performSelector:NSSelectorFromString(@"initForDisplay")] autorelease];
-    [device setValue:@"AlphaSmart NEO" forKey:@"displayName"];
+    [device setValue:@"AlphaSmart Neo" forKey:@"displayName"];
     [device setValue:@"Device" forKey:@"displayKind"];
     [device setValue:[NSImage imageWithSystemSymbolName:@"keyboard" accessibilityDescription:nil] forKey:@"icon"];
     [file setValue:@"Example document.txt" forKey:@"displayName"];
@@ -743,9 +743,9 @@ static void checkAppearances(id controller, NSWindowController* backup, NSString
             @"outletSystemRAM": aq_FormattedFileSize(299520),
             @"outletSystemROM": aq_FormattedFileSize(1048576),
             @"outletSystemVersion": @"3.6",
-            @"outletSystemBuild": @"System 3 NEO",
+            @"outletSystemBuild": @"System 3 Neo",
             @"outletSystemDate": @"2009-05-12",
-            @"outletSystemInfo": @"AlphaSmart NEO system software",
+            @"outletSystemInfo": @"AlphaSmart Neo system software",
             @"outletAppletDescription": @"AlphaWord Plus UK 3.3 (English (UK))",
             @"outletAppletInfo": @"Copyright (c) 2005–2009 by Renaissance Learning, Inc.",
             @"outletAppletFlags": @"Visible",
@@ -761,7 +761,7 @@ static void checkAppearances(id controller, NSWindowController* backup, NSString
         for (NSString* outlet in sizes)
             [[inspector valueForKey:outlet] setStringValue:sizes[outlet]];
         NSArray* panels = @[@"device", @"applet", @"file"];
-        NSArray* panelNames = @[@"AlphaSmart NEO", @"AlphaWord Plus UK", @"Example document.txt"];
+        NSArray* panelNames = @[@"AlphaSmart Neo", @"AlphaWord Plus UK", @"Example document.txt"];
         NSArray* panelSizes = @[@"", aq_FormattedFileSize(34704), aq_FormattedFileSize(31232)];
         NSArray* panelTypes = @[@"System 3.6", @"Version 3.3", @"AlphaWord Plus UK"];
         NSArray* panelIcons = @[@"icon-neo", @"icon-applet", @"icon-file-txt"];

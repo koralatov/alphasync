@@ -58,7 +58,7 @@ static NSStackView* ASAboutColumn(NSArray<NSView*>* views, CGFloat spacing)
         [compatibility setIdentifier:@"about-compatibility"];
         NSStackView* identity = ASAboutColumn(@[title, versionLabel, compatibility], 6);
 
-        NSTextField* description = ASAboutLabel(@"Transfer and back up\nAlphaSmart NEO files.",
+        NSTextField* description = ASAboutLabel(@"Transfer and back up\nAlphaSmart Neo files.",
                                                 [NSFont systemFontSize], [NSColor labelColor]);
         NSBox* separator = [[[NSBox alloc] initWithFrame:NSZeroRect] autorelease];
         [separator setBoxType:NSBoxSeparator];

@@ -111,8 +111,8 @@ static void checkImportLimits(NSString* directory)
         }
         CHECK([@"Small text" writeToFile:path atomically:YES encoding:NSUTF8StringEncoding error:nil]);
         for (unsigned failure : {1u, 2u, 3u, 4u})
-            checkImportRejection(path, create, failure, @"couldn’t read the NEO’s maximum file size");
-        checkImportRejection(path, create, 6, @"couldn’t check the NEO’s available memory");
+            checkImportRejection(path, create, failure, @"couldn’t read the Neo’s maximum file size");
+        checkImportRejection(path, create, 6, @"couldn’t check the Neo’s available memory");
         NSString* growing = [@"a " stringByPaddingToLength:10000 withString:@"a " startingAtIndex:0];
         CHECK([growing writeToFile:path atomically:YES encoding:NSUTF8StringEncoding error:nil]);
         checkImportRejection(path, create, 5, @"enough free memory");
