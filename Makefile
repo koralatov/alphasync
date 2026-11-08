@@ -5,6 +5,7 @@ CXXFLAGS ?= -std=c++17 -Wall -Wextra -Wpedantic -Werror -Wno-unknown-pragmas -g
 CORE_SOURCES := $(filter-out AlphaSync/Driver/ASDeviceFactory.cc,$(wildcard AlphaSync/Driver/*.cc))
 CORE_HEADERS := $(wildcard AlphaSync/Driver/*.h AlphaSync/Library/*.h)
 TEST_SOURCES := $(wildcard tests/*.cc)
+TEST_HEADERS := $(wildcard tests/*.h)
 
 .PHONY: test sanitize clean
 
@@ -14,11 +15,11 @@ test: build/core-tests
 sanitize: build/core-tests-sanitize
 	./build/core-tests-sanitize
 
-build/core-tests: $(CORE_SOURCES) $(CORE_HEADERS) $(TEST_SOURCES) Makefile
+build/core-tests: $(CORE_SOURCES) $(CORE_HEADERS) $(TEST_SOURCES) $(TEST_HEADERS) Makefile
 	@mkdir -p build
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(CORE_SOURCES) $(TEST_SOURCES) -o $@
 
-build/core-tests-sanitize: $(CORE_SOURCES) $(CORE_HEADERS) $(TEST_SOURCES) Makefile
+build/core-tests-sanitize: $(CORE_SOURCES) $(CORE_HEADERS) $(TEST_SOURCES) $(TEST_HEADERS) Makefile
 	@mkdir -p build
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -O1 -fsanitize=address,undefined -fno-omit-frame-pointer $(CORE_SOURCES) $(TEST_SOURCES) -o $@
 
@@ -67,7 +68,7 @@ build/device-factory.o: AlphaSync/Driver/ASDeviceFactory.cc $(CORE_HEADERS) Make
 	@mkdir -p build
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
-build/queue-tests build/text-tests: build/%: tests/%.mm $(QUEUE_SOURCES) $(wildcard AlphaSync/Application/*.h) $(CORE_SOURCES) $(CORE_HEADERS) build/device-factory.o AlphaSync/Library/AQTreeNode.m AlphaSync/Library/AQFileUtilities.m Makefile
+build/queue-tests build/text-tests: build/%: tests/%.mm $(TEST_HEADERS) $(QUEUE_SOURCES) $(wildcard AlphaSync/Application/*.h) $(CORE_SOURCES) $(CORE_HEADERS) build/device-factory.o AlphaSync/Library/AQTreeNode.m AlphaSync/Library/AQFileUtilities.m Makefile
 	@mkdir -p build
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -fblocks -x objective-c++ $< $(QUEUE_SOURCES) $(CORE_SOURCES) AlphaSync/Library/AQTreeNode.m AlphaSync/Library/AQFileUtilities.m -x none build/device-factory.o -framework Cocoa -framework IOKit -framework ServiceManagement -framework UniformTypeIdentifiers -o $@
 endif

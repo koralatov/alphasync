@@ -37,6 +37,9 @@
 #include "ASDevice.h"
 #include "ASMessage.h"
 #include "ASApplet.h"
+#include "ASSettings.h"
+#include <algorithm>
+#include <limits.h>
 
 #define kASMProtocolVersion 0x0230          /**< Minimum ASM protocol version that the device must support. */
 
@@ -119,6 +122,74 @@ namespace ts
     }
 
 
+    bool ASDevice::getFileSizeLimits(unsigned* minimum, unsigned* maximum, const ASApplet* applet)
+    {
+        *minimum = 0;
+        *maximum = UINT_MAX;
+        if (!applet) return false;
+        if (applet->appletID() != kASAppletID_AlphaWord) return true;
+
+        // A missing AlphaWord limit is unknown, never an unlimited allowance.
+        *maximum = 0;
+        uint8_t buffer[8192];
+        unsigned actual = 0;
+        if (!readSettings(buffer, &actual, sizeof buffer, applet, 0x0b)) return false;
+        ASSettings settings(buffer, actual);
+        ASSettingsItem item;
+        if (!settings.findSettingsItem(&item, kASSettingsType_Range32, kASSettingsIdent_AlphaWord_MaxFileSize) ||
+            item.length() < sizeof(uint32_t) || !item.dataU32()) return false;
+        *maximum = item.dataU32();
+        if (settings.findSettingsItem(&item, kASSettingsType_Range32, kASSettingsIdent_AlphaWord_MinFileSize) &&
+            item.length() >= sizeof(uint32_t)) *minimum = item.dataU32();
+        return *minimum <= *maximum;
+    }
+
+    bool ASDevice::checkFileWrite(unsigned size, const ASApplet* applet, int fileIndex, ASFileWriteError* error)
+    {
+        *error = ASFileWriteError();
+        error->required = size;
+        unsigned minimum = 0;
+        if (!getFileSizeLimits(&minimum, &error->maximum, applet))
+        {
+            error->failure = ASFileWriteFailure::LimitsUnavailable;
+            return false;
+        }
+        // The protocol carries the byte length in a 24-bit field.
+        error->maximum = std::min(error->maximum, 0xffffffu);
+        error->required = std::max(size, minimum);
+        if (error->required > error->maximum)
+        {
+            error->failure = ASFileWriteFailure::FileTooLarge;
+            return false;
+        }
+        unsigned freeRam = 0, freeRom = 0;
+        if (!systemMemory(&freeRam, &freeRom))
+        {
+            error->failure = ASFileWriteFailure::MemoryUnavailable;
+            return false;
+        }
+        error->available = freeRam > 1024 ? freeRam - 1024 : 0;
+        if (fileIndex >= 0)
+        {
+            ASFileAttributes current;
+            if (!getFileAttributes(&current, applet, fileIndex))
+            {
+                error->failure = ASFileWriteFailure::FileUnavailable;
+                return false;
+            }
+            // A replacement can reuse its existing allocation.  Keep the reserve
+            // for growth, but do not reject an unchanged or smaller allocation.
+            error->available += current.allocSize();
+        }
+        if (error->required > error->available)
+        {
+            error->failure = ASFileWriteFailure::InsufficientMemory;
+            return false;
+        }
+        return true;
+    }
+
+
     /** Create a new file.
      *
      *  @param  buffer      The buffer to read in to.
@@ -145,15 +216,15 @@ namespace ts
      *      --> REQUEST_CONFIRM_WRITE_FILE
      *      <-- RESPONSE_CONFIRM_WRITE_FILE
      */
-    bool ASDevice::createFile(const char* filename, const char* password, const void* buffer, unsigned size, const ASApplet* applet, int* fileIndex, bool raw)
+    bool ASDevice::createFile(const char* filename, const char* password, const void* buffer, unsigned size, const ASApplet* applet, int* fileIndex, bool raw, ASFileWriteError* error)
     {
+        ASFileWriteError localError;
+        if (!error) error = &localError;
+        if (!checkFileWrite(size, applet, -1, error)) return false;
+        error->failure = ASFileWriteFailure::DeviceError;
         unsigned appletRam;
         unsigned appletFileCount;
-        unsigned freeRam;
-        unsigned freeRom;
         if (!getAppletResourceUsage(&appletFileCount, &appletRam, applet)) return false;
-        if (!systemMemory(&freeRam, &freeRom)) return false;
-        if (size + 1024 > freeRam) return false;        // REVIEW: arbitrarily choosing to keep at least 1k unused on the device
 
         *fileIndex = (int)(appletFileCount + 1);
 
@@ -173,13 +244,14 @@ namespace ts
             message.init(ASMESSAGE_REQUEST_COMMIT);             // Sending this message appears to bind the attributes to a new
             message.setArgument((unsigned)*fileIndex, 4, 1);    // file - not sending it will still result in a new file, but
             message.setArgument(applet->appletID(), 5, 2);      // the attributes will not be correct.
-            result = sendRequestAndGetResponse(&message);
-            if (result && ASMESSAGE_RESPONSE_COMMIT == message.command())
+            result = sendRequestAndGetResponse(&message, ASMESSAGE_RESPONSE_COMMIT);
+            if (result)
             {
                 result = rawWriteFile(buffer, size, applet->appletID(), *fileIndex, raw);
             }
         }
 
+        if (result) error->failure = ASFileWriteFailure::None;
         return dialogueEnd(result);
     }
 
@@ -194,10 +266,15 @@ namespace ts
      *  @return             Logical false if there was an IO error. Note that appletIndex or fileIndex values
      *                      that are out of range will result in an IO error.
      */
-    bool ASDevice::writeFile(const void* buffer, unsigned size, const ASApplet* applet, int fileIndex, bool raw)
+    bool ASDevice::writeFile(const void* buffer, unsigned size, const ASApplet* applet, int fileIndex, bool raw, ASFileWriteError* error)
     {
+        ASFileWriteError localError;
+        if (!error) error = &localError;
+        if (!checkFileWrite(size, applet, fileIndex, error)) return false;
+        error->failure = ASFileWriteFailure::DeviceError;
         bool result = dialogueStart();
         if (result) result = rawWriteFile(buffer, size, applet->appletID(), fileIndex, raw);
+        if (result) error->failure = ASFileWriteFailure::None;
         return dialogueEnd(result);
     }
 
@@ -505,8 +582,8 @@ namespace ts
         message.init(ASMESSAGE_REQUEST_GET_USED_SPACE);
         message.setArgument(0x00000001, 1, 4);              // set zero to get the size of the largest file, non-zero for all files
         message.setArgument(applet->appletID(), 5, 2);
-        bool result = sendRequestAndGetResponse(&message);
-        if (result && message.command() == ASMESSAGE_RESPONSE_GET_USED_SPACE)
+        bool result = sendRequestAndGetResponse(&message, ASMESSAGE_RESPONSE_GET_USED_SPACE);
+        if (result)
         {
             *ram = message.argument(1, 4);
             *fc = message.argument(5, 2);
@@ -935,8 +1012,8 @@ namespace ts
         if (!dialogueStart()) return false;
 
         ASMessage message(ASMESSAGE_REQUEST_GET_AVAIL_SPACE);
-        bool result = sendRequestAndGetResponse(&message);
-        if (result && message.command() == ASMESSAGE_RESPONSE_GET_AVAIL_SPACE)
+        bool result = sendRequestAndGetResponse(&message, ASMESSAGE_RESPONSE_GET_AVAIL_SPACE);
+        if (result)
         {
             *rom = message.argument(1, 4);
             *ram = (message.argument(5, 2) * 256);

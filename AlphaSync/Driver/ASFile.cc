@@ -136,24 +136,26 @@ namespace ts
     }
 
 
-    bool ASFile::save(ASDevice* device, const ASApplet* applet, int fileIndex)
+    bool ASFile::save(ASDevice* device, const ASApplet* applet, int fileIndex, ASFileWriteError* error)
     {
+        if (error) { *error = ASFileWriteError(); error->failure = ASFileWriteFailure::DeviceError; }
         if (!confirmSave(device, applet, fileIndex)) return false;     // specialisation can choose to prevent save from occuring
 
-        return device->writeFile(m_fileData, m_fileSize, applet, fileIndex, true);
+        return device->writeFile(m_fileData, m_fileSize, applet, fileIndex, true, error);
     }
 
 
-    bool ASFile::save(ASDevice* device, const ASApplet* applet, const char* filename)
+    bool ASFile::save(ASDevice* device, const ASApplet* applet, const char* filename, ASFileWriteError* error)
     {
+        if (error) { *error = ASFileWriteError(); error->failure = ASFileWriteFailure::DeviceError; }
         int fileIndex = device->indexForFileWithName(applet, filename);
 
         if (!confirmSave(device, applet, fileIndex)) return false;     // specialisation can choose to prevent save from occuring
 
         // REVIEW: should we allow the password to be specified?
         bool result;
-        if (fileIndex < 0) result = device->createFile(filename, "write", m_fileData, m_fileSize, applet, &fileIndex, true);
-        else               result = device->writeFile(m_fileData, m_fileSize, applet, fileIndex, true);
+        if (fileIndex < 0) result = device->createFile(filename, "write", m_fileData, m_fileSize, applet, &fileIndex, true, error);
+        else               result = device->writeFile(m_fileData, m_fileSize, applet, fileIndex, true, error);
 
         return result;
     }

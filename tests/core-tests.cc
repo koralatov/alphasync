@@ -9,6 +9,7 @@
 #include "ASAlphaWordFile.h"
 #include "ASGenericFile.h"
 #include "ASUserDictionaryFile.h"
+#include "file-write-device.h"
 
 // Keep these checks active in release builds, too.  A failed check must stop the test.
 #define CHECK(condition) do { if (!(condition)) { \
@@ -428,8 +429,86 @@ static void testFullDictionaryImportPreservesData()
     CHECK(dictionary.containsWord("original"));
 }
 
+static void testFileWriteLimits()
+{
+    ts::ASApplet applet = FileWriteDevice::alphaWord();
+    const std::vector<uint8_t> payload(51200, 'a');
+    for (bool create : {false, true})
+    {
+        auto write = [&](FileWriteDevice& device, unsigned size, ts::ASFileWriteError& error) {
+            int index = 1;
+            return create ? device.createFile("New", "write", payload.data(), size, &applet, &index, true, &error) :
+                            device.writeFile(payload.data(), size, &applet, index, true, &error);
+        };
+        for (unsigned size : {51201u, 2u * 1024 * 1024, UINT_MAX})
+        {
+            FileWriteDevice device;
+            const auto original = device.saved;
+            ts::ASFileWriteError error;
+            CHECK(!write(device, size, error));
+            CHECK(error.failure == ts::ASFileWriteFailure::FileTooLarge && error.maximum == 51200);
+            CHECK(!device.attributeWrites && !device.fileWrites && device.saved == original);
+        }
+        for (unsigned failure = 0; failure < 5; ++failure)
+        {
+            FileWriteDevice device;
+            if (failure == 0) device.settingsReadable = false;
+            if (failure == 1) device.maximumPresent = false;
+            if (failure == 2) device.maximumBytes = 2;
+            if (failure == 3) device.maximum = 0;
+            if (failure == 4) device.minimum = device.maximum + 1;
+            ts::ASFileWriteError error;
+            CHECK(!write(device, 512, error));
+            CHECK(error.failure == ts::ASFileWriteFailure::LimitsUnavailable);
+            CHECK(!device.attributeWrites && !device.fileWrites);
+        }
+        FileWriteDevice full;
+        full.allocation = 0;
+        full.freeRAM = 1280;
+        ts::ASFileWriteError error;
+        CHECK(!write(full, 512, error));
+        CHECK(error.failure == ts::ASFileWriteFailure::InsufficientMemory && error.available == 256);
+        CHECK(!full.attributeWrites && !full.fileWrites);
+        full.freeRAM = 1536; // Exactly the file plus the reserve.
+        CHECK(write(full, 512, error) && error.failure == ts::ASFileWriteFailure::None);
+
+        FileWriteDevice unavailable;
+        unavailable.memoryReadable = false;
+        CHECK(!write(unavailable, 512, error));
+        CHECK(error.failure == ts::ASFileWriteFailure::MemoryUnavailable && !unavailable.fileWrites);
+
+        FileWriteDevice boundary;
+        CHECK(write(boundary, 51200, error));
+        CHECK(error.failure == ts::ASFileWriteFailure::None && boundary.saved == payload);
+        FileWriteDevice protocol;
+        protocol.maximum = UINT_MAX;
+        CHECK(!write(protocol, UINT_MAX, error));
+        CHECK(error.failure == ts::ASFileWriteFailure::FileTooLarge && error.maximum == 0xffffff);
+        CHECK(!protocol.attributeWrites && !protocol.fileWrites);
+        if (create)
+        {
+            FileWriteDevice unreadableCount;
+            unreadableCount.usageReadable = false;
+            CHECK(!write(unreadableCount, 512, error));
+            CHECK(error.failure == ts::ASFileWriteFailure::DeviceError);
+            CHECK(!unreadableCount.attributeWrites && !unreadableCount.fileWrites);
+        }
+    }
+    FileWriteDevice shrinking;
+    shrinking.allocation = 8192;
+    shrinking.freeRAM = 0;
+    ts::ASFileWriteError error;
+    CHECK(shrinking.writeFile(payload.data(), 8192, &applet, 1, true, &error));
+    CHECK(shrinking.writeFile(payload.data(), 512, &applet, 1, true, &error));
+    FileWriteDevice missing;
+    missing.filePresent = false;
+    CHECK(!missing.writeFile(payload.data(), 512, &applet, 1, true, &error));
+    CHECK(error.failure == ts::ASFileWriteFailure::FileUnavailable && !missing.fileWrites);
+}
+
 int main()
 {
+    testFileWriteLimits();
     testAlphaWordRoundTrip();
     testAlphaWordLineEndings();
     testUnsupportedTextPreservesData();

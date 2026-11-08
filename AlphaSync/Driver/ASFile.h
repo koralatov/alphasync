@@ -140,7 +140,7 @@ namespace ts
          *  @param  fileIndex   the file index.
          *  @return             Logical true if the file was saved.
          */
-        bool save(ASDevice* device, const ASApplet* applet, int fileIndex);
+        bool save(ASDevice* device, const ASApplet* applet, int fileIndex, ASFileWriteError* error=nullptr);
 
 
         /** Save the file directly to the device. The named file will be created
@@ -151,7 +151,7 @@ namespace ts
          *  @param  filename    The filename. Case is preserved, but matching is case insensitive.
          *  @return             Logical true if the file was saved.
          */
-        bool save(ASDevice* device, const ASApplet* applet, const char* filename);
+        bool save(ASDevice* device, const ASApplet* applet, const char* filename, ASFileWriteError* error=nullptr);
 
 
         /** Return the number of bytes of data in the file. This remains

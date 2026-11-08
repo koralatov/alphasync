@@ -42,6 +42,21 @@
 
 namespace ts
 {
+    enum class ASFileWriteFailure
+    {
+        None, LimitsUnavailable, FileTooLarge, MemoryUnavailable,
+        FileUnavailable, InsufficientMemory, DeviceError
+    };
+
+    // Validation describes the converted NEO data, before any file-writing command.
+    struct ASFileWriteError
+    {
+        ASFileWriteFailure failure = ASFileWriteFailure::None;
+        unsigned required = 0;
+        unsigned maximum = 0;
+        uint64_t available = 0;
+    };
+
     /** Device object. This represents a single physical instance of a Neo or similar device in comms mode.
      *
      *  Device objects may only be created or destroyed by an instance of ASDeviceFactory, which
@@ -94,8 +109,10 @@ namespace ts
         }
         unsigned fileSize(const ASApplet* applet, int fileIndex);
         bool readFile(void* buffer, unsigned size, unsigned* actual, const ASApplet* applet, int fileIndex, bool raw);
-        bool createFile(const char* filename, const char* password, const void* buffer, unsigned size, const ASApplet* applet, int* fileIndex, bool raw);
-        bool writeFile(const void* buffer, unsigned size, const ASApplet* applet, int fileIndex, bool raw);
+        // False means AlphaWord's limits could not be established, not unlimited.
+        bool getFileSizeLimits(unsigned* minimum, unsigned* maximum, const ASApplet* applet);
+        bool createFile(const char* filename, const char* password, const void* buffer, unsigned size, const ASApplet* applet, int* fileIndex, bool raw, ASFileWriteError* error=nullptr);
+        bool writeFile(const void* buffer, unsigned size, const ASApplet* applet, int fileIndex, bool raw, ASFileWriteError* error=nullptr);
 
         bool clearAllFiles(const ASApplet* applet);
         bool clearFile(const ASApplet* applet, int fileIndex);
@@ -144,6 +161,8 @@ namespace ts
 
 
     private:
+
+        bool checkFileWrite(unsigned size, const ASApplet* applet, int fileIndex, ASFileWriteError* error);
 
         uint8_t* m_appletHeaderData;                        /**< Locally cached copy of the applet header data. */
         unsigned m_appletHeaderCount;                       /**< The number of applet headers present on the device. */
