@@ -29,50 +29,113 @@
  *
  */
 #import "ASInspectorWindowController.h"
-#import "ASDeviceNode.h"
 #import "ASAppletNode.h"
 #import "ASFileNode.h"
-#import "ASDevice.h"
 #import "AQFileUtilities.h"
 
 using namespace ts;
 
-// Replace colours archived by the old nib with semantic colours.  AppKit resolves
-// these again when the system appearance or accessibility settings change.
-static void useSystemColours(NSView* view)
+static const CGFloat ASInspectorWidth = 320;
+
+static NSTextField* ASInspectorValue(void)
 {
-    if ([view isKindOfClass:[NSTextField class]])
-    {
-        NSTextField* text = (NSTextField*)view;
-        [text setTextColor:[NSColor labelColor]];
-        [text setBackgroundColor:[NSColor textBackgroundColor]];
-    }
-    if ([view isKindOfClass:[NSBox class]])
-        [[(NSBox*)view titleCell] setTextColor:[NSColor labelColor]];
-    for (NSView* child in [view subviews]) useSystemColours(child);
+    NSTextField* field = [NSTextField wrappingLabelWithString:@""];
+    [field setFont:[NSFont systemFontOfSize:[NSFont systemFontSize]]];
+    [field setSelectable:YES];
+    [field setContentCompressionResistancePriority:NSLayoutPriorityDefaultLow forOrientation:NSLayoutConstraintOrientationHorizontal];
+    [field setContentCompressionResistancePriority:NSLayoutPriorityRequired forOrientation:NSLayoutConstraintOrientationVertical];
+    return field;
 }
 
-@implementation ASInspectorWindowController
+static NSTextField* ASInspectorHeading(NSString* title)
+{
+    NSTextField* field = [NSTextField labelWithString:title];
+    [field setFont:[NSFont systemFontOfSize:[NSFont systemFontSize] weight:NSFontWeightSemibold]];
+    [field setAccessibilityRole:NSAccessibilityHeadingRole];
+    return field;
+}
 
+static NSStackView* ASInspectorColumn(NSArray<NSView*>* views, CGFloat spacing)
+{
+    NSStackView* stack = [NSStackView stackViewWithViews:views];
+    [stack setOrientation:NSUserInterfaceLayoutOrientationVertical];
+    [stack setAlignment:NSLayoutAttributeLeading];
+    [stack setDistribution:NSStackViewDistributionFill];
+    [stack setSpacing:spacing];
+    [stack setDetachesHiddenViews:YES];
+    [stack setTranslatesAutoresizingMaskIntoConstraints:NO];
+    for (NSView* view in views)
+        [[view widthAnchor] constraintEqualToAnchor:[stack widthAnchor]].active = YES;
+    return stack;
+}
+
+static NSView* ASInspectorInset(NSView* view, CGFloat vertical)
+{
+    NSView* container = [[[NSView alloc] initWithFrame:NSZeroRect] autorelease];
+    [view setTranslatesAutoresizingMaskIntoConstraints:NO];
+    [container addSubview:view];
+    [NSLayoutConstraint activateConstraints:@[
+        [[view leadingAnchor] constraintEqualToAnchor:[container leadingAnchor] constant:16],
+        [[view trailingAnchor] constraintEqualToAnchor:[container trailingAnchor] constant:-16],
+        [[view topAnchor] constraintEqualToAnchor:[container topAnchor] constant:vertical],
+        [[view bottomAnchor] constraintEqualToAnchor:[container bottomAnchor] constant:-vertical]
+    ]];
+    return container;
+}
+
+static NSBox* ASInspectorSeparator(void)
+{
+    NSBox* box = [[[NSBox alloc] initWithFrame:NSZeroRect] autorelease];
+    [box setBoxType:NSBoxSeparator];
+    [[box heightAnchor] constraintEqualToConstant:1].active = YES;
+    return box;
+}
+
+static NSGridView* ASInspectorDetails(NSArray<NSString*>* labels, NSArray<NSTextField*>* values)
+{
+    NSMutableArray* rows = [NSMutableArray array];
+    for (NSUInteger index = 0; index < [labels count]; ++index)
+    {
+        NSTextField* label = [NSTextField labelWithString:labels[index]];
+        [label setAlignment:NSTextAlignmentRight];
+        [rows addObject:@[label, values[index]]];
+    }
+    NSGridView* grid = [NSGridView gridViewWithViews:rows];
+    [grid setColumnSpacing:6];
+    [grid setRowSpacing:5];
+    [grid setRowAlignment:NSGridRowAlignmentFirstBaseline];
+    [[grid columnAtIndex:0] setWidth:104];
+    [[grid columnAtIndex:0] setXPlacement:NSGridCellPlacementTrailing];
+    [[grid columnAtIndex:1] setXPlacement:NSGridCellPlacementFill];
+    return grid;
+}
+
+@interface ASInspectorWindowController ()
+- (void)buildWindow;
+- (void)fitWindowToContent;
+- (void)configureDisplay;
+- (void)configurePanelsToShowSystem:(BOOL)system showApplet:(BOOL)applet showFile:(BOOL)file;
+@end
+
+@implementation ASInspectorWindowController
 
 - (id)init
 {
     return [self initWithDisplay:nil];
 }
 
-
 - (id)initWithDisplay:(NSArray*)nodes
 {
-    if ((self = [super initWithWindowNibName:@"Inspector"]))
+    if ((self = [super initWithWindow:nil]))
     {
-        displayNodes = [nodes retain];
+        displayNodes = [nodes copy];
         iconNothing = [[NSImage imageWithSystemSymbolName:@"doc" accessibilityDescription:@"No Selection"] retain];
-
-        for (int i = 0; i < kASInspectorMaxBox; i++)  showBox[i] = TRUE;
+        [self buildWindow];
+        [self configureDisplay];
+        [[self window] center];
     }
     return self;
 }
-
 
 - (void)dealloc
 {
@@ -81,69 +144,140 @@ static void useSystemColours(NSView* view)
     [super dealloc];
 }
 
+- (void)buildWindow
+{
+    NSWindow* window = [[[NSWindow alloc] initWithContentRect:NSMakeRect(0, 0, ASInspectorWidth, 500)
+                                                  styleMask:NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskMiniaturizable
+                                                    backing:NSBackingStoreBuffered defer:NO] autorelease];
+    [window setTitle:@"Inspector"];
+    [window setReleasedWhenClosed:NO];
+    [window setAutorecalculatesKeyViewLoop:YES];
+    [self setWindow:window];
+
+    outletMainIcon = [[[NSImageView alloc] initWithFrame:NSZeroRect] autorelease];
+    [outletMainIcon setImageScaling:NSImageScaleProportionallyUpOrDown];
+    [[outletMainIcon widthAnchor] constraintEqualToConstant:48].active = YES;
+    [[outletMainIcon heightAnchor] constraintEqualToConstant:48].active = YES;
+    outletMainName = ASInspectorValue();
+    [outletMainName setFont:[NSFont systemFontOfSize:[NSFont systemFontSize] weight:NSFontWeightSemibold]];
+    outletMainType = ASInspectorValue();
+    [outletMainType setTextColor:[NSColor secondaryLabelColor]];
+    outletMainSize = [NSTextField labelWithString:@""];
+    [outletMainSize setFont:[NSFont systemFontOfSize:[NSFont systemFontSize] weight:NSFontWeightSemibold]];
+    [outletMainSize setSelectable:YES];
+    [outletMainSize setAlignment:NSTextAlignmentRight];
+    [outletMainSize setContentCompressionResistancePriority:NSLayoutPriorityRequired forOrientation:NSLayoutConstraintOrientationHorizontal];
+    outletMainRamRom = [NSTextField labelWithString:@""];
+    [outletMainRamRom setAlignment:NSTextAlignmentRight];
+    [outletMainRamRom setTextColor:[NSColor secondaryLabelColor]];
+    NSGridView* summary = [NSGridView gridViewWithViews:@[@[outletMainName, outletMainSize], @[outletMainType, outletMainRamRom]]];
+    [summary setColumnSpacing:8];
+    [summary setRowSpacing:4];
+    [summary setRowAlignment:NSGridRowAlignmentFirstBaseline];
+    [[summary columnAtIndex:0] setXPlacement:NSGridCellPlacementFill];
+    [[summary columnAtIndex:1] setXPlacement:NSGridCellPlacementTrailing];
+    [summary setContentHuggingPriority:NSLayoutPriorityDefaultLow forOrientation:NSLayoutConstraintOrientationHorizontal];
+    NSStackView* header = [NSStackView stackViewWithViews:@[outletMainIcon, summary]];
+    [header setOrientation:NSUserInterfaceLayoutOrientationHorizontal];
+    [header setAlignment:NSLayoutAttributeCenterY];
+    [header setDistribution:NSStackViewDistributionFill];
+    [header setSpacing:12];
+
+    previewHeading = ASInspectorHeading(@"Preview:");
+    detailsHeading = ASInspectorHeading(@"More Info:");
+    previewContainer = [[[NSView alloc] initWithFrame:NSZeroRect] autorelease];
+    [[previewContainer heightAnchor] constraintEqualToConstant:180].active = YES;
+    previewScrollView = [[[NSScrollView alloc] initWithFrame:NSMakeRect(0, 0, ASInspectorWidth - 32, 180)] autorelease];
+    [previewScrollView setBorderType:NSBezelBorder];
+    [previewScrollView setHasVerticalScroller:YES];
+    [previewScrollView setAutohidesScrollers:YES];
+    NSSize previewSize = [previewScrollView contentSize];
+    outletPreviewAsText = [[[NSTextView alloc] initWithFrame:NSMakeRect(0, 0, previewSize.width, previewSize.height)] autorelease];
+    [outletPreviewAsText setEditable:NO];
+    [outletPreviewAsText setSelectable:YES];
+    [outletPreviewAsText setRichText:NO];
+    [outletPreviewAsText setImportsGraphics:NO];
+    [outletPreviewAsText setFont:[NSFont systemFontOfSize:[NSFont systemFontSize]]];
+    [outletPreviewAsText setTextColor:[NSColor textColor]];
+    [outletPreviewAsText setBackgroundColor:[NSColor textBackgroundColor]];
+    [outletPreviewAsText setTextContainerInset:NSMakeSize(6, 6)];
+    [outletPreviewAsText setMinSize:NSMakeSize(0, previewSize.height)];
+    [outletPreviewAsText setMaxSize:NSMakeSize(CGFLOAT_MAX, CGFLOAT_MAX)];
+    [outletPreviewAsText setVerticallyResizable:YES];
+    [outletPreviewAsText setHorizontallyResizable:NO];
+    [outletPreviewAsText setAutoresizingMask:NSViewWidthSizable];
+    [[outletPreviewAsText textContainer] setContainerSize:NSMakeSize(previewSize.width, CGFLOAT_MAX)];
+    [[outletPreviewAsText textContainer] setWidthTracksTextView:YES];
+    [[outletPreviewAsText textContainer] setHeightTracksTextView:NO];
+    [previewScrollView setDocumentView:outletPreviewAsText];
+    [previewScrollView setTranslatesAutoresizingMaskIntoConstraints:NO];
+    [previewContainer addSubview:previewScrollView];
+    outletPreviewAsIcon = [[[NSImageView alloc] initWithFrame:NSZeroRect] autorelease];
+    [outletPreviewAsIcon setImageScaling:NSImageScaleProportionallyUpOrDown];
+    [outletPreviewAsIcon setTranslatesAutoresizingMaskIntoConstraints:NO];
+    [previewContainer addSubview:outletPreviewAsIcon];
+    [NSLayoutConstraint activateConstraints:@[
+        [[previewScrollView leadingAnchor] constraintEqualToAnchor:[previewContainer leadingAnchor]],
+        [[previewScrollView trailingAnchor] constraintEqualToAnchor:[previewContainer trailingAnchor]],
+        [[previewScrollView topAnchor] constraintEqualToAnchor:[previewContainer topAnchor]],
+        [[previewScrollView bottomAnchor] constraintEqualToAnchor:[previewContainer bottomAnchor]],
+        [[outletPreviewAsIcon widthAnchor] constraintEqualToConstant:128],
+        [[outletPreviewAsIcon heightAnchor] constraintEqualToConstant:128],
+        [[outletPreviewAsIcon centerXAnchor] constraintEqualToAnchor:[previewContainer centerXAnchor]],
+        [[outletPreviewAsIcon centerYAnchor] constraintEqualToAnchor:[previewContainer centerYAnchor]]
+    ]];
+
+    outletSystemVersion = ASInspectorValue(); outletSystemBuild = ASInspectorValue();
+    outletSystemDate = ASInspectorValue(); outletSystemInfo = ASInspectorValue();
+    outletSystemRAM = ASInspectorValue(); outletSystemROM = ASInspectorValue();
+    systemDetails = ASInspectorDetails(@[@"System version:", @"Build:", @"Build date:", @"Info:", @"Available RAM:", @"Available ROM:"],
+                                      @[outletSystemVersion, outletSystemBuild, outletSystemDate, outletSystemInfo, outletSystemRAM, outletSystemROM]);
+    outletAppletDescription = ASInspectorValue(); outletAppletInfo = ASInspectorValue();
+    outletAppletFlags = ASInspectorValue(); outletAppletROM = ASInspectorValue();
+    outletAppletRAM1 = ASInspectorValue(); outletAppletRAM2 = ASInspectorValue();
+    outletAppletMinFileSize = ASInspectorValue(); outletAppletMaxFileSize = ASInspectorValue();
+    appletDetails = ASInspectorDetails(@[@"Description:", @"Copyright:", @"Visibility:", @"Minimum size:", @"Maximum size:", @"ROM usage:", @"Workspace RAM:", @"File RAM:"],
+                                      @[outletAppletDescription, outletAppletInfo, outletAppletFlags, outletAppletMinFileSize, outletAppletMaxFileSize,
+                                        outletAppletROM, outletAppletRAM1, outletAppletRAM2]);
+    outletFilePassword = ASInspectorValue(); outletFileRam = ASInspectorValue(); outletFileKey = ASInspectorValue();
+    fileDetails = ASInspectorDetails(@[@"Password:", @"RAM usage:", @"Bound to key:"], @[outletFilePassword, outletFileRam, outletFileKey]);
+    emptyDetails = [NSTextField wrappingLabelWithString:@"Select one item to view its information."];
+    [emptyDetails setTextColor:[NSColor secondaryLabelColor]];
+    NSStackView* details = ASInspectorColumn(@[systemDetails, appletDetails, fileDetails, emptyDetails], 0);
+    NSStackView* sections = ASInspectorColumn(@[
+        ASInspectorInset(header, 16), ASInspectorSeparator(),
+        ASInspectorInset(ASInspectorColumn(@[previewHeading, previewContainer], 10), 12), ASInspectorSeparator(),
+        ASInspectorInset(ASInspectorColumn(@[detailsHeading, details], 10), 12)
+    ], 0);
+    NSView* content = [window contentView];
+    [content addSubview:sections];
+    [NSLayoutConstraint activateConstraints:@[
+        [[sections widthAnchor] constraintEqualToConstant:ASInspectorWidth],
+        [[sections leadingAnchor] constraintEqualToAnchor:[content leadingAnchor]],
+        [[sections trailingAnchor] constraintEqualToAnchor:[content trailingAnchor]],
+        [[sections topAnchor] constraintEqualToAnchor:[content topAnchor]],
+        [[sections bottomAnchor] constraintEqualToAnchor:[content bottomAnchor]]
+    ]];
+}
+
+- (void)fitWindowToContent
+{
+    NSWindow* window = [self window];
+    [[window contentView] layoutSubtreeIfNeeded];
+    NSSize size = [[window contentView] fittingSize];
+    NSRect frame = [window frame];
+    [window setContentSize:size];
+    [window setFrameOrigin:NSMakePoint(NSMinX(frame), NSMaxY(frame) - NSHeight([window frame]))];
+}
 
 - (void)configurePanelsToShowSystem:(BOOL)showSystem showApplet:(BOOL)showApplet showFile:(BOOL)showFile
 {
-    BOOL showPreview = ([outletShowPreviewDisclosure state] == NSControlStateValueOn);
-    BOOL showDetail = ([outletShowDetailDisclosure state] == NSControlStateValueOn);
-
-    for (int i = 0; i < kASInspectorMaxBox; i++)  showBox[i] = TRUE;
-    showBox[kASInspectorBoxPreview] = showPreview;
-    showBox[kASInspectorBoxDetailSystem] = showDetail && showSystem;
-    showBox[kASInspectorBoxDetailApplet] = showDetail && showApplet;
-    showBox[kASInspectorBoxDetailFile] = showDetail && showFile;
-
-
-    // get the original settings for reestablishing later:
-    NSUInteger sizingMasks[kASInspectorMaxBox];
-    for (int i = 0; i < kASInspectorMaxBox; i++)
-    {
-        sizingMasks[i] = [boxes[i] autoresizingMask];
-        [boxes[i] setAutoresizingMask:NSViewNotSizable];
-    }
-
-    float displacement = 0.0;
-
-    NSRect dynamicFrame[kASInspectorMaxBox];
-    for (int i = 0; i < kASInspectorMaxBox; i++) dynamicFrame[i] = boxFrame[i];
-
-    for (int i = 0; i < kASInspectorMaxBox; i++)
-    {
-        if (!showBox[i])
-        {
-            for (int j = 0; j < i; j++)
-            {
-                dynamicFrame[j].origin.y -= boxFrame[i].size.height;
-            }
-            displacement += boxFrame[i].size.height;
-            [boxes[i] setHidden:YES];
-        }
-        else
-        {
-            [boxes[i] setHidden:NO];
-        }
-    }
-
-    for (int i = 0; i < kASInspectorMaxBox; i++)
-    {
-        [boxes[i] setFrame:dynamicFrame[i]];
-    }
-
-    NSRect currentWindowFrame = [[self window] frame];
-    float oldHeight = currentWindowFrame.size.height;
-    float newHeight = windowFrame.size.height - displacement;
-    currentWindowFrame.size.height = newHeight;
-    currentWindowFrame.origin.y -= (newHeight - oldHeight);
-
-    [[self window] setFrame:currentWindowFrame display:YES];
-    [[self window] display];
-
-    for (int i = 0; i < kASInspectorMaxBox; i++)
-    {
-        [boxes[i] setAutoresizingMask:sizingMasks[i]];
-    }
+    [systemDetails setHidden:!showSystem];
+    [appletDetails setHidden:!showApplet];
+    [fileDetails setHidden:!showFile];
+    [emptyDetails setHidden:showSystem || showApplet || showFile];
+    [self fitWindowToContent];
 }
-
 
 - (void)setDetailSystem:(ASDeviceNode*)deviceNode setMain:(BOOL)setMain
 {
@@ -241,8 +375,8 @@ static void useSystemColours(NSView* view)
                             ((max == UINT_MAX) ? @"unlimited" : aq_FormattedByteCount(max));
 
         appletROM = aq_FormattedByteCount(applet->appletRomSize());
-        appletRAM1 = [NSString stringWithFormat:@"%@ (workspace)", aq_FormattedByteCount(applet->appletRamSize())];
-        appletRAM2 = [NSString stringWithFormat:@"%@ (files)", aq_FormattedByteCount([appletNode ramUsed])];
+        appletRAM1 = aq_FormattedByteCount(applet->appletRamSize());
+        appletRAM2 = aq_FormattedByteCount([appletNode ramUsed]);
     }
 
     if (setMain)
@@ -304,143 +438,73 @@ static void useSystemColours(NSView* view)
 
 - (void)configureDisplay
 {
-    if (!completedAwakeFromNib) return;
-
-    if (nil == displayNodes || [displayNodes count] == 0)
+    [self setDetailSystem:nil setMain:NO];
+    [self setDetailApplet:nil setMain:NO];
+    [self setDetailFile:nil setMain:NO];
+    [outletMainName setStringValue:@"No Selection"];
+    [outletMainType setStringValue:@"Select an item"];
+    [outletMainRamRom setStringValue:@""];
+    [outletMainSize setStringValue:@""];
+    [outletMainIcon setImage:iconNothing];
+    [outletPreviewAsIcon setImage:iconNothing];
+    [outletPreviewAsText setString:@""];
+    [previewScrollView setHidden:YES];
+    [outletPreviewAsIcon setHidden:NO];
+    BOOL system = NO, applet = NO, file = NO;
+    if ([displayNodes count] == 1)
     {
-        // Nothing selected
-        [self configurePanelsToShowSystem:NO showApplet:NO showFile:NO];
-        [outletMainIcon setImage:iconNothing];
-        [outletMainName setStringValue:@"nothing selected"];
-        [outletMainType setStringValue:@""];
-        [outletMainRamRom setStringValue:@""];
-        [outletMainSize setStringValue:@""];
-        [outletPreviewAsIcon setImage:iconNothing];
-        [outletPreviewAsText setHidden:YES];
-        [outletPreviewAsIcon setHidden:NO];
-    }
-    else if ([displayNodes count] == 1)
-    {
-        // Single selection
-        id item = [displayNodes objectAtIndex:0];
-        [outletMainIcon setImage:[item largeIcon]];
-
-        NSString* previewString = nil;
-        if ([item respondsToSelector:@selector(filePreview)]) previewString = [item filePreview];
-        if (previewString)
+        ASNode* item = [displayNodes objectAtIndex:0];
+        NSImage* icon = [item largeIcon] ?: iconNothing;
+        [outletMainIcon setImage:icon];
+        [outletPreviewAsIcon setImage:icon];
+        if ([item respondsToSelector:@selector(filePreview)])
         {
-            [outletPreviewAsText setStringValue:previewString];
-            [outletPreviewAsText setHidden:NO];
-            [outletPreviewAsIcon setHidden:YES];
+            NSString* preview = [(ASFileNode*)item filePreview];
+            if (preview)
+            {
+                [outletPreviewAsText setString:preview];
+                [outletPreviewAsText scrollRangeToVisible:NSMakeRange(0, 0)];
+                [previewScrollView setHidden:NO];
+                [outletPreviewAsIcon setHidden:YES];
+            }
         }
-        else
+        if ([item isKindOfClass:[ASFileNode class]])
         {
-            [outletPreviewAsIcon setImage:[item largeIcon]];
-            [outletPreviewAsText setHidden:YES];
-            [outletPreviewAsIcon setHidden:NO];
+            file = YES;
+            [self setDetailFile:(ASFileNode*)item setMain:YES];
         }
-
-        if ([item isMemberOfClass:[ASFileNode class]])
+        else if ([item isKindOfClass:[ASAppletNode class]])
         {
-            ASFileNode* fileNode = item;
-            ASAppletNode* appletNode = [fileNode appletNode];
-            ASDeviceNode* deviceNode = [appletNode deviceNode];
-            [self configurePanelsToShowSystem:NO showApplet:NO showFile:YES];
-            [self setDetailFile:fileNode setMain:YES];
-            [self setDetailApplet:appletNode setMain:NO];
-            [self setDetailSystem:deviceNode setMain:NO];
+            applet = YES;
+            [self setDetailApplet:(ASAppletNode*)item setMain:YES];
         }
-        else if ([item isMemberOfClass:[ASAppletNode class]])
+        else if ([item isKindOfClass:[ASDeviceNode class]])
         {
-            ASFileNode* fileNode = nil;
-            ASAppletNode* appletNode = item;
-            ASDeviceNode* deviceNode = [appletNode deviceNode];
-            [self configurePanelsToShowSystem:NO showApplet:YES showFile:NO];
-            [self setDetailFile:fileNode setMain:NO];
-            [self setDetailApplet:appletNode setMain:YES];
-            [self setDetailSystem:deviceNode setMain:NO];
-        }
-        else if ([item isMemberOfClass:[ASDeviceNode class]])
-        {
-            ASFileNode* fileNode = nil;
-            ASAppletNode* appletNode = nil;
-            ASDeviceNode* deviceNode = item;
-            [self configurePanelsToShowSystem:YES showApplet:NO showFile:NO];
-            [self setDetailFile:fileNode setMain:NO];
-            [self setDetailApplet:appletNode setMain:NO];
-            [self setDetailSystem:deviceNode setMain:YES];
+            system = YES;
+            [self setDetailSystem:(ASDeviceNode*)item setMain:YES];
         }
     }
-    else
+    else if ([displayNodes count] > 1)
     {
-        // Multiple selection
-        [outletMainName setStringValue:@"multiple items"];
-        [self configurePanelsToShowSystem:NO showApplet:NO showFile:NO];
-
+        [outletMainName setStringValue:@"Multiple Items"];
+        [outletMainType setStringValue:[NSString stringWithFormat:@"%lu items selected", (unsigned long)[displayNodes count]]];
     }
+    [self configurePanelsToShowSystem:system showApplet:applet showFile:file];
 }
-
-- (void)awakeFromNib
-{
-    useSystemColours([[self window] contentView]);
-    [outletPreviewAsText setTextColor:[NSColor textColor]];
-    windowFrame = [[self window] frame];
-    boxes[kASInspectorBoxMain] = outletBox0;
-    boxes[kASInspectorBoxShowPreview] = outletBox1;
-    boxes[kASInspectorBoxPreview] = outletBox2;
-    boxes[kASInspectorBoxShowDetail] = outletBox3;
-    boxes[kASInspectorBoxDetailSystem] = outletBox4;
-    boxes[kASInspectorBoxDetailApplet] = outletBox5;
-    boxes[kASInspectorBoxDetailFile] = outletBox6;
-
-    for (int i = 0; i < kASInspectorMaxBox; i++)
-    {
-        boxFrame[i] = [boxes[i] frame];
-    }
-
-    completedAwakeFromNib = TRUE;
-    [self configureDisplay];
-}
-
 
 - (void)setDisplay:(NSArray*)nodes
 {
     if (nodes != displayNodes)
     {
         [displayNodes release];
-        displayNodes = [nodes retain];
-        [self configureDisplay];
+        displayNodes = [nodes copy];
     }
+    [self configureDisplay];
 }
-
 
 - (void)clearDisplay
 {
-    if (displayNodes)
-    {
-        [displayNodes release];
-        [self configureDisplay];
-
-    }
+    [self setDisplay:nil];
 }
-
-
-#pragma mark    ----------  Actions  -----------
-
-- (IBAction)actionPreviewDisclosure:(id)sender
-{
-    (void)sender;
-    [self configureDisplay];
-}
-
-
-- (IBAction)actionDetailDisclosure:(id)sender
-{
-    (void)sender;
-    [self configureDisplay];
-}
-
 
 @end
-
-

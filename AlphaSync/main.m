@@ -612,6 +612,34 @@ static void capturePreferenceStatus(id controller, NSString* directory, NSString
     }
 }
 
+static void checkInspectorLayout(id inspector)
+{
+    NSView* content = [[inspector window] contentView];
+    [content layoutSubtreeIfNeeded];
+    for (NSString* key in @[@"previewHeading", @"detailsHeading", @"previewContainer"])
+        requireInterface(![[inspector valueForKey:key] isHiddenOrHasHiddenAncestor], @"An Inspector section is collapsed.");
+    NSArray* fields = @[@"outletMainName", @"outletMainType", @"outletMainSize", @"outletMainRamRom",
+                        @"outletSystemVersion", @"outletSystemBuild", @"outletSystemDate", @"outletSystemInfo", @"outletSystemRAM", @"outletSystemROM",
+                        @"outletAppletDescription", @"outletAppletInfo", @"outletAppletFlags", @"outletAppletMinFileSize", @"outletAppletMaxFileSize",
+                        @"outletAppletROM", @"outletAppletRAM1", @"outletAppletRAM2", @"outletFilePassword", @"outletFileRam", @"outletFileKey"];
+    for (NSString* key in fields)
+    {
+        NSTextField* field = [inspector valueForKey:key];
+        if ([field isHiddenOrHasHiddenAncestor]) continue;
+        NSRect frame = [field convertRect:[field bounds] toView:content];
+        requireInterface(NSContainsRect(NSInsetRect([content bounds], -1, -1), frame),
+                         [NSString stringWithFormat:@"The Inspector field %@ is outside the window.", key]);
+        NSSize needed = [[field cell] cellSizeForBounds:NSMakeRect(0, 0, NSWidth([field bounds]), 10000)];
+        requireInterface(NSHeight([field bounds]) >= needed.height - 1,
+                         [NSString stringWithFormat:@"The Inspector field %@ is clipped.", key]);
+    }
+    NSTextView* preview = [inspector valueForKey:@"outletPreviewAsText"];
+    requireInterface(![preview isEditable] && [preview isSelectable], @"The Inspector preview is not read-only and selectable.");
+    NSScrollView* scroll = [inspector valueForKey:@"previewScrollView"];
+    if (![scroll isHiddenOrHasHiddenAncestor])
+        requireInterface(NSWidth([preview frame]) <= NSWidth([[scroll contentView] bounds]) + 1, @"The Inspector preview does not wrap to its visible width.");
+}
+
 static void checkAppearances(id controller, NSWindowController* backup, NSString* directory)
 {
     requireInterface([NSApp appearance] == nil, @"The app overrides the system appearance.");
@@ -673,9 +701,7 @@ static void checkAppearances(id controller, NSWindowController* backup, NSString
     NSArray* appearances = @[NSAppearanceNameAqua, NSAppearanceNameDarkAqua, NSAppearanceNameAqua];
     for (NSUInteger pass = 0; pass < [appearances count]; ++pass)
     {
-        [[inspector valueForKey:@"outletShowPreviewDisclosure"] setState:NSControlStateValueOff];
-        [[inspector valueForKey:@"outletShowDetailDisclosure"] setState:NSControlStateValueOff];
-        [inspector performSelector:NSSelectorFromString(@"actionPreviewDisclosure:") withObject:nil];
+        [inspector performSelector:NSSelectorFromString(@"clearDisplay")];
         NSString* appearanceName = appearances[pass];
         NSAppearance* appearance = [NSAppearance appearanceNamed:appearanceName];
         // Only the test sets an appearance.  Production windows inherit macOS settings.
@@ -683,7 +709,7 @@ static void checkAppearances(id controller, NSWindowController* backup, NSString
         NSString* mode = pass == 1 ? @"dark" : (pass == 0 ? @"light" : @"light-again");
         [appearance performAsCurrentDrawingAppearance:^{
             checkContrast([[fileCell textField] textColor], [outline backgroundColor]);
-            NSTextField* preview = [inspector valueForKey:@"outletPreviewAsText"];
+            NSTextView* preview = [inspector valueForKey:@"outletPreviewAsText"];
             checkContrast([preview textColor], [preview backgroundColor]);
         }];
         [[controller valueForKey:@"outletAvailableMemory"] setStringValue:
@@ -707,33 +733,51 @@ static void checkAppearances(id controller, NSWindowController* backup, NSString
         capturePreferenceStatus(controller, directory, mode);
         captureBackupResults(backup, directory, mode);
 
-        NSTextField* preview = [inspector valueForKey:@"outletPreviewAsText"];
-        [preview setStringValue:@"A text preview with £, café, and curly quotes: ‘Hello’.\nThe same native field follows each appearance change."];
-        [preview setHidden:NO];
-        [[inspector valueForKey:@"outletPreviewAsIcon"] setHidden:YES];
-        [[inspector valueForKey:@"outletShowPreviewDisclosure"] setState:NSControlStateValueOn];
-        [[inspector valueForKey:@"outletShowDetailDisclosure"] setState:NSControlStateValueOn];
+        NSTextView* preview = [inspector valueForKey:@"outletPreviewAsText"];
+        NSMutableString* text = [NSMutableString stringWithString:@"A text preview with £, café, and curly quotes: ‘Hello’.\n\n"];
+        for (NSUInteger line = 0; line < 20; ++line)
+            [text appendString:@"Long previews remain readable and can be scrolled and copied.\n"];
+        [preview setString:text];
         // Display samples exercise compact sizes and grouped byte counts without device metadata.
         NSDictionary* sizes = @{
             @"outletSystemRAM": aq_FormattedFileSize(299520),
             @"outletSystemROM": aq_FormattedFileSize(1048576),
+            @"outletSystemVersion": @"3.6",
+            @"outletSystemBuild": @"System 3 NEO",
+            @"outletSystemDate": @"2009-05-12",
+            @"outletSystemInfo": @"AlphaSmart NEO system software",
+            @"outletAppletDescription": @"AlphaWord Plus UK 3.3 (English (UK))",
+            @"outletAppletInfo": @"Copyright (c) 2005–2009 by Renaissance Learning, Inc.",
+            @"outletAppletFlags": @"Visible",
             @"outletAppletMinFileSize": aq_FormattedByteCount(512),
             @"outletAppletMaxFileSize": aq_FormattedByteCount(51200),
             @"outletAppletROM": aq_FormattedByteCount(106432),
-            @"outletAppletRAM1": [NSString stringWithFormat:@"%@ (workspace)", aq_FormattedByteCount(3472)],
-            @"outletAppletRAM2": [NSString stringWithFormat:@"%@ (files)", aq_FormattedByteCount(31232)],
-            @"outletFileRam": aq_FormattedByteCount(31232)
+            @"outletAppletRAM1": aq_FormattedByteCount(3472),
+            @"outletAppletRAM2": aq_FormattedByteCount(31232),
+            @"outletFileRam": aq_FormattedByteCount(31232),
+            @"outletFilePassword": @"write",
+            @"outletFileKey": @"F3"
         };
         for (NSString* outlet in sizes)
             [[inspector valueForKey:outlet] setStringValue:sizes[outlet]];
         NSArray* panels = @[@"device", @"applet", @"file"];
         NSArray* panelNames = @[@"AlphaSmart NEO", @"AlphaWord Plus UK", @"Example document.txt"];
         NSArray* panelSizes = @[@"", aq_FormattedFileSize(34704), aq_FormattedFileSize(31232)];
+        NSArray* panelTypes = @[@"System 3.6", @"Version 3.3", @"AlphaWord Plus UK"];
+        NSArray* panelIcons = @[@"icon-neo", @"icon-applet", @"icon-file-txt"];
         SEL selector = NSSelectorFromString(@"configurePanelsToShowSystem:showApplet:showFile:");
         for (NSUInteger index = 0; index < [panels count]; ++index)
         {
             [[inspector valueForKey:@"outletMainName"] setStringValue:panelNames[index]];
             [[inspector valueForKey:@"outletMainSize"] setStringValue:panelSizes[index]];
+            [[inspector valueForKey:@"outletMainType"] setStringValue:panelTypes[index]];
+            [[inspector valueForKey:@"outletMainRamRom"] setStringValue:index == 1 ? @"8 files" : @""];
+            NSString* iconPath = [[NSBundle mainBundle] pathForResource:panelIcons[index] ofType:@"pdf"];
+            NSImage* icon = [[[NSImage alloc] initWithContentsOfFile:iconPath] autorelease];
+            [[inspector valueForKey:@"outletMainIcon"] setImage:icon];
+            [[inspector valueForKey:@"outletPreviewAsIcon"] setImage:icon];
+            [[inspector valueForKey:@"previewScrollView"] setHidden:index != 2];
+            [[inspector valueForKey:@"outletPreviewAsIcon"] setHidden:index == 2];
             NSInvocation* invocation = [NSInvocation invocationWithMethodSignature:[inspector methodSignatureForSelector:selector]];
             [invocation setSelector:selector];
             for (NSUInteger panel = 0; panel < 3; ++panel)
@@ -742,7 +786,9 @@ static void checkAppearances(id controller, NSWindowController* backup, NSString
                 [invocation setArgument:&show atIndex:(NSInteger)panel + 2];
             }
             [invocation invokeWithTarget:inspector];
+            [preview scrollRangeToVisible:NSMakeRange(0, 0)];
             captureWindow([inspector window], directory, [NSString stringWithFormat:@"%@-inspector-%@", mode, panels[index]]);
+            checkInspectorLayout(inspector);
         }
     }
     [outline setDataSource:originalSource];
@@ -805,6 +851,7 @@ static int checkInterface(void)
             NSWindowController* windowController = [controller valueForKey:key];
             requireInterface([windowController window] != nil, [NSString stringWithFormat:@"The %@ window did not load.", key]);
         }
+        checkInspectorLayout([controller valueForKey:@"inspectorController"]);
         fputs("Interface check: checking Preferences settings and layout.\n", stderr);
         checkPreferences(controller);
         fputs("Interface check: creating the backup window.\n", stderr);

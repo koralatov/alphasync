@@ -31,67 +31,47 @@
 #import <Cocoa/Cocoa.h>
 #import "ASDeviceNode.h"
 
-#define kASInspectorBoxMain         (0)
-#define kASInspectorBoxShowPreview  (1)
-#define kASInspectorBoxPreview      (2)
-#define kASInspectorBoxShowDetail   (3)
-#define kASInspectorBoxDetailSystem (4)
-#define kASInspectorBoxDetailApplet (5)
-#define kASInspectorBoxDetailFile   (6)
-#define kASInspectorMaxBox          (7)
-
 @interface ASInspectorWindowController : NSWindowController
 {
-    IBOutlet NSBox* outletBox0;
-    IBOutlet NSBox* outletBox1;
-    IBOutlet NSBox* outletBox2;
-    IBOutlet NSBox* outletBox3;
-    IBOutlet NSBox* outletBox4;
-    IBOutlet NSBox* outletBox5;
-    IBOutlet NSBox* outletBox6;
-    IBOutlet NSImageView* outletMainIcon;
-    IBOutlet NSTextField* outletMainName;
-    IBOutlet NSTextField* outletMainType;
-    IBOutlet NSTextField* outletMainSize;
-    IBOutlet NSTextField* outletMainRamRom;
-    IBOutlet NSButton* outletShowPreviewDisclosure;
-    IBOutlet NSTextField* outletPreviewAsText;
-    IBOutlet NSImageView* outletPreviewAsIcon;
-    IBOutlet NSButton* outletShowDetailDisclosure;
-    IBOutlet NSTextField* outletSystemVersion;
-    IBOutlet NSTextField* outletSystemBuild;
-    IBOutlet NSTextField* outletSystemDate;
-    IBOutlet NSTextField* outletSystemInfo;
-    IBOutlet NSTextField* outletSystemRAM;
-    IBOutlet NSTextField* outletSystemROM;
-    IBOutlet NSTextField* outletAppletDescription;
-    IBOutlet NSTextField* outletAppletInfo;
-    IBOutlet NSTextField* outletAppletFlags;
-    IBOutlet NSTextField* outletAppletROM;
-    IBOutlet NSTextField* outletAppletRAM1;
-    IBOutlet NSTextField* outletAppletRAM2;
-    IBOutlet NSTextField* outletAppletMinFileSize;
-    IBOutlet NSTextField* outletAppletMaxFileSize;
-    IBOutlet NSTextField* outletFilePassword;
-    IBOutlet NSTextField* outletFileRam;
-    IBOutlet NSTextField* outletFileKey;
-
-    BOOL completedAwakeFromNib;
+    NSImageView* outletMainIcon;
+    NSTextField* outletMainName;
+    NSTextField* outletMainType;
+    NSTextField* outletMainSize;
+    NSTextField* outletMainRamRom;
+    NSTextField* previewHeading;
+    NSTextField* detailsHeading;
+    NSView* previewContainer;
+    NSScrollView* previewScrollView;
+    NSTextView* outletPreviewAsText;
+    NSImageView* outletPreviewAsIcon;
+    NSGridView* systemDetails;
+    NSGridView* appletDetails;
+    NSGridView* fileDetails;
+    NSTextField* emptyDetails;
+    NSTextField* outletSystemVersion;
+    NSTextField* outletSystemBuild;
+    NSTextField* outletSystemDate;
+    NSTextField* outletSystemInfo;
+    NSTextField* outletSystemRAM;
+    NSTextField* outletSystemROM;
+    NSTextField* outletAppletDescription;
+    NSTextField* outletAppletInfo;
+    NSTextField* outletAppletFlags;
+    NSTextField* outletAppletROM;
+    NSTextField* outletAppletRAM1;
+    NSTextField* outletAppletRAM2;
+    NSTextField* outletAppletMinFileSize;
+    NSTextField* outletAppletMaxFileSize;
+    NSTextField* outletFilePassword;
+    NSTextField* outletFileRam;
+    NSTextField* outletFileKey;
 
     NSArray* displayNodes;
-
-    NSRect windowFrame;
-    NSBox* boxes[kASInspectorMaxBox];
-    NSRect boxFrame[kASInspectorMaxBox];
-    BOOL showBox[kASInspectorMaxBox];
 
     NSImage* iconNothing;
 }
 
 - (id)initWithDisplay:(NSArray*)nodes;
-
-- (IBAction)actionPreviewDisclosure:(id)sender;
-- (IBAction)actionDetailDisclosure:(id)sender;
 
 - (void)setDisplay:(NSArray*)nodes;
 - (void)clearDisplay;

@@ -62,7 +62,6 @@
 		A99A547B0F0D39FF00BC68F1 /* ASUserDictionaryFile.cc in Sources */ = {isa = PBXBuildFile; fileRef = A99A54730F0D39FF00BC68F1 /* ASUserDictionaryFile.cc */; };
 		A99A549A0F0D3AB700BC68F1 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A99A54990F0D3AB700BC68F1 /* IOKit.framework */; };
 		A99A54B60F0D43D900BC68F1 /* Backup.nib in Resources */ = {isa = PBXBuildFile; fileRef = A99A54B40F0D43D900BC68F1 /* Backup.nib */; };
-		A99A54FA0F0D5F5100BC68F1 /* Inspector.nib in Resources */ = {isa = PBXBuildFile; fileRef = A99A54F80F0D5F5100BC68F1 /* Inspector.nib */; };
         C01100000000000000000001 /* UniformTypeIdentifiers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01100000000000000000002 /* UniformTypeIdentifiers.framework */; };
         C01100000000000000000004 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
         C01100000000000000000005 /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01100000000000000000006 /* ServiceManagement.framework */; };
@@ -521,7 +520,6 @@
 				8D11072A0486CEB800E47090 /* MainMenu.nib in Resources */,
 				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
 				A99A54B60F0D43D900BC68F1 /* Backup.nib in Resources */,
-				A99A54FA0F0D5F5100BC68F1 /* Inspector.nib in Resources */,
 				4D962E180F1C9EF60018CDAA /* icon-file-bin.pdf in Resources */,
 				4D962E450F1CA50D0018CDAA /* icon-applet.pdf in Resources */,
 				4D962E460F1CA50D0018CDAA /* icon-file-txt.pdf in Resources */,
