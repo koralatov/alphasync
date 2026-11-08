@@ -291,6 +291,15 @@ static int checkInterface(void)
         NSNib* nib = [[[NSNib alloc] initWithNibNamed:@"MainMenu" bundle:[NSBundle mainBundle]] autorelease];
         NSArray* objects = nil;
         if (![nib instantiateWithOwner:NSApp topLevelObjects:&objects]) return 1;
+        // NSApplicationMain normally installs the nib's main menu.  The smoke
+        // check instantiates that nib itself, so install its top-level menu too.
+        for (id object in objects)
+            if ([object isKindOfClass:[NSMenu class]])
+            {
+                [NSApp setMainMenu:object];
+                break;
+            }
+        requireInterface([NSApp mainMenu] != nil, @"The main menu did not load.");
         // Use normal AppKit startup for the window and appearance checks.
         [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
         [NSApp finishLaunching];
