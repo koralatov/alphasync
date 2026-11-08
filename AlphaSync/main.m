@@ -759,10 +759,15 @@ static void checkFileViews(id controller)
         NSTextView* text = [first valueForKey:@"textView"];
         requireInterface([[text string] isEqualToString:[worker text]] && [worker readOffMain] && ![queue refreshed],
                          @"The viewer used a partial preview, read on the main thread, or refreshed the device.");
+        [[first window] makeFirstResponder:text];
         [text setSelectedRange:NSMakeRange(0, 5)];
         NSPasteboard* copyBoard = [NSPasteboard pasteboardWithUniqueName];
-        requireInterface([text writeSelectionToPasteboard:copyBoard types:@[NSPasteboardTypeString]] &&
-                         [[copyBoard stringForType:NSPasteboardTypeString] isEqualToString:@"Notes"], @"Read-only text cannot be copied.");
+        NSArray* copyTypes = [text writablePasteboardTypes];
+        BOOL copied = [text writeSelectionToPasteboard:copyBoard types:copyTypes];
+        NSString* copiedText = [copyBoard stringForType:NSPasteboardTypeString];
+        requireInterface(copied && [copiedText isEqualToString:@"Notes"],
+            [NSString stringWithFormat:@"Read-only copy failed: wrote=%d, selection=%@, types=%@, copied=%@.",
+             copied, NSStringFromRange([text selectedRange]), copyTypes, copiedText]);
         [copyBoard releaseGlobally];
         NSSegmentedControl* style = [first valueForKey:@"fontStyle"];
         NSFont* regular = [NSFont systemFontOfSize:0];
