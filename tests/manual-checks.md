@@ -48,6 +48,9 @@ Keep known-good backups before testing writes to the NEO.
 ## Backups
 
 - Back up named files, numbered file spaces, and empty files.  Open the report and check each saved path and the final state.
+- Check the completion sheet’s file count and dated folder path.  Click **Open Backup Folder** and confirm that Finder opens that exact folder.  **Done** should dismiss the sheet, including when Return is pressed.
+- With two NEOs, confirm that both dated locations are listed and **Open Backup Folders** opens both.  Check long paths in Light and Dark Mode, copy a displayed path, and confirm that the text and buttons fit.
+- Force a file failure and confirm that **Backup incomplete** shows saved and failed counts while still offering any folders that were created.  A backup that created no folder should not offer a Finder button.
 - Repeat into the same destination.  Confirm that completed files are not overwritten.
 - Choose an unwritable destination and confirm that copying stops with an explanation.
 - Cancel between files, and disconnect between files.  Check their distinct report states and the files already saved.

@@ -147,6 +147,112 @@ static void checkPreferences(id controller)
                      @"Closing and reopening Preferences lost its settings.");
 }
 
+static void checkBackupLayout(NSWindowController* backup)
+{
+    NSView* content = [[backup window] contentView];
+    [content layoutSubtreeIfNeeded];
+    checkInheritedAppearance(content);
+    NSMutableArray* views = [NSMutableArray arrayWithObject:content];
+    while ([views count])
+    {
+        NSView* view = [[[views lastObject] retain] autorelease];
+        [views removeLastObject];
+        if ([view isHiddenOrHasHiddenAncestor]) continue;
+        [views addObjectsFromArray:[view subviews]];
+        if (![view isKindOfClass:[NSControl class]]) continue;
+        NSRect frame = [view convertRect:[view bounds] toView:content];
+        requireInterface(NSContainsRect(NSInsetRect([content bounds], -1, -1), frame), @"A backup control is outside the sheet.");
+        if ([view isKindOfClass:[NSTextField class]])
+        {
+            NSTextField* field = (NSTextField*)view;
+            NSSize needed = [[field cell] cellSizeForBounds:NSMakeRect(0, 0, NSWidth([field bounds]), 10000)];
+            requireInterface(NSHeight([field bounds]) >= needed.height - 1, @"Backup text or a folder location is clipped.");
+            if ([[field identifier] isEqualToString:@"backup-location"])
+                requireInterface([field isSelectable], @"A backup location cannot be copied.");
+        }
+    }
+    for (NSString* key in @[@"openBackupButton", @"outletStopDoneButton"])
+    {
+        NSButton* button = [backup valueForKey:key];
+        if ([button isHiddenOrHasHiddenAncestor]) continue;
+        requireInterface(NSWidth([button alignmentRectForFrame:[button frame]]) <= [button intrinsicContentSize].width + 1,
+                         @"A backup button is stretched.");
+    }
+}
+
+static void sampleBackupResult(NSWindowController* backup, NSUInteger total, NSUInteger processed, NSUInteger failed,
+                               NSUInteger devices, NSArray* paths, NSString* status)
+{
+    // Only the completion state is simulated.  Do not copy files or open Finder.
+    NSMutableArray* items = [NSMutableArray arrayWithCapacity:total];
+    for (NSUInteger index = 0; index < total; ++index) [items addObject:[NSNull null]];
+    [backup setValue:items forKey:@"backupItems"];
+    [backup setValue:@(processed) forKey:@"nextBackupItem"];
+    [backup setValue:@(failed) forKey:@"failedFiles"];
+    [backup setValue:@(devices) forKey:@"backupDeviceCount"];
+    [backup setValue:[NSMutableArray arrayWithArray:paths] forKey:@"backupSessionPaths"];
+    [backup performSelector:NSSelectorFromString(@"stopBackup:status:") withObject:@"Cancelled" withObject:status];
+    checkBackupLayout(backup);
+}
+
+static void checkBackupResults(NSWindowController* backup)
+{
+    NSArray* paths = @[@"/Users/Example/Documents/AlphaSync/My NEO/2026-11-08"];
+    sampleBackupResult(backup, 8, 8, 0, 1, paths, @"complete");
+    NSTextField* title = [backup valueForKey:@"outletFilesRemaining"];
+    NSTextField* summary = [backup valueForKey:@"outletBackupItem"];
+    NSButton* open = [backup valueForKey:@"openBackupButton"];
+    NSButton* done = [backup valueForKey:@"outletStopDoneButton"];
+    requireInterface([[title stringValue] isEqualToString:@"Backup complete"] &&
+                     [[summary stringValue] containsString:@"copies of 8 files from your NEO"], @"Successful backup wording changed.");
+    requireInterface(![open isHidden] && [open target] == backup && [open action] == NSSelectorFromString(@"actionOpenBackupFolders:"),
+                     @"The backup folder button is not connected.");
+    requireInterface([[done title] isEqualToString:@"Done"] && [[done keyEquivalent] isEqualToString:@"\r"], @"Done is not the default completion button.");
+    NSStackView* locations = [backup valueForKey:@"backupLocationsView"];
+    NSTextField* location = [[locations arrangedSubviews] lastObject];
+    requireInterface([[location toolTip] isEqualToString:paths[0]] && [[location stringValue] isEqualToString:paths[0]],
+                     @"The completion sheet lost its dated backup location.");
+
+    sampleBackupResult(backup, 1, 1, 0, 1, paths, @"complete");
+    requireInterface([[summary stringValue] containsString:@"a copy of 1 file"], @"A single-file backup has the wrong wording.");
+    sampleBackupResult(backup, 8, 8, 2, 1, paths, @"complete");
+    requireInterface([[title stringValue] isEqualToString:@"Backup incomplete"] &&
+                     [[summary stringValue] containsString:@"saved 6 of 8 files"] &&
+                     [[summary stringValue] containsString:@"2 files could not be backed up"], @"Failed files are not explained.");
+    sampleBackupResult(backup, 8, 3, 0, 1, paths, @"cancelled");
+    requireInterface([[title stringValue] isEqualToString:@"Backup stopped"] && [[summary stringValue] containsString:@"5 files were not copied"],
+                     @"A stopped backup is labelled complete.");
+    sampleBackupResult(backup, 8, 1, 1, 1, @[], @"failed");
+    requireInterface([open isHidden] && [locations isHidden], @"A backup without a folder offers to open one.");
+    sampleBackupResult(backup, 0, 0, 0, 0, @[], @"complete");
+    requireInterface([[title stringValue] isEqualToString:@"No files to back up"] && [open isHidden], @"An empty backup claims files were saved.");
+    [backup performSelector:NSSelectorFromString(@"showBackupProgress")];
+    requireInterface([open isHidden] && [locations isHidden] && [[done title] isEqualToString:@"Stop"], @"Starting another backup left its old result visible.");
+    checkBackupLayout(backup);
+    puts("Backup completion, failure counts, cancellation, empty backups, folder actions, and native layout passed.");
+}
+
+static void captureBackupResults(NSWindowController* backup, NSString* directory, NSString* mode)
+{
+    NSArray* paths = @[@"/Users/Example/Documents/AlphaSync/My NEO/2026-11-08"];
+    sampleBackupResult(backup, 8, 8, 0, 1, paths, @"complete");
+    CGFloat shortHeight = NSHeight([[backup window] frame]);
+    captureWindow([backup window], directory, [mode stringByAppendingString:@"-backup-complete"]);
+    sampleBackupResult(backup, 8, 8, 2, 1, paths, @"complete");
+    captureWindow([backup window], directory, [mode stringByAppendingString:@"-backup-incomplete"]);
+    NSArray* longPaths = @[
+        @"/Users/Example/Documents/Writing and notes/AlphaSmart NEO backups/An unusually long backup folder name/My first NEO/2026-11-08",
+        @"/Users/Example/Documents/Writing and notes/AlphaSmart NEO backups/An unusually long backup folder name/My second NEO/2026-11-08 (1)"
+    ];
+    sampleBackupResult(backup, 16, 16, 0, 2, longPaths, @"complete");
+    requireInterface(NSHeight([[backup window] frame]) > shortHeight, @"The backup sheet did not grow for multiple long locations.");
+    requireInterface([[[backup valueForKey:@"outletBackupItem"] stringValue] containsString:@"from 2 NEOs"] &&
+                     [[[backup valueForKey:@"backupLocationsView"] arrangedSubviews] count] == 3 &&
+                     [[[backup valueForKey:@"openBackupButton"] title] isEqualToString:@"Open Backup Folders"], @"Multiple NEO backup locations are missing.");
+    captureWindow([backup window], directory, [mode stringByAppendingString:@"-backup-locations"]);
+    [backup performSelector:NSSelectorFromString(@"showBackupProgress")];
+}
+
 static void capturePreferenceStatus(id controller, NSString* directory, NSString* mode)
 {
     id preferences = [controller valueForKey:@"preferenceController"];
@@ -255,6 +361,7 @@ static void checkAppearances(id controller, NSWindowController* backup, NSString
         captureWindow(main, directory, [mode stringByAppendingString:@"-selection"]);
         [outline deselectAll:nil];
         capturePreferenceStatus(controller, directory, mode);
+        captureBackupResults(backup, directory, mode);
 
         NSTextField* preview = [inspector valueForKey:@"outletPreviewAsText"];
         [preview setStringValue:@"A text preview with £, café, and curly quotes: ‘Hello’.\nThe same native field follows each appearance change."];
@@ -325,6 +432,7 @@ static int checkInterface(void)
         checkPreferences(controller);
         NSWindowController* backup = [[NSClassFromString(@"ASBackupController") alloc] init];
         BOOL loaded = [backup window] != nil;
+        if (loaded) checkBackupResults(backup);
         NSArray* arguments = [[NSProcessInfo processInfo] arguments];
         NSUInteger snapshots = [arguments indexOfObject:@"--appearance-snapshots"];
         if (loaded && snapshots != NSNotFound)

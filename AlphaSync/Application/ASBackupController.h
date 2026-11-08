@@ -40,14 +40,19 @@
     IBOutlet NSTextField* outletFilesRemaining;
     IBOutlet NSProgressIndicator* outletProgressIndicator;
     IBOutlet NSButton* outletStopDoneButton;
+    NSStackView* backupLocationsView;
+    NSTextField* backupHintField;
+    NSButton* openBackupButton;
 
     NSString* currentSessionPath;
+    NSMutableArray* backupSessionPaths;
     NSMutableArray* backupItems;
     ASBackupReport* backupReport;
     NSUInteger nextBackupItem;
     uint64_t bytesToBackup;
     uint64_t bytesSoFar;
     NSUInteger failedFiles;
+    NSUInteger backupDeviceCount;
     ASDeviceController* deviceController;
     BOOL backupInFlight;
     NSString* pendingStopMessage;
@@ -58,5 +63,6 @@
 - (void)requestStopForTermination;
 
 - (IBAction)actionStopDone:(id)sender;
+- (IBAction)actionOpenBackupFolders:(id)sender;
 
 @end
