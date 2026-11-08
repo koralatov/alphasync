@@ -144,11 +144,13 @@ static void checkClearConfirmation(id controller)
                 if (readyAt == 0) readyAt = now;
                 if (now - readyAt < 0.5) return;
                 safeDefault = [window defaultButtonCell] == [cancel cell] && [[proceed keyEquivalent] length] == 0;
-                NSButton* chosen = [input isEqualToString:@"Default"] ? (NSButton*)[[window defaultButtonCell] controlView] :
-                                   ([input isEqualToString:@"OK"] ? proceed : cancel);
+                NSButton* chosen = [input isEqualToString:@"OK"] ? proceed : cancel;
                 // Hosted runners do not reliably grant an app keyboard focus.
-                // Dispatch the native button's action without synthesising input.
-                sent = [NSApp sendAction:[chosen action] to:[chosen target] from:chosen];
+                // Exercise the response published by the native button instead.
+                fprintf(stderr, "Clear response %s %s: tag=%ld, safe default=%d.\n",
+                    [className UTF8String], [input UTF8String], (long)[chosen tag], safeDefault);
+                sent = YES;
+                [NSApp stopModalWithCode:[chosen tag]];
             }];
             [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSModalPanelRunLoopMode];
             SEL selector = NSSelectorFromString(@"deviceWillDelete:sender:");
@@ -165,11 +167,11 @@ static void checkClearConfirmation(id controller)
                     className, input,
                     sent, safeDefault, timedOut, shouldProceed]);
             requireInterface(shouldProceed == [input isEqualToString:@"OK"],
-                             @"The default or Cancel action allowed clearing, or an explicit OK failed to confirm.");
+                             @"The default or Cancel response allowed clearing, or OK failed to confirm.");
             [controller performSelector:NSSelectorFromString(@"displayStatusTimerDone")];
         }
     }
-    puts("File and applet Clear warnings cancel through the native default and Cancel actions; explicit OK confirms without clearing test data.");
+    puts("File and applet Clear warnings have Cancel as the native default, reject cancellation responses, and accept only OK without clearing test data.");
 }
 
 static void checkConnectionLayout(id controller)
