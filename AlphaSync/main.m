@@ -394,7 +394,9 @@ static int checkInterface(void)
 {
     @try
     {
+        fputs("Interface check: starting AppKit.\n", stderr);
         [NSApplication sharedApplication];
+        fputs("Interface check: loading the main menu.\n", stderr);
         NSNib* nib = [[[NSNib alloc] initWithNibNamed:@"MainMenu" bundle:[NSBundle mainBundle]] autorelease];
         NSArray* objects = nil;
         if (![nib instantiateWithOwner:NSApp topLevelObjects:&objects]) return 1;
@@ -409,15 +411,20 @@ static int checkInterface(void)
         requireInterface([NSApp mainMenu] != nil, @"The main menu did not load.");
         // Use normal AppKit startup for the window and appearance checks.
         [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
+        fputs("Interface check: finishing application launch.\n", stderr);
         [NSApp finishLaunching];
+        fputs("Interface check: activating the application.\n", stderr);
         if (@available(macOS 14.0, *)) [NSApp activate];
         else [NSApp activateIgnoringOtherApps:YES];
         id controller = [NSApp delegate];
         if (!controller || ![controller valueForKey:@"outletMainWindow"] || ![controller valueForKey:@"outletFileView"]) return 1;
 
         // Load every window, so missing resources and broken outlet connections fail the check.
+        fputs("Interface check: opening Preferences.\n", stderr);
         [controller performSelector:NSSelectorFromString(@"actionShowPreferences:") withObject:nil];
+        fputs("Interface check: opening the Inspector.\n", stderr);
         [controller performSelector:NSSelectorFromString(@"actionInfo:") withObject:nil];
+        fputs("Interface check: opening About through the menu.\n", stderr);
         BOOL openedAbout = NO;
         for (NSMenuItem* menu in [[NSApp mainMenu] itemArray])
             for (NSMenuItem* item in [[menu submenu] itemArray])
@@ -429,10 +436,13 @@ static int checkInterface(void)
             NSWindowController* windowController = [controller valueForKey:key];
             requireInterface([windowController window] != nil, [NSString stringWithFormat:@"The %@ window did not load.", key]);
         }
+        fputs("Interface check: checking Preferences settings and layout.\n", stderr);
         checkPreferences(controller);
+        fputs("Interface check: creating the backup window.\n", stderr);
         NSWindowController* backup = [[NSClassFromString(@"ASBackupController") alloc] init];
         BOOL loaded = [backup window] != nil;
         requireInterface(loaded, @"The backup window did not load.");
+        fputs("Interface check: checking backup results.\n", stderr);
         if (loaded) checkBackupResults(backup);
         NSArray* arguments = [[NSProcessInfo processInfo] arguments];
         NSUInteger snapshots = [arguments indexOfObject:@"--appearance-snapshots"];
