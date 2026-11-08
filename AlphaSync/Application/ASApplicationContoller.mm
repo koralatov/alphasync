@@ -872,7 +872,7 @@ static const NSInteger kMenuItemTagBackup   = 100;
     NSAlert* alert = [[NSAlert alloc] init];
     [[alert addButtonWithTitle:@"OK"] setKeyEquivalent:@""];
     NSButton* cancel = [alert addButtonWithTitle:@"Cancel"];
-    [cancel setKeyEquivalent:@"\033"];
+    [cancel setKeyEquivalent:@"\r"];
 
     if ([target isMemberOfClass:[ASFileNode class]])
     {
