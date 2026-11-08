@@ -18,6 +18,21 @@ build_number=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$app/Content
 compatibility=$(sed -n 's/^AS_COMPATIBILITY_DESCRIPTION *= *//p' "$profile_configuration")
 test -n "$compatibility"
 test "$(/usr/libexec/PlistBuddy -c 'Print :ASCompatibilityDescription' "$app/Contents/Info.plist")" = "$compatibility"
+icon=$(sed -n 's/^AS_APP_ICON_NAME *= *//p' "$profile_configuration")
+test -n "$icon"
+test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIconFile' "$app/Contents/Info.plist")" = "$icon"
+test -s "$app/Contents/Resources/$icon.icns"
+case "$profile_variant" in
+    universal) test ! -e "$app/Contents/Resources/application-modern.icns" ;;
+    modern) test ! -e "$app/Contents/Resources/application.icns" ;;
+esac
+icon_check_directory=$(mktemp -d "${TMPDIR:-/tmp}/alphasync-icon-check.XXXXXX")
+trap 'rm -rf "$icon_check_directory"' EXIT
+/usr/bin/iconutil --convert iconset --output "$icon_check_directory/selected.iconset" "$app/Contents/Resources/$icon.icns"
+for size in 16 32 128 256 512; do
+    test -s "$icon_check_directory/selected.iconset/icon_${size}x${size}.png"
+    test -s "$icon_check_directory/selected.iconset/icon_${size}x${size}@2x.png"
+done
 
 for bundle in "$app" "$helper"; do
     name=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$bundle/Contents/Info.plist")

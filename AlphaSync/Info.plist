@@ -13,7 +13,7 @@
 	<key>CFBundleHelpBookName</key>
 	<string>AlphaSync Help</string>
 	<key>CFBundleIconFile</key>
-	<string>application</string>
+	<string>$(AS_APP_ICON_NAME)</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.tsoniq.AlphaSync</string>
 	<key>CFBundleInfoDictionaryVersion</key>

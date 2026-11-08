@@ -123,6 +123,8 @@ AlphaSync no longer copies a launcher into Application Support.  If an older ins
 
 Preferences shows the actual launcher state separately from the automatic-launch setting.  It reports registration errors and approval requests, and provides a Login Items settings button on macOS 13 and later.  The older API cannot query the saved registration state, so macOS 11 and 12 report an unknown state when the helper is not running.
 
+The Universal build keeps the original icon in `application.iconset`.  The modern build uses the preferred macOS 27 mockup in `Graphics/application-modern.png` as a flattened icon.  Each profile sets `AS_APP_ICON_NAME`; Xcode uses macOS’s `sips` and `iconutil` tools to create the selected `.icns` file at standard and Retina sizes in its derived files directory.  Only that icon is copied into the main app.  Verification checks the selected name, the absence of the other variant, and every icon size.  The bundled launch helper retains its own icon.
+
 ## Imports and backups
 
 Exports and backups always use UTF-8 without a byte-order mark.  Preferences shows the fixed output format, and encoding preferences saved by older versions do not affect it.  Imports still accept MacASCII (Mac Roman), UTF-8 with or without a byte-order mark, and UTF-16 with a byte-order mark in either byte order.

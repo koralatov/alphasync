@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		4D2E248F18106AF7002E5E7D /* application.iconset in Resources */ = {isa = PBXBuildFile; fileRef = 4D2E248E18106AF7002E5E7D /* application.iconset */; };
+		4D2E248F18106AF7002E5E7D /* App icon in Resources */ = {isa = PBXBuildFile; fileRef = C01100000000000000000010 /* App icon */; };
 		4D962E180F1C9EF60018CDAA /* icon-file-bin.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 4D962E170F1C9EF60018CDAA /* icon-file-bin.pdf */; };
 		4D962E450F1CA50D0018CDAA /* icon-applet.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 4D962E380F1CA50D0018CDAA /* icon-applet.pdf */; };
 		4D962E460F1CA50D0018CDAA /* icon-file-txt.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 4D962E390F1CA50D0018CDAA /* icon-file-txt.pdf */; };
@@ -102,6 +102,8 @@
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		32CA4F630368D1EE00C91783 /* AlphaSync_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlphaSync_Prefix.pch; sourceTree = "<group>"; };
 		4D2E248E18106AF7002E5E7D /* application.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; path = application.iconset; sourceTree = "<group>"; };
+		C01100000000000000000010 /* App icon */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = "App icon"; path = "$(AS_APP_ICON_NAME).icns"; sourceTree = DERIVED_FILE_DIR; };
+		C01100000000000000000011 /* application-modern.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Graphics/application-modern.png"; sourceTree = "<group>"; };
 		4D962E170F1C9EF60018CDAA /* icon-file-bin.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "icon-file-bin.pdf"; path = "Graphics/icon-file-bin.pdf"; sourceTree = "<group>"; };
 		4D962E380F1CA50D0018CDAA /* icon-applet.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "icon-applet.pdf"; path = "Graphics/icon-applet.pdf"; sourceTree = "<group>"; };
 		4D962E390F1CA50D0018CDAA /* icon-file-txt.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "icon-file-txt.pdf"; path = "Graphics/icon-file-txt.pdf"; sourceTree = "<group>"; };
@@ -261,6 +263,8 @@
 			children = (
 				34A6F206D8A48389402ABBA3 /* Build */,
 				4D2E248E18106AF7002E5E7D /* application.iconset */,
+				C01100000000000000000010 /* App icon */,
+				C01100000000000000000011 /* application-modern.png */,
 				A99A54330F0D39C400BC68F1 /* Application */,
 				A95EFA530F17C8EF00E1BDA9 /* Launcher */,
 				4D96308D0F1D15B50018CDAA /* AppletDump */,
@@ -448,6 +452,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = C01FCF4A08A954540054247B /* Build configuration list for PBXNativeTarget "AlphaSync" */;
 			buildPhases = (
+				C01100000000000000000012 /* Build app icon */,
 				8D1107290486CEB800E47090 /* Resources */,
 				8D11072C0486CEB800E47090 /* Sources */,
 				8D11072E0486CEB800E47090 /* Frameworks */,
@@ -533,7 +538,7 @@
 				4D962E510F1CA50D0018CDAA /* icon-toolbar-preview.pdf in Resources */,
 				4D962E750F1CA73D0018CDAA /* icon-file-noselection.pdf in Resources */,
 				4DF7C99D0F1EB42600619084 /* AlphaSync Help in Resources */,
-				4D2E248F18106AF7002E5E7D /* application.iconset in Resources */,
+				4D2E248F18106AF7002E5E7D /* App icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -546,6 +551,37 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		C01100000000000000000012 /* Build app icon */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = ();
+			inputPaths = (
+				"$(SRCROOT)/../scripts/build-app-icon.sh",
+				"$(SRCROOT)/Graphics/application-modern.png",
+				"$(SRCROOT)/application.iconset",
+				"$(SRCROOT)/application.iconset/icon_16x16.png",
+				"$(SRCROOT)/application.iconset/icon_16x16@2x.png",
+				"$(SRCROOT)/application.iconset/icon_32x32.png",
+				"$(SRCROOT)/application.iconset/icon_32x32@2x.png",
+				"$(SRCROOT)/application.iconset/icon_128x128.png",
+				"$(SRCROOT)/application.iconset/icon_128x128@2x.png",
+				"$(SRCROOT)/application.iconset/icon_256x256.png",
+				"$(SRCROOT)/application.iconset/icon_256x256@2x.png",
+				"$(SRCROOT)/application.iconset/icon_512x512.png",
+				"$(SRCROOT)/application.iconset/icon_512x512@2x.png",
+			);
+			name = "Build app icon";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/AppIconBuild",
+				"$(DERIVED_FILE_DIR)/$(AS_APP_ICON_NAME).icns",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "bash \"$SRCROOT/../scripts/build-app-icon.sh\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 
 /* Begin PBXSourcesBuildPhase section */

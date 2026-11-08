@@ -59,4 +59,6 @@ Keep known-good backups before testing writes to the NEO.
 
 ## Distribution
 
+- Check Finder, the Dock, and About for each download.  Universal should show the original green icon; the macOS 27 Apple Silicon build should show the preferred glass icon.  Check small and large icon sizes in Light and Dark Mode.
+
 Use the final stapled ZIP for a clean-install check on a second Mac.  Record Gatekeeper behaviour, opening every window, automatic launching, and a real transfer.  Developer ID signing and notarisation require the release certificate and Keychain profile; ad hoc CI artifacts do not establish these results.
