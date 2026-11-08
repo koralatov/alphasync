@@ -144,7 +144,7 @@ static void checkClearConfirmation(id controller)
                     NSEvent* event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSZeroPoint modifierFlags:0
                         timestamp:[[NSProcessInfo processInfo] systemUptime] windowNumber:[window windowNumber] context:nil
                         characters:input charactersIgnoringModifiers:input isARepeat:NO keyCode:code];
-                    [NSApp postEvent:event atStart:YES];
+                    if (![window performKeyEquivalent:event]) [window sendEvent:event];
                 }
             }];
             [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSModalPanelRunLoopMode];
@@ -157,7 +157,10 @@ static void checkClearConfirmation(id controller)
             BOOL shouldProceed = NO;
             [call getReturnValue:&shouldProceed];
             [timer invalidate];
-            requireInterface(sent && safeDefault && !timedOut, @"The Clear warning did not use Cancel as its native keyboard default.");
+            requireInterface(sent && safeDefault && !timedOut,
+                [NSString stringWithFormat:@"Clear check %@ input %@: sent=%d, default=%d, timeout=%d, proceed=%d.",
+                    className, [input isEqualToString:@"OK"] ? input : [NSString stringWithFormat:@"U+%04X", [input characterAtIndex:0]],
+                    sent, safeDefault, timedOut, shouldProceed]);
             requireInterface(shouldProceed == [input isEqualToString:@"OK"],
                              @"A cancellation key allowed clearing, or an explicit OK failed to confirm.");
             [controller performSelector:NSSelectorFromString(@"displayStatusTimerDone")];
