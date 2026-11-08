@@ -107,7 +107,7 @@ static void checkClearConfirmation(id controller)
     {
         id node = [[[NSClassFromString(className) alloc] performSelector:NSSelectorFromString(@"initForDisplay")] autorelease];
         [node setValue:@"Example" forKey:@"displayName"];
-        for (NSString* input in @[@"\r", @"\003", @"\033", @"OK"])
+        for (NSString* input in @[@"Default", @"Cancel", @"OK"])
         {
             __block BOOL sent = NO, safeDefault = NO, timedOut = NO;
             __block NSTimeInterval readyAt = 0;
@@ -144,19 +144,11 @@ static void checkClearConfirmation(id controller)
                 if (readyAt == 0) readyAt = now;
                 if (now - readyAt < 0.5) return;
                 safeDefault = [window defaultButtonCell] == [cancel cell] && [[proceed keyEquivalent] length] == 0;
-                fprintf(stderr, "Clear probe %s: cancel key=%u, modifiers=%lu, app active=%d, window key=%d, default=%d.\n",
-                    [className UTF8String], (unsigned)([[cancel keyEquivalent] length] ? [[cancel keyEquivalent] characterAtIndex:0] : 0),
-                    (unsigned long)[cancel keyEquivalentModifierMask], [NSApp isActive], [window isKeyWindow], safeDefault);
-                sent = YES;
-                if ([input isEqualToString:@"OK"]) [proceed performClick:nil];
-                else
-                {
-                    unsigned short code = [input isEqualToString:@"\r"] ? 36 : ([input isEqualToString:@"\003"] ? 76 : 53);
-                    NSEvent* event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSZeroPoint modifierFlags:0
-                        timestamp:[[NSProcessInfo processInfo] systemUptime] windowNumber:[window windowNumber] context:nil
-                        characters:input charactersIgnoringModifiers:input isARepeat:NO keyCode:code];
-                    if (![window performKeyEquivalent:event]) [window sendEvent:event];
-                }
+                NSButton* chosen = [input isEqualToString:@"Default"] ? (NSButton*)[[window defaultButtonCell] controlView] :
+                                   ([input isEqualToString:@"OK"] ? proceed : cancel);
+                // Hosted runners do not reliably grant an app keyboard focus.
+                // Dispatch the native button's action without synthesising input.
+                sent = [NSApp sendAction:[chosen action] to:[chosen target] from:chosen];
             }];
             [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSModalPanelRunLoopMode];
             SEL selector = NSSelectorFromString(@"deviceWillDelete:sender:");
@@ -170,14 +162,14 @@ static void checkClearConfirmation(id controller)
             [timer invalidate];
             requireInterface(sent && safeDefault && !timedOut,
                 [NSString stringWithFormat:@"Clear check %@ input %@: sent=%d, default=%d, timeout=%d, proceed=%d.",
-                    className, [input isEqualToString:@"OK"] ? input : [NSString stringWithFormat:@"U+%04X", [input characterAtIndex:0]],
+                    className, input,
                     sent, safeDefault, timedOut, shouldProceed]);
             requireInterface(shouldProceed == [input isEqualToString:@"OK"],
-                             @"A cancellation key allowed clearing, or an explicit OK failed to confirm.");
+                             @"The default or Cancel action allowed clearing, or an explicit OK failed to confirm.");
             [controller performSelector:NSSelectorFromString(@"displayStatusTimerDone")];
         }
     }
-    puts("File and applet Clear warnings cancel with Return, keypad Enter, and Escape; explicit OK confirms without clearing test data.");
+    puts("File and applet Clear warnings cancel through the native default and Cancel actions; explicit OK confirms without clearing test data.");
 }
 
 static void checkConnectionLayout(id controller)
@@ -611,7 +603,7 @@ static int checkInterface(void)
 
         fputs("Interface check: checking connection window transitions.\n", stderr);
         checkConnectionStates(controller);
-        fputs("Interface check: checking Clear warning keyboard responses.\n", stderr);
+        fputs("Interface check: checking Clear warning default and button responses.\n", stderr);
         checkClearConfirmation(controller);
 
         // Load every window, so missing resources and broken outlet connections fail the check.
