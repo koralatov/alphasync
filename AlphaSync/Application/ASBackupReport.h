@@ -1,5 +1,6 @@
 #import <Foundation/Foundation.h>
 
+// An optional log for one NEO, saved directly in its dated backup folder.
 // The saved report stays marked as in progress until every final status is written.
 // After a crash, that status and the pending entries identify an unfinished backup.
 @interface ASBackupReport : NSObject

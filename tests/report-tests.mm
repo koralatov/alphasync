@@ -19,6 +19,8 @@ int main()
         NSError* error = nil;
         ASBackupReport* report = [[ASBackupReport alloc] initWithFolder:folder files:entries error:&error];
         CHECK(report && !error);
+        CHECK([[[report reportURL] path] isEqualToString:[folder stringByAppendingPathComponent:@"AlphaSync Backup Log.plist"]]);
+        CHECK(![manager fileExistsAtPath:[folder stringByAppendingPathComponent:@"Backup Reports"]]);
         CHECK([readReport(report)[@"status"] isEqualToString:@"in progress"]);
         CHECK([readReport(report)[@"files"][0][@"status"] isEqualToString:@"pending"]);
         CHECK([report recordFileAtIndex:0 savedPath:@"One.txt" error:nil saveError:&error]);
@@ -28,8 +30,13 @@ int main()
         CHECK([readReport(report)[@"files"][1][@"error"] isEqualToString:@"Device disconnected"]);
         CHECK([report finishWithStatus:@"disconnected" message:@"Stopped" error:&error]);
         CHECK([readReport(report)[@"status"] isEqualToString:@"disconnected"]);
+        NSURL* firstURL = [[report reportURL] retain];
+        NSData* firstContents = [NSData dataWithContentsOfURL:firstURL];
         [report release];
         report = [[ASBackupReport alloc] initWithFolder:folder files:entries error:&error];
+        CHECK(report && !error && ![[report reportURL] isEqual:firstURL]);
+        CHECK([firstContents isEqualToData:[NSData dataWithContentsOfURL:firstURL]]);
+        [firstURL release];
         CHECK([report recordFileAtIndex:0 savedPath:@"One.txt" error:nil saveError:&error]);
         CHECK([report recordFileAtIndex:1 savedPath:@"Two.txt" error:nil saveError:&error]);
         CHECK([report finishWithStatus:@"complete" message:@"Finished" error:&error]);

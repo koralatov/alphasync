@@ -48,6 +48,8 @@
     NSMutableArray* backupSessionPaths;
     NSMutableArray* backupItems;
     ASBackupReport* backupReport;
+    BOOL saveBackupLogs;
+    NSUInteger reportStartIndex;
     NSUInteger nextBackupItem;
     uint64_t bytesToBackup;
     uint64_t bytesSoFar;

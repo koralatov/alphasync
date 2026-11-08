@@ -1,18 +1,16 @@
 #import "ASBackupReport.h"
+#import "AQFileUtilities.h"
 
 @implementation ASBackupReport
 - (id)initWithFolder:(NSString*)folder files:(NSArray*)entries error:(NSError**)error
 {
     if ((self = [super init]))
     {
-        NSString* directory = [folder stringByAppendingPathComponent:@"Backup Reports"];
-        if (![[NSFileManager defaultManager] createDirectoryAtPath:directory withIntermediateDirectories:YES attributes:nil error:error])
+        if (![[NSFileManager defaultManager] createDirectoryAtPath:folder withIntermediateDirectories:YES attributes:nil error:error])
         {
             [self release];
             return nil;
         }
-        NSString* name = [[[NSUUID UUID] UUIDString] stringByAppendingPathExtension:@"plist"];
-        reportURL = [[NSURL fileURLWithPath:[directory stringByAppendingPathComponent:name]] retain];
         files = [[NSMutableArray alloc] initWithCapacity:[entries count]];
         for (NSDictionary* entry in entries)
         {
@@ -21,11 +19,14 @@
             [files addObject:file];
         }
         contents = [@{@"formatVersion": @1, @"status": @"in progress", @"startedAt": [NSDate date], @"files": files} mutableCopy];
-        if (![self save:error])
+        NSData* data = [NSPropertyListSerialization dataWithPropertyList:contents format:NSPropertyListXMLFormat_v1_0 options:0 error:error];
+        NSString* name = data ? aq_WriteUniqueFile(folder, @"AlphaSync Backup Log", @"plist", data, error) : nil;
+        if (!name)
         {
             [self release];
             return nil;
         }
+        reportURL = [[NSURL fileURLWithPath:[folder stringByAppendingPathComponent:name]] retain];
     }
     return self;
 }

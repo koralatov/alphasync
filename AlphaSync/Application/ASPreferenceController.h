@@ -36,10 +36,12 @@
 
 #define kASPreferenceKeyFilter              @"FilterMode"
 #define kASPreferenceKeyBackupFolder        @"BackupFolder"
+#define kASPreferenceKeySaveBackupLogs      @"SaveBackupLogs"
 #define kASPreferenceKeyAutoRun             @"AutoRun"
 
 #define kASPreferenceDefaultFilter          kASPreferenceOptionFilterAlphawordAndDictionary
 #define kASPreferenceDefaultBackupFolder    @"~/Documents/AlphaSync"
+#define kASPreferenceDefaultSaveBackupLogs  NO
 #define kASPreferenceDefaultAutoRun         NO
 
 // Create an HTML tag <a name="PrefernceWindowAnchor"></a> in the help, and re-index.
@@ -54,6 +56,7 @@
     NSTextField* outputFormatField;
     NSPathControl* backupFolderPath;
     NSButton* chooseFolderButton;
+    NSButton* saveBackupLogsButton;
     NSButton* outletAutoRun;
 
     NSTextField* automaticLaunchStatusField;
@@ -65,6 +68,7 @@
 - (id)initWithAppController:(ASApplicationController*)controller;
 - (IBAction)actionFilterOption:(id)sender;
 - (IBAction)actionBackupFolder:(id)sender;
+- (IBAction)actionSaveBackupLogs:(id)sender;
 - (IBAction)actionAutoRun:(id)sender;
 - (IBAction)actionPreferenceHelp:(id)sender;
 

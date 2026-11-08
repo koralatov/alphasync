@@ -1,5 +1,6 @@
 #import <Cocoa/Cocoa.h>
 #import "AQFileUtilities.h"
+#import "ASNode.h"
 #include <math.h>
 #include <stdio.h>
 
@@ -37,6 +38,63 @@
 - (BOOL)outlineView:(NSOutlineView*)view isItemExpandable:(id)item
 {
     return [self outlineView:view numberOfChildrenOfItem:item] > 0;
+}
+@end
+
+// File exports and scheduling for backup checks only.  No USB device is opened.
+@interface ASInterfaceBackupFile : ASNode
+@property BOOL failExport;
+@end
+@implementation ASInterfaceBackupFile
+- (NSString*)saveUnderPath:(NSString*)path error:(NSString**)error
+{
+    if (_failExport)
+    {
+        if (error) *error = @"Sample export failure";
+        return nil;
+    }
+    NSString* filename = [[self displayName] stringByAppendingPathExtension:@"txt"];
+    NSError* writeError = nil;
+    if (![@"Test backup\n" writeToFile:[path stringByAppendingPathComponent:filename] atomically:YES encoding:NSUTF8StringEncoding error:&writeError])
+    {
+        if (error) *error = [writeError localizedDescription];
+        return nil;
+    }
+    return filename;
+}
+@end
+
+@interface NSWindowController (ASBackupInterfaceChecks)
+- (void)runBackupFor:(ASNode*)root controller:(id)controller modalForWindow:(NSWindow*)window;
+- (void)requestStopForTermination;
+- (IBAction)actionStopDone:(id)sender;
+@end
+
+@interface ASInterfaceBackupQueue : NSObject
+@property (assign) NSWindowController* backup;
+@property NSUInteger stopAfter;
+@property NSUInteger completed;
+@end
+@implementation ASInterfaceBackupQueue
+- (void)performTaskForNode:(ASNode*)node refresh:(BOOL)refresh task:(id (^)(ASNode*))task completion:(void (^)(id, NSString*))completion
+{
+    (void)refresh;
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+        @autoreleasepool
+        {
+            id result = [task(node) retain];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (++_completed == 1)
+                {
+                    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+                    [defaults setBool:![defaults boolForKey:@"SaveBackupLogs"] forKey:@"SaveBackupLogs"];
+                }
+                if (_stopAfter && _completed == _stopAfter) [_backup requestStopForTermination];
+                completion(result, nil);
+                [result release];
+            });
+        }
+    });
 }
 @end
 
@@ -278,7 +336,7 @@ static void checkPreferenceLayout(id preferences)
     NSView* content = [[preferences window] contentView];
     [content layoutSubtreeIfNeeded];
     for (NSString* key in @[@"outletFilterOption", @"outputFormatField", @"backupFolderPath", @"chooseFolderButton",
-                             @"outletAutoRun", @"automaticLaunchStatusField", @"loginItemsButton"])
+                             @"saveBackupLogsButton", @"outletAutoRun", @"automaticLaunchStatusField", @"loginItemsButton"])
     {
         NSView* view = [preferences valueForKey:key];
         if ([view isHiddenOrHasHiddenAncestor]) continue;
@@ -302,6 +360,22 @@ static void checkPreferences(id controller)
     NSPopUpButton* filter = [preferences valueForKey:@"outletFilterOption"];
     NSPathControl* path = [preferences valueForKey:@"backupFolderPath"];
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    NSButton* logs = [preferences valueForKey:@"saveBackupLogsButton"];
+    requireInterface(![[defaults volatileDomainForName:NSRegistrationDomain][@"SaveBackupLogs"] boolValue], @"Backup logs are enabled by default.");
+    BOOL originalLogs = [defaults boolForKey:@"SaveBackupLogs"];
+    requireInterface(([logs state] == NSControlStateValueOn) == originalLogs, @"Preferences did not load the backup log option.");
+    @try
+    {
+        [logs performClick:nil];
+        requireInterface([defaults boolForKey:@"SaveBackupLogs"] != originalLogs, @"The backup log option did not save its change.");
+        [logs performClick:nil];
+        requireInterface([defaults boolForKey:@"SaveBackupLogs"] == originalLogs, @"The backup log option could not be restored.");
+    }
+    @finally
+    {
+        [defaults setBool:originalLogs forKey:@"SaveBackupLogs"];
+        [logs setState:originalLogs ? NSControlStateValueOn : NSControlStateValueOff];
+    }
     [window makeKeyAndOrderFront:nil];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
     requireInterface([window isMemberOfClass:[NSWindow class]], @"Preferences is not a standard Mac window.");
@@ -403,6 +477,92 @@ static void checkBackupResults(NSWindowController* backup)
     requireInterface([open isHidden] && [locations isHidden] && [[done title] isEqualToString:@"Stop"], @"Starting another backup left its old result visible.");
     checkBackupLayout(backup);
     puts("Backup completion, failure counts, cancellation, empty backups, folder actions, and native layout passed.");
+}
+
+static void checkBackupLogs(id controller, NSWindowController* backup)
+{
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    id originalFolder = [[defaults objectForKey:@"BackupFolder"] retain];
+    id originalLogs = [[defaults objectForKey:@"SaveBackupLogs"] retain];
+    NSFileManager* manager = [NSFileManager defaultManager];
+    NSString* temporary = [NSTemporaryDirectory() stringByAppendingPathComponent:[[NSUUID UUID] UUIDString]];
+    NSWindow* parent = [controller valueForKey:@"outletMainWindow"];
+    @try
+    {
+        for (NSUInteger scenario = 0; scenario < 5; ++scenario)
+        {
+            NSString* folder = [temporary stringByAppendingPathComponent:[NSString stringWithFormat:@"%lu", (unsigned long)scenario]];
+            [defaults setObject:folder forKey:@"BackupFolder"];
+            [defaults setBool:scenario != 0 forKey:@"SaveBackupLogs"];
+            ASNode* root = [[[ASNode alloc] init] autorelease];
+            for (NSUInteger device = 0; device < (scenario == 4 ? 0 : 2); ++device)
+            {
+                ASNode* neo = [[[ASNode alloc] init] autorelease];
+                [neo setDisplayName:device == 0 ? @"First NEO" : @"Second NEO"];
+                ASNode* applet = [[[ASNode alloc] init] autorelease];
+                [applet setDisplayName:@"AlphaWord"];
+                for (NSUInteger index = 0; index < 2; ++index)
+                {
+                    ASInterfaceBackupFile* file = [[[ASInterfaceBackupFile alloc] init] autorelease];
+                    [file setDisplayName:index == 0 ? @"One" : @"Two"];
+                    [file setFileSize:12];
+                    [file setFailExport:scenario == 3 && device == 0 && index == 1];
+                    [applet addChild:file];
+                }
+                [neo addChild:applet];
+                [root addChild:neo];
+            }
+            ASInterfaceBackupQueue* queue = [[[ASInterfaceBackupQueue alloc] init] autorelease];
+            [queue setBackup:backup];
+            [queue setStopAfter:scenario == 2 ? 3 : 0];
+            [backup runBackupFor:root controller:queue modalForWindow:parent];
+            NSDate* deadline = [NSDate dateWithTimeIntervalSinceNow:10];
+            while ([backup valueForKey:@"backupItems"] && [deadline timeIntervalSinceNow] > 0)
+                [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.01]];
+            requireInterface([backup valueForKey:@"backupItems"] == nil, @"The sample backup did not finish.");
+            NSArray* titles = @[@"Backup complete", @"Backup complete", @"Backup stopped", @"Backup incomplete", @"No files to back up"];
+            requireInterface([[[backup valueForKey:@"outletFilesRemaining"] stringValue] isEqualToString:titles[scenario]], @"A backup result changed when logging was optional.");
+            NSArray* paths = [backup valueForKey:@"backupSessionPaths"];
+            requireInterface([paths count] == (scenario == 4 ? 0 : 2), @"A dated NEO backup folder is missing.");
+            for (NSUInteger device = 0; device < [paths count]; ++device)
+            {
+                NSString* log = [paths[device] stringByAppendingPathComponent:@"AlphaSync Backup Log.plist"];
+                requireInterface([manager fileExistsAtPath:log] == (scenario != 0), @"Backup logs did not follow the option captured at the start.");
+                if (scenario == 0) continue;
+                NSDictionary* contents = [NSPropertyListSerialization propertyListWithData:[NSData dataWithContentsOfFile:log] options:0 format:NULL error:NULL];
+                NSArray* entries = contents[@"files"];
+                NSString* expected = scenario == 2 && device == 1 ? @"cancelled" :
+                                     (scenario == 3 && device == 0 ? @"completed with failures" : @"complete");
+                requireInterface([contents[@"status"] isEqualToString:expected] && [entries count] == 2, @"A NEO log has the wrong final status or file count.");
+                for (NSDictionary* entry in entries)
+                {
+                    NSString* name = device == 0 ? @"First NEO" : @"Second NEO";
+                    requireInterface([entry[@"device"] isEqualToString:name], @"A log contains another NEO’s files.");
+                    if ([entry[@"status"] isEqualToString:@"saved"])
+                        requireInterface([manager fileExistsAtPath:entry[@"path"]], @"A log lists a file that was not saved.");
+                }
+                if (scenario == 2 && device == 1)
+                    requireInterface([entries[1][@"status"] isEqualToString:@"pending"], @"A cancelled log lost its pending file.");
+            }
+            requireInterface(![manager fileExistsAtPath:[folder stringByAppendingPathComponent:@"Backup Reports"]], @"Backup logs created a separate reports folder.");
+            if (scenario == 4) requireInterface(![manager fileExistsAtPath:folder], @"An empty backup created log folders.");
+            [backup actionStopDone:nil];
+            while ([parent attachedSheet] && [deadline timeIntervalSinceNow] > 0)
+                [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.01]];
+            requireInterface([parent attachedSheet] == nil, @"The sample backup sheet did not close.");
+        }
+    }
+    @finally
+    {
+        if (originalFolder) [defaults setObject:originalFolder forKey:@"BackupFolder"];
+        else [defaults removeObjectForKey:@"BackupFolder"];
+        if (originalLogs) [defaults setObject:originalLogs forKey:@"SaveBackupLogs"];
+        else [defaults removeObjectForKey:@"SaveBackupLogs"];
+        [originalFolder release];
+        [originalLogs release];
+        [manager removeItemAtPath:temporary error:nil];
+    }
+    puts("Optional backup logs, dated destinations, separate NEOs, cancellation, failed exports, and empty backups passed.");
 }
 
 static void captureBackupResults(NSWindowController* backup, NSString* directory, NSString* mode)
@@ -653,6 +813,11 @@ static int checkInterface(void)
         requireInterface(loaded, @"The backup window did not load.");
         fputs("Interface check: checking backup results.\n", stderr);
         if (loaded) checkBackupResults(backup);
+        if (loaded)
+        {
+            fputs("Interface check: checking optional backup logs.\n", stderr);
+            checkBackupLogs(controller, backup);
+        }
         NSArray* arguments = [[NSProcessInfo processInfo] arguments];
         NSUInteger snapshots = [arguments indexOfObject:@"--appearance-snapshots"];
         if (loaded && snapshots != NSNotFound)

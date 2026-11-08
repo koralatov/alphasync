@@ -105,6 +105,7 @@ static const NSInteger kMenuItemTagBackup   = 100;
 
     [defaults setObject:defaultFilter forKey:kASPreferenceKeyFilter];
     [defaults setObject:defaultBackupFolder forKey:kASPreferenceKeyBackupFolder];
+    [defaults setObject:@(kASPreferenceDefaultSaveBackupLogs) forKey:kASPreferenceKeySaveBackupLogs];
 
     [[NSUserDefaults standardUserDefaults] registerDefaults:defaults];
 }

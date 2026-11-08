@@ -50,9 +50,9 @@ ifeq ($(shell uname -s),Darwin)
 test-reports: build/report-tests
 	./build/report-tests
 
-build/report-tests: tests/report-tests.mm AlphaSync/Application/ASBackupReport.mm AlphaSync/Application/ASBackupReport.h Makefile
+build/report-tests: tests/report-tests.mm AlphaSync/Application/ASBackupReport.mm AlphaSync/Application/ASBackupReport.h AlphaSync/Library/AQFileUtilities.m AlphaSync/Library/AQFileUtilities.h Makefile
 	@mkdir -p build
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) tests/report-tests.mm AlphaSync/Application/ASBackupReport.mm -framework Foundation -o $@
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -x objective-c++ tests/report-tests.mm AlphaSync/Application/ASBackupReport.mm AlphaSync/Library/AQFileUtilities.m -framework Cocoa -o $@
 endif
 
 ifeq ($(shell uname -s),Darwin)

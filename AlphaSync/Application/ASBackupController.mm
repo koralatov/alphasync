@@ -295,6 +295,8 @@ static NSTextField* ASBackupLabel(NSString* text)
     nextBackupItem = 0;
     failedFiles = 0;
     backupDeviceCount = 0;
+    // Snapshot the option for this backup, even if Preferences changes during a transfer.
+    saveBackupLogs = [[NSUserDefaults standardUserDefaults] boolForKey:kASPreferenceKeySaveBackupLogs];
     bytesToBackup = 0;
     bytesSoFar = 0;
     [currentSessionPath release]; currentSessionPath = nil;
@@ -321,19 +323,6 @@ static NSTextField* ASBackupLabel(NSString* text)
                 bytesToBackup += static_cast<uint64_t>(MAX([fileNode fileSize], 0));
             }
         }
-    }
-
-    NSMutableArray* entries = [NSMutableArray arrayWithCapacity:[backupItems count]];
-    for (ASBackupItem* item in backupItems)
-        [entries addObject:@{@"device": [item deviceName] ?: @"", @"applet": [item appletName] ?: @"",
-                             @"file": [[item fileNode] displayName] ?: @""}];
-    NSString* folder = [[NSUserDefaults standardUserDefaults] stringForKey:kASPreferenceKeyBackupFolder];
-    NSError* error = nil;
-    backupReport = [[ASBackupReport alloc] initWithFolder:folder files:entries error:&error];
-    if (!backupReport)
-    {
-        [self stopBackup:[NSString stringWithFormat:@"Backup could not start: %@", [error localizedDescription]] status:@"failed"];
-        return NO;
     }
 
     [outletFilesRemaining setStringValue:[NSString stringWithFormat:@"Backing up %@", ASBackupFileCount([backupItems count])]];
@@ -398,7 +387,7 @@ static NSTextField* ASBackupLabel(NSString* text)
     if (backupReport && ![backupReport finishWithStatus:status message:summary error:&reportError])
     {
         title = @"Backup incomplete";
-        summary = [summary stringByAppendingFormat:@"  The final report could not be saved: %@", [reportError localizedDescription]];
+        summary = [summary stringByAppendingFormat:@"  The backup log could not be saved: %@", [reportError localizedDescription]];
     }
     [backupReport release];
     backupReport = nil;
@@ -475,6 +464,19 @@ static NSTextField* ASBackupLabel(NSString* text)
     }
     ASBackupItem* item = backupItems[nextBackupItem];
     ASFileNode* file = [item fileNode];
+    NSMutableArray* entries = nil;
+    if ([item newDevice] && saveBackupLogs)
+    {
+        reportStartIndex = nextBackupItem;
+        entries = [NSMutableArray array];
+        for (NSUInteger index = nextBackupItem; index < [backupItems count]; ++index)
+        {
+            ASBackupItem* next = backupItems[index];
+            if (index != nextBackupItem && [next newDevice]) break;
+            [entries addObject:@{@"device": [next deviceName] ?: @"", @"applet": [next appletName] ?: @"",
+                                 @"file": [[next fileNode] displayName] ?: @""}];
+        }
+    }
     [outletFilesRemaining setStringValue:[NSString stringWithFormat:@"Backing up %@", ASBackupFileCount([backupItems count] - nextBackupItem)]];
     [outletBackupItem setStringValue:[NSString stringWithFormat:@"%@: %@: %@", [item deviceName], [item appletName], [file displayName]]];
     [self fitWindowToContent];
@@ -482,7 +484,15 @@ static NSTextField* ASBackupLabel(NSString* text)
     [deviceController performTaskForNode:file refresh:NO task:^id(ASNode* working) {
         NSString* savedPath = nil;
         NSString* failure = nil;
-        if ([item newDevice]) [self makeNewDeviceSessionPath:[item deviceName]];
+        if ([item newDevice])
+        {
+            if ([self makeNewDeviceSessionPath:[item deviceName]] && saveBackupLogs)
+            {
+                NSError* error = nil;
+                backupReport = [[ASBackupReport alloc] initWithFolder:currentSessionPath files:entries error:&error];
+                if (!backupReport) return @{@"logError": [error localizedDescription] ?: @"The backup log could not be created."};
+            }
+        }
         if (!currentSessionPath) failure = @"Unable to create the backup folder.";
         else
         {
@@ -497,6 +507,11 @@ static NSTextField* ASBackupLabel(NSString* text)
         return @{@"path": savedPath ?: @"", @"error": failure ?: @""};
     } completion:^(id result, NSString* taskError) {
         backupInFlight = NO;
+        if (result[@"logError"])
+        {
+            [self stopBackup:[NSString stringWithFormat:@"Backup stopped because its log could not be created: %@", result[@"logError"]] status:@"failed"];
+            return;
+        }
         NSString* path = [result[@"path"] length] ? result[@"path"] : nil;
         NSString* failure = taskError ?: ([result[@"error"] length] ? result[@"error"] : nil);
         if (!path)
@@ -505,12 +520,23 @@ static NSTextField* ASBackupLabel(NSString* text)
             failure = failure ?: @"The file could not be exported.";
         }
         NSError* reportError = nil;
-        // The transfer has finished even if saving its report now fails.
+        // The transfer has finished even if saving its optional log now fails.
         NSUInteger finishedItem = nextBackupItem++;
-        if (![backupReport recordFileAtIndex:finishedItem savedPath:path error:failure saveError:&reportError])
+        if (backupReport && ![backupReport recordFileAtIndex:finishedItem - reportStartIndex savedPath:path error:failure saveError:&reportError])
         {
-            [self stopBackup:[NSString stringWithFormat:@"Backup stopped because its report could not be saved: %@", [reportError localizedDescription]] status:@"failed"];
+            [self stopBackup:[NSString stringWithFormat:@"Backup stopped because its log could not be saved: %@", [reportError localizedDescription]] status:@"failed"];
             return;
+        }
+        BOOL deviceFinished = nextBackupItem == [backupItems count] || [backupItems[nextBackupItem] newDevice];
+        if (backupReport && deviceFinished)
+        {
+            if (![backupReport finishWithStatus:@"complete" message:@"Backup finished for this NEO." error:&reportError])
+            {
+                [self stopBackup:[NSString stringWithFormat:@"Backup stopped because its log could not be saved: %@", [reportError localizedDescription]] status:@"failed"];
+                return;
+            }
+            [backupReport release];
+            backupReport = nil;
         }
         bytesSoFar += static_cast<uint64_t>(MAX([file fileSize], 0));
         double progress = bytesToBackup ? double(bytesSoFar) / double(bytesToBackup) : double(nextBackupItem) / double([backupItems count]);

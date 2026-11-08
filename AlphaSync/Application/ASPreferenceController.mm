@@ -179,6 +179,9 @@ static NSBox* ASPreferenceSeparator(void)
     [folder setAlignment:NSLayoutAttributeCenterY];
     [folder setSpacing:8];
 
+    saveBackupLogsButton = [NSButton checkboxWithTitle:@"Save a backup log" target:self action:@selector(actionSaveBackupLogs:)];
+    [saveBackupLogsButton setState:[[NSUserDefaults standardUserDefaults] boolForKey:kASPreferenceKeySaveBackupLogs] ? NSControlStateValueOn : NSControlStateValueOff];
+
     outletAutoRun = [NSButton checkboxWithTitle:@"Open AlphaSync when a NEO is connected" target:self action:@selector(actionAutoRun:)];
 
     automaticLaunchStatusField = [NSTextField wrappingLabelWithString:@""];
@@ -195,7 +198,7 @@ static NSBox* ASPreferenceSeparator(void)
     [help setToolTip:@"Preferences Help"];
     [help setAccessibilityLabel:@"Preferences Help"];
     NSView* spacer = [[[NSView alloc] initWithFrame:NSZeroRect] autorelease];
-    NSStackView* footer = [NSStackView stackViewWithViews:@[ASPreferenceNote(@"Changes take effect immediately."), spacer, help]];
+    NSStackView* footer = [NSStackView stackViewWithViews:@[ASPreferenceNote(@"Changes are saved automatically."), spacer, help]];
     [footer setDistribution:NSStackViewDistributionFill];
     [footer setAlignment:NSLayoutAttributeCenterY];
     [footer setSpacing:8];
@@ -203,7 +206,8 @@ static NSBox* ASPreferenceSeparator(void)
     NSStackView* form = ASPreferenceColumn(@[
         ASPreferenceSection(@"Files", @[files]),
         ASPreferenceSeparator(),
-        ASPreferenceSection(@"Backups", @[folder, ASPreferenceNote(@"Quick Backup saves a separate copy of your files in this folder.")]),
+        ASPreferenceSection(@"Backups", @[folder, ASPreferenceNote(@"Quick Backup saves a separate copy of your files in this folder."),
+                                         saveBackupLogsButton, ASPreferenceNote(@"Optional.  Saves a list of copied files and any errors inside each dated backup folder.")]),
         ASPreferenceSeparator(),
         ASPreferenceSection(@"Automatic opening", @[outletAutoRun, automaticLaunchStatusField, settings]),
         ASPreferenceSeparator(),
@@ -324,6 +328,12 @@ static NSBox* ASPreferenceSeparator(void)
     [outletAutoRun setState:[self autoRun] ? NSControlStateValueOn : NSControlStateValueOff];
     [applicationController setupAutoRun:0.0];
     [self refreshAutomaticLaunchStatus:nil];
+}
+
+- (IBAction)actionSaveBackupLogs:(id)sender
+{
+    [[NSUserDefaults standardUserDefaults] setBool:[(NSButton*)sender state] == NSControlStateValueOn
+                                           forKey:kASPreferenceKeySaveBackupLogs];
 }
 
 - (IBAction)actionPreferenceHelp:(id)sender
