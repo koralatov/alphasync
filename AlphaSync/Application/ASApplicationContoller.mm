@@ -702,9 +702,9 @@ static const NSInteger kMenuItemTagBackup   = 100;
     {
         toolbarItem = [[[NSToolbarItem alloc] initWithItemIdentifier:itemIdent] autorelease];
 
-        [toolbarItem setLabel:@"Clear"];
-        [toolbarItem setPaletteLabel:@"Clear"];
-        [toolbarItem setToolTip:@"Clear a single file, or all files belonging to an applet"];
+        [toolbarItem setLabel:@"Clear File…"];
+        [toolbarItem setPaletteLabel:@"Clear Files…"];
+        [toolbarItem setToolTip:@"Select an AlphaWord file, or AlphaWord to clear all its files."];
         [toolbarItem setImage:iconToolbarDelete];
         [toolbarItem setTarget:self];
         [toolbarItem setAction:@selector(actionDelete:)];
@@ -751,7 +751,6 @@ static const NSInteger kMenuItemTagBackup   = 100;
 
 - (BOOL)validateToolbarItem:(NSToolbarItem*)toolbarItem
 {
-    if ([deviceController isBusy]) return NO;
     BOOL enable = NO;
 
     if ([[toolbarItem itemIdentifier] isEqual:kToolbarItemIdentifierInfo])
@@ -760,6 +759,8 @@ static const NSInteger kMenuItemTagBackup   = 100;
     }
     else if ([[toolbarItem itemIdentifier] isEqual:kToolbarItemIdentifierDelete])
     {
+        NSString* label = @"Clear File…";
+        NSString* help = @"Select an AlphaWord file, or AlphaWord to clear all its files.";
         // Only enable the delete option if there is only one item selected and that item supports the delete protocol
         if ([outletFileView numberOfSelectedRows] == 1)
         {
@@ -767,21 +768,16 @@ static const NSInteger kMenuItemTagBackup   = 100;
             enable = [selectedItem conformsToProtocol:@protocol(ASDeleteProtocol)] && [selectedItem deletePermitted];
             if ([selectedItem isMemberOfClass:[ASFileNode class]])
             {
-                [toolbarItem setToolTip:@"Clear the contents of a single file"];
+                help = [NSString stringWithFormat:@"Clear the contents of ‘%@’.", [selectedItem displayName]];
             }
             else if ([selectedItem isMemberOfClass:[ASAppletNode class]])
             {
-                [toolbarItem setToolTip:@"Clear all files belonging to an applet"];
-            }
-            else
-            {
-                [toolbarItem setToolTip:@"Clear the thing that is selected"];
+                label = @"Clear All Files…";
+                help = [NSString stringWithFormat:@"Clear all files in ‘%@’.", [selectedItem displayName]];
             }
         }
-        if (!enable)
-        {
-            [toolbarItem setToolTip:@"Clear the contents of one or more files"];
-        }
+        [toolbarItem setLabel:label];
+        [toolbarItem setToolTip:help];
     }
     else if ([[toolbarItem itemIdentifier] isEqual:kToolbarItemIdentifierBackup])
     {
@@ -789,7 +785,7 @@ static const NSInteger kMenuItemTagBackup   = 100;
         if (0 != [[deviceController systemRoot] numberOfChildren]) enable = true;
     }
 
-    return enable;
+    return enable && ![deviceController isBusy];
 }
 
 

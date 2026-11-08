@@ -42,8 +42,9 @@ Open AlphaSync and connect your NEO with a USB cable.  Your NEO’s files appear
 - **Copy files to your Mac:** drag them from AlphaSync into a Finder folder.
 - **Copy text files to your NEO:** drag them from Finder into AlphaSync.
 - **Back up your files:** click **Backup**.  You can choose where backups are saved in **Preferences**.
+- **Clear files:** select a file for **Clear File…**, or select **AlphaWord** for **Clear All Files…**.  The warning names what will be cleared, and **Cancel** is the default.
 
-Back up the files on your NEO before sending new files to it.
+Back up the files on your NEO before replacing or clearing them.
 
 To have AlphaSync open whenever you connect your NEO, turn on automatic opening in **Preferences**.  Keep the app in Applications, and follow any approval prompts shown in Preferences.
 
