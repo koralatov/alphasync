@@ -100,6 +100,72 @@ static void captureWindow(NSWindow* window, NSString* directory, NSString* name)
     requireInterface([png writeToFile:path options:NSDataWritingAtomic error:&error], [error localizedDescription] ?: @"A screenshot could not be saved.");
 }
 
+static void checkClearConfirmation(id controller)
+{
+    // Invoke only the warning.  These display-only nodes never clear a real file.
+    for (NSString* className in @[@"ASFileNode", @"ASAppletNode"])
+    {
+        id node = [[[NSClassFromString(className) alloc] performSelector:NSSelectorFromString(@"initForDisplay")] autorelease];
+        [node setValue:@"Example" forKey:@"displayName"];
+        for (NSString* input in @[@"\r", @"\003", @"\033", @"OK"])
+        {
+            __block BOOL sent = NO, safeDefault = NO, timedOut = NO;
+            NSDate* deadline = [NSDate dateWithTimeIntervalSinceNow:5];
+            NSTimer* timer = [NSTimer timerWithTimeInterval:0.05 repeats:YES block:^(NSTimer* tick) {
+                if ([deadline timeIntervalSinceNow] <= 0)
+                {
+                    timedOut = YES;
+                    [tick invalidate];
+                    [NSApp abortModal];
+                    return;
+                }
+                NSWindow* window = [NSApp modalWindow];
+                if (sent || !window) return;
+                NSButton* cancel = nil;
+                NSButton* proceed = nil;
+                NSMutableArray* views = [NSMutableArray arrayWithObject:[window contentView]];
+                while ([views count])
+                {
+                    NSView* view = [[[views lastObject] retain] autorelease];
+                    [views removeLastObject];
+                    [views addObjectsFromArray:[view subviews]];
+                    if (![view isKindOfClass:[NSButton class]]) continue;
+                    NSButton* button = (NSButton*)view;
+                    if ([[button title] isEqualToString:@"Cancel"]) cancel = button;
+                    if ([[button title] isEqualToString:@"OK"]) proceed = button;
+                }
+                if (!cancel || !proceed) return;
+                safeDefault = [window defaultButtonCell] == [cancel cell] && [[proceed keyEquivalent] length] == 0;
+                sent = YES;
+                if ([input isEqualToString:@"OK"]) [proceed performClick:nil];
+                else
+                {
+                    unsigned short code = [input isEqualToString:@"\r"] ? 36 : ([input isEqualToString:@"\003"] ? 76 : 53);
+                    NSEvent* event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSZeroPoint modifierFlags:0
+                        timestamp:[[NSProcessInfo processInfo] systemUptime] windowNumber:[window windowNumber] context:nil
+                        characters:input charactersIgnoringModifiers:input isARepeat:NO keyCode:code];
+                    [NSApp postEvent:event atStart:YES];
+                }
+            }];
+            [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSModalPanelRunLoopMode];
+            SEL selector = NSSelectorFromString(@"deviceWillDelete:sender:");
+            NSInvocation* call = [NSInvocation invocationWithMethodSignature:[controller methodSignatureForSelector:selector]];
+            [call setSelector:selector];
+            [call setArgument:&node atIndex:2];
+            [call setArgument:&node atIndex:3];
+            [call invokeWithTarget:controller];
+            BOOL shouldProceed = NO;
+            [call getReturnValue:&shouldProceed];
+            [timer invalidate];
+            requireInterface(sent && safeDefault && !timedOut, @"The Clear warning did not use Cancel as its native keyboard default.");
+            requireInterface(shouldProceed == [input isEqualToString:@"OK"],
+                             @"A cancellation key allowed clearing, or an explicit OK failed to confirm.");
+            [controller performSelector:NSSelectorFromString(@"displayStatusTimerDone")];
+        }
+    }
+    puts("File and applet Clear warnings cancel with Return, keypad Enter, and Escape; explicit OK confirms without clearing test data.");
+}
+
 static void checkConnectionLayout(id controller)
 {
     NSWindow* window = [controller valueForKey:@"outletMainWindow"];
@@ -531,6 +597,8 @@ static int checkInterface(void)
 
         fputs("Interface check: checking connection window transitions.\n", stderr);
         checkConnectionStates(controller);
+        fputs("Interface check: checking Clear warning keyboard responses.\n", stderr);
+        checkClearConfirmation(controller);
 
         // Load every window, so missing resources and broken outlet connections fail the check.
         fputs("Interface check: opening Preferences.\n", stderr);

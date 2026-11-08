@@ -43,6 +43,7 @@ Keep known-good backups before testing writes to the NEO.
 - Disconnect during a backup or file sheet.  Read and dismiss the result before the parent shrinks.  Repeat in full screen; the window should return to the compact size after leaving full screen.  Check the animation with Reduce Motion enabled.
 - In the file viewer, check readable filenames and sizes, toolbar buttons, and status bar.  Widen and narrow the window; the Name column should take up the extra space while Size keeps its width.
 - Check an empty file and files of 1, 999, 1,000, 1,024, and 12,000 bytes.  The list and Inspector should agree, using bytes below 1 KB and KB from 1 KB upwards.  Check the decimal units and localised number formatting against Finder; the Inspector details should still show the exact byte count.
+- Open the Clear warning for a file and an applet.  Cancel should be the default; Return, keypad Enter, and Escape should dismiss the warning without clearing anything.  With a disposable file and a known-good backup, confirm that deliberately choosing OK still clears only the indicated contents.
 - Copy files in both directions, including pound signs, accented letters, and curly quotes.
 - Import matching MacASCII, UTF-8, and UTF-16 files, including both UTF-16 byte orders with byte-order marks.  Confirm that exported copies and backups use UTF-8 and preserve the text.
 - Import the same paragraphs with LF, CRLF, and CR endings.  Check for the same paragraph breaks.
