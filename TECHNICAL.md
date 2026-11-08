@@ -165,7 +165,7 @@ The Build Help phase generates an offline licence page directly from the origina
 
 ## Versioning
 
-Both downloads and their helpers share **version 1.4.4, build 144**, read from [Version.xcconfig](AlphaSync/Build/Version.xcconfig).  Increase the build number for each distributed revision, independently of the release version, and set the version before creating its release tag.  The separate build reports record the full source commit for both downloads.
+Both downloads and their helpers share **version 1.4.5, build 145**, read from [Version.xcconfig](AlphaSync/Build/Version.xcconfig).  Increase the build number for each distributed revision, independently of the release version, and set the version before creating its release tag.  The separate build reports record the full source commit for both downloads.
 
 To publish a testing release, commit its notes as `releases/<version>.md`, then push a version update with the exact commit subject `Release AlphaSync <version>`.  The version must match `Version.xcconfig`.  The **Build and test** workflow builds both downloads, completes the required checks, and verifies the version, source commit, and checksums before creating a fresh tag.  It uploads both ZIPs, their checksums, and build reports to one draft, verifies all six uploaded files, then publishes it as a prerelease.  Existing tags and releases are not overwritten.  Only the publication job has release-writing permission.  Other pushes and pull requests produce build artifacts as before.
 
