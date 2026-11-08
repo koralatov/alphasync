@@ -32,6 +32,7 @@
 
 #import "ASApplicationContoller.h"
 #import "ASInspectorWindowController.h"
+#import "ASAboutWindowController.h"
 #import "AQFileUtilities.h"
 #import "aq_launcher.h"
 #import "aq_launcherconfig.h"
@@ -120,6 +121,7 @@ static const NSInteger kMenuItemTagBackup   = 100;
 - (void)dealloc
 {
     [preferenceController release];
+    [aboutController release];
     [deviceController release];
     [statusDisplayTimer invalidate];
     [launcherInstallPath release];
@@ -316,6 +318,13 @@ static const NSInteger kMenuItemTagBackup   = 100;
 
     if (!preferenceController) preferenceController = [[ASPreferenceController alloc] initWithAppController:self];
     [preferenceController showWindow:self];
+}
+
+- (IBAction)actionShowAbout:(id)sender
+{
+    (void)sender;
+    if (!aboutController) aboutController = [[ASAboutWindowController alloc] init];
+    [aboutController showWindow:self];
 }
 
 
@@ -1064,6 +1073,19 @@ static const NSInteger kMenuItemTagBackup   = 100;
 
 #pragma mark -
 #pragma mark Application Delegate Methods
+
+- (void)applicationDidFinishLaunching:(NSNotification*)notification
+{
+    (void)notification;
+    // Reconnect the existing About item after the main menu has finished loading.
+    for (NSMenuItem* menu in [[NSApp mainMenu] itemArray])
+        for (NSMenuItem* item in [[menu submenu] itemArray])
+            if ([item action] == @selector(orderFrontStandardAboutPanel:))
+            {
+                [item setTarget:self];
+                [item setAction:@selector(actionShowAbout:)];
+            }
+}
 
 
 

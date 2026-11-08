@@ -15,6 +15,9 @@ version=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$app/C
 build_number=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$app/Contents/Info.plist")
 [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
 [[ "$build_number" =~ ^[1-9][0-9]*$ ]]
+compatibility=$(sed -n 's/^AS_COMPATIBILITY_DESCRIPTION *= *//p' "$profile_configuration")
+test -n "$compatibility"
+test "$(/usr/libexec/PlistBuddy -c 'Print :ASCompatibilityDescription' "$app/Contents/Info.plist")" = "$compatibility"
 
 for bundle in "$app" "$helper"; do
     name=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$bundle/Contents/Info.plist")

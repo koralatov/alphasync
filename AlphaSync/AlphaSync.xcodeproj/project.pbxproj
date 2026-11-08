@@ -67,6 +67,7 @@
         C01100000000000000000004 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
         C01100000000000000000005 /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01100000000000000000006 /* ServiceManagement.framework */; };
 		4ABCBDDC395974B75A43B8E8 /* ASBackupReport.mm in Sources */ = {isa = PBXBuildFile; fileRef = E41551F125E170A143893D41 /* ASBackupReport.mm */; };
+		4F4037857F8284AEB6168760 /* ASAboutWindowController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2988E42F47B3BF6ADF1A6831 /* ASAboutWindowController.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -187,6 +188,8 @@
 		E7E3978206CD4AB3E5F1B4CD /* Universal.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Universal.xcconfig; sourceTree = "<group>"; };
 		D7B4C96AC8AF0BF3C8619F8B /* Modern.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Modern.xcconfig; sourceTree = "<group>"; };
 		85CDB32AAC2D3B860B22908E /* Version.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Version.xcconfig; sourceTree = "<group>"; };
+		1D2AB5E8AD17E38DCF755E8F /* ASAboutWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASAboutWindowController.h; sourceTree = "<group>"; };
+		2988E42F47B3BF6ADF1A6831 /* ASAboutWindowController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASAboutWindowController.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -383,6 +386,8 @@
 			children = (
 				A99A54380F0D39E400BC68F1 /* ASAppletNode.h */,
 				A99A54390F0D39E400BC68F1 /* ASAppletNode.mm */,
+				1D2AB5E8AD17E38DCF755E8F /* ASAboutWindowController.h */,
+				2988E42F47B3BF6ADF1A6831 /* ASAboutWindowController.mm */,
 				A99A543A0F0D39E400BC68F1 /* ASApplicationContoller.h */,
 				A99A543B0F0D39E400BC68F1 /* ASApplicationContoller.mm */,
 				A99A543C0F0D39E400BC68F1 /* ASBackupController.h */,
@@ -559,6 +564,7 @@
 			files = (
 				8D11072D0486CEB800E47090 /* main.m in Sources */,
 				A99A54540F0D39E400BC68F1 /* ASAppletNode.mm in Sources */,
+				4F4037857F8284AEB6168760 /* ASAboutWindowController.mm in Sources */,
 				A99A54550F0D39E400BC68F1 /* ASApplicationContoller.mm in Sources */,
 				A99A54560F0D39E400BC68F1 /* ASBackupController.mm in Sources */,
 				4ABCBDDC395974B75A43B8E8 /* ASBackupReport.mm in Sources */,

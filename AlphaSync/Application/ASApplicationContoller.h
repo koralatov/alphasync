@@ -37,6 +37,8 @@
 #import "ASDeviceAccessProtocol.h"
 #import "ASInspectorWindowController.h"
 
+@class ASAboutWindowController;
+
 @interface ASApplicationController : NSObject <NSApplicationDelegate, ASDeviceAccessProtocol, NSWindowDelegate, NSOutlineViewDelegate, NSToolbarDelegate, NSTextFieldDelegate>
 {
     IBOutlet NSWindow* outletMainWindow;
@@ -65,6 +67,7 @@
     ASBackupController* backupController;
     ASDeviceController* deviceController;
     ASInspectorWindowController* inspectorController;
+    ASAboutWindowController* aboutController;
 
     NSTimer* statusDisplayTimer;
     NSToolbar* toolbar;
@@ -81,6 +84,7 @@
 - (IBAction)actionInfo:(id)sender;
 - (IBAction)actionBackup:(id)sender;
 - (IBAction)actionShowPreferences:(id)sender;
+- (IBAction)actionShowAbout:(id)sender;
 - (IBAction)actionOpenBackupFolder:(id)sender;
 - (IBAction)actionUninstall:(id)sender;
 - (IBAction)reloadDeviceData:(id)sender;

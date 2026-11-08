@@ -88,7 +88,7 @@ scripts/verify-app.sh build/ModernData/Build/Products/ReleaseModern/AlphaSync.ap
 
 This checks the exact architectures, executable deployment targets, system-only dependencies, matching app and helper versions, nested signatures, and every interface window.  It does not capture USB devices or change login items.  An alternative app path can be passed as its first argument.  An explicit `--skip-launch` third argument permits binary inspection on an older host; it does not establish runtime compatibility.
 
-The interface uses standard AppKit controls and follows the macOS appearance automatically, including changes while the app is running.  Toolbar symbols, file rows, the Inspector, and Apple Help use system styling and adaptive colours.  To check both appearances and save screenshots of each window and Help page on a Mac, run:
+The interface uses standard AppKit controls and follows the macOS appearance automatically, including changes while the app is running.  Toolbar symbols, file rows, the Inspector, About, and Apple Help use system styling and adaptive colours.  To check both appearances and save screenshots of each window and Help page on a Mac, run:
 
 ```sh
 scripts/check-appearance.sh build/DerivedData/Build/Products/Release/AlphaSync.app build/appearance
@@ -97,6 +97,8 @@ scripts/check-appearance.sh build/DerivedData/Build/Products/Release/AlphaSync.a
 This check uses cached sample rows without connecting to a NEO or changing login items.  It checks native row components, rename permissions and cancellation, text contrast, appearance inheritance, and switching from Light to Dark and back to Light.  Help pages are rendered with the system WebKit.  CI retains the screenshots separately from the app downloads.
 
 Preferences uses a standard `NSWindow` with native stack and grid views, a folder path control, and Auto Layout.  The window fits its content when the automatic-launch status changes.  Interface checks verify saved settings, closing and reopening the window, native button sizing, and unclipped status messages.  Appearance captures include a long folder path and registration error in each mode.  The manual checklist covers selecting and cancelling a backup folder in the system file panel, whose remote service can be unavailable on unattended runners.
+
+About uses native AppKit controls, the bundled app icon, and the shared version and build values.  Each build profile supplies its compatibility wording through `ASCompatibilityDescription` in the app’s property list.  Verification checks this against the selected profile.  The window is opened through its menu action during smoke checks and included in the Light, Dark, and Light-again captures.
 
 GitHub Actions builds the universal app on Intel and Apple Silicon runners with macOS 15 and 26.  A required macOS 27 Apple Silicon job builds and launches the modern app.  Both profiles receive Debug, Release, archive, dependency, signature, and window checks.  These checks run on the runners’ macOS versions, so they do not establish that every feature works on macOS 11.
 

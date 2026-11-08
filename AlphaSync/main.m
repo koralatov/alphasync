@@ -179,8 +179,9 @@ static void checkAppearances(id controller, NSWindowController* backup, NSString
     NSWindow* main = [controller valueForKey:@"outletMainWindow"];
     NSOutlineView* outline = [controller valueForKey:@"outletFileView"];
     id inspector = [controller valueForKey:@"inspectorController"];
-    NSArray* windows = @[main, [[controller valueForKey:@"preferenceController"] window], [inspector window], [backup window]];
-    NSArray* names = @[@"main", @"preferences", @"inspector", @"backup"];
+    NSArray* windows = @[main, [[controller valueForKey:@"preferenceController"] window], [inspector window], [backup window],
+                         [[controller valueForKey:@"aboutController"] window]];
+    NSArray* names = @[@"main", @"preferences", @"inspector", @"backup", @"about"];
     for (NSWindow* window in windows)
     {
         requireInterface([window appearance] == nil, @"A window overrides the system appearance.");
@@ -301,7 +302,13 @@ static int checkInterface(void)
         // Load every window, so missing resources and broken outlet connections fail the check.
         [controller performSelector:NSSelectorFromString(@"actionShowPreferences:") withObject:nil];
         [controller performSelector:NSSelectorFromString(@"actionInfo:") withObject:nil];
-        for (NSString* key in @[@"preferenceController", @"inspectorController"])
+        BOOL openedAbout = NO;
+        for (NSMenuItem* menu in [[NSApp mainMenu] itemArray])
+            for (NSMenuItem* item in [[menu submenu] itemArray])
+                if ([item action] == NSSelectorFromString(@"actionShowAbout:"))
+                    openedAbout = [NSApp sendAction:[item action] to:[item target] from:item];
+        requireInterface(openedAbout, @"The About menu did not open the native About window.");
+        for (NSString* key in @[@"preferenceController", @"inspectorController", @"aboutController"])
         {
             NSWindowController* windowController = [controller valueForKey:key];
             requireInterface([windowController window] != nil, [NSString stringWithFormat:@"The %@ window did not load.", key]);
