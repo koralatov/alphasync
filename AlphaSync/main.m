@@ -1111,7 +1111,8 @@ static void checkHelpMenu(id controller)
 {
     NSMenu* menu = [NSApp helpMenu];
     requireInterface(menu && [[[[NSApp mainMenu] itemArray] lastObject] submenu] == menu,
-                     @"The native Help menu is not registered at the end of the menu bar.");
+                     [NSString stringWithFormat:@"The native Help menu is not registered at the end of the menu bar.  Registered: %@; menus: %@; Help items: %@",
+                         [menu title], [[[NSApp mainMenu] itemArray] valueForKey:@"title"], [[menu itemArray] valueForKey:@"identifier"]]);
     [menu update];
     NSMutableDictionary* items = [NSMutableDictionary dictionary];
     for (NSMenuItem* item in [menu itemArray])
@@ -1190,6 +1191,11 @@ static int checkInterface(void)
         else [NSApp activateIgnoringOtherApps:YES];
         id controller = [NSApp delegate];
         if (!controller || ![controller valueForKey:@"outletMainWindow"] || ![controller valueForKey:@"outletFileView"]) return 1;
+
+        // Finish pending AppKit launch callbacks before inspecting the menu.
+        NSDate* helpDeadline = [NSDate dateWithTimeIntervalSinceNow:2];
+        while (![[[[NSApp helpMenu] itemArray] valueForKey:@"identifier"] containsObject:@"ASHelpGuide"] && [helpDeadline timeIntervalSinceNow] > 0)
+            [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.01]];
 
         fputs("Interface check: checking Help commands and destinations.\n", stderr);
         checkHelpMenu(controller);
