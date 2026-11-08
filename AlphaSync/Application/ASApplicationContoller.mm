@@ -166,6 +166,8 @@ static NSMenuItem* ASAddHelpLink(NSMenu* menu, NSString* title, NSString* identi
 {
     [outletMainWindow setDelegate:self];
     [NSApp setDelegate:self];
+    // The nib's main menu is installed after its objects finish awakening.
+    [self performSelector:@selector(setupHelpMenu) withObject:nil afterDelay:0];
 
     iconDisconnected = [[NSImage imageNamed:NSImageNameStatusNone] retain];
     iconRed = [[NSImage imageNamed:NSImageNameStatusUnavailable] retain];
@@ -882,12 +884,6 @@ static NSMenuItem* ASAddHelpLink(NSMenu* menu, NSString* title, NSString* identi
 
 #pragma mark -
 #pragma mark Menu handling
-
-- (void)applicationDidFinishLaunching:(NSNotification*)notification
-{
-    (void)notification;
-    [self setupHelpMenu];
-}
 
 - (void)setupHelpMenu
 {
