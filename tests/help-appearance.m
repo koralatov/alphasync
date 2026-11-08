@@ -44,10 +44,13 @@ int main(int argc, const char* argv[])
     {
         @try
         {
-            require(argc == 3, @"Supply the built Help folder and screenshot folder.");
+            require(argc == 4, @"Supply the built Help folder, screenshot folder, and source licence.");
             [NSApplication sharedApplication];
             NSURL* folder = [NSURL fileURLWithPath:[NSString stringWithUTF8String:argv[1]] isDirectory:YES];
             NSString* output = [NSString stringWithUTF8String:argv[2]];
+            NSString* licence = [NSString stringWithContentsOfFile:[NSString stringWithUTF8String:argv[3]]
+                                                        encoding:NSUTF8StringEncoding error:NULL];
+            require([licence length] > 0, @"The original licence could not be read.");
             NSArray* pages = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:folder includingPropertiesForKeys:nil options:0 error:NULL];
             require([pages count] > 0, @"The built Help folder is empty.");
             NSWindow* window = [[[NSWindow alloc] initWithContentRect:NSMakeRect(0, 0, 760, 700)
@@ -75,7 +78,7 @@ int main(int argc, const char* argv[])
                     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
                     __block BOOL evaluated = NO;
                     __block NSDictionary* styles = nil;
-                    [web evaluateJavaScript:@"({dark: matchMedia('(prefers-color-scheme: dark)').matches, scheme: getComputedStyle(document.documentElement).colorScheme, colour: getComputedStyle(document.body).color, fixed: document.body.hasAttribute('bgcolor')})"
+                    [web evaluateJavaScript:@"({dark: matchMedia('(prefers-color-scheme: dark)').matches, scheme: getComputedStyle(document.documentElement).colorScheme, colour: getComputedStyle(document.body).color, fixed: document.body.hasAttribute('bgcolor'), licence: document.querySelector('pre.licence')?.textContent ?? null})"
                           completionHandler:^(id result, NSError* error) {
                         require(error == nil, [error localizedDescription]);
                         styles = [result retain];
@@ -85,6 +88,8 @@ int main(int argc, const char* argv[])
                     require([styles[@"dark"] boolValue] == dark, @"Help did not follow the current appearance.");
                     require([styles[@"scheme"] containsString:@"light"] && [styles[@"scheme"] containsString:@"dark"], @"Help is missing adaptive colours.");
                     require(![styles[@"fixed"] boolValue], @"Help still has a fixed page background.");
+                    if ([[page lastPathComponent] isEqualToString:@"licence.html"])
+                        require([styles[@"licence"] isEqualToString:licence], @"The displayed licence differs from the original notice.");
                     NSString* name = [[page lastPathComponent] stringByDeletingPathExtension];
                     if (pass == 0) lightColours[name] = styles[@"colour"];
                     else require([styles[@"colour"] isEqual:lightColours[name]] != dark, @"Help text did not change colour with the appearance.");

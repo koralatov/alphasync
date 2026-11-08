@@ -11,6 +11,9 @@ fi
 minimum=$profile_minimum
 expected_architectures=$(printf '%s\n' $profile_architectures | LC_ALL=C sort | xargs)
 helper="$app/Contents/Library/LoginItems/AlphaSyncLauncher.app"
+help_book="$app/Contents/Resources/AlphaSync Help"
+test -s "$help_book/AlphaSync Help.helpindex"
+test -s "$help_book/licence.html"
 version=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$app/Contents/Info.plist")
 build_number=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$app/Contents/Info.plist")
 [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]

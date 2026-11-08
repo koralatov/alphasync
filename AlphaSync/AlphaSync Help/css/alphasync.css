@@ -48,4 +48,10 @@ blockquote
 	font-weight: normal;
 }
 
+.licence {
+	font: inherit;
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+}
+
 

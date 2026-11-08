@@ -13,4 +13,4 @@ python3 "$repository/scripts/run-interface-check.py" --timeout 300 \
 checker="$2/../help-appearance"
 xcrun clang -fblocks -Wall -Wextra -Werror "$repository/tests/help-appearance.m" \
     -framework Cocoa -framework WebKit -o "$checker"
-"$checker" "$1/Contents/Resources/AlphaSync Help" "$2"
+"$checker" "$1/Contents/Resources/AlphaSync Help" "$2" "$repository/LICENSE"

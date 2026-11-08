@@ -458,6 +458,7 @@
 			buildPhases = (
 				C01100000000000000000012 /* Build app icon */,
 				8D1107290486CEB800E47090 /* Resources */,
+				F01200000000000000000001 /* Build Help */,
 				8D11072C0486CEB800E47090 /* Sources */,
 				8D11072E0486CEB800E47090 /* Frameworks */,
                 C01100000000000000000003 /* Copy Login Items */,
@@ -583,6 +584,25 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
 			shellScript = "bash \"$SRCROOT/../scripts/build-app-icon.sh\"\n";
+		};
+		F01200000000000000000001 /* Build Help */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = ();
+			inputPaths = (
+				"$(SRCROOT)/../scripts/build-help.sh",
+				"$(SRCROOT)/../LICENSE",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/AlphaSync Help/alphasync-help.html",
+			);
+			name = "Build Help";
+			outputPaths = (
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/AlphaSync Help/licence.html",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/AlphaSync Help/AlphaSync Help.helpindex",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "bash \"$SRCROOT/../scripts/build-help.sh\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
