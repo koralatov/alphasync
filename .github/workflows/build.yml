@@ -36,6 +36,16 @@ jobs:
           selected_developer="/Applications/Xcode_$version.app/Contents/Developer"
           test -d "$selected_developer"
           printf 'DEVELOPER_DIR=%s\n' "$selected_developer" >> "$GITHUB_ENV"
+      - name: Use generic icons on the affected Intel runner
+        if: matrix.runner == 'macos-26-intel'
+        timeout-minutes: 1
+        run: |
+          # This VM's icon agent crash-loops; keep the full native UI checks.
+          # https://github.com/actions/runner-images/issues/14751
+          ci_runner_uid=$(id -u)
+          icon_service="gui/$ci_runner_uid/com.apple.iconservices.iconservicesagent"
+          launchctl bootout "$icon_service" || true
+          launchctl disable "$icon_service"
       - name: Show the build tools
         run: xcodebuild -version
       - name: Verify the release toolchain
