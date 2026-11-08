@@ -39,6 +39,7 @@ On macOS 13 and later, check the approval-required state, the settings button, g
 Keep known-good backups before testing writes to the NEO.
 
 - Open the app with its default window size.  Check the compact 480-point width, readable filenames and sizes, toolbar buttons, and status bar.  Widen and narrow the window; the Name column should take up the extra space while Size keeps its width.
+- Check an empty file and files of 1, 999, 1,000, 1,024, and 12,000 bytes.  The list and Inspector should agree, using bytes below 1 KB and KB from 1 KB upwards.  Check the decimal units and localised number formatting against Finder; the Inspector details should still show the exact byte count.
 - Copy files in both directions, including pound signs, accented letters, and curly quotes.
 - Import matching MacASCII, UTF-8, and UTF-16 files, including both UTF-16 byte orders with byte-order marks.  Confirm that exported copies and backups use UTF-8 and preserve the text.
 - Import the same paragraphs with LF, CRLF, and CR endings.  Check for the same paragraph breaks.

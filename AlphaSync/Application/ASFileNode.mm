@@ -268,14 +268,15 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
         NSString* fileName = [NSString stringWithCString:fileAttributes->fileName() encoding:NSWindowsCP1252StringEncoding];
         int size = (int)fileAttributes->allocSize();
 
-        NSString* displaySizeString;
-        if (size < 1024) displaySizeString = [NSString stringWithFormat:@"%d bytes", size];
-        else displaySizeString = [NSString stringWithFormat:@"%3.1f kbytes", float(size) / 1024.0];
+        NSByteCountFormatter* sizeFormatter = [[[NSByteCountFormatter alloc] init] autorelease];
+        [sizeFormatter setCountStyle:NSByteCountFormatterCountStyleFile];
+        [sizeFormatter setAllowedUnits:NSByteCountFormatterUseBytes | NSByteCountFormatterUseKB];
+        [sizeFormatter setAllowsNonnumericFormatting:NO];
 
         [self setIcon:fileIcon];
         [self setDisplayName:fileName];
         [self setDisplayKind:[NSString stringWithFormat:@"File"]];
-        [self setDisplaySize:displaySizeString];
+        [self setDisplaySize:[sizeFormatter stringFromByteCount:size]];
         [self setFileSize:(int)fileAttributes->allocSize()];
         [self setFileSpace:(int)fileAttributes->fileSpace()];
 

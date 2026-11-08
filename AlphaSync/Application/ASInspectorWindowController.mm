@@ -279,8 +279,7 @@ static void useSystemColours(NSView* view)
         mainName = [fileNode displayName];
         mainType = (appletNode) ? [appletNode displayName] : @"";
         int fileSize = [fileNode fileSize];
-        if (fileSize < 250) mainSize = [NSString stringWithFormat:@"%d bytes", fileSize];
-        else  mainSize = [NSString stringWithFormat:@"%3.1lfkB", double(fileSize)/1024.0];
+        mainSize = [fileNode displaySize];
         mainRamRom = @"";
 
         filePassword = [fileNode password];

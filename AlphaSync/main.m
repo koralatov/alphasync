@@ -303,7 +303,7 @@ static void checkAppearances(id controller, NSWindowController* backup, NSString
     [device setValue:[NSImage imageWithSystemSymbolName:@"keyboard" accessibilityDescription:nil] forKey:@"icon"];
     [file setValue:@"Example document.txt" forKey:@"displayName"];
     [file setValue:@"Text" forKey:@"displayKind"];
-    [file setValue:@"1.2 kB" forKey:@"displaySize"];
+    [file setValue:[NSByteCountFormatter stringFromByteCount:12000 countStyle:NSByteCountFormatterCountStyleFile] forKey:@"displaySize"];
     [file setValue:[NSImage imageWithSystemSymbolName:@"doc.text" accessibilityDescription:nil] forKey:@"icon"];
     [device performSelector:@selector(addChild:) withObject:file];
     ASInterfaceRows* rows = [[[ASInterfaceRows alloc] init] autorelease];
