@@ -55,6 +55,12 @@ To have AlphaSync open whenever you connect your Neo, turn on automatic opening 
 
 AlphaSync follows your Mac’s Light or Dark appearance automatically.
 
+## Help and support
+
+Choose **Help → AlphaSync Help** or press **⌘?** for the built-in guide.
+The Help menu also includes the licence, release notes for your version, and a link to the GitHub project.  Choose **Report Issue…** to report a problem on GitHub.
+Choose **Contact Us…** to open an email addressed to **mike@koralatov.com** in your usual mail app.
+
 ## Advanced users
 
 For development downloads, build instructions, tests, supported text formats, and implementation notes, see the [technical guide](TECHNICAL.md).

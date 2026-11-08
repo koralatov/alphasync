@@ -21,6 +21,14 @@ With the app running, change macOS Appearance between Light, Dark, and Auto in S
 
 For the modern app, run `scripts/verify-app.sh /Applications/AlphaSync.app modern` on macOS 27 or later.  This requires exactly `arm64` in both the app and launcher, with a macOS 27 minimum.  Verify that the release contains both downloads with matching versions and source commits, and install only the app appropriate for the test Mac.
 
+## Help menu
+
+- Open Help without a Neo and during a background transfer.  Confirm that the system Search field is present, AlphaSync Help is the first app command, and Help remains the last menu.  Test ⌘? and VoiceOver navigation.
+- Search for a command and a Help topic such as “backup”, “monospaced”, or “licence”.  Open a result and check the current guide in Help Viewer.  Repeat after moving or updating the app, including on macOS 11 and 12.
+- Open Licence while offline and compare it with the original notice.  Check scrolling and Light and Dark appearance.  Open Release Notes and confirm that its version and GitHub tag match About, rather than whichever release is newest online.
+- Check that AlphaSync on GitHub opens the repository in the default browser and Report Issue… opens GitHub’s new-issue form, with a report template and the app and system details.  No text files or device identifiers should be included.  Leave the report unsubmitted.
+- Check that Contact Us… opens an unsent message to mike@koralatov.com in the default mail app, with the correct version in its subject.  Cancel the message.  If a handler is unavailable, check the native error alert and Copy Link button.
+
 ## Preferences
 
 - Open Preferences, change the file filter, close the window, and reopen it.  Confirm that the selected filter and main file list agree, including after restarting the app.

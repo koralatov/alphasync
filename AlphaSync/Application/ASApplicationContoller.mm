@@ -76,6 +76,7 @@ enum ASAlertStatus
 - (void)setStatusIdle;
 - (void)setStatusImmediateIdle;
 - (void)setupToolbar;
+- (void)setupHelpMenu;
 - (void)setupStatusBar;
 - (void)setupConnectionView;
 - (void)updateMainWindowConnectionState;
@@ -92,6 +93,15 @@ static NSString* kToolbarItemIdentifierBackup   = @"ToolbarItem:Backup";
 static NSString* kToolbarItemIdentifierDelete   = @"ToolbarItem:Delete";
 
 static const NSInteger kMenuItemTagBackup   = 100;
+
+static NSMenuItem* ASAddHelpLink(NSMenu* menu, NSString* title, NSString* identifier, NSURL* url, id target)
+{
+    NSMenuItem* item = [menu addItemWithTitle:title action:@selector(actionOpenHelpLink:) keyEquivalent:@""];
+    [item setIdentifier:identifier];
+    [item setTarget:target];
+    [item setRepresentedObject:url];
+    return item;
+}
 
 
 @implementation ASApplicationController
@@ -872,6 +882,89 @@ static const NSInteger kMenuItemTagBackup   = 100;
 
 #pragma mark -
 #pragma mark Menu handling
+
+- (void)applicationDidFinishLaunching:(NSNotification*)notification
+{
+    (void)notification;
+    [self setupHelpMenu];
+}
+
+- (void)setupHelpMenu
+{
+    NSBundle* bundle = [NSBundle mainBundle];
+    NSString* version = [bundle objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+    NSString* build = [bundle objectForInfoDictionaryKey:@"CFBundleVersion"];
+    NSString* edition = [bundle objectForInfoDictionaryKey:@"ASCompatibilityDescription"];
+#if defined(__arm64__)
+    NSString* architecture = @"arm64";
+#else
+    NSString* architecture = @"x86_64";
+#endif
+    NSString* details = [NSString stringWithFormat:@"AlphaSync %@ (build %@)\nEdition: %@\nmacOS: %@\nProcess architecture: %@",
+        version, build, edition, [[NSProcessInfo processInfo] operatingSystemVersionString], architecture];
+    NSURL* repository = [NSURL URLWithString:@"https://github.com/koralatov/alphasync"];
+    NSURL* notes = [NSURL URLWithString:[NSString stringWithFormat:@"https://github.com/koralatov/alphasync/releases/tag/v%@", version]];
+    NSURLComponents* issue = [NSURLComponents componentsWithString:@"https://github.com/koralatov/alphasync/issues/new"];
+    [issue setQueryItems:@[[NSURLQueryItem queryItemWithName:@"body" value:
+        [NSString stringWithFormat:@"Describe the problem and the steps to reproduce it.\n\nExpected behaviour:\n\nWhat happened:\n\n---\n%@\n", details]]]];
+    NSURLComponents* contact = [NSURLComponents componentsWithString:@"mailto:mike@koralatov.com"];
+    [contact setQueryItems:@[
+        [NSURLQueryItem queryItemWithName:@"subject" value:[NSString stringWithFormat:@"AlphaSync %@ Support", version]],
+        [NSURLQueryItem queryItemWithName:@"body" value:[NSString stringWithFormat:@"Your message:\n\n\n---\n%@\n", details]]
+    ]];
+
+    NSMenu* help = [[[NSMenu alloc] initWithTitle:@"Help"] autorelease];
+    NSMenuItem* guide = [help addItemWithTitle:@"AlphaSync Help" action:@selector(showHelp:) keyEquivalent:@"?"];
+    [guide setKeyEquivalentModifierMask:NSEventModifierFlagCommand];
+    [guide setIdentifier:@"ASHelpGuide"];
+    [guide setTarget:NSApp];
+    [help addItem:[NSMenuItem separatorItem]];
+    ASAddHelpLink(help, [NSString stringWithFormat:@"Release Notes for %@", version], @"ASHelpReleaseNotes", notes, self);
+    NSMenuItem* licence = [help addItemWithTitle:@"Licence" action:@selector(actionShowLicence:) keyEquivalent:@""];
+    [licence setIdentifier:@"ASHelpLicence"];
+    [licence setTarget:self];
+    [help addItem:[NSMenuItem separatorItem]];
+    ASAddHelpLink(help, @"AlphaSync on GitHub", @"ASHelpRepository", repository, self);
+    ASAddHelpLink(help, @"Report Issue…", @"ASHelpReportIssue", [issue URL], self);
+    ASAddHelpLink(help, @"Contact Us…", @"ASHelpContact", [contact URL], self);
+
+    // AppKit supplies Help search; keep this native menu last in the menu bar.
+    NSMenu* main = [NSApp mainMenu];
+    NSMenuItem* previous = [main itemWithTitle:@"Help"];
+    if (previous) [main removeItem:previous];
+    NSMenuItem* heading = [[[NSMenuItem alloc] initWithTitle:@"Help" action:nil keyEquivalent:@""] autorelease];
+    [heading setSubmenu:help];
+    [main addItem:heading];
+    [NSApp setHelpMenu:help];
+    [[NSHelpManager sharedHelpManager] registerBooksInBundle:bundle];
+}
+
+- (IBAction)actionShowLicence:(id)sender
+{
+    (void)sender;
+    NSString* book = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleHelpBookName"];
+    [[NSHelpManager sharedHelpManager] openHelpAnchor:@"alphasync-licence" inBook:book];
+}
+
+- (IBAction)actionOpenHelpLink:(id)sender
+{
+    if (![sender isKindOfClass:[NSMenuItem class]]) return;
+    NSURL* url = [sender representedObject];
+    if (![url isKindOfClass:[NSURL class]] || [[NSWorkspace sharedWorkspace] openURL:url]) return;
+    NSAlert* alert = [[[NSAlert alloc] init] autorelease];
+    BOOL email = [[url scheme] isEqualToString:@"mailto"];
+    [alert setMessageText:email ? @"Couldn’t open your mail app" : @"Couldn’t open this link"];
+    [alert setInformativeText:email ? @"You can email mike@koralatov.com using your preferred mail app.  Copy the email link to use it there." :
+        @"Copy the link and open it in your preferred browser."];
+    [alert addButtonWithTitle:@"OK"];
+    [alert addButtonWithTitle:@"Copy Link"];
+    if ([alert runModal] == NSAlertSecondButtonReturn)
+    {
+        NSPasteboard* pasteboard = [NSPasteboard generalPasteboard];
+        [pasteboard clearContents];
+        [pasteboard writeObjects:@[[url absoluteString]]];
+    }
+}
 
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem

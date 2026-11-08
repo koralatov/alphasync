@@ -99,6 +99,8 @@
 - (IBAction)actionBackup:(id)sender;
 - (IBAction)actionShowPreferences:(id)sender;
 - (IBAction)actionShowAbout:(id)sender;
+- (IBAction)actionShowLicence:(id)sender;
+- (IBAction)actionOpenHelpLink:(id)sender;
 - (IBAction)actionOpenBackupFolder:(id)sender;
 - (IBAction)actionUninstall:(id)sender;
 - (IBAction)reloadDeviceData:(id)sender;

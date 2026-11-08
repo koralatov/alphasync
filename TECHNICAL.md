@@ -155,6 +155,14 @@ USB commands and connection callbacks run on one background queue.  The interfac
 
 Exports are written and synchronised in a hidden temporary file before their final name appears.  Existing files are preserved.  Optional backup logs are stored as **AlphaSync Backup Log.plist** in each Neo’s dated destination folder, recording saved filenames, failures, and pending files.  A cancelled, disconnected, or interrupted backup remains distinguishable from a completed backup when logging is enabled.  Hidden temporary files left by an interrupted write can be removed after checking the saved files and any log.
 
+## Help and support
+
+The Help menu uses native `NSMenu` and `NSMenuItem` objects and is assigned to `NSApplication.helpMenu`, which supplies system Help search.  It remains last in the menu bar, with AlphaSync Help first among the app’s commands and the standard ⌘? shortcut.  Separators group the guide, release notes and licence, and support links.  Labels follow [Apple’s menu guidance](https://developer.apple.com/design/human-interface-guidelines/menus), with ellipses only on the issue and contact commands that need further input.
+
+Release Notes uses the running bundle’s `CFBundleShortVersionString` to link to that exact GitHub release.  Report Issue opens GitHub’s new-issue form, and Contact Us opens `mailto:mike@koralatov.com` through the user’s default mail app.  Their editable forms include app version, build, edition, macOS version, and process architecture.  No file contents, paths, device identifiers, or attachments are included.  Choosing either command opens a form; submission remains with the user.  A native alert offers to copy the link if macOS cannot open its handler.
+
+The Build Help phase generates an offline licence page directly from the original `LICENSE`, then uses macOS’s `hiutil` to rebuild the Help index, including anchors.  It runs after copying the Help resources and before signing, for both variants and archives.  The obsolete prebuilt index is no longer kept in source control.  The Licence command opens the generated `alphasync-licence` anchor in Help Viewer.  Interface checks validate menu wiring and destinations without launching browsers or mail, and the WebKit checks compare the displayed licence text with the original notice in each appearance mode.  Native Help-popup screenshots are collected when the runner permits screen capture; interactive Help search and external handlers remain in the manual checklist.
+
 ## Versioning
 
 Both downloads and their helpers share **version 1.4.4, build 144**, read from [Version.xcconfig](AlphaSync/Build/Version.xcconfig).  Increase the build number for each distributed revision, independently of the release version, and set the version before creating its release tag.  The separate build reports record the full source commit for both downloads.

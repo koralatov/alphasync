@@ -904,6 +904,40 @@ static void checkInspectorLayout(id inspector)
         requireInterface(NSWidth([preview frame]) <= NSWidth([[scroll contentView] bounds]) + 1, @"The Inspector preview does not wrap to its visible width.");
 }
 
+static void captureHelpMenu(NSWindow* window, NSString* directory, NSString* mode)
+{
+    NSMenu* menu = [NSApp helpMenu];
+    NSView* content = [window contentView];
+    NSPoint point = NSMakePoint(20, NSHeight([content bounds]) - 20);
+    NSPoint onScreen = [window convertPointToScreen:[content convertPoint:point toView:nil]];
+    __block BOOL captured = NO;
+    NSTimer* captureTimer = [NSTimer timerWithTimeInterval:0.4 repeats:NO block:^(NSTimer* timer) {
+        (void)timer;
+        @try
+        {
+            NSSize size = [menu size];
+            CGFloat screenTop = NSMaxY([[[NSScreen screens] firstObject] frame]);
+            NSString* rectangle = [NSString stringWithFormat:@"%.0f,%.0f,%.0f,%.0f", onScreen.x - 12,
+                screenTop - onScreen.y - 12, MAX(size.width, 260) + 24, size.height + 48];
+            NSString* filename = [NSString stringWithFormat:@"%@-help-menu.png", mode];
+            NSString* path = [directory stringByAppendingPathComponent:filename];
+            NSTask* task = [[[NSTask alloc] init] autorelease];
+            [task setExecutableURL:[NSURL fileURLWithPath:@"/usr/sbin/screencapture"]];
+            [task setArguments:@[@"-x", @"-R", rectangle, path]];
+            if ([task launchAndReturnError:NULL])
+            {
+                [task waitUntilExit];
+                captured = [task terminationStatus] == 0 && [[NSFileManager defaultManager] fileExistsAtPath:path];
+            }
+        }
+        @finally { [menu cancelTracking]; }
+    }];
+    [[NSRunLoop currentRunLoop] addTimer:captureTimer forMode:NSEventTrackingRunLoopMode];
+    [menu popUpMenuPositioningItem:nil atLocation:point inView:content];
+    [captureTimer invalidate];
+    if (!captured) fprintf(stderr, "The runner could not capture the native Help popup; menu behaviour remains in the manual checklist.\n");
+}
+
 static void checkAppearances(id controller, NSWindowController* backup, NSString* directory)
 {
     requireInterface([NSApp appearance] == nil, @"The app overrides the system appearance.");
@@ -992,6 +1026,7 @@ static void checkAppearances(id controller, NSWindowController* backup, NSString
         [controller performSelector:NSSelectorFromString(@"setStatusBusy:") withObject:@"Reading files from the Neo…"];
         captureWindow(main, directory, [mode stringByAppendingString:@"-main-busy"]);
         [controller performSelector:NSSelectorFromString(@"displayStatusTimerDone")];
+        captureHelpMenu(main, directory, mode);
         [outline selectRowIndexes:[NSIndexSet indexSetWithIndex:1] byExtendingSelection:NO];
         captureWindow(main, directory, [mode stringByAppendingString:@"-selection"]);
         [outline deselectAll:nil];
@@ -1072,6 +1107,61 @@ static void checkAppearances(id controller, NSWindowController* backup, NSString
     puts("Native views, editing permissions, cancelled renames, contrast, and live appearance changes passed.");
 }
 
+static void checkHelpMenu(id controller)
+{
+    NSMenu* menu = [NSApp helpMenu];
+    requireInterface(menu && [[[[NSApp mainMenu] itemArray] lastObject] submenu] == menu,
+                     @"The native Help menu is not registered at the end of the menu bar.");
+    [menu update];
+    NSMutableDictionary* items = [NSMutableDictionary dictionary];
+    for (NSMenuItem* item in [menu itemArray])
+        if ([[item identifier] hasPrefix:@"ASHelp"])
+        {
+            requireInterface([item view] == nil && [item isEnabled], @"A Help action is custom-drawn or unavailable without a Neo.");
+            items[[item identifier]] = item;
+        }
+    NSMenuItem* guide = items[@"ASHelpGuide"];
+    requireInterface([guide target] == NSApp && [guide action] == @selector(showHelp:) &&
+                     [[guide keyEquivalent] isEqualToString:@"?"] && [guide keyEquivalentModifierMask] == NSEventModifierFlagCommand,
+                     @"The standard Help command or shortcut is missing.");
+    NSBundle* bundle = [NSBundle mainBundle];
+    NSString* version = [bundle objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+    NSMenuItem* notes = items[@"ASHelpReleaseNotes"];
+    NSURL* releaseURL = [notes representedObject];
+    requireInterface([[notes title] containsString:version] && [[releaseURL host] isEqualToString:@"github.com"] &&
+                     [[releaseURL path] isEqualToString:[NSString stringWithFormat:@"/koralatov/alphasync/releases/tag/v%@", version]],
+                     @"Release notes do not point to the installed app version.");
+    NSMenuItem* licence = items[@"ASHelpLicence"];
+    NSString* helpFolder = [[bundle resourcePath] stringByAppendingPathComponent:[bundle objectForInfoDictionaryKey:@"CFBundleHelpBookFolder"]];
+    NSString* licenceHTML = [NSString stringWithContentsOfFile:[helpFolder stringByAppendingPathComponent:@"licence.html"] encoding:NSUTF8StringEncoding error:NULL];
+    requireInterface([licence target] == controller && [licence action] == NSSelectorFromString(@"actionShowLicence:") &&
+                     [licenceHTML containsString:@"name=\"alphasync-licence\""], @"The offline licence page or Help anchor is missing.");
+    NSURL* repository = [items[@"ASHelpRepository"] representedObject];
+    requireInterface([[repository absoluteString] isEqualToString:@"https://github.com/koralatov/alphasync"], @"The project link points to the wrong repository.");
+    for (NSString* identifier in @[@"ASHelpReportIssue", @"ASHelpContact"])
+    {
+        NSMenuItem* item = items[identifier];
+        requireInterface([item target] == controller && [item action] == NSSelectorFromString(@"actionOpenHelpLink:") &&
+                         [[item title] hasSuffix:@"…"], @"A support command has the wrong target or omits its input ellipsis.");
+        NSURLComponents* components = [NSURLComponents componentsWithURL:[item representedObject] resolvingAgainstBaseURL:NO];
+        NSMutableDictionary* query = [NSMutableDictionary dictionary];
+        for (NSURLQueryItem* parameter in [components queryItems]) query[[parameter name]] = [parameter value];
+        requireInterface([query[@"body"] containsString:[NSString stringWithFormat:@"AlphaSync %@ (build %@)", version,
+            [bundle objectForInfoDictionaryKey:@"CFBundleVersion"]]] && [query[@"body"] containsString:@"macOS:"],
+            @"A support link lost its correctly encoded app and system details.");
+        if ([identifier isEqualToString:@"ASHelpContact"])
+            requireInterface([[components scheme] isEqualToString:@"mailto"] && [[components path] isEqualToString:@"mike@koralatov.com"] &&
+                             [query[@"subject"] isEqualToString:[NSString stringWithFormat:@"AlphaSync %@ Support", version]],
+                             @"Contact Us has the wrong recipient or subject.");
+        else
+            requireInterface([[components scheme] isEqualToString:@"https"] && [[components host] isEqualToString:@"github.com"] &&
+                             [[components path] isEqualToString:@"/koralatov/alphasync/issues/new"] &&
+                             [query[@"body"] containsString:@"steps to reproduce"] && [query[@"body"] containsString:@"Expected behaviour:"],
+                             @"Issue reporting has the wrong destination or lost its report template.");
+    }
+    puts("Native Help registration, shortcut, offline licence, version-specific notes, and support-link destinations passed without opening external apps.");
+}
+
 static int checkInterface(void)
 {
     @try
@@ -1100,6 +1190,9 @@ static int checkInterface(void)
         else [NSApp activateIgnoringOtherApps:YES];
         id controller = [NSApp delegate];
         if (!controller || ![controller valueForKey:@"outletMainWindow"] || ![controller valueForKey:@"outletFileView"]) return 1;
+
+        fputs("Interface check: checking Help commands and destinations.\n", stderr);
+        checkHelpMenu(controller);
 
         fputs("Interface check: checking connection window transitions.\n", stderr);
         checkConnectionStates(controller);
