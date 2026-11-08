@@ -51,7 +51,10 @@ static NSTextField* ASInspectorHeading(NSString* title)
 {
     NSTextField* field = [NSTextField labelWithString:title];
     [field setFont:[NSFont systemFontOfSize:[NSFont systemFontSize] weight:NSFontWeightSemibold]];
-    [field setAccessibilityRole:NSAccessibilityHeadingRole];
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
+    if (@available(macOS 26.0, *))
+        [field setAccessibilityRole:NSAccessibilityHeadingRole];
+#endif
     return field;
 }
 
