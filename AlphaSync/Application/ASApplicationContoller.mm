@@ -870,9 +870,10 @@ static const NSInteger kMenuItemTagBackup   = 100;
     (void)sender;
 
     NSAlert* alert = [[NSAlert alloc] init];
-    [[alert addButtonWithTitle:@"OK"] setKeyEquivalent:@""];
     NSButton* cancel = [alert addButtonWithTitle:@"Cancel"];
     [cancel setKeyEquivalent:@"\r"];
+    [cancel setKeyEquivalentModifierMask:0];
+    [[alert addButtonWithTitle:@"OK"] setKeyEquivalent:@""];
 
     if ([target isMemberOfClass:[ASFileNode class]])
     {
@@ -893,11 +894,8 @@ static const NSInteger kMenuItemTagBackup   = 100;
         [alert setAlertStyle:NSAlertStyleWarning];
     }
 
-    [alert layout];
-    [[alert window] setDefaultButtonCell:[cancel cell]];
-    [[alert window] setInitialFirstResponder:cancel];
     NSModalResponse button = [alert runModal];
-    BOOL shouldProceed = (button == NSAlertFirstButtonReturn);
+    BOOL shouldProceed = (button == NSAlertSecondButtonReturn);
     [alert release];
 
     if (shouldProceed)

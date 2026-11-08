@@ -110,6 +110,7 @@ static void checkClearConfirmation(id controller)
         for (NSString* input in @[@"\r", @"\003", @"\033", @"OK"])
         {
             __block BOOL sent = NO, safeDefault = NO, timedOut = NO;
+            __block NSTimeInterval readyAt = 0;
             NSDate* deadline = [NSDate dateWithTimeIntervalSinceNow:5];
             NSTimer* timer = [NSTimer timerWithTimeInterval:0.05 repeats:YES block:^(NSTimer* tick) {
                 if ([deadline timeIntervalSinceNow] <= 0)
@@ -134,8 +135,18 @@ static void checkClearConfirmation(id controller)
                     if ([[button title] isEqualToString:@"Cancel"]) cancel = button;
                     if ([[button title] isEqualToString:@"OK"]) proceed = button;
                 }
-                if (!cancel || !proceed) return;
+                if (!cancel || !proceed || ![window isVisible] || ![cancel isEnabled] || ![proceed isEnabled])
+                {
+                    readyAt = 0;
+                    return;
+                }
+                NSTimeInterval now = [[NSProcessInfo processInfo] systemUptime];
+                if (readyAt == 0) readyAt = now;
+                if (now - readyAt < 0.5) return;
                 safeDefault = [window defaultButtonCell] == [cancel cell] && [[proceed keyEquivalent] length] == 0;
+                fprintf(stderr, "Clear probe %s: cancel key=%u, modifiers=%lu, app active=%d, window key=%d, default=%d.\n",
+                    [className UTF8String], (unsigned)([[cancel keyEquivalent] length] ? [[cancel keyEquivalent] characterAtIndex:0] : 0),
+                    (unsigned long)[cancel keyEquivalentModifierMask], [NSApp isActive], [window isKeyWindow], safeDefault);
                 sent = YES;
                 if ([input isEqualToString:@"OK"]) [proceed performClick:nil];
                 else
