@@ -58,6 +58,7 @@ static NSTextField* ASBackupLabel(NSString* text)
 }
 
 @interface ASBackupController ()
+- (void)buildWindow;
 - (void)fitWindowToContent;
 - (void)showBackupProgress;
 @end
@@ -120,6 +121,7 @@ static NSTextField* ASBackupLabel(NSString* text)
     if ((self = [super initWithWindow:nil]))
     {
         backupSessionPaths = [[NSMutableArray alloc] init];
+        [self buildWindow];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceDisconnected:)
                                                     name:kASDeviceControllerDeviceDisconnected object:nil];
     }
@@ -140,7 +142,7 @@ static NSTextField* ASBackupLabel(NSString* text)
     [super dealloc];
 }
 
-- (void)loadWindow
+- (void)buildWindow
 {
     NSWindow* window = [[[NSWindow alloc] initWithContentRect:NSMakeRect(0, 0, 520, 240)
                                                   styleMask:NSWindowStyleMaskTitled

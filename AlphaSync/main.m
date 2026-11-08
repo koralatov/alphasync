@@ -432,6 +432,7 @@ static int checkInterface(void)
         checkPreferences(controller);
         NSWindowController* backup = [[NSClassFromString(@"ASBackupController") alloc] init];
         BOOL loaded = [backup window] != nil;
+        requireInterface(loaded, @"The backup window did not load.");
         if (loaded) checkBackupResults(backup);
         NSArray* arguments = [[NSProcessInfo processInfo] arguments];
         NSUInteger snapshots = [arguments indexOfObject:@"--appearance-snapshots"];
