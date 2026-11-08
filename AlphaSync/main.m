@@ -1,4 +1,5 @@
 #import <Cocoa/Cocoa.h>
+#import "AQFileUtilities.h"
 #include <math.h>
 #include <stdio.h>
 
@@ -472,7 +473,7 @@ static void checkAppearances(id controller, NSWindowController* backup, NSString
     [device setValue:[NSImage imageWithSystemSymbolName:@"keyboard" accessibilityDescription:nil] forKey:@"icon"];
     [file setValue:@"Example document.txt" forKey:@"displayName"];
     [file setValue:@"Text" forKey:@"displayKind"];
-    [file setValue:[NSByteCountFormatter stringFromByteCount:12000 countStyle:NSByteCountFormatterCountStyleFile] forKey:@"displaySize"];
+    [file setValue:aq_FormattedFileSize(12000) forKey:@"displaySize"];
     [file setValue:[NSImage imageWithSystemSymbolName:@"doc.text" accessibilityDescription:nil] forKey:@"icon"];
     [device performSelector:@selector(addChild:) withObject:file];
     ASInterfaceRows* rows = [[[ASInterfaceRows alloc] init] autorelease];
@@ -525,6 +526,8 @@ static void checkAppearances(id controller, NSWindowController* backup, NSString
             NSTextField* preview = [inspector valueForKey:@"outletPreviewAsText"];
             checkContrast([preview textColor], [preview backgroundColor]);
         }];
+        [[controller valueForKey:@"outletAvailableMemory"] setStringValue:
+            [NSString stringWithFormat:@"%@ available", aq_FormattedFileSize(299520)]];
         for (NSUInteger index = 0; index < [windows count]; ++index)
         {
             NSWindow* window = windows[index];
@@ -550,10 +553,27 @@ static void checkAppearances(id controller, NSWindowController* backup, NSString
         [[inspector valueForKey:@"outletPreviewAsIcon"] setHidden:YES];
         [[inspector valueForKey:@"outletShowPreviewDisclosure"] setState:NSControlStateValueOn];
         [[inspector valueForKey:@"outletShowDetailDisclosure"] setState:NSControlStateValueOn];
+        // Display samples exercise compact sizes and grouped byte counts without device metadata.
+        NSDictionary* sizes = @{
+            @"outletSystemRAM": aq_FormattedFileSize(299520),
+            @"outletSystemROM": aq_FormattedFileSize(1048576),
+            @"outletAppletMinFileSize": aq_FormattedByteCount(512),
+            @"outletAppletMaxFileSize": aq_FormattedByteCount(51200),
+            @"outletAppletROM": aq_FormattedByteCount(106432),
+            @"outletAppletRAM1": [NSString stringWithFormat:@"%@ (workspace)", aq_FormattedByteCount(3472)],
+            @"outletAppletRAM2": [NSString stringWithFormat:@"%@ (files)", aq_FormattedByteCount(31232)],
+            @"outletFileRam": aq_FormattedByteCount(31232)
+        };
+        for (NSString* outlet in sizes)
+            [[inspector valueForKey:outlet] setStringValue:sizes[outlet]];
         NSArray* panels = @[@"device", @"applet", @"file"];
+        NSArray* panelNames = @[@"AlphaSmart NEO", @"AlphaWord Plus UK", @"Example document.txt"];
+        NSArray* panelSizes = @[@"", aq_FormattedFileSize(34704), aq_FormattedFileSize(31232)];
         SEL selector = NSSelectorFromString(@"configurePanelsToShowSystem:showApplet:showFile:");
         for (NSUInteger index = 0; index < [panels count]; ++index)
         {
+            [[inspector valueForKey:@"outletMainName"] setStringValue:panelNames[index]];
+            [[inspector valueForKey:@"outletMainSize"] setStringValue:panelSizes[index]];
             NSInvocation* invocation = [NSInvocation invocationWithMethodSignature:[inspector methodSignatureForSelector:selector]];
             [invocation setSelector:selector];
             for (NSUInteger panel = 0; panel < 3; ++panel)

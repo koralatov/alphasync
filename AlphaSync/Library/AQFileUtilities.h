@@ -38,6 +38,10 @@ extern "C" {
 
 extern BOOL aq_FileUtilitiesCreateDirectoriesForPath(NSString* directoryPath);
 
+// Compact Finder-style bytes/KB, or an exact byte count with localised grouping.
+extern NSString* aq_FormattedFileSize(unsigned long long byteCount);
+extern NSString* aq_FormattedByteCount(unsigned long long byteCount);
+
 // Return the published filename, or nil on failure.  Existing files are never replaced.
 extern NSString* aq_WriteUniqueFile(NSString* directory, NSString* basename, NSString* extension,
                                     NSData* data, NSError** error);

@@ -508,8 +508,7 @@ static const NSInteger kMenuItemTagBackup   = 100;
     else if (1 == count)
     {
         ASDeviceNode* deviceNode = [array objectAtIndex:0];
-        double availableRam = double([deviceNode availableRam]) / 1024.0;
-        [outletAvailableMemory setStringValue:[NSString stringWithFormat:@"%3.1lf kbytes available", availableRam]];
+        [outletAvailableMemory setStringValue:[NSString stringWithFormat:@"%@ available", aq_FormattedFileSize([deviceNode availableRam])]];
     }
     else
     {

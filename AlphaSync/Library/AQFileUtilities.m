@@ -46,6 +46,25 @@ BOOL aq_FileUtilitiesCreateDirectoriesForPath(NSString* directoryPath)
     return [fileManager createDirectoryAtPath:directoryPath withIntermediateDirectories:YES attributes:nil error:nil];
 }
 
+NSString* aq_FormattedFileSize(unsigned long long byteCount)
+{
+    NSByteCountFormatter* formatter = [[[NSByteCountFormatter alloc] init] autorelease];
+    [formatter setCountStyle:NSByteCountFormatterCountStyleFile];
+    [formatter setAllowedUnits:NSByteCountFormatterUseBytes | NSByteCountFormatterUseKB];
+    [formatter setAllowsNonnumericFormatting:NO];
+    return [formatter stringFromByteCount:(long long)byteCount];
+}
+
+NSString* aq_FormattedByteCount(unsigned long long byteCount)
+{
+    NSNumberFormatter* formatter = [[[NSNumberFormatter alloc] init] autorelease];
+    [formatter setNumberStyle:NSNumberFormatterDecimalStyle];
+    [formatter setUsesGroupingSeparator:YES];
+    [formatter setMaximumFractionDigits:0];
+    NSString* count = [formatter stringFromNumber:[NSNumber numberWithUnsignedLongLong:byteCount]];
+    return [NSString stringWithFormat:byteCount == 1 ? @"%@ byte" : @"%@ bytes", count];
+}
+
 NSString* aq_WriteUniqueFile(NSString* directory, NSString* basename, NSString* extension,
                             NSData* data, NSError** error)
 {

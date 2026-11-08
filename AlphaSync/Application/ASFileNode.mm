@@ -266,17 +266,11 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
         fileData->setAppletInfo(applet->appletID(), applet->appletVersionMajor(), applet->appletVersionMinor());
 
         NSString* fileName = [NSString stringWithCString:fileAttributes->fileName() encoding:NSWindowsCP1252StringEncoding];
-        int size = (int)fileAttributes->allocSize();
-
-        NSByteCountFormatter* sizeFormatter = [[[NSByteCountFormatter alloc] init] autorelease];
-        [sizeFormatter setCountStyle:NSByteCountFormatterCountStyleFile];
-        [sizeFormatter setAllowedUnits:NSByteCountFormatterUseBytes | NSByteCountFormatterUseKB];
-        [sizeFormatter setAllowsNonnumericFormatting:NO];
 
         [self setIcon:fileIcon];
         [self setDisplayName:fileName];
         [self setDisplayKind:[NSString stringWithFormat:@"File"]];
-        [self setDisplaySize:[sizeFormatter stringFromByteCount:size]];
+        [self setDisplaySize:aq_FormattedFileSize(fileAttributes->allocSize())];
         [self setFileSize:(int)fileAttributes->allocSize()];
         [self setFileSpace:(int)fileAttributes->fileSpace()];
 
@@ -499,7 +493,7 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
             if (fileData->fileSize() > maxFileSize)
             {
                 result = FALSE;
-                if (error) *error = [NSString stringWithFormat:@"File is too large (maximum file size is %u bytes).", maxFileSize];
+                if (error) *error = [NSString stringWithFormat:@"File is too large (maximum file size is %@).", aq_FormattedByteCount(maxFileSize)];
             }
             else
             {

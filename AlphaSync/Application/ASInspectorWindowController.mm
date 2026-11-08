@@ -33,6 +33,7 @@
 #import "ASAppletNode.h"
 #import "ASFileNode.h"
 #import "ASDevice.h"
+#import "AQFileUtilities.h"
 
 using namespace ts;
 
@@ -171,8 +172,8 @@ static void useSystemColours(NSView* view)
         systemBuild = [deviceNode systemBuild];
         systemDate = [deviceNode systemDate];
         systemInfo = [deviceNode systemInfo];
-        systemRAM = [NSString stringWithFormat:@"%.1lf kbytes", double(ram)/1024];
-        systemROM = [NSString stringWithFormat:@"%.1lf kbytes", double(rom)/1024];
+        systemRAM = aq_FormattedFileSize(ram);
+        systemROM = aq_FormattedFileSize(rom);
     }
 
     if (setMain)
@@ -222,9 +223,8 @@ static void useSystemColours(NSView* view)
 
         mainName = [appletNode displayName];
         mainType = [NSString stringWithCString:version encoding:NSWindowsCP1252StringEncoding];
-        unsigned totalRAM = [appletNode ramUsed] + applet->appletRamSize();
-        if (totalRAM < 250) mainSize = [NSString stringWithFormat:@"%d bytes", totalRAM];
-        else mainSize = [NSString stringWithFormat:@"%3.1lfkB", double(totalRAM)/1024.0];
+        unsigned long long totalRAM = static_cast<unsigned long long>([appletNode ramUsed]) + applet->appletRamSize();
+        mainSize = aq_FormattedFileSize(totalRAM);
         unsigned fileCount = [appletNode fileCount];
         if (0 == fileCount) mainRamRom = @"";
         else if (1 == fileCount) mainRamRom = @"1 file";
@@ -236,12 +236,12 @@ static void useSystemColours(NSView* view)
 
         unsigned min = [appletNode minFileSize];
         unsigned max = [appletNode maxFileSize];
-        appletMinFileSize = [NSString stringWithFormat:@"%u bytes", min];
-        appletMaxFileSize = (max == UINT_MAX) ? @"unlimited" : [NSString stringWithFormat:@"%u bytes", max];
+        appletMinFileSize = aq_FormattedByteCount(min);
+        appletMaxFileSize = (max == UINT_MAX) ? @"unlimited" : aq_FormattedByteCount(max);
 
-        appletROM = [NSString stringWithFormat:@"%u bytes", applet->appletRomSize()];
-        appletRAM1 = [NSString stringWithFormat:@"%u bytes (workspace)", applet->appletRamSize()];
-        appletRAM2 = [NSString stringWithFormat:@"%u bytes (files)", [appletNode ramUsed]];
+        appletROM = aq_FormattedByteCount(applet->appletRomSize());
+        appletRAM1 = [NSString stringWithFormat:@"%@ (workspace)", aq_FormattedByteCount(applet->appletRamSize())];
+        appletRAM2 = [NSString stringWithFormat:@"%@ (files)", aq_FormattedByteCount([appletNode ramUsed])];
     }
 
     if (setMain)
@@ -283,7 +283,7 @@ static void useSystemColours(NSView* view)
         mainRamRom = @"";
 
         filePassword = [fileNode password];
-        fileRam = [NSString stringWithFormat:@"%u bytes", fileSize];
+        fileRam = aq_FormattedByteCount(static_cast<unsigned>(MAX(fileSize, 0)));
         fileKey = [fileNode displayFileSpace];
     }
 
