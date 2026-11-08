@@ -1074,18 +1074,6 @@ static const NSInteger kMenuItemTagBackup   = 100;
 #pragma mark -
 #pragma mark Application Delegate Methods
 
-- (void)applicationDidFinishLaunching:(NSNotification*)notification
-{
-    (void)notification;
-    // Reconnect the existing About item after the main menu has finished loading.
-    for (NSMenuItem* menu in [[NSApp mainMenu] itemArray])
-        for (NSMenuItem* item in [[menu submenu] itemArray])
-            if ([item action] == @selector(orderFrontStandardAboutPanel:))
-            {
-                [item setTarget:self];
-                [item setAction:@selector(actionShowAbout:)];
-            }
-}
 
 
 
