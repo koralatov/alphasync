@@ -92,7 +92,7 @@ static void checkImportRejection(NSString* path, bool create, unsigned failure, 
     id node = create ? (id)[[TestImportAppletNode alloc] initWithTestDevice:&device] :
                        (id)[[TestWritableFileNode alloc] initWithTestDevice:&device];
     CHECK(![node loadFromPath:path]);
-    CHECK([[node operationError] containsString:expected]);
+    CHECK([[(ASNode*)node operationError] containsString:expected]);
     CHECK(!device.attributeWrites && !device.fileWrites && device.saved == original);
     [node release];
 }
