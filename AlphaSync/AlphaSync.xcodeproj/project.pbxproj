@@ -3,12 +3,11 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		4D2E248F18106AF7002E5E7D /* application.iconset in Resources */ = {isa = PBXBuildFile; fileRef = 4D2E248E18106AF7002E5E7D /* application.iconset */; };
-		4D4066050F1F45AA001DD407 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A95EFB980F17C9F500E1BDA9 /* Carbon.framework */; };
 		4D962E180F1C9EF60018CDAA /* icon-file-bin.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 4D962E170F1C9EF60018CDAA /* icon-file-bin.pdf */; };
 		4D962E450F1CA50D0018CDAA /* icon-applet.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 4D962E380F1CA50D0018CDAA /* icon-applet.pdf */; };
 		4D962E460F1CA50D0018CDAA /* icon-file-txt.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 4D962E390F1CA50D0018CDAA /* icon-file-txt.pdf */; };
@@ -32,14 +31,13 @@
 		8D11072A0486CEB800E47090 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 29B97318FDCFA39411CA2CEA /* MainMenu.nib */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
-		A95EFA5B0F17C91400E1BDA9 /* aq_launcher.c in Sources */ = {isa = PBXBuildFile; fileRef = A95EFA560F17C90D00E1BDA9 /* aq_launcher.c */; };
+		A95EFA5B0F17C91400E1BDA9 /* aq_launcher.m in Sources */ = {isa = PBXBuildFile; fileRef = A95EFA560F17C90D00E1BDA9 /* aq_launcher.m */; };
 		A95EFAE70F17C96A00E1BDA9 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		A95EFAE80F17C97900E1BDA9 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
-		A95EFAEA0F17C98F00E1BDA9 /* aq_launchermain.c in Sources */ = {isa = PBXBuildFile; fileRef = A95EFA590F17C90D00E1BDA9 /* aq_launchermain.c */; };
+		A95EFAEA0F17C98F00E1BDA9 /* aq_launchermain.m in Sources */ = {isa = PBXBuildFile; fileRef = A95EFA590F17C90D00E1BDA9 /* aq_launchermain.m */; };
 		A95EFAEB0F17C99500E1BDA9 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A99A54990F0D3AB700BC68F1 /* IOKit.framework */; };
 		A95EFB890F17C99600E1BDA9 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
-		A95EFB990F17C9F500E1BDA9 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A95EFB980F17C9F500E1BDA9 /* Carbon.framework */; };
-		A95EFCD90F17CA7600E1BDA9 /* AlphaSyncLauncher.app in Resources */ = {isa = PBXBuildFile; fileRef = A95EFA620F17C94B00E1BDA9 /* AlphaSyncLauncher.app */; };
+		A95EFCD90F17CA7600E1BDA9 /* AlphaSyncLauncher.app in Copy Login Items */ = {isa = PBXBuildFile; fileRef = A95EFA620F17C94B00E1BDA9 /* AlphaSyncLauncher.app */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		A95EFD2C0F17D06000E1BDA9 /* AQFileUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = A95EFD2B0F17D06000E1BDA9 /* AQFileUtilities.m */; };
 		A95EFD360F17D60F00E1BDA9 /* AQFileUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = A95EFD2B0F17D06000E1BDA9 /* AQFileUtilities.m */; };
 		A96033A30F15D66B0046DBC1 /* AQTreeNode.m in Sources */ = {isa = PBXBuildFile; fileRef = A96033A20F15D66B0046DBC1 /* AQTreeNode.m */; };
@@ -55,7 +53,6 @@
 		A99A545E0F0D39E400BC68F1 /* ASNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = A99A544E0F0D39E400BC68F1 /* ASNode.mm */; };
 		A99A545F0F0D39E400BC68F1 /* ASNodeDataSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = A99A54500F0D39E400BC68F1 /* ASNodeDataSource.mm */; };
 		A99A54600F0D39E400BC68F1 /* ASPreferenceController.mm in Sources */ = {isa = PBXBuildFile; fileRef = A99A54520F0D39E400BC68F1 /* ASPreferenceController.mm */; };
-		A99A54630F0D39F400BC68F1 /* AQContainer.cc in Sources */ = {isa = PBXBuildFile; fileRef = A99A54610F0D39F400BC68F1 /* AQContainer.cc */; };
 		A99A54750F0D39FF00BC68F1 /* ASAlphaWordFile.cc in Sources */ = {isa = PBXBuildFile; fileRef = A99A54640F0D39FF00BC68F1 /* ASAlphaWordFile.cc */; };
 		A99A54760F0D39FF00BC68F1 /* ASApplet.cc in Sources */ = {isa = PBXBuildFile; fileRef = A99A54660F0D39FF00BC68F1 /* ASApplet.cc */; };
 		A99A54770F0D39FF00BC68F1 /* ASDevice.cc in Sources */ = {isa = PBXBuildFile; fileRef = A99A54690F0D39FF00BC68F1 /* ASDevice.cc */; };
@@ -65,9 +62,12 @@
 		A99A547B0F0D39FF00BC68F1 /* ASUserDictionaryFile.cc in Sources */ = {isa = PBXBuildFile; fileRef = A99A54730F0D39FF00BC68F1 /* ASUserDictionaryFile.cc */; };
 		A99A549A0F0D3AB700BC68F1 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A99A54990F0D3AB700BC68F1 /* IOKit.framework */; };
 		A99A54B60F0D43D900BC68F1 /* Backup.nib in Resources */ = {isa = PBXBuildFile; fileRef = A99A54B40F0D43D900BC68F1 /* Backup.nib */; };
-		A99A54EF0F0D474F00BC68F1 /* Preferences.nib in Resources */ = {isa = PBXBuildFile; fileRef = A99A54ED0F0D474F00BC68F1 /* Preferences.nib */; };
 		A99A54FA0F0D5F5100BC68F1 /* Inspector.nib in Resources */ = {isa = PBXBuildFile; fileRef = A99A54F80F0D5F5100BC68F1 /* Inspector.nib */; };
-		A9E5D3710F12BD5B002A9EC3 /* ASFileCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = A9E5D3700F12BD5B002A9EC3 /* ASFileCell.mm */; };
+        C01100000000000000000001 /* UniformTypeIdentifiers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01100000000000000000002 /* UniformTypeIdentifiers.framework */; };
+        C01100000000000000000004 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+        C01100000000000000000005 /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01100000000000000000006 /* ServiceManagement.framework */; };
+		4ABCBDDC395974B75A43B8E8 /* ASBackupReport.mm in Sources */ = {isa = PBXBuildFile; fileRef = E41551F125E170A143893D41 /* ASBackupReport.mm */; };
+		4F4037857F8284AEB6168760 /* ASAboutWindowController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2988E42F47B3BF6ADF1A6831 /* ASAboutWindowController.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -80,14 +80,26 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+        C01100000000000000000003 /* Copy Login Items */ = {
+            isa = PBXCopyFilesBuildPhase;
+            buildActionMask = 2147483647;
+            dstPath = Contents/Library/LoginItems;
+            dstSubfolderSpec = 1;
+            files = (A95EFCD90F17CA7600E1BDA9 /* AlphaSyncLauncher.app in Copy Login Items */, );
+            name = "Copy Login Items";
+            runOnlyForDeploymentPostprocessing = 0;
+        };
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		089C165DFE840E0CC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
-		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
+		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		29B97319FDCFA39411CA2CEA /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/MainMenu.nib; sourceTree = "<group>"; };
-		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
-		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		32CA4F630368D1EE00C91783 /* AlphaSync_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlphaSync_Prefix.pch; sourceTree = "<group>"; };
 		4D2E248E18106AF7002E5E7D /* application.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; path = application.iconset; sourceTree = "<group>"; };
 		4D962E170F1C9EF60018CDAA /* icon-file-bin.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "icon-file-bin.pdf"; path = "Graphics/icon-file-bin.pdf"; sourceTree = "<group>"; };
@@ -113,14 +125,13 @@
 		4DF7C9840F1EB42600619084 /* AlphaSync Help */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "AlphaSync Help"; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* AlphaSync.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AlphaSync.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		A95EFA560F17C90D00E1BDA9 /* aq_launcher.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = aq_launcher.c; sourceTree = "<group>"; };
+		A95EFA560F17C90D00E1BDA9 /* aq_launcher.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = aq_launcher.m; sourceTree = "<group>"; };
 		A95EFA570F17C90D00E1BDA9 /* aq_launcher.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = aq_launcher.h; sourceTree = "<group>"; };
 		A95EFA580F17C90D00E1BDA9 /* aq_launcherconfig.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = aq_launcherconfig.h; sourceTree = "<group>"; };
-		A95EFA590F17C90D00E1BDA9 /* aq_launchermain.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = aq_launchermain.c; sourceTree = "<group>"; };
+		A95EFA590F17C90D00E1BDA9 /* aq_launchermain.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = aq_launchermain.m; sourceTree = "<group>"; };
 		A95EFA5A0F17C90D00E1BDA9 /* aq_launcherprivate.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = aq_launcherprivate.h; sourceTree = "<group>"; };
 		A95EFA620F17C94B00E1BDA9 /* AlphaSyncLauncher.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AlphaSyncLauncher.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A95EFA640F17C94B00E1BDA9 /* AlphaSyncLauncher-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "AlphaSyncLauncher-Info.plist"; path = "../AlphaSyncLauncher-Info.plist"; sourceTree = "<group>"; };
-		A95EFB980F17C9F500E1BDA9 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
 		A95EFD2A0F17D06000E1BDA9 /* AQFileUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AQFileUtilities.h; sourceTree = "<group>"; };
 		A95EFD2B0F17D06000E1BDA9 /* AQFileUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AQFileUtilities.m; sourceTree = "<group>"; };
 		A96033A10F15D66B0046DBC1 /* AQTreeNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AQTreeNode.h; sourceTree = "<group>"; };
@@ -150,8 +161,6 @@
 		A99A54500F0D39E400BC68F1 /* ASNodeDataSource.mm */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.objcpp; path = ASNodeDataSource.mm; sourceTree = "<group>"; };
 		A99A54510F0D39E400BC68F1 /* ASPreferenceController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ASPreferenceController.h; sourceTree = "<group>"; };
 		A99A54520F0D39E400BC68F1 /* ASPreferenceController.mm */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.objcpp; path = ASPreferenceController.mm; sourceTree = "<group>"; };
-		A99A54610F0D39F400BC68F1 /* AQContainer.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = AQContainer.cc; sourceTree = "<group>"; };
-		A99A54620F0D39F400BC68F1 /* AQContainer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = AQContainer.h; sourceTree = "<group>"; };
 		A99A54640F0D39FF00BC68F1 /* ASAlphaWordFile.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = ASAlphaWordFile.cc; sourceTree = "<group>"; };
 		A99A54650F0D39FF00BC68F1 /* ASAlphaWordFile.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ASAlphaWordFile.h; sourceTree = "<group>"; };
 		A99A54660F0D39FF00BC68F1 /* ASApplet.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = ASApplet.cc; sourceTree = "<group>"; };
@@ -169,12 +178,18 @@
 		A99A54720F0D39FF00BC68F1 /* ASMessage.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ASMessage.h; sourceTree = "<group>"; };
 		A99A54730F0D39FF00BC68F1 /* ASUserDictionaryFile.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = ASUserDictionaryFile.cc; sourceTree = "<group>"; };
 		A99A54740F0D39FF00BC68F1 /* ASUserDictionaryFile.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ASUserDictionaryFile.h; sourceTree = "<group>"; };
-		A99A54990F0D3AB700BC68F1 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
+		A99A54990F0D3AB700BC68F1 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		A99A54B50F0D43D900BC68F1 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/Backup.nib; sourceTree = "<group>"; };
-		A99A54EE0F0D474F00BC68F1 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/Preferences.nib; sourceTree = "<group>"; };
 		A99A54F90F0D5F5100BC68F1 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/Inspector.nib; sourceTree = "<group>"; };
-		A9E5D36F0F12BD5B002A9EC3 /* ASFileCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASFileCell.h; sourceTree = "<group>"; };
-		A9E5D3700F12BD5B002A9EC3 /* ASFileCell.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASFileCell.mm; sourceTree = "<group>"; };
+        C01100000000000000000002 /* UniformTypeIdentifiers.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UniformTypeIdentifiers.framework; path = System/Library/Frameworks/UniformTypeIdentifiers.framework; sourceTree = SDKROOT; };
+        C01100000000000000000006 /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
+		62623E530502DA726AF5AC00 /* ASBackupReport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASBackupReport.h; sourceTree = "<group>"; };
+		E41551F125E170A143893D41 /* ASBackupReport.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ASBackupReport.mm; sourceTree = "<group>"; };
+		E7E3978206CD4AB3E5F1B4CD /* Universal.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Universal.xcconfig; sourceTree = "<group>"; };
+		D7B4C96AC8AF0BF3C8619F8B /* Modern.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Modern.xcconfig; sourceTree = "<group>"; };
+		85CDB32AAC2D3B860B22908E /* Version.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Version.xcconfig; sourceTree = "<group>"; };
+		1D2AB5E8AD17E38DCF755E8F /* ASAboutWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASAboutWindowController.h; sourceTree = "<group>"; };
+		2988E42F47B3BF6ADF1A6831 /* ASAboutWindowController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASAboutWindowController.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -190,9 +205,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				A99A549A0F0D3AB700BC68F1 /* IOKit.framework in Frameworks */,
+                C01100000000000000000001 /* UniformTypeIdentifiers.framework in Frameworks */,
+                C01100000000000000000005 /* ServiceManagement.framework in Frameworks */,
 				A95EFAE70F17C96A00E1BDA9 /* Cocoa.framework in Frameworks */,
 				A95EFAE80F17C97900E1BDA9 /* Foundation.framework in Frameworks */,
-				4D4066050F1F45AA001DD407 /* Carbon.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -201,8 +217,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				A95EFAEB0F17C99500E1BDA9 /* IOKit.framework in Frameworks */,
+                C01100000000000000000004 /* Cocoa.framework in Frameworks */,
 				A95EFB890F17C99600E1BDA9 /* Foundation.framework in Frameworks */,
-				A95EFB990F17C9F500E1BDA9 /* Carbon.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -213,6 +229,8 @@
 			isa = PBXGroup;
 			children = (
 				1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */,
+                C01100000000000000000002 /* UniformTypeIdentifiers.framework */,
+                C01100000000000000000006 /* ServiceManagement.framework */,
 			);
 			name = "Linked Frameworks";
 			sourceTree = "<group>";
@@ -224,7 +242,6 @@
 				13E42FB307B3F0F600E4EEF1 /* CoreData.framework */,
 				29B97325FDCFA39411CA2CEA /* Foundation.framework */,
 				A99A54990F0D3AB700BC68F1 /* IOKit.framework */,
-				A95EFB980F17C9F500E1BDA9 /* Carbon.framework */,
 			);
 			name = "Other Frameworks";
 			sourceTree = "<group>";
@@ -242,6 +259,7 @@
 		29B97314FDCFA39411CA2CEA /* AlphaSync */ = {
 			isa = PBXGroup;
 			children = (
+				34A6F206D8A48389402ABBA3 /* Build */,
 				4D2E248E18106AF7002E5E7D /* application.iconset */,
 				A99A54330F0D39C400BC68F1 /* Application */,
 				A95EFA530F17C8EF00E1BDA9 /* Launcher */,
@@ -288,7 +306,6 @@
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
 				29B97318FDCFA39411CA2CEA /* MainMenu.nib */,
 				A99A54B40F0D43D900BC68F1 /* Backup.nib */,
-				A99A54ED0F0D474F00BC68F1 /* Preferences.nib */,
 				A99A54F80F0D5F5100BC68F1 /* Inspector.nib */,
 			);
 			name = Resources;
@@ -315,10 +332,10 @@
 			isa = PBXGroup;
 			children = (
 				A95EFA640F17C94B00E1BDA9 /* AlphaSyncLauncher-Info.plist */,
-				A95EFA560F17C90D00E1BDA9 /* aq_launcher.c */,
+				A95EFA560F17C90D00E1BDA9 /* aq_launcher.m */,
 				A95EFA570F17C90D00E1BDA9 /* aq_launcher.h */,
 				A95EFA580F17C90D00E1BDA9 /* aq_launcherconfig.h */,
-				A95EFA590F17C90D00E1BDA9 /* aq_launchermain.c */,
+				A95EFA590F17C90D00E1BDA9 /* aq_launchermain.m */,
 				A95EFA5A0F17C90D00E1BDA9 /* aq_launcherprivate.h */,
 				4DD223AE0F1B5C8F006F004F /* launcher.icns */,
 			);
@@ -356,8 +373,6 @@
 		A99A54300F0D39A400BC68F1 /* Library */ = {
 			isa = PBXGroup;
 			children = (
-				A99A54610F0D39F400BC68F1 /* AQContainer.cc */,
-				A99A54620F0D39F400BC68F1 /* AQContainer.h */,
 				A96033A10F15D66B0046DBC1 /* AQTreeNode.h */,
 				A96033A20F15D66B0046DBC1 /* AQTreeNode.m */,
 				A95EFD2A0F17D06000E1BDA9 /* AQFileUtilities.h */,
@@ -371,10 +386,14 @@
 			children = (
 				A99A54380F0D39E400BC68F1 /* ASAppletNode.h */,
 				A99A54390F0D39E400BC68F1 /* ASAppletNode.mm */,
+				1D2AB5E8AD17E38DCF755E8F /* ASAboutWindowController.h */,
+				2988E42F47B3BF6ADF1A6831 /* ASAboutWindowController.mm */,
 				A99A543A0F0D39E400BC68F1 /* ASApplicationContoller.h */,
 				A99A543B0F0D39E400BC68F1 /* ASApplicationContoller.mm */,
 				A99A543C0F0D39E400BC68F1 /* ASBackupController.h */,
 				A99A543D0F0D39E400BC68F1 /* ASBackupController.mm */,
+				62623E530502DA726AF5AC00 /* ASBackupReport.h */,
+				E41551F125E170A143893D41 /* ASBackupReport.mm */,
 				A99A543E0F0D39E400BC68F1 /* ASDeviceAccessProtocol.h */,
 				A99A54410F0D39E400BC68F1 /* ASDeviceController.h */,
 				A99A54420F0D39E400BC68F1 /* ASDeviceController.mm */,
@@ -392,10 +411,18 @@
 				A99A54500F0D39E400BC68F1 /* ASNodeDataSource.mm */,
 				A99A54510F0D39E400BC68F1 /* ASPreferenceController.h */,
 				A99A54520F0D39E400BC68F1 /* ASPreferenceController.mm */,
-				A9E5D36F0F12BD5B002A9EC3 /* ASFileCell.h */,
-				A9E5D3700F12BD5B002A9EC3 /* ASFileCell.mm */,
 			);
 			path = Application;
+			sourceTree = "<group>";
+		};
+		34A6F206D8A48389402ABBA3 /* Build */ = {
+			isa = PBXGroup;
+			children = (
+				85CDB32AAC2D3B860B22908E /* Version.xcconfig */,
+				E7E3978206CD4AB3E5F1B4CD /* Universal.xcconfig */,
+				D7B4C96AC8AF0BF3C8619F8B /* Modern.xcconfig */,
+			);
+			path = Build;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -424,7 +451,7 @@
 				8D1107290486CEB800E47090 /* Resources */,
 				8D11072C0486CEB800E47090 /* Sources */,
 				8D11072E0486CEB800E47090 /* Frameworks */,
-				4DDA9F92180F160A00BA274B /* ShellScript */,
+                C01100000000000000000003 /* Copy Login Items */,
 			);
 			buildRules = (
 			);
@@ -444,7 +471,6 @@
 				A95EFA5E0F17C94B00E1BDA9 /* Resources */,
 				A95EFA5F0F17C94B00E1BDA9 /* Sources */,
 				A95EFA600F17C94B00E1BDA9 /* Frameworks */,
-				4DDA9F91180F157800BA274B /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -464,7 +490,7 @@
 				LastUpgradeCheck = 0410;
 			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "AlphaSync" */;
-			compatibilityVersion = "Xcode 3.2";
+			compatibilityVersion = "Xcode 12.0";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
@@ -486,11 +512,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A95EFCD90F17CA7600E1BDA9 /* AlphaSyncLauncher.app in Resources */,
+
 				8D11072A0486CEB800E47090 /* MainMenu.nib in Resources */,
 				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
 				A99A54B60F0D43D900BC68F1 /* Backup.nib in Resources */,
-				A99A54EF0F0D474F00BC68F1 /* Preferences.nib in Resources */,
 				A99A54FA0F0D5F5100BC68F1 /* Inspector.nib in Resources */,
 				4D962E180F1C9EF60018CDAA /* icon-file-bin.pdf in Resources */,
 				4D962E450F1CA50D0018CDAA /* icon-applet.pdf in Resources */,
@@ -522,34 +547,6 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
-/* Begin PBXShellScriptBuildPhase section */
-		4DDA9F91180F157800BA274B /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# Apply codesigning here rather than in the project (so that a SHA1 hash can be used as the identity).\nif [ ${CONFIGURATION} != \"Debug\" ] ; then\n  echo \"Stripping release build\"\n  /usr/bin/strip \"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\"\nfi\n\necho \"Applying app codesigning ${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}\"\n/usr/bin/codesign --force --sign \"0ce5fa2ff1f7e47a85df62f2ab16f943a213b85d\" \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}\"\n";
-		};
-		4DDA9F92180F160A00BA274B /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# Apply codesigning here rather than in the project (so that a SHA1 hash can be used as the identity).\nif [ ${CONFIGURATION} != \"Debug\" ] ; then\n  echo \"Stripping release build\"\n  /usr/bin/strip \"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\"\nfi\n\necho \"Applying app codesigning ${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}\"\n/usr/bin/codesign --force --sign \"0ce5fa2ff1f7e47a85df62f2ab16f943a213b85d\" \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}\"\n";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		4D9630860F1D15A80018CDAA /* Sources */ = {
@@ -567,8 +564,10 @@
 			files = (
 				8D11072D0486CEB800E47090 /* main.m in Sources */,
 				A99A54540F0D39E400BC68F1 /* ASAppletNode.mm in Sources */,
+				4F4037857F8284AEB6168760 /* ASAboutWindowController.mm in Sources */,
 				A99A54550F0D39E400BC68F1 /* ASApplicationContoller.mm in Sources */,
 				A99A54560F0D39E400BC68F1 /* ASBackupController.mm in Sources */,
+				4ABCBDDC395974B75A43B8E8 /* ASBackupReport.mm in Sources */,
 				A99A54580F0D39E400BC68F1 /* ASDeviceController.mm in Sources */,
 				A99A54590F0D39E400BC68F1 /* ASInspectorWindowController.mm in Sources */,
 				A99A545A0F0D39E400BC68F1 /* ASDeviceNode.mm in Sources */,
@@ -577,7 +576,6 @@
 				A99A545E0F0D39E400BC68F1 /* ASNode.mm in Sources */,
 				A99A545F0F0D39E400BC68F1 /* ASNodeDataSource.mm in Sources */,
 				A99A54600F0D39E400BC68F1 /* ASPreferenceController.mm in Sources */,
-				A99A54630F0D39F400BC68F1 /* AQContainer.cc in Sources */,
 				A99A54750F0D39FF00BC68F1 /* ASAlphaWordFile.cc in Sources */,
 				A99A54760F0D39FF00BC68F1 /* ASApplet.cc in Sources */,
 				A99A54770F0D39FF00BC68F1 /* ASDevice.cc in Sources */,
@@ -585,9 +583,8 @@
 				A99A54790F0D39FF00BC68F1 /* ASFile.cc in Sources */,
 				A99A547A0F0D39FF00BC68F1 /* ASFileAttributes.cc in Sources */,
 				A99A547B0F0D39FF00BC68F1 /* ASUserDictionaryFile.cc in Sources */,
-				A9E5D3710F12BD5B002A9EC3 /* ASFileCell.mm in Sources */,
 				A96033A30F15D66B0046DBC1 /* AQTreeNode.m in Sources */,
-				A95EFA5B0F17C91400E1BDA9 /* aq_launcher.c in Sources */,
+				A95EFA5B0F17C91400E1BDA9 /* aq_launcher.m in Sources */,
 				A95EFD360F17D60F00E1BDA9 /* AQFileUtilities.m in Sources */,
 				A99A4DF20F18D2F400BFDBAB /* ASGenericFile.cc in Sources */,
 				4D9630AF0F1D432C0018CDAA /* ASSettings.cc in Sources */,
@@ -598,7 +595,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A95EFAEA0F17C98F00E1BDA9 /* aq_launchermain.c in Sources */,
+				A95EFAEA0F17C98F00E1BDA9 /* aq_launchermain.m in Sources */,
 				A95EFD2C0F17D06000E1BDA9 /* AQFileUtilities.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -638,14 +635,6 @@
 			name = Backup.nib;
 			sourceTree = "<group>";
 		};
-		A99A54ED0F0D474F00BC68F1 /* Preferences.nib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				A99A54EE0F0D474F00BC68F1 /* English */,
-			);
-			name = Preferences.nib;
-			sourceTree = "<group>";
-		};
 		A99A54F80F0D5F5100BC68F1 /* Inspector.nib */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -661,163 +650,207 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_PREFIX_HEADER = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = AppletDump;
 			};
 			name = Debug;
+		};
+		35FBBEF1C1503749C2209597 /* DebugModern */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				GCC_PREFIX_HEADER = "";
+				INSTALL_PATH = /usr/local/bin;
+				PRODUCT_NAME = AppletDump;
+			};
+			name = DebugModern;
 		};
 		4D96308C0F1D15A90018CDAA /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_PREFIX_HEADER = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = AppletDump;
-				ZERO_LINK = NO;
 			};
 			name = Release;
+		};
+		E864A82D283967F5B8F36856 /* ReleaseModern */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				GCC_PREFIX_HEADER = "";
+				INSTALL_PATH = /usr/local/bin;
+				PRODUCT_NAME = AppletDump;
+			};
+			name = ReleaseModern;
 		};
 		A95EFA660F17C94B00E1BDA9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_PREFIX_HEADER = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "AlphaSyncLauncher-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
+				SKIP_INSTALL = YES;
 				OTHER_LDFLAGS = (
 					"-framework",
 					Foundation,
 				);
 				PRODUCT_NAME = AlphaSyncLauncher;
+                PRODUCT_BUNDLE_IDENTIFIER = com.tsoniq.AlphaSyncLauncher;
 				WRAPPER_EXTENSION = app;
-				ZERO_LINK = YES;
 			};
 			name = Debug;
+		};
+		B10B72ADBA960429622B8528 /* DebugModern */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				GCC_PREFIX_HEADER = "";
+				INFOPLIST_FILE = "AlphaSyncLauncher-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				SKIP_INSTALL = YES;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+				);
+				PRODUCT_NAME = AlphaSyncLauncher;
+                PRODUCT_BUNDLE_IDENTIFIER = com.tsoniq.AlphaSyncLauncher;
+				WRAPPER_EXTENSION = app;
+			};
+			name = DebugModern;
 		};
 		A95EFA670F17C94B00E1BDA9 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_PREFIX_HEADER = "";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "AlphaSyncLauncher-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
+				SKIP_INSTALL = YES;
 				OTHER_LDFLAGS = (
 					"-framework",
 					Foundation,
 				);
 				PRODUCT_NAME = AlphaSyncLauncher;
+                PRODUCT_BUNDLE_IDENTIFIER = com.tsoniq.AlphaSyncLauncher;
 				WRAPPER_EXTENSION = app;
-				ZERO_LINK = NO;
 			};
 			name = Release;
+		};
+		CFC69FB6F95A37EDCE82DC4C /* ReleaseModern */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				GCC_PREFIX_HEADER = "";
+				INFOPLIST_FILE = "AlphaSyncLauncher-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				SKIP_INSTALL = YES;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+				);
+				PRODUCT_NAME = AlphaSyncLauncher;
+                PRODUCT_BUNDLE_IDENTIFIER = com.tsoniq.AlphaSyncLauncher;
+				WRAPPER_EXTENSION = app;
+			};
+			name = ReleaseModern;
 		};
 		C01FCF4B08A954540054247B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = Info.plist;
-				INSTALL_PATH = "$(HOME)/Applications";
+				INSTALL_PATH = /Applications;
 				PRODUCT_NAME = AlphaSync;
+                PRODUCT_BUNDLE_IDENTIFIER = com.tsoniq.AlphaSync;
 				WRAPPER_EXTENSION = app;
-				ZERO_LINK = YES;
 			};
 			name = Debug;
+		};
+		598116EA568D317BFB6F255F /* DebugModern */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = /Applications;
+				PRODUCT_NAME = AlphaSync;
+                PRODUCT_BUNDLE_IDENTIFIER = com.tsoniq.AlphaSync;
+				WRAPPER_EXTENSION = app;
+			};
+			name = DebugModern;
 		};
 		C01FCF4C08A954540054247B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_MODEL_TUNING = G5;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = Info.plist;
-				INSTALL_PATH = "$(HOME)/Applications";
+				INSTALL_PATH = /Applications;
 				PRODUCT_NAME = AlphaSync;
+                PRODUCT_BUNDLE_IDENTIFIER = com.tsoniq.AlphaSync;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
 		};
+		7DDC292532B0C41B09752808 /* ReleaseModern */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = /Applications;
+				PRODUCT_NAME = AlphaSync;
+                PRODUCT_BUNDLE_IDENTIFIER = com.tsoniq.AlphaSync;
+				WRAPPER_EXTENSION = app;
+			};
+			name = ReleaseModern;
+		};
 		C01FCF4F08A954540054247B /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = E7E3978206CD4AB3E5F1B4CD /* Universal.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = YES;
-				CODE_SIGN_IDENTITY = "";
+                CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+                GCC_TREAT_WARNINGS_AS_ERRORS = YES;
+				ALWAYS_SEARCH_USER_PATHS = NO;
+                CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				ENABLE_HARDENED_RUNTIME = YES;
+				HEADER_SEARCH_PATHS = ("$(SRCROOT)/Application", "$(SRCROOT)/Driver", "$(SRCROOT)/Library", "$(SRCROOT)/Launcher");
+				ONLY_ACTIVE_ARCH = NO;
+				SDKROOT = macosx;
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = NO;
 				GCC_C_LANGUAGE_STANDARD = c99;
-				GCC_ENABLE_CPP_EXCEPTIONS = NO;
-				GCC_ENABLE_CPP_RTTI = NO;
-				GCC_FAST_OBJC_DISPATCH = NO;
-				GCC_VERSION = 4.0;
-				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
-				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
-				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = YES;
-				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = YES;
-				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
-				GCC_WARN_MISSING_PARENTHESES = YES;
-				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
-				GCC_WARN_SHADOW = YES;
-				GCC_WARN_SIGN_COMPARE = YES;
-				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = NO;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_LABEL = YES;
-				GCC_WARN_UNUSED_PARAMETER = YES;
-				GCC_WARN_UNUSED_VALUE = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.5;
-				ONLY_LINK_ESSENTIAL_SYMBOLS = NO;
-				STRIP_INSTALLED_PRODUCT = NO;
-			};
-			name = Debug;
-		};
-		C01FCF5008A954540054247B /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
-				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = YES;
-				CODE_SIGN_IDENTITY = "";
-				COPY_PHASE_STRIP = NO;
-				DEAD_CODE_STRIPPING = NO;
-				GCC_C_LANGUAGE_STANDARD = c99;
-				GCC_ENABLE_CPP_EXCEPTIONS = NO;
-				GCC_ENABLE_CPP_RTTI = NO;
-				GCC_FAST_OBJC_DISPATCH = NO;
-				GCC_VERSION = 4.0;
+				GCC_ENABLE_CPP_EXCEPTIONS = YES;
+				GCC_ENABLE_CPP_RTTI = YES;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -836,11 +869,138 @@
 				GCC_WARN_UNUSED_PARAMETER = YES;
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.5;
-				ONLY_LINK_ESSENTIAL_SYMBOLS = NO;
+				STRIP_INSTALLED_PRODUCT = NO;
+			};
+			name = Debug;
+		};
+		69ABDEB41C6F25F95AAB5C43 /* DebugModern */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = D7B4C96AC8AF0BF3C8619F8B /* Modern.xcconfig */;
+			buildSettings = {
+				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = YES;
+                CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+                GCC_TREAT_WARNINGS_AS_ERRORS = YES;
+				ALWAYS_SEARCH_USER_PATHS = NO;
+                CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				ENABLE_HARDENED_RUNTIME = YES;
+				HEADER_SEARCH_PATHS = ("$(SRCROOT)/Application", "$(SRCROOT)/Driver", "$(SRCROOT)/Library", "$(SRCROOT)/Launcher");
+				ONLY_ACTIVE_ARCH = NO;
+				SDKROOT = macosx;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = NO;
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_ENABLE_CPP_EXCEPTIONS = YES;
+				GCC_ENABLE_CPP_RTTI = YES;
+				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
+				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = YES;
+				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = YES;
+				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
+				GCC_WARN_MISSING_PARENTHESES = YES;
+				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
+				GCC_WARN_SHADOW = YES;
+				GCC_WARN_SIGN_COMPARE = YES;
+				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_LABEL = YES;
+				GCC_WARN_UNUSED_PARAMETER = YES;
+				GCC_WARN_UNUSED_VALUE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				STRIP_INSTALLED_PRODUCT = NO;
+			};
+			name = DebugModern;
+		};
+		C01FCF5008A954540054247B /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = E7E3978206CD4AB3E5F1B4CD /* Universal.xcconfig */;
+			buildSettings = {
+				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = YES;
+                CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+                GCC_TREAT_WARNINGS_AS_ERRORS = YES;
+				ALWAYS_SEARCH_USER_PATHS = NO;
+                CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				ENABLE_HARDENED_RUNTIME = YES;
+				HEADER_SEARCH_PATHS = ("$(SRCROOT)/Application", "$(SRCROOT)/Driver", "$(SRCROOT)/Library", "$(SRCROOT)/Launcher");
+				ONLY_ACTIVE_ARCH = NO;
+				SDKROOT = macosx;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = NO;
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_ENABLE_CPP_EXCEPTIONS = YES;
+				GCC_ENABLE_CPP_RTTI = YES;
+				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
+				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = YES;
+				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = YES;
+				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
+				GCC_WARN_MISSING_PARENTHESES = YES;
+				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
+				GCC_WARN_SHADOW = YES;
+				GCC_WARN_SIGN_COMPARE = YES;
+				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_LABEL = YES;
+				GCC_WARN_UNUSED_PARAMETER = YES;
+				GCC_WARN_UNUSED_VALUE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
 				STRIP_INSTALLED_PRODUCT = NO;
 			};
 			name = Release;
+		};
+		2F3D6C59DF1B2C486366EDA9 /* ReleaseModern */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = D7B4C96AC8AF0BF3C8619F8B /* Modern.xcconfig */;
+			buildSettings = {
+				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = YES;
+                CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+                GCC_TREAT_WARNINGS_AS_ERRORS = YES;
+				ALWAYS_SEARCH_USER_PATHS = NO;
+                CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				ENABLE_HARDENED_RUNTIME = YES;
+				HEADER_SEARCH_PATHS = ("$(SRCROOT)/Application", "$(SRCROOT)/Driver", "$(SRCROOT)/Library", "$(SRCROOT)/Launcher");
+				ONLY_ACTIVE_ARCH = NO;
+				SDKROOT = macosx;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = NO;
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_ENABLE_CPP_EXCEPTIONS = YES;
+				GCC_ENABLE_CPP_RTTI = YES;
+				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
+				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = YES;
+				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = YES;
+				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
+				GCC_WARN_MISSING_PARENTHESES = YES;
+				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
+				GCC_WARN_SHADOW = YES;
+				GCC_WARN_SIGN_COMPARE = YES;
+				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_LABEL = YES;
+				GCC_WARN_UNUSED_PARAMETER = YES;
+				GCC_WARN_UNUSED_VALUE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				STRIP_INSTALLED_PRODUCT = NO;
+			};
+			name = ReleaseModern;
 		};
 /* End XCBuildConfiguration section */
 
@@ -849,7 +1009,9 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4D96308B0F1D15A90018CDAA /* Debug */,
+				35FBBEF1C1503749C2209597 /* DebugModern */,
 				4D96308C0F1D15A90018CDAA /* Release */,
+				E864A82D283967F5B8F36856 /* ReleaseModern */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -858,7 +1020,9 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A95EFA660F17C94B00E1BDA9 /* Debug */,
+				B10B72ADBA960429622B8528 /* DebugModern */,
 				A95EFA670F17C94B00E1BDA9 /* Release */,
+				CFC69FB6F95A37EDCE82DC4C /* ReleaseModern */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -867,7 +1031,9 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C01FCF4B08A954540054247B /* Debug */,
+				598116EA568D317BFB6F255F /* DebugModern */,
 				C01FCF4C08A954540054247B /* Release */,
+				7DDC292532B0C41B09752808 /* ReleaseModern */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -876,7 +1042,9 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C01FCF4F08A954540054247B /* Debug */,
+				69ABDEB41C6F25F95AAB5C43 /* DebugModern */,
 				C01FCF5008A954540054247B /* Release */,
+				2F3D6C59DF1B2C486366EDA9 /* ReleaseModern */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

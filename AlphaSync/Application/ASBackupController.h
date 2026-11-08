@@ -30,6 +30,9 @@
  */
 #import <Cocoa/Cocoa.h>
 #import "ASNode.h"
+#import "ASBackupReport.h"
+
+@class ASDeviceController;
 
 @interface ASBackupController : NSWindowController
 {
@@ -37,17 +40,29 @@
     IBOutlet NSTextField* outletFilesRemaining;
     IBOutlet NSProgressIndicator* outletProgressIndicator;
     IBOutlet NSButton* outletStopDoneButton;
+    NSStackView* backupLocationsView;
+    NSTextField* backupHintField;
+    NSButton* openBackupButton;
 
     NSString* currentSessionPath;
+    NSMutableArray* backupSessionPaths;
     NSMutableArray* backupItems;
+    ASBackupReport* backupReport;
     NSUInteger nextBackupItem;
-    int bytesToBackup;
-    int bytesSoFar;
-    NSTimer* backupTimer;
+    uint64_t bytesToBackup;
+    uint64_t bytesSoFar;
+    NSUInteger failedFiles;
+    NSUInteger backupDeviceCount;
+    ASDeviceController* deviceController;
+    BOOL backupInFlight;
+    NSString* pendingStopMessage;
+    NSString* pendingStopStatus;
 }
 
-- (void)runBackupFor:(ASNode*)root modalForWindow:(NSWindow*)window;
+- (void)runBackupFor:(ASNode*)root controller:(ASDeviceController*)controller modalForWindow:(NSWindow*)window;
+- (void)requestStopForTermination;
 
 - (IBAction)actionStopDone:(id)sender;
+- (IBAction)actionOpenBackupFolders:(id)sender;
 
 @end

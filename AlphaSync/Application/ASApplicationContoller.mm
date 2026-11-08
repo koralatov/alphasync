@@ -32,7 +32,7 @@
 
 #import "ASApplicationContoller.h"
 #import "ASInspectorWindowController.h"
-#import "ASFileCell.h"
+#import "ASAboutWindowController.h"
 #import "AQFileUtilities.h"
 #import "aq_launcher.h"
 #import "aq_launcherconfig.h"
@@ -43,8 +43,6 @@ using namespace ts;
 
 /** The launcher application name.
  */
-#define kASLauncherName         @"AlphaSyncLauncher"
-#define kASLauncherExtension    @"app"
 
 /** The application's bundle ID. This is used by the launcher to start the application
  *  when a device is connected. It must match the value in the applications info.plist file.
@@ -68,7 +66,6 @@ enum ASAlertStatus
 
 @interface ASApplicationController(PrivateAPI)
 - (void)uninstall;
-- (void)installApplicationSupport;
 - (void)deviceControllerNotification:(NSNotification*)notification;
 - (void)displayMemoryStatus;
 - (void)displayStatusTimerDone;
@@ -124,9 +121,18 @@ static const NSInteger kMenuItemTagBackup   = 100;
 - (void)dealloc
 {
     [preferenceController release];
+    [aboutController release];
     [deviceController release];
     [statusDisplayTimer invalidate];
     [launcherInstallPath release];
+    [automaticLaunchError release];
+    [iconDisconnected release];
+    [iconRed release];
+    [iconYellow release];
+    [iconGreen release];
+    [iconToolbarInfo release];
+    [iconToolbarBackup release];
+    [iconToolbarDelete release];
     [super dealloc];
 }
 
@@ -136,20 +142,17 @@ static const NSInteger kMenuItemTagBackup   = 100;
     [outletMainWindow setDelegate:self];
     [NSApp setDelegate:self];
 
-    NSBundle* bundle = [NSBundle mainBundle];
-    iconDisconnected = [[NSImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-status-clear" ofType:@"pdf"]];
-    iconRed = [[NSImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-status-red" ofType:@"pdf"]];
-    iconYellow = [[NSImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-status-yellow" ofType:@"pdf"]];
-    iconGreen = [[NSImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-status-green" ofType:@"pdf"]];
-    iconToolbarInfo = [[NSImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-toolbar-info" ofType:@"pdf"]];
-    iconToolbarBackup = [[NSImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-toolbar-backup" ofType:@"pdf"]];
-    iconToolbarDeleteDisabled = [[NSImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-toolbar-delete-disabled" ofType:@"pdf"]];
-    iconToolbarDeleteFile = [[NSImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-toolbar-delete-single" ofType:@"pdf"]];
-    iconToolbarDeleteFiles = [[NSImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-toolbar-delete-multiple" ofType:@"pdf"]];
+    iconDisconnected = [[NSImage imageNamed:NSImageNameStatusNone] retain];
+    iconRed = [[NSImage imageNamed:NSImageNameStatusUnavailable] retain];
+    iconYellow = [[NSImage imageNamed:NSImageNameStatusPartiallyAvailable] retain];
+    iconGreen = [[NSImage imageNamed:NSImageNameStatusAvailable] retain];
+    iconToolbarInfo = [[NSImage imageWithSystemSymbolName:@"info.circle" accessibilityDescription:@"Information"] retain];
+    iconToolbarBackup = [[NSImage imageWithSystemSymbolName:@"externaldrive" accessibilityDescription:@"Back Up"] retain];
+    iconToolbarDelete = [[NSImage imageWithSystemSymbolName:@"trash" accessibilityDescription:@"Clear Files"] retain];
 
     [outletStatusImage setImageFrameStyle:NSImageFrameNone];
     [outletStatusImage setImageAlignment:NSImageAlignCenter];
-    [outletStatusImage setImageScaling:NSScaleProportionally];
+    [outletStatusImage setImageScaling:NSImageScaleProportionallyDown];
 
     [outletProgressIndicator stopAnimation:self];
     [outletProgressIndicator setUsesThreadedAnimation:YES];
@@ -157,17 +160,20 @@ static const NSInteger kMenuItemTagBackup   = 100;
 
     [self setupToolbar];
 
-    [self installApplicationSupport];
     [self setupAutoRun:0.0];
 
-    // Setup custom cell for the file name and icon view.
-    NSTableColumn *tc = [outletFileView tableColumnWithIdentifier:@"Name"];
-    ASFileCell *fs = [[[ASFileCell alloc] init] autorelease];
-    [fs setEditable:YES];
-    [tc setDataCell:fs];
+    [outletFileView setRowSizeStyle:NSTableViewRowSizeStyleDefault];
+    // Older nibs stored a white background instead of an adaptive AppKit colour.
+    [outletFileView setBackgroundColor:[NSColor controlBackgroundColor]];
+    [[outletFileView enclosingScrollView] setBackgroundColor:[NSColor controlBackgroundColor]];
+    for (NSTableColumn* column in [outletFileView tableColumns])
+    {
+        [[column headerCell] setTextColor:[NSColor labelColor]];
+        [[column headerCell] setBackgroundColor:[NSColor controlColor]];
+    }
 
     // Setup drag and drop.
-    [outletFileView registerForDraggedTypes:[NSArray arrayWithObjects:NSStringPboardType, NSFilenamesPboardType, nil]];
+    [outletFileView registerForDraggedTypes:[NSArray arrayWithObjects:NSPasteboardTypeString, NSPasteboardTypeFileURL, nil]];
     [outletFileView setDraggingSourceOperationMask:NSDragOperationEvery forLocal:YES];
     [outletFileView setDraggingSourceOperationMask:NSDragOperationEvery forLocal:NO];
     [outletFileView setAutoresizesOutlineColumn:NO];
@@ -184,13 +190,18 @@ static const NSInteger kMenuItemTagBackup   = 100;
     [nc addObserver:self selector:@selector(deviceControllerNotification:) name:kASDeviceControllerDeviceDetected object:nil];
     [nc addObserver:self selector:@selector(deviceControllerNotification:) name:kASDeviceControllerDeviceConnected object:nil];
     [nc addObserver:self selector:@selector(deviceControllerNotification:) name:kASDeviceControllerDeviceDisconnected object:nil];
+    [nc addObserver:self selector:@selector(deviceControllerNotification:) name:kASDeviceControllerDataChanged object:nil];
+    [nc addObserver:self selector:@selector(deviceControllerNotification:) name:kASDeviceControllerTaskChanged object:nil];
+    [nc addObserver:self selector:@selector(deviceControllerNotification:) name:kASDeviceControllerError object:nil];
 
     dataSource = [[ASNodeDataSource alloc] init];
     [dataSource setDeviceController:deviceController];
     [outletFileView setDataSource:dataSource];
     [outletFileView setDelegate:self];
 
-    [deviceController enable];      // this may trigger an immediate notification (eg for device connect)
+    // Interface checks must not capture a connected NEO or change login-item registration.
+    if (![[[NSProcessInfo processInfo] arguments] containsObject:@"--smoke-test"])
+        [deviceController enable];
     [dataSource reloadData:outletFileView];
 
     [self displayMemoryStatus];
@@ -221,11 +232,14 @@ static const NSInteger kMenuItemTagBackup   = 100;
         [self setStatusIdle];
         [dataSource reloadData:outletFileView];
     }
-    else
+    else if ([name isEqualToString:kASDeviceControllerDataChanged])
     {
-        NSLog(@"ASApplicationController: ignoring unknown device message: %@", name);
+        [dataSource reloadData:outletFileView];
+        [self updateInspectorDisplay];
     }
+    else if ([name isEqualToString:kASDeviceControllerError]) [self setStatusError:[notification object]];
 
+    [outletFileView setEnabled:![deviceController isBusy]];
     [toolbar validateVisibleItems];
 }
 
@@ -257,19 +271,15 @@ static const NSInteger kMenuItemTagBackup   = 100;
 {
     (void)sender;
 
-    if ([outletFileView numberOfSelectedRows] == 1)
-    {
-        id selectedItem = [outletFileView itemAtRow:[outletFileView selectedRow]];
-        if ([selectedItem conformsToProtocol:@protocol(ASDeleteProtocol)])
-        {
-            [selectedItem deleteSelf];      // Delete the item (will invoke deviceWillDelete delegate, if appropriate).
-
-            ASAppletNode* modifiedApplet = [selectedItem ancestorOfClass:[ASAppletNode class]];
-            if (modifiedApplet) [modifiedApplet reload];
-        }
-
-        [outletFileView reloadData];
-    }
+    if ([deviceController isBusy] || [outletFileView numberOfSelectedRows] != 1) return;
+    ASNode* selected = [outletFileView itemAtRow:[outletFileView selectedRow]];
+    if (![selected conformsToProtocol:@protocol(ASDeleteProtocol)] || ![self deviceWillDelete:selected sender:selected]) return;
+    [deviceController performTaskForNode:selected refresh:YES task:^id(ASNode* working) {
+        return @([(id<ASDeleteProtocol>)working deleteSelf]);
+    } completion:^(id result, NSString* error) {
+        (void)result;
+        [self deviceDidDelete:selected error:error sender:selected];
+    }];
 }
 
 
@@ -288,7 +298,7 @@ static const NSInteger kMenuItemTagBackup   = 100;
     (void)sender;
 
     if (!backupController) backupController = [[ASBackupController alloc] init];
-    [backupController runBackupFor:[deviceController systemRoot] modalForWindow:outletMainWindow];
+    [backupController runBackupFor:[deviceController systemRoot] controller:deviceController modalForWindow:outletMainWindow];
 }
 
 
@@ -310,18 +320,25 @@ static const NSInteger kMenuItemTagBackup   = 100;
     [preferenceController showWindow:self];
 }
 
+- (IBAction)actionShowAbout:(id)sender
+{
+    (void)sender;
+    if (!aboutController) aboutController = [[ASAboutWindowController alloc] init];
+    [aboutController showWindow:self];
+}
+
 
 - (IBAction)actionUninstall:(id)sender
 {
     (void)sender;
     NSAlert* alert = [[NSAlert alloc] init];
-    [alert setAlertStyle:NSCriticalAlertStyle];
+    [alert setAlertStyle:NSAlertStyleCritical];
     [[alert addButtonWithTitle:@"Cancel"] setKeyEquivalent:@"\033"];
     [[alert addButtonWithTitle:@"Uninstall"] setKeyEquivalent:@"\r"];
     [alert setMessageText:@"Uninstall AlphaSync?"];
     [alert setInformativeText:@"The application and supporting files will be moved to the trash."];
 
-    int button = [alert runModal];
+    NSModalResponse button = [alert runModal];
     BOOL shouldProceed = (button == NSAlertSecondButtonReturn);
     [alert release];
 
@@ -553,7 +570,7 @@ static const NSInteger kMenuItemTagBackup   = 100;
         [toolbarItem setLabel:@"Clear"];
         [toolbarItem setPaletteLabel:@"Clear"];
         [toolbarItem setToolTip:@"Clear a single file, or all files belonging to an applet"];
-        [toolbarItem setImage:iconToolbarDeleteFiles];
+        [toolbarItem setImage:iconToolbarDelete];
         [toolbarItem setTarget:self];
         [toolbarItem setAction:@selector(actionDelete:)];
     }
@@ -591,16 +608,15 @@ static const NSInteger kMenuItemTagBackup   = 100;
             kToolbarItemIdentifierInfo,
             kToolbarItemIdentifierDelete,
             NSToolbarSpaceItemIdentifier,
-            NSToolbarCustomizeToolbarItemIdentifier,
             NSToolbarFlexibleSpaceItemIdentifier,
             NSToolbarSpaceItemIdentifier,
-            NSToolbarSeparatorItemIdentifier,
             nil];
 }
 
 
 - (BOOL)validateToolbarItem:(NSToolbarItem*)toolbarItem
 {
+    if ([deviceController isBusy]) return NO;
     BOOL enable = NO;
 
     if ([[toolbarItem itemIdentifier] isEqual:kToolbarItemIdentifierInfo])
@@ -617,23 +633,19 @@ static const NSInteger kMenuItemTagBackup   = 100;
             if ([selectedItem isMemberOfClass:[ASFileNode class]])
             {
                 [toolbarItem setToolTip:@"Clear the contents of a single file"];
-                [toolbarItem setImage:iconToolbarDeleteFile];
             }
             else if ([selectedItem isMemberOfClass:[ASAppletNode class]])
             {
                 [toolbarItem setToolTip:@"Clear all files belonging to an applet"];
-                [toolbarItem setImage:iconToolbarDeleteFiles];
             }
             else
             {
                 [toolbarItem setToolTip:@"Clear the thing that is selected"];
-                [toolbarItem setImage:iconToolbarDeleteFile];
             }
         }
         if (!enable)
         {
             [toolbarItem setToolTip:@"Clear the contents of one or more files"];
-            [toolbarItem setImage:iconToolbarDeleteDisabled];
         }
     }
     else if ([[toolbarItem itemIdentifier] isEqual:kToolbarItemIdentifierBackup])
@@ -653,6 +665,9 @@ static const NSInteger kMenuItemTagBackup   = 100;
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem
 {
+    SEL action = [menuItem action];
+    if ([deviceController isBusy] && (action == @selector(actionDelete:) || action == @selector(actionBackup:) ||
+        action == @selector(reloadDeviceData:) || action == @selector(actionUninstall:))) return NO;
     BOOL enable = TRUE;
     if ([menuItem tag] == kMenuItemTagBackup)
     {
@@ -699,9 +714,9 @@ static const NSInteger kMenuItemTagBackup   = 100;
     [[alert addButtonWithTitle:@"Cancel"] setKeyEquivalent:@"\033"];
     [alert setMessageText:[NSString stringWithFormat:@"Overwrite file %@?", [target displayName]]];
     [alert setInformativeText:@"This operation can not be undone."];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
 
-    int button = [alert runModal];
+    NSModalResponse button = [alert runModal];
     BOOL shouldProceed = (button == NSAlertFirstButtonReturn);
     [alert release];
 
@@ -727,22 +742,22 @@ static const NSInteger kMenuItemTagBackup   = 100;
     {
         [alert setMessageText:[NSString stringWithFormat:@"Clear file %@?", [target displayName]]];
         [alert setInformativeText:@"This operation can not be undone."];
-        [alert setAlertStyle:NSWarningAlertStyle];
+        [alert setAlertStyle:NSAlertStyleWarning];
     }
     else if ([target isMemberOfClass:[ASAppletNode class]])
     {
         [alert setMessageText:[NSString stringWithFormat:@"Clear all files for %@?", [target displayName]]];
         [alert setInformativeText:@"This operation can not be undone."];
-        [alert setAlertStyle:NSCriticalAlertStyle];
+        [alert setAlertStyle:NSAlertStyleCritical];
     }
     else
     {
         [alert setMessageText:[NSString stringWithFormat:@"Clear %@?", [target displayName]]];
         [alert setInformativeText:@"This operation can not be undone."];
-        [alert setAlertStyle:NSWarningAlertStyle];
+        [alert setAlertStyle:NSAlertStyleWarning];
     }
 
-    int button = [alert runModal];
+    NSModalResponse button = [alert runModal];
     BOOL shouldProceed = (button == NSAlertFirstButtonReturn);
     [alert release];
 
@@ -768,7 +783,7 @@ static const NSInteger kMenuItemTagBackup   = 100;
         [[alert addButtonWithTitle:@"OK"] setKeyEquivalent:@"\r"];
         [alert setMessageText:[NSString stringWithFormat:@"Failed to load %@", [path lastPathComponent]]];
         [alert setInformativeText:error];
-        [alert setAlertStyle:NSWarningAlertStyle];
+        [alert setAlertStyle:NSAlertStyleWarning];
         [alert runModal];
         [alert release];
     }
@@ -792,7 +807,7 @@ static const NSInteger kMenuItemTagBackup   = 100;
         [[alert addButtonWithTitle:@"OK"] setKeyEquivalent:@"\r"];
         [alert setMessageText:[NSString stringWithFormat:@"Failed to save %@", [source displayName]]];
         [alert setInformativeText:error];
-        [alert setAlertStyle:NSWarningAlertStyle];
+        [alert setAlertStyle:NSAlertStyleWarning];
         [alert runModal];
         [alert release];
     }
@@ -816,7 +831,7 @@ static const NSInteger kMenuItemTagBackup   = 100;
         [[alert addButtonWithTitle:@"OK"] setKeyEquivalent:@"\r"];
         [alert setMessageText:[NSString stringWithFormat:@"Failed to replace file %@", [target displayName]]];
         [alert setInformativeText:error];
-        [alert setAlertStyle:NSWarningAlertStyle];
+        [alert setAlertStyle:NSAlertStyleWarning];
         [alert runModal];
         [alert release];
     }
@@ -841,7 +856,7 @@ static const NSInteger kMenuItemTagBackup   = 100;
         [[alert addButtonWithTitle:@"OK"] setKeyEquivalent:@"\r"];
         [alert setMessageText:[NSString stringWithFormat:@"Failed to delete file %@", [node displayName]]];
         [alert setInformativeText:error];
-        [alert setAlertStyle:NSWarningAlertStyle];
+        [alert setAlertStyle:NSAlertStyleWarning];
         [alert runModal];
         [alert release];
     }
@@ -870,25 +885,74 @@ static const NSInteger kMenuItemTagBackup   = 100;
 }
 
 
-- (BOOL)outlineView:(NSOutlineView*)outlineView shouldEditTableColumn:(NSTableColumn*)tableColumn item:(id)item
+- (NSView*)outlineView:(NSOutlineView*)outlineView viewForTableColumn:(NSTableColumn*)tableColumn item:(id)item
 {
-    (void)outlineView;
-    (void)tableColumn;
-    if ([item isMemberOfClass:[ASFileNode class]]) return YES;
-    else return NO;         // REVIEW: may allow editing of the device name in future
+    BOOL isName = [[tableColumn identifier] isEqualToString:@"Name"];
+    NSTableCellView* cell = [outlineView makeViewWithIdentifier:[tableColumn identifier] owner:self];
+    if (!cell)
+    {
+        cell = [[[NSTableCellView alloc] initWithFrame:NSZeroRect] autorelease];
+        [cell setIdentifier:[tableColumn identifier]];
+        NSTextField* text = [NSTextField labelWithString:@""];
+        [text setFont:[NSFont systemFontOfSize:[NSFont systemFontSize]]];
+        [text setLineBreakMode:NSLineBreakByTruncatingTail];
+        [text setTranslatesAutoresizingMaskIntoConstraints:NO];
+        [cell addSubview:text];
+        [cell setTextField:text];
+
+        NSLayoutXAxisAnchor* leading = [cell leadingAnchor];
+        if (isName)
+        {
+            NSImageView* image = [[[NSImageView alloc] initWithFrame:NSZeroRect] autorelease];
+            [image setImageScaling:NSImageScaleProportionallyDown];
+            [image setTranslatesAutoresizingMaskIntoConstraints:NO];
+            [cell addSubview:image];
+            [cell setImageView:image];
+            [NSLayoutConstraint activateConstraints:@[
+                [[image leadingAnchor] constraintEqualToAnchor:[cell leadingAnchor] constant:2],
+                [[image centerYAnchor] constraintEqualToAnchor:[cell centerYAnchor]],
+                [[image widthAnchor] constraintEqualToConstant:16],
+                [[image heightAnchor] constraintEqualToConstant:16]
+            ]];
+            leading = [image trailingAnchor];
+            [text setDelegate:self];
+        }
+        [NSLayoutConstraint activateConstraints:@[
+            [[text leadingAnchor] constraintEqualToAnchor:leading constant:4],
+            [[text trailingAnchor] constraintEqualToAnchor:[cell trailingAnchor] constant:-4],
+            [[text centerYAnchor] constraintEqualToAnchor:[cell centerYAnchor]]
+        ]];
+    }
+
+    [cell setObjectValue:item];
+    [[cell textField] setStringValue:[dataSource outlineView:outlineView objectValueForTableColumn:tableColumn byItem:item] ?: @""];
+    [[cell textField] setEditable:isName && [item isMemberOfClass:[ASFileNode class]]];
+    [[cell imageView] setImage:isName ? [item smallIcon] : nil];
+    return cell;
 }
 
 
-/** Delagate method used to specify the icon to show next to the file name.
- */
-- (void)outlineView:(NSOutlineView*)outlineView willDisplayCell:(NSCell*)cell forTableColumn:(NSTableColumn*)tableColumn item:(id)item
+- (BOOL)control:(NSControl*)control textShouldBeginEditing:(NSText*)editor
 {
-    (void)outlineView;
-    if ([[tableColumn identifier] isEqualToString:@"Name"])
+    (void)editor;
+    NSTableCellView* cell = (NSTableCellView*)[control superview];
+    return ![deviceController isBusy] && [[cell objectValue] isMemberOfClass:[ASFileNode class]];
+}
+
+
+- (void)controlTextDidEndEditing:(NSNotification*)notification
+{
+    NSTextField* text = [notification object];
+    NSTableCellView* cell = (NSTableCellView*)[text superview];
+    id item = [cell objectValue];
+    if ([[notification userInfo][@"NSTextMovement"] integerValue] != NSCancelTextMovement &&
+        ![[text stringValue] isEqualToString:[item displayName]])
     {
-        ASFileCell* fc = (ASFileCell*)cell;
-    	[fc setIcon:[item smallIcon]];
+        NSTableColumn* column = [outletFileView tableColumnWithIdentifier:@"Name"];
+        [dataSource outlineView:outletFileView setObjectValue:[text stringValue] forTableColumn:column byItem:item];
     }
+    // Show the cached name until the existing queued rename publishes its result.
+    [text setStringValue:[item displayName]];
 }
 
 
@@ -924,49 +988,9 @@ static const NSInteger kMenuItemTagBackup   = 100;
  */
 - (NSString*)launcherInstallPath
 {
-    NSString* path = [[self appSupportFolderPath] stringByAppendingPathComponent:kASLauncherName];
-    path = [path stringByAppendingPathExtension:kASLauncherExtension];
-    return path;
+    return [[[NSBundle mainBundle] bundlePath]
+            stringByAppendingPathComponent:@"Contents/Library/LoginItems/AlphaSyncLauncher.app"];
 }
-
-/** This will create an application support directory and install the launcher
- *  application there (so that the path is independent of the application's install
- *  location.
- */
-- (void)installApplicationSupport
-{
-    NSFileManager* fm = [NSFileManager defaultManager];
-
-    if (!launcherInstallPath)
-    {
-        launcherInstallPath = [[self launcherInstallPath] retain];
-        if (!launcherInstallPath) return;
-    }
-
-
-    [fm removeItemAtPath:launcherInstallPath error:nil];      // REVIEW: should we always force a reinstall?
-    if (![fm fileExistsAtPath:launcherInstallPath])
-    {
-        NSBundle* bundle = [NSBundle mainBundle];
-        NSString* launcherSourcePath = [bundle pathForResource:kASLauncherName ofType:kASLauncherExtension];
-
-        aq_FileUtilitiesCreateDirectoriesForPath([self appSupportFolderPath]);
-        if (![fm copyItemAtPath:launcherSourcePath toPath:launcherInstallPath error:nil])
-        {
-            NSLog(@"Error copying launcher to application support directory");
-        }
-        else
-        {
-            CFURLRef url = CFURLCreateWithFileSystemPath(kCFAllocatorDefault, (CFStringRef)launcherInstallPath, kCFURLPOSIXPathStyle, false);
-            if (url)
-            {
-                LSRegisterURL(url, true);
-                CFRelease(url);
-            }
-        }
-    }
-}
-
 
 /** Setup the auto-run configuration.
  *
@@ -974,11 +998,13 @@ static const NSInteger kMenuItemTagBackup   = 100;
  */
 - (void)setupAutoRun:(float)secondsToWait
 {
+    if (!launcherInstallPath) launcherInstallPath = [[self launcherInstallPath] retain];
+    if ([[[NSProcessInfo processInfo] arguments] containsObject:@"--smoke-test"]) return;
     BOOL shouldAutoRun = [[NSUserDefaults standardUserDefaults] boolForKey:kASPreferenceKeyAutoRun];
-
-    if (!launcherInstallPath) [self installApplicationSupport];
     if (!launcherInstallPath) return;
 
+    [automaticLaunchError release];
+    automaticLaunchError = nil;
     AQLauncherRef launcher = aq_LauncherOpen((CFStringRef)launcherInstallPath);
     if (launcher)
     {
@@ -988,19 +1014,59 @@ static const NSInteger kMenuItemTagBackup   = 100;
             aq_LauncherClearLaunchItems(launcher);
             aq_LauncherAddLaunchItem(launcher, (CFStringRef)appID, 0x081e, 0xbd04);    // REVIEW: symbolic constants for the USB IDs and remove
             aq_LauncherAddLaunchItem(launcher, (CFStringRef)appID, 0x081e, 0xbd01);    // REVIEW: duplication with the USB device factory
-            aq_LauncherInstall(launcher);
+            CFStringRef errorMessage = NULL;
+            if (!aq_LauncherInstall(launcher, &errorMessage))
+            {
+                automaticLaunchError = [(NSString*)errorMessage copy];
+                if (errorMessage) CFRelease(errorMessage);
+                [self setStatusError:automaticLaunchError];
+                aq_LauncherClose(launcher);
+                return;
+            }
 
+            if (aq_LauncherGetStatus(launcher) == AQLauncherStatusRequiresApproval)
+            {
+                [self setStatusError:@"Automatic launching is awaiting approval in System Settings."];
+                aq_LauncherClose(launcher);
+                return;
+            }
             if (secondsToWait <= 0.0) aq_LauncherStart(launcher);
             else aq_LauncherPause(launcher, secondsToWait);
         }
         else
         {
             aq_LauncherStop(launcher);          // stop existing application launching
-            aq_LauncherUninstall(launcher);     // remove from login items
+            CFStringRef errorMessage = NULL;
+            if (!aq_LauncherUninstall(launcher, &errorMessage))
+            {
+                automaticLaunchError = [(NSString*)errorMessage copy];
+                if (errorMessage) CFRelease(errorMessage);
+                [self setStatusError:automaticLaunchError];
+            }
         }
 
         aq_LauncherClose(launcher);
     }
+}
+
+
+- (NSString*)automaticLaunchStatus
+{
+    if (automaticLaunchError) return [@"Automatic launching failed: " stringByAppendingString:automaticLaunchError];
+    AQLauncherRef launcher = aq_LauncherOpen((CFStringRef)[self launcherInstallPath]);
+    AQLauncherStatus status = aq_LauncherGetStatus(launcher);
+    aq_LauncherClose(launcher);
+    switch (status)
+    {
+        case AQLauncherStatusEnabled: return @"Automatic launching is enabled.";
+        case AQLauncherStatusRequiresApproval: return @"Automatic launching is awaiting approval in System Settings.";
+        case AQLauncherStatusUnavailable: return @"The bundled launcher could not be found.  Keep the app bundle intact.";
+        case AQLauncherStatusDisabled: return @"Automatic launching is off.";
+        case AQLauncherStatusUnknown:
+            return [[NSUserDefaults standardUserDefaults] boolForKey:kASPreferenceKeyAutoRun] ?
+                @"Automatic launching is selected.  The launcher is not running yet." : @"Automatic launching is off.";
+    }
+    return @"The automatic-launch status is unavailable.";
 }
 
 
@@ -1010,12 +1076,19 @@ static const NSInteger kMenuItemTagBackup   = 100;
 
 
 
+
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication*)sender
 {
     (void)sender;
-    [deviceController closeAllDevices];
-    if (!appIsUninstalling) [self setupAutoRun:8.0];    // disable launch requests to prevent immediate application re-open
-    return NSTerminateNow;
+    if (terminationPending) return NSTerminateLater;
+    terminationPending = YES;
+    if (!appIsUninstalling) [self setupAutoRun:60.0];
+    [backupController requestStopForTermination];
+    [deviceController shutdownWithCompletion:^{
+        if (!appIsUninstalling) [self setupAutoRun:8.0];
+        [NSApp replyToApplicationShouldTerminate:YES];
+    }];
+    return NSTerminateLater;
 }
 
 
@@ -1033,22 +1106,24 @@ static const NSInteger kMenuItemTagBackup   = 100;
     AQLauncherRef launcher = aq_LauncherOpen((CFStringRef)launcherPath);
     if (launcher)
     {
-        aq_LauncherUninstall(launcher);
+        aq_LauncherUninstall(launcher, NULL);
         aq_LauncherClose(launcher);
     }
 
     NSWorkspace* workspace = [NSWorkspace sharedWorkspace];
-    NSInteger tag;
-    NSString* applicationPath = [[NSBundle mainBundle] bundlePath];
-    NSArray* filesToTrash = [NSArray arrayWithObjects:applicationPath, applicationSupportPath, nil];
-    [workspace performFileOperation:NSWorkspaceRecycleOperation
-               source:@"/"          // source files are all absolute paths
-               destination:@""      // there is no destination
-               files:filesToTrash
-               tag:&tag];
-
-    appIsUninstalling = TRUE;
-    [NSApp terminate:self];
+    NSURL* applicationURL = [[NSBundle mainBundle] bundleURL];
+    NSMutableArray* urls = [NSMutableArray arrayWithObject:applicationURL];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:applicationSupportPath])
+        [urls addObject:[NSURL fileURLWithPath:applicationSupportPath isDirectory:YES]];
+    [workspace recycleURLs:urls completionHandler:^(NSDictionary* newURLs, NSError* error) {
+        (void)newURLs;
+        if (error) [self setStatusError:[error localizedDescription]];
+        else
+        {
+            appIsUninstalling = YES;
+            [NSApp terminate:self];
+        }
+    }];
 }
 
 

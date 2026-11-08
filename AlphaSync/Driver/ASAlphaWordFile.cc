@@ -119,9 +119,11 @@ namespace ts
 
     bool ASAlphaWordFile::importText(const uint16_t* text, unsigned textSize)
     {
+        if (!canRepresentText(text, textSize)) return false;
         if (textSize > 1024*1024*1024) return false;                        // Implausibly large text (may cause overflow later)
 
         unsigned inputCharacterCount = (textSize / 2);                      // Number of input characters
+        if (inputCharacterCount > (UINT_MAX - m_minFileSize) / 4) return false;
         unsigned maxNeoSize = m_minFileSize + (inputCharacterCount * 4);    // worst case estimated neo data size (everything escaped)
         uint8_t* neoText = (uint8_t*)malloc(maxNeoSize);
         if (!neoText) return false;
@@ -132,7 +134,9 @@ namespace ts
         uint8_t* neo = neoText;
         uint8_t* endn = neo + maxNeoSize;
         const uint16_t* uni = text;
-        const uint16_t* endu = uni + inputCharacterCount;
+        const uint16_t* endu = inputCharacterCount ? uni + inputCharacterCount : uni;
+        bool swapped = inputCharacterCount && *uni == 0xfffe;
+        if (swapped) ++uni;
         unsigned softBreakCount = 0;
         unsigned hardBreakCount = 0;
         static const unsigned softBreakInterval = 40;
@@ -146,13 +150,21 @@ namespace ts
             int code;
 
             uint16_t unicode = *uni ++;
+            if (swapped) unicode = (unicode >> 8) | (unicode << 8);
             if (0xfeff == unicode) continue;          // Ignore byte order marks
             int c = unicodeToNeo(unicode);
 
             // Miscellaneous re-mapping.
             if (c == 0x81) c = 0xac;        // Re-map the "not" alternate character (to not clash with line-break hint)
 
-            // REVIEW: should we explicitly handle DOS CR+LF endings?
+            // Windows uses two characters for one line ending.  Preserve real blank lines,
+            // but consume the LF paired with this CR before creating a NEO paragraph break.
+            if (unicode == '\r' && uni != endu)
+            {
+                uint16_t next = *uni;
+                if (swapped) next = (next >> 8) | (next << 8);
+                if (next == '\n') ++uni;
+            }
             if (c >= 0xa1 && c <= 0xbf)     { escape = true;    code = c; }
             else if (0x09 == c)             { escape = true;    code = c; }
             else if (0x0a == c)             { escape = true;    code = c; }

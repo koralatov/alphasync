@@ -27,8 +27,8 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *
- *  The launcher API is intended to be used with an auxillary application, typically bundled in the main
- *  application's resource directory. The auxillary application can be installed to run at login and
+ *  The launcher API is intended to be used with a helper application bundled in the main
+ *  application’s Contents/Library/LoginItems directory. The auxillary application can be installed to run at login and
  *  can be configured to start the main application when a particular USB device is connected.
  *
  *  The basic API methods are:
@@ -87,31 +87,23 @@ extern AQLauncherRef aq_LauncherOpen(CFStringRef path);
 extern void aq_LauncherClose(AQLauncherRef lh);
 
 
-/** Check if the launcher application is installed (set in the login auto-run list).
- *
- *  @return             Zero if the launcher is not installed, +1 if it is and -1 if the status
- *                      can not be determined (for example, if the launcher path was not supplied
- *                      at open).
- */
-int aq_LauncherIsInstalled(AQLauncherRef lh);
+// Registration and approval are separate states.  The older API cannot query
+// registration, so Unknown means that no running helper was found on macOS 11 or 12.
+typedef enum
+{
+    AQLauncherStatusDisabled,
+    AQLauncherStatusEnabled,
+    AQLauncherStatusRequiresApproval,
+    AQLauncherStatusUnavailable,
+    AQLauncherStatusUnknown
+} AQLauncherStatus;
 
+extern AQLauncherStatus aq_LauncherGetStatus(AQLauncherRef lh);
 
-/** Install the launcher application. This will cause the launcher to start automatically at login.
- *  The install affects only the current user. The launcher application is automatically started
- *  on installation if it is not already executing.
- *
- *  @param  path        The path to the launcher application. This must be an absolute path string.
- *  @return             Non-zero if the launcher was installed correctly.
- */
-extern int aq_LauncherInstall(AQLauncherRef lh);
-
-
-/** Uninstall the launcher application. The launcher is removed from the login list and any running
- *  instance is terminated. If the launcher was not previously installed this function does nothing.
- *
- *  @param  path        The path to the launcher application (as supplied to @e aq_LauncherInstallLanucher()).
- */
-extern void aq_LauncherUninstall(AQLauncherRef lh);
+// The caller owns an error message returned through errorMessage and must release it.
+// A registered helper may still require approval before macOS allows it to run.
+extern int aq_LauncherInstall(AQLauncherRef lh, CFStringRef* errorMessage);
+extern int aq_LauncherUninstall(AQLauncherRef lh, CFStringRef* errorMessage);
 
 
 /** Enumerator for launch items.

@@ -709,8 +709,8 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">orderFrontStandardAboutPanel:</string>
-						<reference key="source" ref="182713214"/>
+						<string key="label">actionShowAbout:</string>
+						<reference key="source" ref="137284370"/>
 						<reference key="destination" ref="145841680"/>
 					</object>
 					<int key="connectionID">142</int>
@@ -1327,6 +1327,7 @@
 						<string key="actionDelete:">id</string>
 						<string key="actionInfo:">id</string>
 						<string key="actionOpenBackupFolder:">id</string>
+						<string key="actionShowAbout:">id</string>
 						<string key="actionShowPreferences:">id</string>
 						<string key="actionUninstall:">id</string>
 						<string key="reloadDeviceData:">id</string>
@@ -1346,6 +1347,10 @@
 						</object>
 						<object class="IBActionInfo" key="actionOpenBackupFolder:">
 							<string key="name">actionOpenBackupFolder:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="actionShowAbout:">
+							<string key="name">actionShowAbout:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="actionShowPreferences:">

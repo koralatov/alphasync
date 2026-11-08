@@ -32,6 +32,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <limits.h>
 #include "ASFile.h"
 
 
@@ -91,17 +92,17 @@ namespace ts
 
     bool ASFile::load(const void* data, unsigned size)
     {
-        void* ptr = setFileSize(size);
-        if (ptr) memcpy(ptr, data, size);
-        return confirmLoad();
+        if (size && !data) return false;
+        void* copy = size ? malloc(size) : nullptr;
+        if (size && !copy) return false;
+        // Copy before releasing the old buffer, because the caller may be loading from it.
+        if (size) memcpy(copy, data, size);
+        return replaceData(copy, size);
     }
 
 
     bool ASFile::load(ASDevice* device, const ASApplet* applet, int fileIndex, unsigned maxBytes)
     {
-        setFileSize(0);                     // release any existing memory
-        assert(0 == m_fileData);
-
         if (maxBytes != 0)
         {
             if (minimumLoadSize() > maxBytes) return false;   // requested load size is not permitted
@@ -112,7 +113,7 @@ namespace ts
 
         unsigned rawSize = attr.allocSize();
         if (maxBytes != 0 && rawSize > maxBytes) rawSize = maxBytes;
-        uint8_t* rawData = (uint8_t*)malloc(rawSize);
+        uint8_t* rawData = (uint8_t*)malloc(rawSize ? rawSize : 1);
         if (0 == rawData) return false;     // out of memory
 
         unsigned actualRawSize = 0;
@@ -122,17 +123,14 @@ namespace ts
             return false;                   // error reading file from device
         }
 
-        m_fileData = rawData;
-        m_fileSize = actualRawSize;
-
-        return confirmLoad();               // allow specialisation to determine if data was valid
+        return replaceData(rawData, actualRawSize);
     }
 
 
     bool ASFile::load(ASDevice* device, const ASApplet* applet, const char* filename)
     {
         int fileIndex = device->indexForFileWithName(applet, filename);
-        if (fileIndex < 0) return -1;       // no such file
+        if (fileIndex < 0) return false;       // no such file
 
         return load(device, applet, fileIndex);
     }
@@ -185,6 +183,21 @@ namespace ts
 #pragma mark    --------  Protected Methods  --------
 
 
+    bool ASFile::canRepresentText(const uint16_t* text, unsigned textSize) const
+    {
+        if ((textSize & 1) || (textSize && !text)) return false;
+        const unsigned count = textSize / sizeof(uint16_t);
+        const bool swapped = count && text[0] == 0xfffe;
+        for (unsigned index = swapped ? 1 : 0; index < count; ++index)
+        {
+            uint16_t character = text[index];
+            if (swapped) character = (character >> 8) | (character << 8);
+            if (character != 0xfeff && unicodeToNeo(character) == kNeoCodeUnknown) return false;
+        }
+        return true;
+    }
+
+
     int ASFile::unicodeToNeo(uint16_t uni) const
     {
         if (0x0009 == uni) return kNeoCodeTab;
@@ -215,55 +228,25 @@ namespace ts
     {
         if (0 == count) return 0;
 
-        bool nativeEndian;
-        if (0xfeff == *uni)
+        bool swapped = (*uni == 0xfffe);
+        if (*uni == 0xfeff || swapped)
         {
-            nativeEndian = true;    // BOM indicating native byte order
-            uni ++;
-            count --;
+            ++uni;
+            --count;
         }
-        else if (0xfffe == *uni)
+        for (unsigned i = 0; i < count; ++i)
         {
-            nativeEndian = true;    // BOM indicating reversed byte order
-            uni ++;
-            count --;
-        }
-        else
-        {
-            nativeEndian = true;    // assume native endian format
-        }
-
-
-        uint8_t* end = neo + count;
-        if (nativeEndian)
-        {
-            while (neo != end)
+            uint16_t character = uni[i];
+            if (swapped) character = (character >> 8) | (character << 8);
+            int code = unicodeToNeo(character);
+            if (code < 0 || code > 255)
             {
-                int code = unicodeToNeo(*uni ++);
-                if (code < 0 || code > 255)
-                {
-                    if (escape)     // If escaping characters, pass through tab, newline and return
-                    {
-                        if (code == kNeoCodeTab) code = 9;
-                        else if (code == kNeoCodeNewline) code = 10;
-                        else if (code == kNeoCodeReturn) code = 11;
-                        else code = kNeoUntranslatableCharacter;
-                    }
-                    else
-                    {
-                        code = kNeoUntranslatableCharacter;
-                    }
-                }
-                *neo ++ = code & 0xff;
+                if (escape && code == kNeoCodeTab) code = 9;
+                else if (escape && code == kNeoCodeNewline) code = 10;
+                else if (escape && code == kNeoCodeReturn) code = 13;
+                else code = kNeoUntranslatableCharacter;
             }
-        }
-        else
-        {
-            while (neo != end)
-            {
-                unsigned code = *uni++;
-                *neo ++ = unicodeToNeo(((code >> 8) & 0xff) | ((code << 8) & 0xff00));
-            }
+            neo[i] = static_cast<uint8_t>(code);
         }
 
         return count;
@@ -292,28 +275,27 @@ namespace ts
 
     void* ASFile::setFileSize(unsigned size)
     {
-        void* newRawData = (size > 0) ? realloc(m_fileData, size) : 0;
-        if (0 == newRawData)
+        if (!size)
         {
-            // Either size was zero or allocation failed - clear existing buffers
-            if (0 != m_fileData) free(m_fileData);
-            m_fileData = 0;
+            free(m_fileData);
+            m_fileData = nullptr;
             m_fileSize = 0;
+            return nullptr;
         }
-        else
-        {
-            // Have successfully resized to a non-zero capacity
-            m_fileData = newRawData;
-            if (size > m_fileSize) memset(((uint8_t*)m_fileData) + m_fileSize, 0, size - m_fileSize);
-            m_fileSize = size;
-        }
+        void* newRawData = realloc(m_fileData, size);
+        if (!newRawData) return nullptr;
+        m_fileData = newRawData;
+        if (size > m_fileSize) memset(byteData() + m_fileSize, 0, size - m_fileSize);
+        m_fileSize = size;
         return m_fileData;
     }
 
 
     bool ASFile::appendData(void* data, unsigned size)
     {
+        if (!size) return true;
         unsigned previousSize = fileSize();
+        if (!data || size > UINT_MAX - previousSize) return false;
         uint8_t* newData = (uint8_t*)setFileSize(previousSize + size);
         if (!newData)
         {
@@ -344,6 +326,27 @@ namespace ts
 
 
 #pragma mark    --------  Private Methods  --------
+
+
+    bool ASFile::replaceData(void* data, unsigned size)
+    {
+        void* previousData = m_fileData;
+        unsigned previousSize = m_fileSize;
+        m_fileData = data;
+        m_fileSize = size;
+        if (confirmLoad())
+        {
+            free(previousData);
+            return true;
+        }
+
+        // A rejected file must not replace the last valid data or its decoded metadata.
+        free(m_fileData);
+        m_fileData = previousData;
+        m_fileSize = previousSize;
+        confirmLoad();
+        return false;
+    }
 
 
 }   // namespace

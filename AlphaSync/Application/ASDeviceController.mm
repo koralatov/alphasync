@@ -32,210 +32,223 @@
 
 #import "ASDeviceController.h"
 #import "ASPreferenceController.h"
-#import "ASAppletID.h"
 
 using namespace ts;
+static char deviceQueueKey;
 
-
-
-#pragma mark Forward Delarations
-
-
-@interface ASDeviceController(PrivateAPI)
+@interface ASDeviceController (Worker)
 - (void)deviceDetected;
 - (void)deviceConnected:(ASDevice*)device;
 - (void)deviceDisconnected:(ASDevice*)device;
+- (void)publishDevice:(ASDeviceNode*)node notification:(NSString*)name;
 @end
 
-
-
-
-
-#pragma mark C++ callback bindings
-
-
-static bool deviceDetect(class ASDeviceFactory* factory, void* context, unsigned ident)
+static bool deviceDetect(ASDeviceFactory* factory, void* context, unsigned ident)
 {
-    // Return true to switch the device to comms mode, or false to leave it as it is. This can be
-    // used to prevent repeated capture of the same device (looping between HID and COMMS mode).
-    (void)factory;
-    (void)ident;
-    ASDeviceController* controller = (ASDeviceController*)context;
-    [controller deviceDetected];
+    (void)factory; (void)ident;
+    @autoreleasepool { [(ASDeviceController*)context deviceDetected]; }
     return true;
 }
-
-
-static void deviceConnect(class ASDeviceFactory* factory, void* context, unsigned ident, ASDevice* device)
+static void deviceConnect(ASDeviceFactory* factory, void* context, unsigned ident, ASDevice* device)
 {
-    (void)factory;
-    (void)ident;
-    ASDeviceController* controller = (ASDeviceController*)context;
-    [controller deviceConnected:device];
+    (void)factory; (void)ident;
+    @autoreleasepool { [(ASDeviceController*)context deviceConnected:device]; }
 }
-
-
-static void deviceDisconnect(class ASDeviceFactory* factory, void* context, unsigned ident, ASDevice* device)
+static void deviceDisconnect(ASDeviceFactory* factory, void* context, unsigned ident, ASDevice* device)
 {
-    (void)factory;
-    (void)ident;
-    ASDeviceController* controller = (ASDeviceController*)context;
-    [controller deviceDisconnected:device];
+    (void)factory; (void)ident;
+    @autoreleasepool { [(ASDeviceController*)context deviceDisconnected:device]; }
 }
-
-
-
-
-#pragma mark ASDeviceController(PrivateAPI)
-
-
-
-@implementation ASDeviceController(PrivateAPI)
-
-
-/** Callback on detection of a new device (in HID mode).
- */
-- (void)deviceDetected
-{
-    [notificationCenter postNotificationName:kASDeviceControllerDeviceDetected object:nil];
-}
-
-
-/** Callback on connection of a new device (in comms mode).
- *
- *  @param  device      The device handle.
- */
-- (void)deviceConnected:(ASDevice*)device
-{
-    ASDeviceNode* deviceNode = [[[ASDeviceNode alloc] initWithDevice:device] autorelease];
-    if (deviceNode)
-    {
-        [rootNode addChild:deviceNode];
-        [notificationCenter postNotificationName:kASDeviceControllerDeviceConnected object:deviceNode];
-    }
-}
-
-
-/** Callback on disconnection of a device.
- *
- *  @param  device      The device handle.
- */
-- (void)deviceDisconnected:(ASDevice*)device
-{
-    NSEnumerator* deviceEnumerator = [rootNode childEnumerator];
-    while (ASDeviceNode* deviceNode = [deviceEnumerator nextObject])
-    {
-        if ([deviceNode device] == device)
-        {
-            [rootNode removeChild:deviceNode];
-            [notificationCenter postNotificationName:kASDeviceControllerDeviceDisconnected object:deviceNode];
-            break;
-        }
-    }
-}
-
-
-@end
-
-
-
-
-#pragma mark    ASDeviceController
-
-
 
 @implementation ASDeviceController
-
-/** Designated initialiser. Only one instance of the class should be created at a time, and only when
- *  the low level driver functions should be enabled.
- */
 - (id)init
 {
     if ((self = [super init]))
     {
+        shuttingDown = false;
         notificationCenter = [NSNotificationCenter defaultCenter];
         rootNode = [[ASNode alloc] init];
-        deviceFactory = new ASDeviceFactory;
-        if (!rootNode || !deviceFactory)
-        {
-            // This is fatal to the entire application - there is no way to recover.
-            NSLog(@"AlphaSync: unable to initialise device factory");
-            self = nil;
-        }
+        workerNodes = [[NSMutableDictionary alloc] init];
+        dispatch_queue_attr_t attributes = dispatch_queue_attr_make_with_autorelease_frequency(
+            DISPATCH_QUEUE_SERIAL, DISPATCH_AUTORELEASE_FREQUENCY_WORK_ITEM);
+        deviceQueue = dispatch_queue_create("com.tsoniq.AlphaSync.devices", attributes);
+        dispatch_queue_set_specific(deviceQueue, &deviceQueueKey, self, NULL);
+        deviceFactory = new ASDeviceFactory((dispatch_queue_s*)deviceQueue);
     }
     return self;
 }
 
-
-/** Destructor. As well as releasing resources, this will shutdown the driver and reset each connected
- *  device instance (putting it back in to HID mode).
- */
 - (void)dealloc
 {
-    [rootNode release];     // will invoke the destructors for each contained device node, reseting the devices
-    if (deviceFactory) delete deviceFactory;
+    // Normal shutdown drains this queue first.  Keep teardown on that queue even
+    // for callers that release a controller without enabling any devices.
+    shuttingDown = true;
+    ASDeviceFactory* factory = deviceFactory;
+    if (dispatch_get_specific(&deviceQueueKey) == self) delete factory;
+    else dispatch_sync(deviceQueue, ^{ delete factory; });
+    dispatch_release(deviceQueue);
+    [workerNodes release];
+    [rootNode release];
     [super dealloc];
 }
 
-
-/** Enable the driver.
- */
 - (BOOL)enable
 {
-    return deviceFactory->enable(self, deviceDetect, deviceConnect, deviceDisconnect) ? TRUE : FALSE;
+    if (shuttingDown) return NO;
+    dispatch_async(deviceQueue, ^{
+        if (!deviceFactory->enable(self, deviceDetect, deviceConnect, deviceDisconnect))
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [notificationCenter postNotificationName:kASDeviceControllerError object:@"Unable to enable USB device detection."];
+            });
+    });
+    return YES;
 }
 
-
-/** Disable the driver.
- */
 - (void)disable
 {
-    deviceFactory->disable();
+    dispatch_async(deviceQueue, ^{ deviceFactory->disable(); });
 }
 
+- (ASNode*)systemRoot { return rootNode; }
+- (BOOL)isBusy { return pendingTaskCount != 0 || shuttingDown; }
 
-/** Return the root node for the hardware tree.
- */
-- (ASNode*)systemRoot
+- (void)deviceDetected
 {
-    return rootNode;
+    if (shuttingDown) return;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (!shuttingDown) [notificationCenter postNotificationName:kASDeviceControllerDeviceDetected object:nil];
+    });
 }
 
+- (void)publishDevice:(ASDeviceNode*)node notification:(NSString*)name
+{
+    if (shuttingDown) return;
+    ASDeviceNode* snapshot = (ASDeviceNode*)[[node copyForDisplay] autorelease];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (shuttingDown) return;
+        for (ASDeviceNode* previous in [[[rootNode children] copy] autorelease])
+            if ([previous connectionID] == [snapshot connectionID]) [rootNode removeChild:previous];
+        [rootNode addChild:snapshot];
+        [notificationCenter postNotificationName:name object:snapshot];
+    });
+}
 
-/** Request each attached device to reload its data.
- */
+- (void)deviceConnected:(ASDevice*)device
+{
+    if (shuttingDown) return;
+    ASDeviceNode* node = [[[ASDeviceNode alloc] initWithDevice:device] autorelease];
+    [node setConnectionID:++nextConnectionID];
+    workerNodes[@([node connectionID])] = node;
+    [self publishDevice:node notification:kASDeviceControllerDeviceConnected];
+}
+
+- (void)deviceDisconnected:(ASDevice*)device
+{
+    NSNumber* identity = nil;
+    for (NSNumber* key in workerNodes)
+        if ([(ASDeviceNode*)workerNodes[key] device] == device) { identity = key; break; }
+    if (!identity) return;
+    // A new connection gets a new identity even if a USB object reuses an old address.
+    // Queued work for the old connection therefore cannot reach the new device.
+    [[identity retain] autorelease];
+    [workerNodes removeObjectForKey:identity];
+    if (shuttingDown) return;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        for (ASDeviceNode* node in [[[rootNode children] copy] autorelease])
+            if ([node connectionID] == [identity unsignedIntegerValue])
+            {
+                [rootNode removeChild:node];
+                [notificationCenter postNotificationName:kASDeviceControllerDeviceDisconnected object:node];
+            }
+    });
+}
+
+- (void)performTaskForNode:(ASNode*)node refresh:(BOOL)refresh task:(id (^)(ASNode*))task
+               completion:(void (^)(id result, NSString* error))completion
+{
+    NSAssert([NSThread isMainThread], @"Schedule device work from the main thread.");
+    ASDeviceNode* owner = [node isKindOfClass:[ASDeviceNode class]] ? (ASDeviceNode*)node : [node ancestorOfClass:[ASDeviceNode class]];
+    ASAppletNode* applet = [node isKindOfClass:[ASAppletNode class]] ? (ASAppletNode*)node : [node ancestorOfClass:[ASAppletNode class]];
+    NSNumber* identity = @([owner connectionID]);
+    NSInteger appletIndex = applet ? [applet appletIndex] : -1;
+    NSInteger fileIndex = [node isKindOfClass:[ASFileNode class]] ? [(ASFileNode*)node fileIndex] : -1;
+    NSString* selectedName = [node displayName];
+    if (shuttingDown || !owner)
+    {
+        if (completion) completion(nil, @"The NEO is no longer available.");
+        return;
+    }
+    ++pendingTaskCount;
+    [notificationCenter postNotificationName:kASDeviceControllerTaskChanged object:self];
+    dispatch_async(deviceQueue, ^{
+        ASDeviceNode* live = workerNodes[identity];
+        ASNode* selected = live;
+        if (appletIndex >= 0)
+        {
+            selected = nil;
+            for (ASAppletNode* child in [live children])
+                if ([child appletIndex] == appletIndex) { selected = child; break; }
+        }
+        if (fileIndex >= 0)
+        {
+            ASNode* found = nil;
+            for (ASFileNode* child in [selected children])
+                if ([child fileIndex] == fileIndex && [[child displayName] isEqualToString:selectedName]) { found = child; break; }
+            selected = found;
+        }
+        id result = nil;
+        NSString* error = nil;
+        if (!selected) error = @"The selected file or NEO is no longer available.  Select it again and retry.";
+        else
+        {
+            [selected setOperationError:nil];
+            result = task(selected);
+            if (!result || ([result isKindOfClass:[NSNumber class]] && ![result boolValue]))
+            {
+                error = [selected operationError];
+                if (!error) error = @"The device operation could not be completed.";
+            }
+            if (refresh)
+            {
+                [live reload];
+                [self publishDevice:live notification:kASDeviceControllerDataChanged];
+            }
+        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            --pendingTaskCount;
+            [notificationCenter postNotificationName:kASDeviceControllerTaskChanged object:self];
+            if (completion) completion(result, error);
+        });
+    });
+}
+
 - (void)reloadAllDevices
 {
-    NSEnumerator* enumerator = [rootNode childEnumerator];
-    ASDeviceNode* deviceNode;
-    while ((deviceNode = [enumerator nextObject]))
-    {
-        [deviceNode reload];
-    }
+    for (ASDeviceNode* node in [[[rootNode children] copy] autorelease])
+        [self performTaskForNode:node refresh:YES task:^id(ASNode* working) {
+            (void)working; return @YES;
+        } completion:nil];
 }
 
-
-/** Close a device, returning it to HID mode.
- */
-- (void)closeDevice:(ASDeviceNode*)deviceNode
+- (void)closeDevice:(ASDeviceNode*)node
 {
-    ASDevice* device = [deviceNode device];
-    device->restart();
+    [self performTaskForNode:node refresh:NO task:^id(ASNode* working) {
+        return @([(ASDeviceNode*)working device]->restart());
+    } completion:nil];
 }
 
-
-/** Close all connected devices.
- */
 - (void)closeAllDevices
 {
-    NSEnumerator* enumerator = [rootNode childEnumerator];
-    ASDeviceNode* deviceNode;
-    while ((deviceNode = [enumerator nextObject]))
-    {
-        [self closeDevice:deviceNode];
-    }
+    for (ASDeviceNode* node in [[[rootNode children] copy] autorelease]) [self closeDevice:node];
 }
 
-
-
+- (void)shutdownWithCompletion:(void (^)(void))completion
+{
+    shuttingDown = YES;
+    dispatch_async(deviceQueue, ^{
+        for (ASDeviceNode* node in [workerNodes allValues]) [node device]->restart();
+        deviceFactory->disable();
+        dispatch_async(dispatch_get_main_queue(), ^{ if (completion) completion(); });
+    });
+}
 @end

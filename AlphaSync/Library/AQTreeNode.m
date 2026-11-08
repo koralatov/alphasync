@@ -210,7 +210,7 @@
 
 /** Return logical true if this node is a child of @e candidate.
  */
-- (BOOL)isChildOf:(AQTreeNode*)candidate;
+- (BOOL)isChildOf:(AQTreeNode*)candidate
 {
     AQTreeNode* search = [self parent];
     while (search && search != candidate) search = [search parent];
@@ -223,7 +223,7 @@
 - (NSString*)descriptionWithPrefix:(NSString*)prefixString
 {
     NSString* classDescription = [[self class] description];
-    NSString* myDescription = [NSString stringWithFormat:@"%@ASTreeNode @%p: %@", prefixString, self, classDescription];
+    NSString* myDescription = [NSString stringWithFormat:@"%@ASTreeNode @%p: %@", prefixString, (void*)self, classDescription];
 
     prefixString = [NSString stringWithFormat:@"--%@", prefixString];
     NSEnumerator* enumerator = [self childEnumerator];

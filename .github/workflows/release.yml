@@ -1,0 +1,153 @@
+name: Prepare a release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag, matching the version, such as v1.4.0
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  resolve:
+    name: Resolve one source commit for both downloads
+    runs-on: ubuntu-latest
+    outputs:
+      commit: ${{ steps.source.outputs.commit }}
+    steps:
+      - name: Validate the existing tag
+        id: source
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          [[ "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          commit=$(gh api "repos/$GITHUB_REPOSITORY/commits/$RELEASE_TAG" --jq .sha)
+          [[ "$commit" =~ ^[0-9a-f]{40}$ ]]
+          printf 'commit=%s\n' "$commit" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ steps.source.outputs.commit }}
+          persist-credentials: false
+      - name: Check the version before signing
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          version=$(sed -n 's/^MARKETING_VERSION *= *//p' AlphaSync/Build/Version.xcconfig)
+          test "$RELEASE_TAG" = "v$version"
+
+  sign:
+    name: Sign and notarise ${{ matrix.variant }}
+    needs: resolve
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - variant: universal
+            runner: macos-26
+          - variant: modern
+            runner: xcode-27
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ needs.resolve.outputs.commit }}
+          persist-credentials: false
+      - name: Select this profile's compiler
+        env:
+          BUILD_VARIANT: ${{ matrix.variant }}
+        run: |
+          source scripts/build-profile.sh "$BUILD_VARIANT"
+          selected_developer="/Applications/Xcode_$profile_xcode.app/Contents/Developer"
+          test -d "$selected_developer"
+          printf 'DEVELOPER_DIR=%s\n' "$selected_developer" >> "$GITHUB_ENV"
+      - name: Install the signing certificate in a temporary Keychain
+        env:
+          CERTIFICATE_P12: ${{ secrets.ALPHASYNC_CERTIFICATE_P12 }}
+          CERTIFICATE_PASSWORD: ${{ secrets.ALPHASYNC_CERTIFICATE_PASSWORD }}
+          APPLE_ID: ${{ secrets.ALPHASYNC_APPLE_ID }}
+          APP_PASSWORD: ${{ secrets.ALPHASYNC_APP_PASSWORD }}
+          TEAM_ID: ${{ secrets.ALPHASYNC_TEAM_ID }}
+        run: |
+          : "${CERTIFICATE_P12:?Configure the signing certificate secret.}"
+          : "${CERTIFICATE_PASSWORD:?Configure the certificate password secret.}"
+          : "${APPLE_ID:?Configure the Apple account secret.}"
+          : "${APP_PASSWORD:?Configure the app-specific password secret.}"
+          : "${TEAM_ID:?Configure the developer team secret.}"
+          certificate="$RUNNER_TEMP/alphasync-certificate.p12"
+          keychain="$RUNNER_TEMP/alphasync-signing.keychain-db"
+          keychain_password=$(uuidgen)
+          printf '::add-mask::%s\n' "$keychain_password"
+          printf '%s' "$CERTIFICATE_P12" | base64 --decode > "$certificate"
+          security create-keychain -p "$keychain_password" "$keychain"
+          security set-keychain-settings -lut 21600 "$keychain"
+          security unlock-keychain -p "$keychain_password" "$keychain"
+          security import "$certificate" -P "$CERTIFICATE_PASSWORD" -k "$keychain" -T /usr/bin/codesign -T /usr/bin/security
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$keychain_password" "$keychain"
+          security list-keychains -d user -s "$keychain"
+          xcrun notarytool store-credentials AlphaSync-CI --keychain "$keychain" \
+            --apple-id "$APPLE_ID" --team-id "$TEAM_ID" --password "$APP_PASSWORD"
+      - name: Build and notarise this download
+        env:
+          BUILD_VARIANT: ${{ matrix.variant }}
+          ALPHASYNC_SIGNING_IDENTITY: ${{ secrets.ALPHASYNC_SIGNING_IDENTITY }}
+          ALPHASYNC_TEAM_ID: ${{ secrets.ALPHASYNC_TEAM_ID }}
+          ALPHASYNC_NOTARY_PROFILE: AlphaSync-CI
+          ALPHASYNC_NOTARY_KEYCHAIN: ${{ runner.temp }}/alphasync-signing.keychain-db
+        run: scripts/release.sh "$BUILD_VARIANT" "$RUNNER_TEMP/release"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: AlphaSync-signed-${{ matrix.variant }}
+          path: ${{ runner.temp }}/release/assets/*
+          if-no-files-found: error
+      - name: Remove temporary signing material
+        if: always()
+        run: |
+          keychain="$RUNNER_TEMP/alphasync-signing.keychain-db"
+          if [[ -f "$keychain" ]]; then security delete-keychain "$keychain"; fi
+          rm -f "$RUNNER_TEMP/alphasync-certificate.p12"
+
+  draft:
+    name: Attach both downloads to one draft release
+    needs: [resolve, sign]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ needs.resolve.outputs.commit }}
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          pattern: AlphaSync-signed-*
+          path: incoming
+      - name: Verify and collect the release pair
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+          RELEASE_COMMIT: ${{ needs.resolve.outputs.commit }}
+        run: |
+          python3 tests/release-tests.py
+          python3 scripts/collect-release.py --universal incoming/AlphaSync-signed-universal \
+            --modern incoming/AlphaSync-signed-modern --output build/release-assets \
+            --require-notarised --tag "$RELEASE_TAG" --source-commit "$RELEASE_COMMIT"
+      - name: Create the draft with both downloads
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+          RELEASE_COMMIT: ${{ needs.resolve.outputs.commit }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          current=$(gh api "repos/$GITHUB_REPOSITORY/commits/$RELEASE_TAG" --jq .sha)
+          test "$current" = "$RELEASE_COMMIT"
+          gh release create "$RELEASE_TAG" build/release-assets/*.zip \
+            build/release-assets/*.sha256 build/release-assets/*.build-information.txt \
+            --repo "$GITHUB_REPOSITORY" --verify-tag --draft \
+            --title "AlphaSync ${RELEASE_TAG#v}" --notes-file build/release-assets/release-notes.md

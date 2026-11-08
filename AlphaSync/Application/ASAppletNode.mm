@@ -67,12 +67,12 @@ static NSImage* iconApplet = nil;              /**< Icon to use for applets. */
         {
             NSBundle* bundle = [NSBundle mainBundle];
             iconApplet = [[NSImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-applet" ofType:@"pdf"]];
-            [iconApplet setDataRetained:YES];
         }
 
         appletIndex = appletIdx;
         device = dev;
-        applet = device->appletAtIndex(appletIndex);
+        const ASApplet* sourceApplet = device->appletAtIndex(appletIndex);
+        applet = sourceApplet ? new ASApplet(*sourceApplet) : nullptr;
         if (!applet)
         {
             self = nil;
@@ -90,12 +90,25 @@ static NSImage* iconApplet = nil;              /**< Icon to use for applets. */
  */
 - (void)dealloc
 {
+    delete applet;
     [super dealloc];
 }
 
 
 /** Return the device node for this applet.
  */
+- (void)copyDisplayFieldsTo:(ASNode*)value
+{
+    ASAppletNode* snapshot = (ASAppletNode*)value;
+    snapshot->device = device;
+    snapshot->applet = applet ? new ASApplet(*applet) : nullptr;
+    snapshot->appletIndex = appletIndex;
+    snapshot->fileCount = fileCount;
+    snapshot->ramUsed = ramUsed;
+    snapshot->minFileSize = minFileSize;
+    snapshot->maxFileSize = maxFileSize;
+}
+
 - (ASDeviceNode*)deviceNode
 {
     return (ASDeviceNode*) [self parent];

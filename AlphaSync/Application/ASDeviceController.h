@@ -35,12 +35,17 @@
  *      kASDeviceControllerDeviceDisconnected   New device has appeared. Receiver should re-parse the object tree.
  */
 #import <Cocoa/Cocoa.h>
+#include <atomic>
 #import "ASNode.h"
 #import "ASDeviceNode.h"
 #import "ASAppletNode.h"
 #import "ASFileNode.h"
 #import "ASDevice.h"
 #import "ASDeviceFactory.h"
+
+#define kASDeviceControllerDataChanged @"ASDeviceDataChanged"
+#define kASDeviceControllerTaskChanged @"ASDeviceTaskChanged"
+#define kASDeviceControllerError @"ASDeviceError"
 
 #define kASDeviceControllerDeviceDetected       @"ASDeviceDetected"     /**< Notification name for detect events. */
 #define kASDeviceControllerDeviceConnected      @"ASDeviceConnected"    /**< Notification name for connect events. */
@@ -52,7 +57,19 @@
     ts::ASDeviceFactory* deviceFactory;         /**< Single instance of the device factory. */
     ASNode* rootNode;                           /**< Contains the set of ASDeviceNodes corresponding to connected devices. */
     NSNotificationCenter* notificationCenter;
+    dispatch_queue_t deviceQueue;
+    NSMutableDictionary* workerNodes;
+    NSUInteger nextConnectionID;
+    NSUInteger pendingTaskCount;
+    std::atomic<bool> shuttingDown;
 }
+
+// Call from the main thread.  Work and IOKit callbacks share one background queue;
+// completions and published display copies always return to the main thread.
+- (void)performTaskForNode:(ASNode*)node refresh:(BOOL)refresh task:(id (^)(ASNode*))task
+               completion:(void (^)(id result, NSString* error))completion;
+- (BOOL)isBusy;
+- (void)shutdownWithCompletion:(void (^)(void))completion;
 
 - (BOOL)enable;
 - (void)disable;

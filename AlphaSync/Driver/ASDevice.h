@@ -37,7 +37,8 @@
 #include "ASMessage.h"
 #include "ASFileAttributes.h"
 #include "ASApplet.h"
-#include "AQContainer.h"
+#include <memory>
+#include <vector>
 
 namespace ts
 {
@@ -146,7 +147,7 @@ namespace ts
 
         uint8_t* m_appletHeaderData;                        /**< Locally cached copy of the applet header data. */
         unsigned m_appletHeaderCount;                       /**< The number of applet headers present on the device. */
-        AQContainer<ASApplet> m_applets;                    /**< Applet list for the device. */
+        std::vector<std::unique_ptr<ASApplet>> m_applets;                    /**< Applet list for the device. */
 
         void clearEnumeratedApplets();
         bool sendRequest(const ASMessage* request);

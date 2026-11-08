@@ -46,10 +46,10 @@ int main(int argc, const char* argv[])
         {
             printf("\nLoad file %s\n\n", filename);
             static uint8_t buffer[4*1024*1024];
-            unsigned actual = fread(buffer, 1, sizeof buffer, fh);
+            size_t actual = fread(buffer, 1, sizeof buffer, fh);
             fclose(fh);
             ts::ASApplet applet;
-            applet.loadApplet(buffer, actual);
+            applet.loadApplet(buffer, static_cast<unsigned>(actual));
             applet.dump(stdout);
         }
         arg ++;

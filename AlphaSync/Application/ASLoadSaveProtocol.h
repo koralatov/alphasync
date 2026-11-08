@@ -117,7 +117,6 @@
 
 // REVIEW: these should probably be moved in to a generic file system utilities library...
 extern NSString* makeFilesystemPath(NSString* rootPath, NSString* extendedPath);
-extern NSFileHandle* makeUniqueFile(NSString* path, NSString* basename, NSString* extension, NSString** oFilename);
 extern NSString* utiFromFilePath(NSString* filePath);
 extern BOOL filePathConformsToUTI(NSString* filePath, NSString* uti);
 

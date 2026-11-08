@@ -46,12 +46,7 @@ namespace ts
      */
     void ASDevice::clearEnumeratedApplets()
     {
-        for (unsigned i = 0; i < m_applets.count(); i++)
-        {
-            delete m_applets.itemAtIndex(i);
-        }
-
-        m_applets.removeAllItems();
+        m_applets.clear();
     }
 
 
@@ -63,7 +58,7 @@ namespace ts
      */
     void ASDevice::initialise()
     {
-        assert(0 == m_applets.count());
+        assert(m_applets.empty());
 
         bool result = dialogueStart();
         if (!result) return;
@@ -85,9 +80,9 @@ namespace ts
              */
             for (unsigned i = 0; i < headerCount; i++)
             {
-                ASApplet* applet = new ASApplet;
+                auto applet = std::make_unique<ASApplet>();
                 applet->loadHeader(&buffer[i * kASAppletHeaderSize]);
-                m_applets.appendItem(applet);
+                m_applets.push_back(std::move(applet));
             }
 
             appletCount += headerCount;
@@ -419,7 +414,9 @@ namespace ts
      */
     const ASApplet* ASDevice::appletAtIndex(int appletIndex)
     {
-        return m_applets.itemAtIndex((unsigned)appletIndex);
+        if (appletIndex < 0) return nullptr;
+        size_t index = static_cast<size_t>(appletIndex);
+        return index < m_applets.size() ? m_applets[index].get() : nullptr;
     }
 
 
@@ -427,12 +424,9 @@ namespace ts
      */
     const ASApplet* ASDevice::appletForID(ASAppletID appletID)
     {
-        int index = 0;
-        const ASApplet* applet;
-        while ((applet = m_applets.itemAtIndex((unsigned)index)))
+        for (const auto& applet : m_applets)
         {
-            if (applet->appletID() == appletID) return applet;
-            ++ index;
+            if (applet->appletID() == appletID) return applet.get();
         }
         return 0;
     }
@@ -638,7 +632,7 @@ namespace ts
      */
     bool ASDevice::getResponse(ASMessage* response)
     {
-        bool result = read(response->rawData(), response->rawSize());
+        bool result = read(response->rawData(), response->rawSize()) && response->valid();
         if (!result) fprintf(stderr, "%s: error reading from device\n", __FUNCTION__);
         return result;
     }
@@ -740,6 +734,12 @@ namespace ts
             {
                 unsigned blocksize = response.argument(1, 4);
                 unsigned checksum = response.argument(5, 2);
+                // Check the device’s length before allowing the transport to fill our buffer.
+                if (!blocksize || blocksize > remaining)
+                {
+                    ok = false;
+                    break;
+                }
                 ok = read(ptr, blocksize);
                 if (!ok)
                 {
@@ -757,6 +757,7 @@ namespace ts
                 {
                     ptr += blocksize;
                     bytesread += blocksize;
+                    remaining -= blocksize;
                 }
             }
             else

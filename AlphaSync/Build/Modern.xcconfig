@@ -1,0 +1,6 @@
+#include "Version.xcconfig"
+
+// Native Apple Silicon app for macOS 27 and later.
+ARCHS = arm64
+MACOSX_DEPLOYMENT_TARGET = 27.0
+AS_COMPATIBILITY_DESCRIPTION = For macOS 27 and later

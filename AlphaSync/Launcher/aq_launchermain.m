@@ -1,4 +1,4 @@
-/** @file       aq_launchermain.c
+/** @file       aq_launchermain.m
  *  @brief      Launcher service library.
  *
  *  Copyright (c) 2008-2013, tSoniq. http://tsoniq.com
@@ -30,7 +30,7 @@
 #include <unistd.h>
 #include <stdint.h>
 #include <CoreFoundation/CoreFoundation.h>
-#include <ApplicationServices/ApplicationServices.h>
+#import <Cocoa/Cocoa.h>
 #include <IOKit/IOKitLib.h>
 #include <IOKit/IOCFPlugIn.h>
 #include <IOKit/usb/IOUSBLib.h>
@@ -235,40 +235,27 @@ static void deviceAdded(void* refCon, io_iterator_t iterator)
                 if ((-1 == lc->m_vendorID || vendor == lc->m_vendorID) &&
                     (-1 == lc->m_productID || product == lc->m_productID))
                 {
-                    FSRef appFSRef;
-                    OSStatus oserr = LSFindApplicationForInfo(kLSUnknownCreator, lc->m_applicationID, NULL, &appFSRef, NULL);
-                    if (!oserr) oserr = LSOpenFSRef(&appFSRef, NULL);
-                    if (oserr) LOG_ERROR("Attempt to launch application for IDs %04x %04x failed with error %d\n", (int)lc->m_vendorID, (int)lc->m_productID, (int)oserr);
+                    @autoreleasepool
+                    {
+                        NSWorkspace* workspace = [NSWorkspace sharedWorkspace];
+                        NSURL* url = [workspace URLForApplicationWithBundleIdentifier:(NSString*)lc->m_applicationID];
+                        if (url)
+                        {
+                            NSWorkspaceOpenConfiguration* configuration = [NSWorkspaceOpenConfiguration configuration];
+                            [workspace openApplicationAtURL:url configuration:configuration
+                                         completionHandler:^(NSRunningApplication* app, NSError* error) {
+                                (void)app;
+                                if (error) NSLog(@"Unable to open AlphaSync: %@", error);
+                            }];
+                        }
+                        else NSLog(@"Unable to find AlphaSync’s application bundle.");
+                    }
                 }
                 lc = lc->m_next;
             }
         }
 
         (*dev)->Release(dev);
-    }
-}
-
-
-/** Signal trap handler. SIGUSR1 is trapped and used as a hint to re-read the preference data.
- */
-static void signalHandler(int sigraised)
-{
-    if (SIGUSR1 == sigraised)
-    {
-        // Re-load preference data.
-        loadPreferences();
-    }
-    else
-    {
-        // Exit.
-        IONotificationPortDestroy(globals.m_notifyPort);
-        if (globals.m_deviceAddedIter)
-        {
-            IOObjectRelease(globals.m_deviceAddedIter);
-            globals.m_deviceAddedIter = 0;
-        }
-
-        _exit(0);   // exit(0) should not be called from a signal handler. Use _exit(0) instead
     }
 }
 
@@ -314,7 +301,7 @@ static CFDataRef ipcMessageHandlerCopyReply(CFMessagePortRef local, SInt32 msgid
         }
 
         case kAQLauncherControlMsgID_Quit:
-            exit(0);    // REVIEW: is it safe to quit here???
+            CFRunLoopStop(CFRunLoopGetMain());
             break;
 
         default:
@@ -330,14 +317,14 @@ static CFDataRef ipcMessageHandlerCopyReply(CFMessagePortRef local, SInt32 msgid
  */
 int main (int argc, const char *argv[])
 {
+    @autoreleasepool
+    {
     (void)argc;
     (void)argv;
 
-    mach_port_t masterPort;
+    mach_port_t masterPort = MACH_PORT_NULL;
     CFMutableDictionaryRef matchingDict;
     CFRunLoopSourceRef runLoopSource;
-    kern_return_t kr;
-    sig_t oldHandler;
 
     // Initialise global data.
     globals.m_notifyPort = 0;
@@ -347,25 +334,12 @@ int main (int argc, const char *argv[])
     globals.m_isPaused = 0;
     globals.m_pauseTime = 0.0;
 
-    // Set up a signal handler so we can clean up when we're interrupted from the command line
-    // Otherwise we stay in our run loop forever.
-    oldHandler = signal(SIGINT, signalHandler);
-    if (oldHandler == SIG_ERR) LOG_ERROR("Could not establish new signal handler");
-
-    // first create a master_port for my task
-    kr = IOMasterPort(MACH_PORT_NULL, &masterPort);
-    if (kr || !masterPort)
-    {
-        LOG_ERROR("Couldn't create a master IOKit Port(%08x)\n", kr);
-        return -1;
-    }
-
+    // A null port asks IOKit to use its default port on every supported macOS version.
     // Set up the matching criteria for the devices we're interested in
     matchingDict = IOServiceMatching(kIOUSBDeviceClassName);    // Interested in instances of class IOUSBDevice and its subclasses
     if (!matchingDict)
     {
         LOG_ERROR("Can't create a USB matching dictionary\n");
-        mach_port_deallocate(mach_task_self(), masterPort);
         return -1;
     }
 
@@ -373,23 +347,25 @@ int main (int argc, const char *argv[])
     // This is how async notifications get set up. By using an empty dictionary we
     // get to see all devices that are connected.
     globals.m_notifyPort = IONotificationPortCreate(masterPort);
+    if (!globals.m_notifyPort) return 1;
     runLoopSource = IONotificationPortGetRunLoopSource(globals.m_notifyPort);
 
     CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSource, kCFRunLoopDefaultMode);
 
     // Set up the notification to be called when a raw device is first matched by I/O Kit
-    IOServiceAddMatchingNotification(globals.m_notifyPort,
+    kern_return_t status = IOServiceAddMatchingNotification(globals.m_notifyPort,
                                      kIOFirstMatchNotification,
                                      matchingDict,
                                      deviceAdded,
                                      NULL,
                                      &globals.m_deviceAddedIter);
+    if (status != KERN_SUCCESS) return 1;
 
     // Create the mach port used to receive messages from client applications.
     CFMessagePortContext context = {0, NULL, NULL, NULL, NULL};
     Boolean shouldFreeInfo;
     CFMessagePortRef controlPort = CFMessagePortCreateLocal(kCFAllocatorDefault, kAQLauncherControlPort, ipcMessageHandlerCopyReply, &context, &shouldFreeInfo);
-    CFRunLoopSourceRef rlSource = CFMessagePortCreateRunLoopSource(NULL, controlPort, 0);
+    CFRunLoopSourceRef rlSource = controlPort ? CFMessagePortCreateRunLoopSource(NULL, controlPort, 0) : NULL;
     if (!controlPort || !rlSource)
     {
         LOG_ERROR("Failed to create control port");
@@ -409,13 +385,12 @@ int main (int argc, const char *argv[])
     deviceAdded(NULL, globals.m_deviceAddedIter);
 
 
-    // Now done with the master_port
-    mach_port_deallocate(mach_task_self(), masterPort);
-    masterPort = 0;
 
     // Start the run loop. Now we'll receive notifications.
     CFRunLoopRun();
 
-    // We should never get here
+    IOObjectRelease(globals.m_deviceAddedIter);
+    IONotificationPortDestroy(globals.m_notifyPort);
     return 0;
+}
 }

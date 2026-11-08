@@ -1,0 +1,290 @@
+name: Build and test
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  macos:
+    name: ${{ matrix.runner }} with Xcode ${{ matrix.xcode }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15
+            xcode: '16.4'
+          - runner: macos-15-intel
+            xcode: '16.4'
+          - runner: macos-26
+            xcode: pinned
+            archive: true
+          - runner: macos-26-intel
+            xcode: pinned
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Select the checked toolchain
+        run: |
+          version='${{ matrix.xcode }}'
+          if [[ "$version" == pinned ]]; then version=$(cat .xcode-version); fi
+          selected_developer="/Applications/Xcode_$version.app/Contents/Developer"
+          test -d "$selected_developer"
+          printf 'DEVELOPER_DIR=%s\n' "$selected_developer" >> "$GITHUB_ENV"
+      - name: Show the build tools
+        run: xcodebuild -version
+      - name: Verify the release toolchain
+        if: matrix.xcode == 'pinned'
+        run: scripts/check-toolchain.sh
+      - name: Check shell scripts
+        run: |
+          for script in scripts/*.sh; do
+            bash -n "$script"
+          done
+      - name: Run the core and native regression tests
+        run: make test sanitize
+      - name: Build a universal release app
+        run: >-
+          xcodebuild -project AlphaSync/AlphaSync.xcodeproj -scheme AlphaSync
+          -configuration Release -destination 'generic/platform=macOS'
+          -derivedDataPath build/DerivedData build
+      - name: Check architectures, deployment targets, dependencies, signatures, and windows
+        run: scripts/verify-app.sh
+      - name: Check native controls and live appearance changes
+        run: scripts/check-appearance.sh build/DerivedData/Build/Products/Release/AlphaSync.app build/appearance
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: AlphaSync-appearance-${{ matrix.runner }}-${{ github.sha }}
+          path: build/appearance/*
+          if-no-files-found: warn
+      - name: Build the debug app
+        run: >-
+          xcodebuild -project AlphaSync/AlphaSync.xcodeproj -scheme AlphaSync
+          -configuration Debug -destination 'generic/platform=macOS'
+          -derivedDataPath build/DerivedData build
+      - name: Build the diagnostic tool
+        run: >-
+          xcodebuild -project AlphaSync/AlphaSync.xcodeproj -target AppletDump
+          -configuration Release SYMROOT="$PWD/build/Products" build
+      - name: Check the distribution archive layout
+        if: matrix.archive == true
+        run: |
+          xcodebuild -project AlphaSync/AlphaSync.xcodeproj -scheme AlphaSync \
+            -configuration Release -destination 'generic/platform=macOS' \
+            -archivePath build/AlphaSync.xcarchive -derivedDataPath build/ArchiveData \
+            CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO archive
+          scripts/verify-app.sh build/AlphaSync.xcarchive/Products/Applications/AlphaSync.app
+          test ! -e build/AlphaSync.xcarchive/Products/Applications/AlphaSyncLauncher.app
+      - name: Package the universal app
+        run: scripts/package-app.sh build/DerivedData/Build/Products/Release/AlphaSync.app universal build/downloads
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: AlphaSync-universal-${{ matrix.runner }}-${{ github.sha }}
+          path: build/downloads/*
+          if-no-files-found: error
+
+  modern:
+    name: Apple Silicon, macOS 27, pinned Xcode
+    runs-on: xcode-27
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Select the modern compiler
+        run: |
+          version=$(cat .xcode-version-modern)
+          selected_developer="/Applications/Xcode_$version.app/Contents/Developer"
+          test -d "$selected_developer"
+          printf 'DEVELOPER_DIR=%s\n' "$selected_developer" >> "$GITHUB_ENV"
+      - name: Verify the modern toolchain
+        run: scripts/check-toolchain.sh modern
+      - name: Run the core and native regression tests
+        run: make test sanitize
+      - name: Build the modern release app
+        run: >-
+          xcodebuild -project AlphaSync/AlphaSync.xcodeproj -scheme AlphaSync-Modern
+          -configuration ReleaseModern -destination 'generic/platform=macOS'
+          -derivedDataPath build/ModernData build
+      - name: Verify the modern app and reject a universal label
+        run: |
+          app=build/ModernData/Build/Products/ReleaseModern/AlphaSync.app
+          scripts/verify-app.sh "$app" modern
+          if scripts/verify-app.sh "$app" universal --skip-launch; then
+            printf 'A modern app was incorrectly accepted as universal.\n' >&2
+            exit 1
+          fi
+      - name: Build the modern debug app
+        run: >-
+          xcodebuild -project AlphaSync/AlphaSync.xcodeproj -scheme AlphaSync-Modern
+          -configuration DebugModern -destination 'generic/platform=macOS'
+          -derivedDataPath build/ModernData build
+      - name: Check native controls and live appearance changes
+        run: scripts/check-appearance.sh build/ModernData/Build/Products/ReleaseModern/AlphaSync.app build/appearance
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: AlphaSync-appearance-modern-${{ github.sha }}
+          path: build/appearance/*
+          if-no-files-found: warn
+      - name: Build the modern diagnostic tool
+        run: >-
+          xcodebuild -project AlphaSync/AlphaSync.xcodeproj -target AppletDump
+          -configuration ReleaseModern SYMROOT="$PWD/build/ModernProducts" build
+      - name: Check the modern distribution archive
+        run: |
+          xcodebuild -project AlphaSync/AlphaSync.xcodeproj -scheme AlphaSync-Modern \
+            -configuration ReleaseModern -destination 'generic/platform=macOS' \
+            -archivePath build/Modern.xcarchive -derivedDataPath build/ModernArchiveData \
+            CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO archive
+          scripts/verify-app.sh build/Modern.xcarchive/Products/Applications/AlphaSync.app modern
+          test ! -e build/Modern.xcarchive/Products/Applications/AlphaSyncLauncher.app
+      - name: Package the modern app
+        run: scripts/package-app.sh build/ModernData/Build/Products/ReleaseModern/AlphaSync.app modern build/downloads
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: AlphaSync-modern-${{ github.sha }}
+          path: build/downloads/*
+          if-no-files-found: error
+
+  default-xcode:
+    name: Default Xcode source check, separate from releases
+    runs-on: xcode-27
+    timeout-minutes: 15
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Show the runner's default Xcode
+        run: xcodebuild -version
+      - name: Run the core and native regression tests
+        run: make test sanitize
+      # The default SDK can change independently of the pinned release compiler.
+      # This advisory job must never supply either release artifact.
+      - name: Build the modern app against the default SDK
+        run: >-
+          xcodebuild -project AlphaSync/AlphaSync.xcodeproj -scheme AlphaSync-Modern
+          -configuration ReleaseModern -destination 'generic/platform=macOS'
+          -derivedDataPath build/DefaultXcode build
+      - name: Verify this compatibility build
+        run: scripts/verify-app.sh build/DefaultXcode/Build/Products/ReleaseModern/AlphaSync.app modern
+
+  collect:
+    name: Collect both downloads for one release
+    needs: [macos, modern]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Check release pairing
+        run: python3 tests/release-tests.py
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: AlphaSync-universal-macos-26-${{ github.sha }}
+          path: incoming/universal
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: AlphaSync-modern-${{ github.sha }}
+          path: incoming/modern
+      - name: Collect matching downloads
+        run: >-
+          python3 scripts/collect-release.py --universal incoming/universal
+          --modern incoming/modern --output build/release-assets
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: AlphaSync-release-${{ github.sha }}
+          path: build/release-assets/*
+          if-no-files-found: error
+
+  publish:
+    name: Publish both downloads as one testing release
+    if: github.event_name == 'push' && startsWith(github.event.head_commit.message, 'Release AlphaSync ')
+    needs: collect
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+    concurrency:
+      group: publish-${{ github.ref }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Check the release request and notes
+        id: release
+        env:
+          RELEASE_MESSAGE: ${{ github.event.head_commit.message }}
+        run: |
+          version=$(sed -n 's/^MARKETING_VERSION *= *//p' AlphaSync/Build/Version.xcconfig)
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          subject=${RELEASE_MESSAGE%%$'\n'*}
+          test "$subject" = "Release AlphaSync $version"
+          test -s "releases/$version.md"
+          printf 'version=%s\ntag=v%s\n' "$version" "$version" >> "$GITHUB_OUTPUT"
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: AlphaSync-universal-macos-26-${{ github.sha }}
+          path: incoming/universal
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: AlphaSync-modern-${{ github.sha }}
+          path: incoming/modern
+      - name: Verify the release version and source before publishing
+        env:
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+          RELEASE_COMMIT: ${{ github.sha }}
+        run: >-
+          python3 scripts/collect-release.py --universal incoming/universal
+          --modern incoming/modern --output build/publish-assets
+          --tag "$RELEASE_TAG" --source-commit "$RELEASE_COMMIT"
+      - name: Create the tag and upload the draft
+        env:
+          RELEASE_VERSION: ${{ steps.release.outputs.version }}
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+          RELEASE_COMMIT: ${{ github.sha }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Creating a fresh ref fails if the tag already exists; never move a release tag.
+          gh api "repos/$GITHUB_REPOSITORY/git/refs" --method POST \
+            -f "ref=refs/tags/$RELEASE_TAG" -f "sha=$RELEASE_COMMIT"
+          gh release create "$RELEASE_TAG" build/publish-assets/*.zip \
+            build/publish-assets/*.sha256 build/publish-assets/*.build-information.txt \
+            --repo "$GITHUB_REPOSITORY" --verify-tag --draft --prerelease --latest=false \
+            --title "AlphaSync $RELEASE_VERSION" --notes-file "releases/$RELEASE_VERSION.md"
+          gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" \
+            --json assets,isDraft,isPrerelease,tagName > build/draft-release.json
+      - name: Check all six uploaded assets before publication
+        env:
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          release = json.loads(Path('build/draft-release.json').read_text())
+          expected = {p.name: p.stat().st_size for p in Path('build/publish-assets').iterdir()
+                      if p.name != 'release-notes.md'}
+          actual = {asset['name']: asset['size'] for asset in release['assets']}
+          assert len(expected) == 6 and actual == expected, 'The uploaded release assets are incomplete.'
+          assert release['isDraft'] and release['isPrerelease']
+          assert release['tagName'] == os.environ['RELEASE_TAG']
+          PY
+      - name: Publish the testing release
+        env:
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+          RELEASE_COMMIT: ${{ github.sha }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          test "$(gh api "repos/$GITHUB_REPOSITORY/commits/$RELEASE_TAG" --jq .sha)" = "$RELEASE_COMMIT"
+          gh release edit "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" \
+            --draft=false --prerelease --latest=false
+          gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" \
+            --json url,isDraft,isPrerelease,tagName

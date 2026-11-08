@@ -37,7 +37,9 @@
 #import "ASDeviceAccessProtocol.h"
 #import "ASInspectorWindowController.h"
 
-@interface ASApplicationController : NSObject <ASDeviceAccessProtocol, NSWindowDelegate, NSOutlineViewDelegate, NSToolbarDelegate>
+@class ASAboutWindowController;
+
+@interface ASApplicationController : NSObject <NSApplicationDelegate, ASDeviceAccessProtocol, NSWindowDelegate, NSOutlineViewDelegate, NSToolbarDelegate, NSTextFieldDelegate>
 {
     IBOutlet NSWindow* outletMainWindow;
     IBOutlet NSOutlineView* outletFileView;
@@ -56,21 +58,22 @@
     NSImage* iconGreen;
     NSImage* iconToolbarInfo;
     NSImage* iconToolbarBackup;
-    NSImage* iconToolbarDeleteDisabled;
-    NSImage* iconToolbarDeleteFile;
-    NSImage* iconToolbarDeleteFiles;
+    NSImage* iconToolbarDelete;
 
     NSString* launcherInstallPath;
+    NSString* automaticLaunchError;
 
     ASPreferenceController* preferenceController;
     ASBackupController* backupController;
     ASDeviceController* deviceController;
     ASInspectorWindowController* inspectorController;
+    ASAboutWindowController* aboutController;
 
     NSTimer* statusDisplayTimer;
     NSToolbar* toolbar;
 
     BOOL appIsUninstalling;
+    BOOL terminationPending;
 }
 
 - (id)init;
@@ -81,10 +84,12 @@
 - (IBAction)actionInfo:(id)sender;
 - (IBAction)actionBackup:(id)sender;
 - (IBAction)actionShowPreferences:(id)sender;
+- (IBAction)actionShowAbout:(id)sender;
 - (IBAction)actionOpenBackupFolder:(id)sender;
 - (IBAction)actionUninstall:(id)sender;
 - (IBAction)reloadDeviceData:(id)sender;
 
 - (void)setupAutoRun:(float)secondsToWait;
+- (NSString*)automaticLaunchStatus;
 
 @end

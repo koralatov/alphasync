@@ -69,5 +69,6 @@
 - (BOOL)fileIsPlainText;
 - (NSString*)fileData;
 - (BOOL)setFileData:(NSString*)data error:(NSString**)error;
+- (NSString*)saveUnderPath:(NSString*)path error:(NSString**)error;
 
 @end

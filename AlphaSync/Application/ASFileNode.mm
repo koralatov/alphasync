@@ -29,6 +29,8 @@
  *
  */
 #import "ASFileNode.h"
+#import "AQFileUtilities.h"
+#include <limits.h>
 #import "ASFileAttributes.h"
 #import "ASFile.h"
 #import "ASGenericFile.h"
@@ -36,7 +38,6 @@
 #import "ASUserDictionaryFile.h"
 #import "ASAppletID.h"
 #import "ASDeviceAccessProtocol.h"
-#import "ASPreferenceController.h"
 
 using namespace ts;
 
@@ -128,7 +129,7 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
     if (contentsOfPath)
     {
         NSData* unicodeData = [contentsOfPath dataUsingEncoding:NSUnicodeStringEncoding allowLossyConversion:YES];
-        if (unicodeData)
+        if (unicodeData && [unicodeData length] <= UINT_MAX)
         {
             switch (applet->appletID())
             {
@@ -137,7 +138,7 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
                 default:                                file = new ASGenericFile;           break;
             }
 
-            if (file->importText((const uint16_t*)[unicodeData bytes], [unicodeData length]))
+            if (file->importText((const uint16_t*)[unicodeData bytes], static_cast<unsigned>([unicodeData length])))
             {
                 NSString* deviceFilename = [[path lastPathComponent] stringByDeletingPathExtension];
                 fileNode = [ASFileNode createFileNodeOnDevice:device
@@ -172,7 +173,7 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
  *  @param  attr                The file attributes.
  *  @return                     A pointer to self.
  */
-- (id)initWithDevice:(ts::ASDevice*)devicePtr applet:(const ts::ASApplet*)app fileIndex:(int)fin fileAttributes:(const ts::ASFileAttributes*)attr;
+- (id)initWithDevice:(ts::ASDevice*)devicePtr applet:(const ts::ASApplet*)app fileIndex:(int)fin fileAttributes:(const ts::ASFileAttributes*)attr
 {
     if ((self = [super init]))
     {
@@ -180,14 +181,12 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
         {
             NSBundle* bundle = [NSBundle mainBundle];
             iconFileTxt = [[NSImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-file-txt" ofType:@"pdf"]];
-            [iconFileTxt setDataRetained:YES];
         }
 
         if (!iconFileBin)
         {
             NSBundle* bundle = [NSBundle mainBundle];
             iconFileBin = [[NSImage alloc] initWithContentsOfFile:[bundle pathForResource:@"icon-file-bin" ofType:@"pdf"]];
-            [iconFileBin setDataRetained:YES];
         }
 
         fileIndex = fin;
@@ -201,6 +200,20 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
     return self;
 }
 
+
+- (void)copyDisplayFieldsTo:(ASNode*)value
+{
+    ASFileNode* snapshot = (ASFileNode*)value;
+    // Cache plain text while still on the device queue.  Inspectors and pasteboards then need no USB access.
+    if (fileIsPlainText) [self fileData];
+    snapshot->device = device;
+    snapshot->applet = new ASApplet(*applet);
+    snapshot->fileAttributes = new ASFileAttributes(*fileAttributes);
+    snapshot->fileIndex = fileIndex;
+    snapshot->fileExtension = fileExtension;
+    snapshot->fileIsPlainText = fileIsPlainText;
+    snapshot->filePreview = [filePreview copy];
+}
 
 - (void)dealloc
 {
@@ -222,6 +235,9 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
         isFirstRefresh = NO;
 
         NSImage* fileIcon;
+        delete fileData;
+        fileData = nullptr;
+        fileIsSynchronised = NO;
 
         switch (applet->appletID())
         {
@@ -393,6 +409,7 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
 
     *basename = [NSString stringWithCString:deviceName encoding:NSWindowsCP1252StringEncoding];
     if (!*basename) *basename = @"";
+    *basename = [*basename stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
 
     // If the device filename already has an appropriate extension remove it (to prevent a double extension).
     if (NSOrderedSame == [*extension caseInsensitiveCompare:[*basename pathExtension]])
@@ -416,6 +433,7 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
  */
 - (NSString*)fileData
 {
+    if (displayOnly) return filePreview;
     NSString* result = nil;
 
     if (!fileIsSynchronised)
@@ -458,14 +476,18 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
     if (error) *error = nil;
 
     fileIsSynchronised = FALSE;
-    NSData* unicodeData = [data dataUsingEncoding:NSUnicodeStringEncoding allowLossyConversion:YES];
-    if (!unicodeData)
+    NSData* unicodeData = [data dataUsingEncoding:NSUnicodeStringEncoding allowLossyConversion:NO];
+    if (!unicodeData || [unicodeData length] > UINT_MAX)
     {
         if (error) *error = @"Unable to read file contents.";
     }
+    else if (fileIsPlainText && !fileData->canRepresentText((const uint16_t*)[unicodeData bytes], static_cast<unsigned>([unicodeData length])))
+    {
+        if (error) *error = @"The NEO cannot store one or more characters in this text.  Remove unsupported characters, such as emoji, and try again.  The device file has not been changed.";
+    }
     else
     {
-        result = fileData->importText((const uint16_t*)[unicodeData bytes], [unicodeData length]);
+        result = fileData->importText((const uint16_t*)[unicodeData bytes], static_cast<unsigned>([unicodeData length]));
         if (!result)
         {
             if (error) *error = @"Incompatible file.";
@@ -475,6 +497,7 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
             unsigned maxFileSize = [[self appletNode] maxFileSize];
             if (fileData->fileSize() > maxFileSize)
             {
+                result = FALSE;
                 if (error) *error = [NSString stringWithFormat:@"File is too large (maximum file size is %u bytes).", maxFileSize];
             }
             else
@@ -484,6 +507,7 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
             }
         }
     }
+    [self setOperationError:error ? *error : nil];
     [self reload];
     return result;
 }
@@ -506,76 +530,52 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
     *totalBytes = fileAttributes->allocSize();
 }
 
-// REVIEW: this can fail after having created a file. Need to add cleanup if this happens...
 - (NSString*)saveUnderPath:(NSString*)path
 {
-    NSString* result = nil;
-
-    if (![path isAbsolutePath]) return nil;     // invalid path supplied
-
-    NSString* basename;
-    NSString* extension;
-    [self getFileNameBase:&basename extension:&extension];
-
-    if (0 == [basename length]) basename = @"unspecified";     // can't make sense of device filename, so use a default
-
-    NSString* targetFilename;
-    NSFileHandle* fileHandle =  makeUniqueFile(path, basename, extension, &targetFilename);
-    if (fileHandle)
-    {
-        NSData* data = nil;
-
-        id accessDelegate = [self delegate];
-        BOOL shouldProceed = YES;
-
-        if ([accessDelegate conformsToProtocol:@protocol(ASDeviceAccessProtocol)])
-        {
-            shouldProceed = [accessDelegate deviceWillSave:self to:path sender:self];
-        }
-
-        if (shouldProceed)
-        {
-            NSString* stringData = [self fileData];
-            NSString* error = nil;
-            if (!stringData)
-            {
-                error = @"Unable to read the file data from the device.";
-            }
-            else
-            {
-                NSStringEncoding encoding = [ASPreferenceController getDefaultTextEncoding];
-                data = [stringData dataUsingEncoding:encoding allowLossyConversion:YES];
-                if (!data)
-                {
-                    error = @"Unable to make sense of the data from the device.";
-                }
-                else
-                {
-                    [fileHandle writeData:data];
-                    result = targetFilename;
-                }
-            }
-
-            if ([accessDelegate conformsToProtocol:@protocol(ASDeviceAccessProtocol)])
-            {
-                [accessDelegate deviceDidSave:self error:error sender:self];
-            }
-
-        }   // shouldProceed
-
-        [fileHandle release];
-        fileHandle = nil;
-    }
-
-    return result;
+    return [self saveUnderPath:path error:NULL];
 }
 
+- (NSString*)saveUnderPath:(NSString*)path error:(NSString**)errorMessage
+{
+    if (errorMessage) *errorMessage = nil;
+    if (![path isAbsolutePath])
+    {
+        if (errorMessage) *errorMessage = @"The destination path is not absolute.";
+        return nil;
+    }
+    id accessDelegate = [self delegate];
+    BOOL hasDelegate = [accessDelegate conformsToProtocol:@protocol(ASDeviceAccessProtocol)];
+    if (hasDelegate && ![accessDelegate deviceWillSave:self to:path sender:self]) return nil;
 
+    NSString* error = nil;
+    NSString* result = nil;
+    NSString* text = [self fileData];
+    NSData* data = nil;
+    if (!text) error = @"Unable to read the file data from the device.";
+    else
+    {
+        data = [text dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:NO];
+        if (!data) error = @"Unable to encode the file as UTF-8.";
+    }
 
-
-
-
-
+    if (data)
+    {
+        NSString* basename;
+        NSString* extension;
+        [self getFileNameBase:&basename extension:&extension];
+        if (![basename length]) basename = @"unspecified";
+        NSError* writeError = nil;
+        result = aq_WriteUniqueFile(path, basename, extension, data, &writeError);
+        if (!result)
+        {
+            error = [writeError localizedDescription];
+            if (!error) error = @"Unable to finish writing the file.";
+        }
+    }
+    if (errorMessage) *errorMessage = error;
+    if (hasDelegate) [accessDelegate deviceDidSave:self error:error sender:self];
+    return result;
+}
 
 
 #pragma mark    --------  ASLoadProtocol  --------
@@ -686,7 +686,7 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
     if (shouldProceed)
     {
         NSString* error = nil;
-        [self setFileData:@"" error:&error];
+        didDeleteFile = [self setFileData:@"" error:&error];
         [self reload];
 
         if ([accessDelegate conformsToProtocol:@protocol(ASDeviceAccessProtocol)])

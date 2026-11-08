@@ -51,8 +51,45 @@
 }
 
 
+- (id)initForDisplay
+{
+    return [super init];
+}
+
+- (ASNode*)copyForDisplay
+{
+    ASNode* snapshot = [[[self class] alloc] initForDisplay];
+    snapshot->displayOnly = YES;
+    snapshot->smallIcon = [smallIcon copy];
+    snapshot->largeIcon = [largeIcon copy];
+    snapshot->displayName = [displayName copy];
+    snapshot->displayKind = [displayKind copy];
+    snapshot->displaySize = [displaySize copy];
+    snapshot->fileSpace = fileSpace;
+    snapshot->fileSize = fileSize;
+    snapshot->sortKey = sortKey;
+    [self copyDisplayFieldsTo:snapshot];
+    for (ASNode* child in [self children])
+    {
+        ASNode* copy = [child copyForDisplay];
+        [snapshot addChild:copy];
+        [copy release];
+    }
+    return snapshot;
+}
+
+- (void)copyDisplayFieldsTo:(ASNode*)snapshot { (void)snapshot; }
+- (NSString*)operationError { return operationError; }
+- (void)setOperationError:(NSString*)error
+{
+    [operationError release];
+    operationError = [error copy];
+}
+
+
 - (void)dealloc
 {
+    [operationError release];
     [smallIcon release];
     [largeIcon release];
     [displayName release];
@@ -171,8 +208,6 @@
     smallIcon = [value copy];
     largeIcon = [value copy];
 
-    [largeIcon setDataRetained:YES];
-    [smallIcon setDataRetained:NO];
 }
 
 - (void)setDisplayName:(NSString*)value
@@ -365,7 +400,7 @@ static NSInteger sortFunctionDisplayKind(id node1, id node2, void* context)
     id node;
     while ((node = [enumerator nextObject]))
     {
-        if ([node conformsToProtocol:@protocol(ASSaveProtocol)])  [node saveUnderPath:directoryName];
+        if ([node conformsToProtocol:@protocol(ASSaveProtocol)] && ![node saveWillBeEmpty] && ![node saveUnderPath:directoryName]) return nil;
     }
 
     return directoryName;

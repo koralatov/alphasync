@@ -36,6 +36,21 @@
 
 using namespace ts;
 
+// Replace colours archived by the old nib with semantic colours.  AppKit resolves
+// these again when the system appearance or accessibility settings change.
+static void useSystemColours(NSView* view)
+{
+    if ([view isKindOfClass:[NSTextField class]])
+    {
+        NSTextField* text = (NSTextField*)view;
+        [text setTextColor:[NSColor labelColor]];
+        [text setBackgroundColor:[NSColor textBackgroundColor]];
+    }
+    if ([view isKindOfClass:[NSBox class]])
+        [[(NSBox*)view titleCell] setTextColor:[NSColor labelColor]];
+    for (NSView* child in [view subviews]) useSystemColours(child);
+}
+
 @implementation ASInspectorWindowController
 
 
@@ -50,7 +65,7 @@ using namespace ts;
     if ((self = [super initWithWindowNibName:@"Inspector"]))
     {
         displayNodes = [nodes retain];
-        iconNothing = [NSImage imageNamed:@"icon-file-noselection"];
+        iconNothing = [[NSImage imageWithSystemSymbolName:@"doc" accessibilityDescription:@"No Selection"] retain];
 
         for (int i = 0; i < kASInspectorMaxBox; i++)  showBox[i] = TRUE;
     }
@@ -61,14 +76,15 @@ using namespace ts;
 - (void)dealloc
 {
     [displayNodes release];
+    [iconNothing release];
     [super dealloc];
 }
 
 
 - (void)configurePanelsToShowSystem:(BOOL)showSystem showApplet:(BOOL)showApplet showFile:(BOOL)showFile
 {
-    BOOL showPreview = ([outletShowPreviewDisclosure state] == NSOnState);
-    BOOL showDetail = ([outletShowDetailDisclosure state] == NSOnState);
+    BOOL showPreview = ([outletShowPreviewDisclosure state] == NSControlStateValueOn);
+    BOOL showDetail = ([outletShowDetailDisclosure state] == NSControlStateValueOn);
 
     for (int i = 0; i < kASInspectorMaxBox; i++)  showBox[i] = TRUE;
     showBox[kASInspectorBoxPreview] = showPreview;
@@ -193,8 +209,7 @@ using namespace ts;
 
     if (appletNode)
     {
-        ASDevice* device = [appletNode device];
-        const ASApplet* applet = device->appletAtIndex([appletNode appletIndex]);
+        const ASApplet* applet = [appletNode applet];
         char version[16];
         snprintf(version, sizeof version, "Version %u.%u%c", applet->appletVersionMajor(), applet->appletVersionMinor(), applet->appletVersionRevision());
         char description[256];
@@ -367,6 +382,8 @@ using namespace ts;
 
 - (void)awakeFromNib
 {
+    useSystemColours([[self window] contentView]);
+    [outletPreviewAsText setTextColor:[NSColor textColor]];
     windowFrame = [[self window] frame];
     boxes[kASInspectorBoxMain] = outletBox0;
     boxes[kASInspectorBoxShowPreview] = outletBox1;

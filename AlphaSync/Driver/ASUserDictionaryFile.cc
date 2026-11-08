@@ -32,6 +32,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <vector>
 #include "ASEndian.h"
 #include "ASUserDictionaryFile.h"
 
@@ -55,11 +56,6 @@
  *  The maximum file size is an arbitrary limit (the file could contain a very large number of
  *  20 letter length words if the file size is not constrained to a 16 bit value).
  */
-
-#define kASUserDictionaryFileMinWordLength  (2)                 /**< Smallest word that can be stored. */
-#define kASUserDictionaryFileMaxWordLength  (20)                /**< Longest word that can be stored. */
-#define kASUserDictionaryFileMinFileSize    (19*2)              /**< Smallest possible dictionary file. */
-#define kASUserDictionaryFileMaxFileSize    (64*1024)           /**< Maximum size of the dictionary file. */
 
 namespace ts
 {
@@ -102,7 +98,9 @@ namespace ts
 
     bool ASUserDictionaryFile::containsWord(const char* word) const
     {
-        unsigned length = strlen(word);
+        size_t count = strlen(word);
+        if (count < kASUserDictionaryFileMinWordLength || count > kASUserDictionaryFileMaxWordLength) return false;
+        unsigned length = static_cast<unsigned>(count);
         return (0 != locateWord((uint8_t*)word, length));
     }
 
@@ -118,8 +116,7 @@ namespace ts
             uint8_t* start;
             uint8_t* end;
 
-            textRegionForLength(&start, &end, wordLength);
-            assert(end >= start);
+            if (!textRegionForLength(&start, &end, wordLength)) return false;
             unsigned wordsThisLength = unsigned(end - start) / wordLength;
 
             if (index < wordsThisLength)
@@ -141,7 +138,9 @@ namespace ts
         if (0 == byteData()) clearDictionary();
         if (0 == byteData()) return false;
 
-        unsigned wordLength = strlen(word);
+        size_t count = strlen(word);
+        if (count < kASUserDictionaryFileMinWordLength || count > kASUserDictionaryFileMaxWordLength) return false;
+        unsigned wordLength = static_cast<unsigned>(count);
 
         uint8_t* start;
         uint8_t* end;
@@ -158,7 +157,12 @@ namespace ts
             search += wordLength;
         }
 
-        if (wordLength + fileSize() > kASUserDictionaryFileMaxFileSize) return false;   // file full
+        if (wordLength > kASUserDictionaryFileMaxFileSize - fileSize()) return false;
+        // The final section’s inferred end may reach 65536.  Stored offsets must fit 16 bits.
+        for (unsigned length = wordLength + 1; length <= kASUserDictionaryFileMaxWordLength; ++length)
+        {
+            if (m_offsets[length] > UINT16_MAX - wordLength) return false;
+        }
 
         assert(search > byteData());
         unsigned offset = unsigned(search - byteData());            // byte offset at which to insert the new word
@@ -186,7 +190,9 @@ namespace ts
         // Handle any earlier memory allocation failure.
         if (0 == byteData()) return;
 
-        size_t wordLength = strlen(word);
+        size_t count = strlen(word);
+        if (count < kASUserDictionaryFileMinWordLength || count > kASUserDictionaryFileMaxWordLength) return;
+        unsigned wordLength = static_cast<unsigned>(count);
         uint8_t* location = locateWord((uint8_t*)word, wordLength);
         if (location)
         {
@@ -210,32 +216,30 @@ namespace ts
 
     bool ASUserDictionaryFile::importText(const uint16_t* text, unsigned textSize)
     {
-        if (!clearDictionary()) return false;
-
+        if (!canRepresentText(text, textSize)) return false;
         unsigned characterCount = textSize / 2;
+        std::vector<uint8_t> neoText(characterCount + 1);
+        characterCount = unicodeToNeo(neoText.data(), text, characterCount);
+        ASUserDictionaryFile replacement;
+        if (!replacement.fileData()) return false;
 
-        uint8_t* neoText = (uint8_t*)malloc(characterCount * sizeof (uint8_t) + 1);   // +1 to allow additional zero terminator at end
-        if (!neoText) return false;
-        unicodeToNeo(neoText, text, characterCount);
-
-        uint8_t* ptr = neoText;
+        uint8_t* ptr = neoText.data();
         uint8_t* end = ptr + characterCount;
-
         while (ptr < end)
         {
-            while (ptr < end && (isspace(*ptr) || ispunct(*ptr))) ptr ++;
+            while (ptr < end && (isspace(*ptr) || ispunct(*ptr))) ++ptr;
             if (ptr == end) break;
 
             uint8_t* start = ptr;
-            while (ptr < end && !isspace(*ptr) && !ispunct(*ptr)) ptr++;
+            while (ptr < end && !isspace(*ptr) && !ispunct(*ptr)) ++ptr;
+            unsigned length = static_cast<unsigned>(ptr - start);
             *ptr = 0;
-            addWord((const char*)start);         // ignore errors adding specific words
-            if (ptr < end) ptr++;
+            // Words outside the device’s length limits are skipped.  A storage failure rejects the whole import.
+            if (length >= kASUserDictionaryFileMinWordLength && length <= kASUserDictionaryFileMaxWordLength &&
+                !replacement.addWord(reinterpret_cast<const char*>(start))) return false;
+            if (ptr < end) ++ptr;
         }
-
-        free(neoText);
-
-        return true;
+        return load(replacement.fileData(), replacement.fileSize());
     }
 
 
@@ -264,7 +268,8 @@ namespace ts
         while (getWordAtIndex(word, index++))
         {
             if (index > 1) *ptr++ = 0x0020;     // prepend a separating space character
-            char* cptr = word;
+            // NEO characters use all eight bits, even when the compiler treats char as signed.
+            const unsigned char* cptr = reinterpret_cast<const unsigned char*>(word);
             while (0 != *cptr) *ptr++ = neoToUnicode(*cptr++);
             assert(ptr <= ((uint16_t*)m_exportBuffer) + charCount);
         }
@@ -326,36 +331,29 @@ namespace ts
      */
     bool ASUserDictionaryFile::loadOffsets()
     {
-        for (unsigned i = 0; i < sizeof m_offsets / sizeof m_offsets[0]; i++)  m_offsets[i] = 0;
-
-        bool ok = true;
-
-        if (fileSize() > kASUserDictionaryFileMaxFileSize)
-        {
-            assert(0);
+        if (fileSize() < kASUserDictionaryFileMinFileSize || fileSize() > kASUserDictionaryFileMaxFileSize)
             return false;
-        }
 
-        if (fileSize() < (kASUserDictionaryFileMaxWordLength - kASUserDictionaryFileMinWordLength + 1) * 2)
+        unsigned offsets[kASUserDictionaryFileMaxWordLength + 2] = {};
+        unsigned previous = kASUserDictionaryFileMinFileSize;
+        for (unsigned length = kASUserDictionaryFileMinWordLength; length <= kASUserDictionaryFileMaxWordLength; ++length)
         {
-            assert(0);
-            return false;
+            unsigned offset = as_EndianReadU16(byteData() + (length - kASUserDictionaryFileMinWordLength) * 2);
+            if (offset < previous || offset > fileSize()) return false;
+            // Each section stores whole words of the preceding section’s fixed length.
+            if (length > kASUserDictionaryFileMinWordLength && (offset - previous) % (length - 1)) return false;
+            offsets[length] = offset;
+            previous = offset;
         }
+        if ((fileSize() - previous) % kASUserDictionaryFileMaxWordLength) return false;
+        offsets[kASUserDictionaryFileMaxWordLength + 1] = fileSize();
 
-        m_offsets[kASUserDictionaryFileMaxWordLength + 1] = fileSize();
+        unsigned textOffset = offsets[kASUserDictionaryFileMinWordLength];
+        if (fileSize() > textOffset && memchr(byteData() + textOffset, 0, fileSize() - textOffset)) return false;
 
-        for (unsigned i = kASUserDictionaryFileMinWordLength; i <= kASUserDictionaryFileMaxWordLength; i++)
-        {
-            m_offsets[i] = as_EndianReadU16(byteData() + ((i - kASUserDictionaryFileMinWordLength) * 2));
-            assert(m_offsets[i] <= m_offsets[kASUserDictionaryFileMaxWordLength+1]);
-            if (m_offsets[i] > fileSize())
-            {
-                m_offsets[i] = fileSize(); // catch corrupt input
-                ok = false;
-            }
-        }
-
-        return ok;
+        // Only publish decoded offsets after the complete file has passed validation.
+        memcpy(m_offsets, offsets, sizeof m_offsets);
+        return true;
     }
 
 
@@ -382,7 +380,9 @@ namespace ts
      */
     bool ASUserDictionaryFile::textRegionForLength(uint8_t** start, uint8_t** end, unsigned length) const
     {
-        if (0 == byteData() || length < kASUserDictionaryFileMinWordLength || length > kASUserDictionaryFileMaxWordLength)
+        if (!byteData() || length < kASUserDictionaryFileMinWordLength || length > kASUserDictionaryFileMaxWordLength ||
+            m_offsets[length] < kASUserDictionaryFileMinFileSize || m_offsets[length] > m_offsets[length + 1] ||
+            m_offsets[length + 1] > fileSize() || (m_offsets[length + 1] - m_offsets[length]) % length)
         {
             *start = 0;
             *end = 0;
@@ -414,7 +414,7 @@ namespace ts
         uint8_t* start;
         uint8_t* end;
 
-        textRegionForLength(&start, &end, length);
+        if (!textRegionForLength(&start, &end, length)) return nullptr;
 
         for (uint8_t* search = start; search < end; search += length)
         {
