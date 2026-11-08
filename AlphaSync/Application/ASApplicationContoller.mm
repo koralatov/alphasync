@@ -178,6 +178,13 @@ static const NSInteger kMenuItemTagBackup   = 100;
     [outletFileView setDraggingSourceOperationMask:NSDragOperationEvery forLocal:NO];
     [outletFileView setAutoresizesOutlineColumn:NO];
 
+    // Keep the initial window compact, with most of its width available for names.
+    [outletFileView setColumnAutoresizingStyle:NSTableViewFirstColumnOnlyAutoresizingStyle];
+    [[outletFileView tableColumnWithIdentifier:@"Size"] setWidth:130.0];
+    NSSize initialSize = [[outletMainWindow contentView] bounds].size;
+    initialSize.width = 480.0;
+    [outletMainWindow setContentSize:initialSize];
+
     deviceController = [[ASDeviceController alloc] init];
     if (!deviceController)
     {
