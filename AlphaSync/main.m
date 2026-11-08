@@ -140,8 +140,10 @@ static void checkConnectionStates(id controller)
     requireInterface([window contentView] == compact && [window toolbar] == nil && NSWidth([window frame]) < 480,
                      @"Startup without a NEO did not show the compact connection window.");
     requireInterface([NSImage imageWithSystemSymbolName:@"cable.connector" accessibilityDescription:nil] != nil &&
-                     [[symbol image] isTemplate] && [[symbol image] symbolConfiguration] != nil,
+                     [[symbol image] isTemplate],
                      @"The connection icon is not an available native SF Symbol.");
+    if (@available(macOS 12.0, *))
+        requireInterface([[symbol image] symbolConfiguration] != nil, @"The connection symbol lost its native configuration.");
     requireInterface([[title stringValue] isEqualToString:@"No NEO connected"], @"The disconnected title changed.");
     checkConnectionLayout(controller);
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ASDeviceDetected" object:nil];
