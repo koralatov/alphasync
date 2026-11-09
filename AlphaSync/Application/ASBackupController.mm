@@ -363,13 +363,13 @@ static NSTextField* ASBackupLabel(NSString* text)
     {
         title = @"Backup complete";
         NSString* source = backupDeviceCount > 1 ? [NSString stringWithFormat:@"%lu Neos", (unsigned long)backupDeviceCount] : @"your Neo";
-        summary = [NSString stringWithFormat:@"AlphaSync has saved %@ of %@ from %@.  The original files on your %@ have not been changed.",
+        summary = [NSString stringWithFormat:@"AlphaSync has saved %@ of %@ from %@. The original files on your %@ have not been changed.",
                    saved == 1 ? @"a copy" : @"copies", ASBackupFileCount(saved), source, backupDeviceCount > 1 ? @"Neos" : @"Neo"];
     }
     else if (successful)
     {
         title = @"No files to back up";
-        summary = @"AlphaSync found no files to back up.  No backup files were created.";
+        summary = @"AlphaSync found no files to back up. No backup files were created.";
     }
     else
     {

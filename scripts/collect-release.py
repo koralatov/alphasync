@@ -81,7 +81,7 @@ def main():
                  'Choose the download for your Mac:\n\n'
                  '- **macOS 11–26, Intel or Apple Silicon:** the universal ZIP.\n'
                  '- **macOS 27 or later, Apple Silicon:** the Apple Silicon ZIP.\n\n'
-                 'Both downloads use the same app version and source code.  '
+                 'Both downloads use the same app version and source code. '
                  'Keep the bundled launcher inside the app.\n')
         if packages[0][0]['Signing'] == 'development':
             notes += '\nThese are development builds with ad hoc signatures.\n'

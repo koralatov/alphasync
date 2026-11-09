@@ -291,7 +291,7 @@ static NSString* ASCreateRecoveryCopy(ASNode* node, NSString* root, NSInteger da
         }
         id result = nil;
         NSString* error = nil;
-        if (!selected) error = @"The selected file or Neo is no longer available.  Select it again and retry.";
+        if (!selected) error = @"The selected file or Neo is no longer available. Select it again and retry.";
         else
         {
             [selected setOperationError:nil];

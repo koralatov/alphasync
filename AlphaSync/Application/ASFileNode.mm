@@ -47,21 +47,21 @@ static NSString* ASFileWriteMessage(const ASFileWriteError& error)
     switch (error.failure)
     {
         case ASFileWriteFailure::LimitsUnavailable:
-            return @"AlphaSync couldn’t read the Neo’s maximum file size.  Disconnect and reconnect the Neo, then try again.  No files on the Neo have been changed.";
+            return @"AlphaSync couldn’t read the Neo’s maximum file size. Disconnect and reconnect the Neo, then try again. No files on the Neo have been changed.";
         case ASFileWriteFailure::FileTooLarge:
-            return [NSString stringWithFormat:@"This file needs %@ on the Neo.  The maximum file size is %@.  Shorten the text or split it into smaller files, then try again.  No files on the Neo have been changed.",
+            return [NSString stringWithFormat:@"This file needs %@ on the Neo. The maximum file size is %@. Shorten the text or split it into smaller files, then try again. No files on the Neo have been changed.",
                     aq_FormattedByteCount(error.required), aq_FormattedByteCount(error.maximum)];
         case ASFileWriteFailure::MemoryUnavailable:
-            return @"AlphaSync couldn’t check the Neo’s available memory.  Disconnect and reconnect the Neo, then try again.  No files on the Neo have been changed.";
+            return @"AlphaSync couldn’t check the Neo’s available memory. Disconnect and reconnect the Neo, then try again. No files on the Neo have been changed.";
         case ASFileWriteFailure::FileUnavailable:
-            return @"AlphaSync couldn’t check the existing file’s size on the Neo.  Disconnect and reconnect the Neo, then try again.  No files on the Neo have been changed.";
+            return @"AlphaSync couldn’t check the existing file’s size on the Neo. Disconnect and reconnect the Neo, then try again. No files on the Neo have been changed.";
         case ASFileWriteFailure::InsufficientMemory:
-            return [NSString stringWithFormat:@"There isn’t enough free memory on the Neo.  This file needs %@ after conversion; up to %@ is available for this import.  Free some space on the Neo, then try again.  No files on the Neo have been changed.",
+            return [NSString stringWithFormat:@"There isn’t enough free memory on the Neo. This file needs %@ after conversion; up to %@ is available for this import. Free some space on the Neo, then try again. No files on the Neo have been changed.",
                     aq_FormattedByteCount(error.required), aq_FormattedByteCount(error.available)];
         case ASFileWriteFailure::VerificationFailed:
             return @"The file was sent, but its contents could not be verified on the Neo. The file may have changed. Check the connection and the file’s contents before continuing, and restore your recovery copy if needed.";
         default:
-            return @"The file could not be written to the Neo.  Check the connection and try again.";
+            return @"The file could not be written to the Neo. Check the connection and try again.";
     }
 }
 
@@ -130,12 +130,12 @@ static BOOL ASImportFileText(ASFile* file, BOOL plainText, NSString* text, NSStr
     }
     if (plainText && !file->canRepresentText((const uint16_t*)[unicodeData bytes], static_cast<unsigned>([unicodeData length])))
     {
-        if (error) *error = @"The Neo cannot store one or more characters in this text.  Remove unsupported characters, such as emoji, and try again.  No files on the Neo have been changed.";
+        if (error) *error = @"The Neo cannot store one or more characters in this text. Remove unsupported characters, such as emoji, and try again. No files on the Neo have been changed.";
         return NO;
     }
     if (!file->importText((const uint16_t*)[unicodeData bytes], static_cast<unsigned>([unicodeData length])))
     {
-        if (error) *error = @"The file could not be converted into the Neo’s format.  No files on the Neo have been changed.";
+        if (error) *error = @"The file could not be converted into the Neo’s format. No files on the Neo have been changed.";
         return NO;
     }
     return YES;

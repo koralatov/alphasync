@@ -1,6 +1,6 @@
 # AlphaSync
 
-AlphaSync copies text files between your Mac and an AlphaSmart Neo.  It can also back up the files on your Neo and open automatically when you connect it.
+AlphaSync copies text files between your Mac and an AlphaSmart Neo. It can also back up the files on your Neo and open automatically when you connect it.
 
 ## Download
 
@@ -19,46 +19,46 @@ If the download you need is not available yet, see [development downloads](TECHN
 
 1. Double-click the downloaded ZIP file to unpack it.
 2. Quit AlphaSync if it is already running.
-3. Drag the **AlphaSync** app into your **Applications** folder.  If you are updating an older copy, replace it when Finder asks.
+3. Drag the **AlphaSync** app into your **Applications** folder. If you are updating an older copy, replace it when Finder asks.
 4. Open **Applications**, then double-click **AlphaSync**.
 
 ## If your Mac blocks AlphaSync
 
-Your Mac may say that it cannot verify AlphaSync.  Dismiss the warning, then open the settings for your macOS version:
+Your Mac may say that it cannot verify AlphaSync. Dismiss the warning, then open the settings for your macOS version:
 
 | macOS | Where to go |
 |---|---|
 | 11 and 12 | **System Preferences → Security & Privacy → General** |
 | 13 and later | **System Settings → Privacy & Security**, then scroll to **Security** |
 
-Find the message about AlphaSync and click **Open Anyway**.  If you see an **Open** button first, click it to reach **Open Anyway**.  Follow the prompts, using your Mac login password or Touch ID if asked.
+Find the message about AlphaSync and click **Open Anyway**. If you see an **Open** button first, click it to reach **Open Anyway**. Follow the prompts, using your Mac login password or Touch ID if asked.
 
-Your Mac remembers that you allowed this copy of AlphaSync.  You can then open it by double-clicking it as usual.  Apple has [more help with opening downloaded apps](https://support.apple.com/en-gb/102445).
+Your Mac remembers that you allowed this copy of AlphaSync. You can then open it by double-clicking it as usual. Apple has [more help with opening downloaded apps](https://support.apple.com/en-gb/102445).
 
 ## Use AlphaSync
 
-Open AlphaSync and connect your Neo with a USB cable.  Your Neo’s files appear in the window.
+Open AlphaSync and connect your Neo with a USB cable. Your Neo’s files appear in the window.
 
-- **Read a file:** double-click it to open a read-only window.  Use **Font** to choose **Regular** or **Monospaced**.  You can select and copy the text.
+- **Read a file:** double-click it to open a read-only window. Use **Font** to choose **Regular** or **Monospaced**. You can select and copy the text.
 - **Copy files to your Mac:** drag them from AlphaSync into a Finder folder.
 - **Copy text files to your Neo:** drag them from Finder into AlphaSync.
-- **Back up your files:** click **Backup**.  You can choose where backups are saved in **Preferences**.
-- **Clear files:** select a file for **Clear File…**, or select **AlphaWord** for **Clear All Files…**.  The warning names what will be cleared, and **Cancel** is the default.
+- **Back up your files:** click **Backup**. You can choose where backups are saved in **Preferences**.
+- **Clear files:** select a file for **Clear File…**, or select **AlphaWord** for **Clear All Files…**. The warning names what will be cleared, and **Cancel** is the default.
 
 Back up the files on your Neo before replacing or clearing them.
 
-If a text file is too large for your Neo, AlphaSync explains the limit and leaves your files unchanged.  Shorten the text or split it into smaller files, then try again.
+If a text file is too large for your Neo, AlphaSync explains the limit and leaves your files unchanged. Shorten the text or split it into smaller files, then try again.
 
-Backup logs are off by default.  If you want a record of copied files and any errors, enable **Save a backup log** in **Preferences**.  The log is saved inside each dated backup folder.
+Backup logs are off by default. If you want a record of copied files and any errors, enable **Save a backup log** in **Preferences**. The log is saved inside each dated backup folder.
 
-To have AlphaSync open whenever you connect your Neo, turn on automatic opening in **Preferences**.  Keep the app in Applications, and follow any approval prompts shown in Preferences.
+To have AlphaSync open whenever you connect your Neo, turn on automatic opening in **Preferences**. Keep the app in Applications, and follow any approval prompts shown in Preferences.
 
 AlphaSync follows your Mac’s Light or Dark appearance automatically.
 
 ## Help and support
 
 Choose **Help → AlphaSync Help** or press **⌘?** for the built-in guide.
-The Help menu also includes the licence, release notes for your version, and a link to the GitHub project.  Choose **Report Issue…** to report a problem on GitHub.
+The Help menu also includes the licence, release notes for your version, and a link to the GitHub project. Choose **Report Issue…** to report a problem on GitHub.
 Choose **Contact Us…** to open an email addressed to **mike@koralatov.com** in your usual mail app.
 
 ## Advanced users
@@ -67,4 +67,4 @@ For development downloads, build instructions, tests, supported text formats, an
 
 ## Licence
 
-AlphaSync was originally written by tSoniq.  The original copyright notices and BSD-style licence remain in [LICENSE](LICENSE) and the source files.
+AlphaSync was originally written by tSoniq. The original copyright notices and BSD-style licence remain in [LICENSE](LICENSE) and the source files.

@@ -328,7 +328,7 @@ static void checkConnectionStates(id controller)
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ASDeviceDetected" object:nil];
     requireInterface([window contentView] == compact && [[title stringValue] isEqualToString:@"Connecting to Neo…"],
                      @"Detecting a Neo did not keep the compact connection progress visible.");
-    NSString* error = @"The Neo could not be opened because another application is using it.  Close that application, check the USB cable, and reconnect your Neo to try again.";
+    NSString* error = @"The Neo could not be opened because another application is using it. Close that application, check the USB cable, and reconnect your Neo to try again.";
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ASDeviceError" object:error];
     requireInterface([[message stringValue] isEqualToString:error], @"The compact view hid a connection error.");
     checkConnectionLayout(controller);
@@ -651,7 +651,7 @@ static void capturePreferenceStatus(id controller, NSString* directory, NSString
     {
         // Display samples only.  Do not alter saved preferences or login-item registration.
         [path setURL:[NSURL fileURLWithPath:@"/Users/Example/Documents/Writing and notes/AlphaSmart Neo backups/An unusually long backup folder name" isDirectory:YES]];
-        [controller setValue:@"The system could not register the automatic-launch helper.  Check the app’s location and permissions, then try again.  If approval is needed, open Login Items Settings and allow AlphaSync to run in the background."
+        [controller setValue:@"The system could not register the automatic-launch helper. Check the app’s location and permissions, then try again. If approval is needed, open Login Items Settings and allow AlphaSync to run in the background."
                       forKey:@"automaticLaunchError"];
         [preferences performSelector:NSSelectorFromString(@"refreshAutomaticLaunchStatus:") withObject:nil];
         checkPreferenceLayout(preferences);
@@ -1101,7 +1101,7 @@ static void checkHelpMenu(id controller)
     requireInterface([[find itemWithTitle:@"Find…"] action] == @selector(performTextFinderAction:), @"The native Find command is missing.");
     NSMenu* menu = [NSApp helpMenu];
     requireInterface(menu && [[[[NSApp mainMenu] itemArray] lastObject] submenu] == menu,
-                     [NSString stringWithFormat:@"The native Help menu is not registered at the end of the menu bar.  Registered: %@; menus: %@; Help items: %@",
+                     [NSString stringWithFormat:@"The native Help menu is not registered at the end of the menu bar. Registered: %@; menus: %@; Help items: %@",
                          [menu title], [[[NSApp mainMenu] itemArray] valueForKey:@"title"], [[menu itemArray] valueForKey:@"identifier"]]);
     [menu update];
     NSMutableDictionary* items = [NSMutableDictionary dictionary];

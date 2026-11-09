@@ -157,7 +157,7 @@ static NSInteger ASRecoveryRetentionDays(void)
         @[[NSTextField labelWithString:@"Show:"], outletFilterOption],
         @[[NSGridCell emptyContentView], ASPreferenceNote(@"Quick Backup includes the files shown in the main window.")],
         @[[NSTextField labelWithString:@"Save as:"], outputFormatField],
-        @[[NSGridCell emptyContentView], ASPreferenceNote(@"Exports and backups use UTF-8.  Imports accept MacASCII (Mac Roman), UTF-8, and UTF-16.")]
+        @[[NSGridCell emptyContentView], ASPreferenceNote(@"Exports and backups use UTF-8. Imports accept MacASCII (Mac Roman), UTF-8, and UTF-16.")]
     ]];
     [files setColumnSpacing:12];
     [files setRowSpacing:6];
@@ -233,7 +233,7 @@ static NSInteger ASRecoveryRetentionDays(void)
         ASPreferenceSection(@"Files", @[files]),
         ASPreferenceSeparator(),
         ASPreferenceSection(@"Backups", @[folder, ASPreferenceNote(@"Quick Backup saves a separate copy of your files in this folder."),
-                                         saveBackupLogsButton, ASPreferenceNote(@"Optional.  Saves a list of copied files and any errors inside each dated backup folder.")]),
+                                         saveBackupLogsButton, ASPreferenceNote(@"Optional. Saves a list of copied files and any errors inside each dated backup folder.")]),
         ASPreferenceSeparator(),
         ASPreferenceSection(@"Recovery copies", @[saveRecoveryCopiesButton, recoveryRow,
             ASPreferenceNote(@"Recovery Copies inside your backup folder contains the original text. Expired copies move to Trash when a new copy is made.")]),

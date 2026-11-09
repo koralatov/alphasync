@@ -133,7 +133,7 @@ static NSString* const ASFileViewMonospacedKey = @"FileViewerMonospaced";
     [controller performTaskForNode:file refresh:NO task:^id(ASNode* working) {
         NSString* text = [(ASFileNode*)working fileData];
         if (!text)
-            [working setOperationError:@"AlphaSync couldn’t read the text in this file.  Check the USB connection, then close this window and open the file again."];
+            [working setOperationError:@"AlphaSync couldn’t read the text in this file. Check the USB connection, then close this window and open the file again."];
         return text;
     } completion:^(id result, NSString* error) {
         // Closing a loading window must not reopen it when the USB read finishes.
@@ -149,7 +149,7 @@ static NSString* const ASFileViewMonospacedKey = @"FileViewerMonospaced";
     [textView setString:error ? @"" : (text ?: @"")];
     [self applyFont];
     [textView scrollRangeToVisible:NSMakeRange(0, 0)];
-    [statusLabel setStringValue:error ?: ([text length] ? @"Read-only" : @"This file is empty.  Read-only.")];
+    [statusLabel setStringValue:error ?: ([text length] ? @"Read-only" : @"This file is empty. Read-only.")];
     [statusLabel setTextColor:error ? [NSColor labelColor] : [NSColor secondaryLabelColor]];
 }
 

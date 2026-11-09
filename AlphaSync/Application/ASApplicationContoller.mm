@@ -1006,7 +1006,7 @@ static NSMenuItem* ASAddHelpLink(NSMenu* menu, NSString* title, NSString* identi
     NSAlert* alert = [[[NSAlert alloc] init] autorelease];
     BOOL email = [[url scheme] isEqualToString:@"mailto"];
     [alert setMessageText:email ? @"Couldn’t open your mail app" : @"Couldn’t open this link"];
-    [alert setInformativeText:email ? @"You can email mike@koralatov.com using your preferred mail app.  Copy the email link to use it there." :
+    [alert setInformativeText:email ? @"You can email mike@koralatov.com using your preferred mail app. Copy the email link to use it there." :
         @"Copy the link and open it in your preferred browser."];
     [alert addButtonWithTitle:@"OK"];
     [alert addButtonWithTitle:@"Copy Link"];
@@ -1404,11 +1404,11 @@ static NSMenuItem* ASAddHelpLink(NSMenu* menu, NSString* title, NSString* identi
     {
         case AQLauncherStatusEnabled: return @"Automatic launching is enabled.";
         case AQLauncherStatusRequiresApproval: return @"Automatic launching is awaiting approval in System Settings.";
-        case AQLauncherStatusUnavailable: return @"The bundled launcher could not be found.  Keep the app bundle intact.";
+        case AQLauncherStatusUnavailable: return @"The bundled launcher could not be found. Keep the app bundle intact.";
         case AQLauncherStatusDisabled: return @"Automatic launching is off.";
         case AQLauncherStatusUnknown:
             return [[NSUserDefaults standardUserDefaults] boolForKey:kASPreferenceKeyAutoRun] ?
-                @"Automatic launching is selected.  The launcher is not running yet." : @"Automatic launching is off.";
+                @"Automatic launching is selected. The launcher is not running yet." : @"Automatic launching is off.";
     }
     return @"The automatic-launch status is unavailable.";
 }
