@@ -1,16 +1,16 @@
 #!/bin/bash
 set -euo pipefail
 repository=$(cd "$(dirname "$0")/.." && pwd)
-if [[ $# != 2 ]]; then
-    printf 'Usage: %s products-directory output-directory\n' "$0" >&2
+if [[ $# != 3 ]]; then
+    printf 'Usage: %s products-directory universal|apple-silicon output-directory\n' "$0" >&2
     exit 1
 fi
 products=$1
-output=$2
+output=$3
 "$repository/scripts/verify-symbols.sh" "$products"
 version=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$products/AlphaSync.app/Contents/Info.plist")
 build_number=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$products/AlphaSync.app/Contents/Info.plist")
-source "$repository/scripts/build-profile.sh" universal
+source "$repository/scripts/build-profile.sh" "$2"
 filename="AlphaSync-$version-$build_number-$profile_label-symbols.zip"
 mkdir -p "$output"
 output=$(cd "$output" && pwd)

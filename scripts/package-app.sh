@@ -2,7 +2,7 @@
 set -euo pipefail
 
 if [[ $# -lt 3 || $# -gt 4 ]]; then
-    printf 'Usage: %s app universal output-directory [development|notarised]\n' "$0" >&2
+    printf 'Usage: %s app universal|apple-silicon output-directory [development|notarised]\n' "$0" >&2
     exit 1
 fi
 repository=$(cd "$(dirname "$0")/.." && pwd)

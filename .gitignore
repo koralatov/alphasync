@@ -13,3 +13,4 @@ build/
 DerivedData/
 *.xcresult
 __pycache__/
+.build/

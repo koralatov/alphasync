@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-# Xcode supplies these paths for the main app target.  Keep generated files out
+# Xcode supplies these paths for the main app target. Keep generated files out
 # of the source tree, and use only the image tools that ship with macOS.
 : "${SRCROOT:?}"
 : "${DERIVED_FILE_DIR:?}"
