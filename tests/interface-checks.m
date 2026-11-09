@@ -272,6 +272,9 @@ static void checkClearConfirmation(id controller)
                 }
                 requireInterface(cancel && proceed && [[parent attachedSheet] defaultButtonCell] == [cancel cell] &&
                                  [[proceed keyEquivalent] length] == 0, @"A destructive sheet has no safe Cancel default or explicit action label.");
+                requireInterface([[parent attachedSheet] firstResponder] != proceed, @"A destructive action has initial keyboard focus and can be triggered by Space.");
+                if ([NSApp isFullKeyboardAccessEnabled])
+                    requireInterface([[parent attachedSheet] firstResponder] == cancel, @"Cancel does not have the initial keyboard focus.");
                 [([confirm boolValue] ? proceed : cancel) performClick:nil];
                 while (!finished && [deadline timeIntervalSinceNow] > 0)
                     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.01]];

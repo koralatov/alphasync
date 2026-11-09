@@ -1084,6 +1084,9 @@ static NSMenuItem* ASAddHelpLink(NSMenu* menu, NSString* title, NSString* identi
     [recovery setToolTip:@"Saved inside your backup folder. Preferences controls how long copies are kept."];
     [alert setAccessoryView:recovery];
     [alert setAlertStyle:NSAlertStyleWarning];
+    [alert layout];
+    // Return uses the default button; Space uses the focused control.
+    [[alert window] setInitialFirstResponder:cancel];
     [alert beginSheetModalForWindow:outletMainWindow completionHandler:^(NSModalResponse response) {
         BOOL allowed = response == NSAlertSecondButtonReturn;
         if (allowed)
@@ -1094,6 +1097,7 @@ static NSMenuItem* ASAddHelpLink(NSMenu* menu, NSString* title, NSString* identi
         completion(allowed);
         [self updateMainWindowConnectionState];
     }];
+    [[alert window] makeFirstResponder:cancel];
 }
 
 - (void)confirmReplace:(ASNode*)target with:(NSString*)path completion:(void (^)(BOOL))completion
