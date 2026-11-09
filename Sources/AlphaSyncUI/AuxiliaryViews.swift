@@ -7,9 +7,19 @@ public struct AboutView: View {
     private enum AboutLink: Hashable { case project, release, licence }
     @FocusState private var focusedLink: AboutLink?
     public init() {}
+    @MainActor
+    private var bundledIcon: NSImage {
+        // Load the selected artwork without the system application icon’s additional presentation.
+        if let file = Bundle.main.object(forInfoDictionaryKey: "CFBundleIconFile") as? String,
+           let url = Bundle.main.url(forResource: (file as NSString).deletingPathExtension, withExtension: "icns"),
+           let image = NSImage(contentsOf: url) {
+            return image
+        }
+        return NSApp.applicationIconImage
+    }
     public var body: some View {
         VStack(spacing: 20) {
-            Image(nsImage: NSApp.applicationIconImage).resizable().scaledToFit().frame(width: 96, height: 96).accessibilityHidden(true)
+            Image(nsImage: bundledIcon).renderingMode(.original).resizable().scaledToFit().frame(width: 96, height: 96).accessibilityHidden(true)
             VStack(spacing: 6) {
                 Text("AlphaSync").font(.largeTitle.bold())
                 Text("Version \(AppMetadata.version) (\(AppMetadata.build))")
