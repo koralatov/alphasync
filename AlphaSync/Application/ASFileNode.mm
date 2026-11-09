@@ -31,6 +31,7 @@
 #import "ASFileNode.h"
 #import "AQFileUtilities.h"
 #include <limits.h>
+#include <algorithm>
 #import "ASFileAttributes.h"
 #import "ASFile.h"
 #import "ASGenericFile.h"
@@ -62,14 +63,57 @@ static NSString* ASFileWriteMessage(const ASFileWriteError& error)
     }
 }
 
-static NSString* ASReadTextFile(NSString* path, NSString** error)
+static NSString* ASReadTextFile(NSString* path, ASDevice* device, const ASApplet* applet, NSString** error)
 {
     if (error) *error = nil;
+    unsigned minimum = 0, maximum = 0xffffff;
+    if (device && applet && !device->getFileSizeLimits(&minimum, &maximum, applet))
+    {
+        if (error) *error = @"AlphaSync couldn’t read the Neo’s maximum file size. Disconnect and reconnect the Neo, then try again. No files on the Neo have been changed.";
+        return nil;
+    }
+    // UTF-16, UTF-8, and CRLF can require more source bytes than the Neo format.
+    NSUInteger limit = (NSUInteger)std::min(uint64_t(maximum) * 4 + 65536, uint64_t(64 * 1024 * 1024));
+    NSString* tooLarge = [NSString stringWithFormat:@"This text file is too large to import. The Neo’s maximum file size is %@ after conversion. Shorten the text or split it into smaller files. No files on the Neo have been changed.", aq_FormattedByteCount(maximum)];
     NSError* readError = nil;
-    NSStringEncoding encoding;
-    NSString* text = [NSString stringWithContentsOfFile:path usedEncoding:&encoding error:&readError];
-    if (!text) text = [NSString stringWithContentsOfFile:path encoding:NSMacOSRomanStringEncoding error:&readError];
-    if (!text && error) *error = [NSString stringWithFormat:@"The text file could not be read: %@", [readError localizedDescription]];
+    NSURL* url = [NSURL fileURLWithPath:path];
+    NSNumber* size = nil;
+    if ([url getResourceValue:&size forKey:NSURLFileSizeKey error:&readError] && [size unsignedLongLongValue] > limit)
+    {
+        if (error) *error = tooLarge;
+        return nil;
+    }
+    NSFileHandle* handle = [NSFileHandle fileHandleForReadingFromURL:url error:&readError];
+    NSMutableData* data = [NSMutableData data];
+    if (handle)
+    {
+        while ([data length] <= limit)
+        {
+            NSData* part = [handle readDataUpToLength:MIN((NSUInteger)65536, limit + 1 - [data length]) error:&readError];
+            if (!part || ![part length]) break;
+            [data appendData:part];
+        }
+        NSError* closeError = nil;
+        if (![handle closeAndReturnError:&closeError] && !readError) readError = closeError;
+    }
+    if ([data length] > limit)
+    {
+        if (error) *error = tooLarge;
+        return nil;
+    }
+    if (!handle || readError)
+    {
+        if (error) *error = [NSString stringWithFormat:@"The text file could not be read: %@", [readError localizedDescription] ?: @"The file is unavailable."];
+        return nil;
+    }
+    NSString* text = nil;
+    BOOL lossy = NO;
+    [NSString stringEncodingForData:data encodingOptions:@{
+        NSStringEncodingDetectionSuggestedEncodingsKey: @[@(NSUTF8StringEncoding), @(NSUnicodeStringEncoding), @(NSUTF16LittleEndianStringEncoding), @(NSUTF16BigEndianStringEncoding)],
+        NSStringEncodingDetectionUseOnlySuggestedEncodingsKey: @YES
+    } convertedString:&text usedLossyConversion:&lossy];
+    if (!text || lossy) text = [[[NSString alloc] initWithData:data encoding:NSMacOSRomanStringEncoding] autorelease];
+    if (!text && error) *error = @"The text file could not be decoded as MacASCII, UTF-8, or UTF-16.";
     return text;
 }
 
@@ -181,7 +225,7 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
 {
     ASFileNode* fileNode = nil;
     ASFile* file = 0;
-    NSString* contentsOfPath = ASReadTextFile(path, error);
+    NSString* contentsOfPath = ASReadTextFile(path, device, applet, error);
     if (contentsOfPath)
     {
         switch (applet->appletID())
@@ -637,7 +681,7 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
     BOOL result = FALSE;
 
     NSString* readError = nil;
-    NSString* contentsOfPath = ASReadTextFile(path, &readError);
+    NSString* contentsOfPath = ASReadTextFile(path, device, applet, &readError);
     if (!contentsOfPath) [self setOperationError:readError];
     if (contentsOfPath)
     {
