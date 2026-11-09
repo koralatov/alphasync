@@ -13,6 +13,9 @@ The [frozen 1.5.1 checklist](https://github.com/koralatov/alphasync/blob/v1.5.1/
 | macOS 13, Apple Silicon, Apple Silicon | Minimum runtime, physical Neo, and helper | Not run |
 | Later macOS, Intel, Universal | Physical transfers and full interface | Not run |
 | Later macOS, Apple Silicon, both editions | Physical transfers, full interface, and helper | Not run |
+| macOS 27, edition and architecture not specified | General operation | Reported working by Mike on 9 November 2026; individual transfer and helper checks not specified |
+
+The macOS 27 report does not identify the build, source commit, exact system version, or Neo model.  It leaves the macOS 13 runtime checks outstanding.
 
 Use known-good independent backups and disposable Neo files for writing checks. Install and test one edition at a time. Preserve the original files separately.
 
