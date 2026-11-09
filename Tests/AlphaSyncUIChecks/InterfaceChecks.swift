@@ -17,21 +17,21 @@ struct InterfaceChecks {
     struct AccessibleElement {
         let object: NSObject
         // Public accessibility getters do not require formal protocol conformance.
-        func value(_ key: String, getter: Selector) -> Any? {
-            guard object.responds(to: getter) else { return nil }
+        func value(_ key: String, getter: String? = nil) -> Any? {
+            guard object.responds(to: NSSelectorFromString(getter ?? key)) else { return nil }
             return object.value(forKey: key)
         }
-        var role: String? { value("accessibilityRole", getter: #selector(NSAccessibilityProtocol.accessibilityRole)) as? String }
-        var title: String? { value("accessibilityTitle", getter: #selector(NSAccessibilityProtocol.accessibilityTitle)) as? String }
-        var label: String? { value("accessibilityLabel", getter: #selector(NSAccessibilityProtocol.accessibilityLabel)) as? String }
+        var role: String? { value("accessibilityRole") as? String }
+        var title: String? { value("accessibilityTitle") as? String }
+        var label: String? { value("accessibilityLabel") as? String }
         var enabled: Bool {
-            (value("accessibilityEnabled", getter: #selector(NSAccessibilityProtocol.isAccessibilityEnabled)) as? NSNumber)?.boolValue ?? false
+            (value("accessibilityEnabled", getter: "isAccessibilityEnabled") as? NSNumber)?.boolValue ?? false
         }
         var frame: NSRect? {
-            (value("accessibilityFrame", getter: #selector(NSAccessibilityProtocol.accessibilityFrame)) as? NSValue)?.rectValue
+            (value("accessibilityFrame") as? NSValue)?.rectValue
         }
         var children: [Any] {
-            value("accessibilityChildren", getter: #selector(NSAccessibilityProtocol.accessibilityChildren)) as? [Any] ?? []
+            value("accessibilityChildren") as? [Any] ?? []
         }
     }
     static func accessibilityElements(_ root: Any) -> [AccessibleElement] {
