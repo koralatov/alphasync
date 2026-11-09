@@ -67,6 +67,7 @@
     ASBackupController* backupController;
     ASDeviceController* deviceController;
     ASInspectorWindowController* inspectorController;
+    ASFileNode* inspectorPreviewFile;
     ASAboutWindowController* aboutController;
     NSMutableArray* fileViewWindows;
     NSPoint fileViewCascadePoint;

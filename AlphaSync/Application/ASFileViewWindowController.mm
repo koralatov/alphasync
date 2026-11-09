@@ -137,6 +137,7 @@ static NSString* const ASFileViewMonospacedKey = @"FileViewerMonospaced";
         return text;
     } completion:^(id result, NSString* error) {
         // Closing a loading window must not reopen it when the USB read finishes.
+        if (!error && [result isKindOfClass:[NSString class]]) [file cacheDisplayText:result];
         if (!closed) [self showText:result error:error];
     }];
 }

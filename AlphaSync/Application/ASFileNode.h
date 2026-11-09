@@ -68,6 +68,8 @@
 
 - (BOOL)fileIsPlainText;
 - (NSString*)fileData;
+- (BOOL)hasCompleteText;
+- (void)cacheDisplayText:(NSString*)text;
 - (BOOL)setFileData:(NSString*)data error:(NSString**)error;
 - (NSString*)saveUnderPath:(NSString*)path error:(NSString**)error;
 

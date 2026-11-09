@@ -148,6 +148,7 @@ static NSMenuItem* ASAddHelpLink(NSMenu* menu, NSString* title, NSString* identi
     [preferenceController release];
     [aboutController release];
     [fileViewWindows release];
+    [inspectorPreviewFile release];
     [deviceController release];
     [statusDisplayTimer invalidate];
     [launcherInstallPath release];
@@ -407,6 +408,21 @@ static NSMenuItem* ASAddHelpLink(NSMenu* menu, NSString* title, NSString* identi
     }
 
     [inspectorController setDisplay:array];
+    ASFileNode* file = [array count] == 1 && [array[0] isKindOfClass:[ASFileNode class]] ? array[0] : nil;
+    if (file != inspectorPreviewFile)
+    {
+        [inspectorPreviewFile release]; inspectorPreviewFile = nil;
+    }
+    if (file && [[inspectorController window] isVisible] && ![file hasCompleteText] && file != inspectorPreviewFile && ![deviceController isBusy])
+    {
+        inspectorPreviewFile = [file retain];
+        [deviceController performTaskForNode:file refresh:NO task:^id(ASNode* working) {
+            return [(ASFileNode*)working fileData];
+        } completion:^(id result, NSString* error) {
+            if (!error) [file cacheDisplayText:result];
+            if (file == inspectorPreviewFile) [self updateInspectorDisplay];
+        }];
+    }
 }
 
 
@@ -438,8 +454,8 @@ static NSMenuItem* ASAddHelpLink(NSMenu* menu, NSString* title, NSString* identi
     (void)sender;
 
     if (! inspectorController) inspectorController = [[ASInspectorWindowController alloc] init];
-    [self updateInspectorDisplay];
     [inspectorController showWindow:self];
+    [self updateInspectorDisplay];
 }
 
 - (IBAction)actionOpenFile:(id)sender

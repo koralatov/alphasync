@@ -76,7 +76,8 @@ using namespace ts;
             NSString* extension;
             [(ASFileNode*)item getFileNameBase:&name extension:&extension];
             name = [name stringByAppendingPathExtension:extension];
-            if ([(ASFileNode*)item fileIsPlainText]) plainText = [[(ASFileNode*)item fileData] copy];
+            if ([(ASFileNode*)item fileIsPlainText] && [(ASFileNode*)item hasCompleteText])
+                plainText = [[(ASFileNode*)item fileData] copy];
         }
         name = [name stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
         filename = [(([name length] && ![name isEqualToString:@"."] && ![name isEqualToString:@".."]) ? name : @"Untitled") copy];

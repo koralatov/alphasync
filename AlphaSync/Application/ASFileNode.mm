@@ -296,14 +296,14 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
 - (void)copyDisplayFieldsTo:(ASNode*)value
 {
     ASFileNode* snapshot = (ASFileNode*)value;
-    // Cache plain text while still on the device queue.  Inspectors and pasteboards then need no USB access.
-    if (fileIsPlainText) [self fileData];
+    // Display snapshots never cause a USB read.
     snapshot->device = device;
     snapshot->applet = new ASApplet(*applet);
     snapshot->fileAttributes = new ASFileAttributes(*fileAttributes);
     snapshot->fileIndex = fileIndex;
     snapshot->fileExtension = fileExtension;
     snapshot->fileIsPlainText = fileIsPlainText;
+    snapshot->fileIsSynchronised = fileIsSynchronised;
     snapshot->filePreview = [filePreview copy];
 }
 
@@ -371,23 +371,7 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
             [filePreview release];
             filePreview = nil;
 
-            if (fileIsPlainText && fileData->minimumLoadSize() != 0 && fileData->minimumLoadSize() <= 128)
-            {
-                if (fileData->load(device, applet, fileIndex, 128))
-                {
-                    const uint16_t* unicodeData;
-                    unsigned unicodeSize;
-                    if (!fileData->exportText(&unicodeData, &unicodeSize))
-                    {
-                        NSLog(@"Error translating text data from file %d for applet ID %04x", fileIndex, applet->appletID());
-                    }
-                    else
-                    {
-                        if (unicodeSize > 0) filePreview = [[NSString stringWithCharacters:unicodeData length:unicodeSize/2] retain];
-                        else filePreview = @"";
-                    }
-                }
-            }
+
         }
     }
     else
@@ -555,6 +539,16 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
     }
 
     return result;
+}
+
+- (BOOL)hasCompleteText { return fileIsSynchronised; }
+
+- (void)cacheDisplayText:(NSString*)text
+{
+    if (!displayOnly || !text) return;
+    [filePreview release];
+    filePreview = [text copy];
+    fileIsSynchronised = YES;
 }
 
 
