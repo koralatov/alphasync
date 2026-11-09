@@ -27,7 +27,7 @@ public enum AppActions {
     }
     public static func find(_ action: NSFindPanelAction) {
         let sender = NSMenuItem(title: "Find", action: nil, keyEquivalent: "")
-        sender.tag = action.rawValue
+        sender.tag = Int(action.rawValue)
         NSApp.sendAction(#selector(NSTextView.performFindPanelAction(_:)), to: nil, from: sender)
     }
 }

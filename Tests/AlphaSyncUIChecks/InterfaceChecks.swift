@@ -51,7 +51,7 @@ struct InterfaceChecks {
         let id = UUID()
         applet.limits = try NeoFileLimits(minimum: 512, maximum: 51_200)
         applet.files = try (0..<8).map { index in
-            NeoFile(id: NeoFileID(connection: id, applet: applet.id, index: UInt8(index)),
+            NeoFile(id: NeoFileID(connection: id, applet: applet.id, index: UInt8(index + 1)),
                     attributes: try NeoFileAttributes(name: "File \(index + 1)", fileSpace: index + 1), size: 512 + index * 1024)
         }
         return NeoSnapshot(connection: id, registryID: 1, systemVersion: "3.6", availableRAM: 378_880, availableROM: 1_048_576, applets: [applet])
