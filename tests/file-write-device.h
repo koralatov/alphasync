@@ -19,7 +19,10 @@ public:
     unsigned freeRAM = 300 * 1024, allocation = 1024;
     unsigned attributeWrites = 0, fileWrites = 0;
     bool corruptReadback = false;
+    bool rejectAttributeWrites = false, ignoreAttributeChanges = false;
     std::vector<uint8_t> saved = std::vector<uint8_t>(1024, 'o');
+
+    FileWriteDevice() { storedAttributes.setFileName("Existing"); }
 
     static ts::ASApplet alphaWord()
     {
@@ -52,6 +55,11 @@ protected:
         {
             if (length != blockBytes) std::abort();
             if (writingFile) pending.insert(pending.end(), bytes, bytes + length);
+            else if (!ignoreAttributeChanges)
+            {
+                if (length != kASFileAttributesSize) std::abort();
+                storedAttributes.copyFrom(bytes);
+            }
             blockBytes = 0;
             reply(ASMESSAGE_RESPONSE_BLOCK_WRITE_DONE);
             return true;
@@ -104,8 +112,7 @@ protected:
             case ASMESSAGE_REQUEST_GET_FILE_ATTRIBUTES:
             {
                 if (!filePresent || request.argument(1, 4) != 1) { reply(ASMESSAGE_ERROR_PARAMETER); break; }
-                ts::ASFileAttributes attributes;
-                attributes.setFileName("Existing");
+                ts::ASFileAttributes attributes(storedAttributes);
                 attributes.setAllocSize(allocation);
                 replyData(ASMESSAGE_RESPONSE_GET_FILE_ATTRIBUTES, attributes.rawData(), kASFileAttributesSize);
                 break;
@@ -113,7 +120,7 @@ protected:
             case ASMESSAGE_REQUEST_SET_FILE_ATTRIBUTES:
                 ++attributeWrites;
                 writingFile = false;
-                reply(ASMESSAGE_RESPONSE_SET_FILE_ATTRIBUTES);
+                reply(rejectAttributeWrites ? ASMESSAGE_ERROR_PARAMETER : ASMESSAGE_RESPONSE_SET_FILE_ATTRIBUTES);
                 break;
             case ASMESSAGE_REQUEST_COMMIT:
                 reply(ASMESSAGE_RESPONSE_COMMIT);
@@ -157,6 +164,7 @@ protected:
 private:
     std::deque<std::vector<uint8_t>> responses;
     std::vector<uint8_t> pending;
+    ts::ASFileAttributes storedAttributes;
     bool writingFile = false;
     unsigned blockBytes = 0;
     unsigned readOffset = 0, readLimit = 0;

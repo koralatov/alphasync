@@ -138,6 +138,29 @@ static void checkImportLimits(NSString* directory)
     [file release];
 }
 
+static void checkRenamingAndClearing(void)
+{
+    FileWriteDevice device;
+    TestWritableFileNode* file = [[TestWritableFileNode alloc] initWithTestDevice:&device];
+    for (NSString* invalid in @[@"", @"🙂", @"SixteenCharacters", @"Line\nbreak"])
+    {
+        CHECK(![file setFileName:invalid] && [file operationError]);
+        CHECK(!device.attributeWrites && !device.fileWrites);
+    }
+    device.rejectAttributeWrites = true;
+    CHECK(![file setFileName:@"New name"] && [[file operationError] containsString:@"could not confirm"]);
+    device.rejectAttributeWrites = false;
+    device.ignoreAttributeChanges = true;
+    CHECK(![file setFileName:@"New name"] && [[file operationError] containsString:@"could not confirm"]);
+    device.ignoreAttributeChanges = false;
+    CHECK([[file setFileName:@"New name"] isEqualToString:@"New name"] && ![file operationError]);
+    CHECK(!device.fileWrites);
+    CHECK([file deleteSelf] && ![file operationError]);
+    device.corruptReadback = true;
+    CHECK(![file deleteSelf] && [[file operationError] containsString:@"could not be verified"]);
+    [file release];
+}
+
 static void checkExport(ASFileNode* node, NSString* directory, NSData* expected)
 {
     NSString* error = nil;
@@ -162,6 +185,7 @@ int main()
         NSString* directory = [NSTemporaryDirectory() stringByAppendingPathComponent:[[NSUUID UUID] UUIDString]];
         CHECK([manager createDirectoryAtPath:directory withIntermediateDirectories:YES attributes:nil error:nil]);
         checkImportLimits(directory);
+        checkRenamingAndClearing();
         NSUserDefaults* preferences = [NSUserDefaults standardUserDefaults];
         id previous = [[preferences objectForKey:@"TextEncoding"] retain];
 

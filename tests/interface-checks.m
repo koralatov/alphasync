@@ -585,6 +585,7 @@ static void checkBackupLogs(id controller, NSWindowController* backup)
                 requireInterface([manager fileExistsAtPath:log] == (scenario != 0), @"Backup logs did not follow the option captured at the start.");
                 if (scenario == 0) continue;
                 NSDictionary* contents = [NSPropertyListSerialization propertyListWithData:[NSData dataWithContentsOfFile:log] options:0 format:NULL error:NULL];
+                requireInterface([contents[@"formatVersion"] isEqual:@2], @"The backup log is not using relative-path format version 2.");
                 NSArray* entries = contents[@"files"];
                 NSString* expected = scenario == 2 && device == 1 ? @"cancelled" :
                                      (scenario == 3 && device == 0 ? @"completed with failures" : @"complete");
@@ -594,7 +595,8 @@ static void checkBackupLogs(id controller, NSWindowController* backup)
                     NSString* name = device == 0 ? @"First Neo" : @"Second Neo";
                     requireInterface([entry[@"device"] isEqualToString:name], @"A log contains another Neo’s files.");
                     if ([entry[@"status"] isEqualToString:@"saved"])
-                        requireInterface([manager fileExistsAtPath:entry[@"path"]], @"A log lists a file that was not saved.");
+                        requireInterface(![entry[@"path"] isAbsolutePath] && [manager fileExistsAtPath:[paths[device] stringByAppendingPathComponent:entry[@"path"]]],
+                                         @"A relative log path no longer resolves after completing the backup folder.");
                 }
                 if (scenario == 2 && device == 1)
                     requireInterface([entries[1][@"status"] isEqualToString:@"pending"], @"A cancelled log lost its pending file.");
