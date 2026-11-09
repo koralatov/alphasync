@@ -28,7 +28,8 @@ jobs:
           persist-credentials: false
       - name: Select the pinned compiler
         run: |
-          selected_developer=/Applications/Xcode_26.6.app/Contents/Developer
+          selected_xcode=$(cat .xcode-version)
+          selected_developer="/Applications/Xcode_$selected_xcode.app/Contents/Developer"
           test -d "$selected_developer"
           printf 'DEVELOPER_DIR=%s\n' "$selected_developer" >> "$GITHUB_ENV"
       - name: Record the source and host

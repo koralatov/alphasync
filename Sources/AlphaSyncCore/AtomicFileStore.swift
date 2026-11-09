@@ -65,7 +65,8 @@ public enum AtomicFileStore {
             }
         }
         guard fsync(descriptor) == 0 else { throw posixError() }
-        let closed = close(descriptor); opened = false
+        let closed = close(descriptor)
+        opened = false
         guard closed == 0 else { throw posixError() }
         let base = safeComponent(name), ext = safeComponent(suffix)
         for number in 0..<10000 {

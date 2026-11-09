@@ -1,0 +1,83 @@
+name: Swift regression checks
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_commit:
+        description: Full source commit to check without building app bundles
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  regressions:
+    name: Regressions (${{ matrix.host }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - host: Apple Silicon
+            runner: macos-26
+            xcode: canonical
+          - host: Intel
+            runner: macos-15-intel
+            xcode: '16.4'
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+    steps:
+      - name: Require an exact source commit
+        env:
+          SOURCE_COMMIT: ${{ inputs.source_commit }}
+        run: '[[ "$SOURCE_COMMIT" =~ ^[0-9a-f]{40}$ ]]'
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ inputs.source_commit }}
+          persist-credentials: false
+      - name: Select the compiler
+        env:
+          XCODE_VERSION: ${{ matrix.xcode }}
+        run: |
+          if [[ "$XCODE_VERSION" == canonical ]]; then XCODE_VERSION=$(cat .xcode-version); fi
+          selected_developer="/Applications/Xcode_$XCODE_VERSION.app/Contents/Developer"
+          test -d "$selected_developer"
+          printf 'DEVELOPER_DIR=%s\n' "$selected_developer" >> "$GITHUB_ENV"
+      - name: Record the source and host
+        env:
+          SOURCE_COMMIT: ${{ inputs.source_commit }}
+        run: |
+          test "$(git rev-parse HEAD)" = "$SOURCE_COMMIT"
+          mkdir -p build/regression-checks
+          {
+            git rev-parse HEAD
+            sw_vers
+            uname -m
+            xcodebuild -version
+          } > build/regression-checks/source-and-host.txt
+      - name: Check generated project definitions
+        run: |
+          python3 scripts/generate-project.py
+          git diff --exit-code -- AlphaSync/AlphaSync.xcodeproj
+      - name: Compile the shared interface-check executable
+        run: |
+          set -o pipefail
+          swift build --product AlphaSyncUIChecks 2>&1 | tee build/regression-checks/compile.log
+      - name: Run core and simulated device regressions
+        run: |
+          set -o pipefail
+          swift test --parallel 2>&1 | tee build/regression-checks/tests.log
+      - name: Check package validation with disposable fixtures
+        run: |
+          set -o pipefail
+          python3 Tests/Packaging/check-packages.py 2>&1 | tee build/regression-checks/packages.log
+      - name: Check native interface behaviour
+        run: |
+          set -o pipefail
+          swift run --skip-build AlphaSyncUIChecks build/regression-checks/interface 2>&1 | tee build/regression-checks/interface.log
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: AlphaSync-regression-checks-${{ matrix.runner }}-${{ github.run_id }}
+          path: build/regression-checks/**
+          if-no-files-found: warn

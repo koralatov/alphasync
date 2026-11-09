@@ -6,7 +6,7 @@ public struct DiscoveryResult: Sendable {
     public let issue: String?
 }
 
-/// The only unchecked boundary: every mutable field and all USB handles are confined to queue.
+/// The USB concurrency boundary: mutable connection state and handles are confined to queue.
 /// The main actor receives immutable Sendable snapshots and never a driver or registry pointer.
 public final class DeviceService: @unchecked Sendable {
     private let queue = DispatchQueue(label: "com.koralatov.alphasync.usb", qos: .userInitiated)
@@ -34,7 +34,10 @@ public final class DeviceService: @unchecked Sendable {
             try Task.checkCancellation()
             return try await withCheckedThrowingContinuation { continuation in
                 queue.async { [self] in
-                    guard !stopping else { continuation.resume(throwing: NeoError.disconnected); return }
+                    guard !stopping else {
+                        continuation.resume(throwing: NeoError.disconnected)
+                        return
+                    }
                     do {
                         let access = IsolatedDeviceAccess(service: self, cancellation: cancellation)
                         try access.checkCancellation()
@@ -66,7 +69,9 @@ public final class DeviceService: @unchecked Sendable {
         await withCheckedContinuation { continuation in
             queue.async { [self] in
                 stopping = true
-                for item in connections.values { item.engine.close() }
+                for item in connections.values {
+                    item.engine.close()
+                }
                 connections.removeAll()
                 continuation.resume()
             }

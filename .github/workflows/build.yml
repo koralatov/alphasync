@@ -20,7 +20,7 @@ jobs:
         include:
           - host: Apple Silicon
             runner: macos-26
-            xcode: '26.6'
+            xcode: canonical
             package: true
           - host: Intel
             runner: macos-15-intel
@@ -36,6 +36,7 @@ jobs:
         env:
           XCODE_VERSION: ${{ matrix.xcode }}
         run: |
+          if [[ "$XCODE_VERSION" == canonical ]]; then XCODE_VERSION=$(cat .xcode-version); fi
           selected_developer="/Applications/Xcode_$XCODE_VERSION.app/Contents/Developer"
           test -d "$selected_developer"
           printf 'DEVELOPER_DIR=%s\n' "$selected_developer" >> "$GITHUB_ENV"

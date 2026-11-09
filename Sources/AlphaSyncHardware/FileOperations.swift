@@ -6,7 +6,9 @@ public struct RecoveryOptions: Sendable {
     public let folder: URL
     public let retentionDays: Int
     public init(enabled: Bool, folder: URL, retentionDays: Int) {
-        self.enabled = enabled; self.folder = folder; self.retentionDays = retentionDays
+        self.enabled = enabled
+        self.folder = folder
+        self.retentionDays = retentionDays
     }
 }
 
@@ -20,7 +22,6 @@ public struct PreparedChange: Identifiable, Sendable {
     public let connection: UUID
     public let applet: NeoApplet
     public let items: [Item]
-    public let sourceName: String?
     public let title: String
     public let action: String
     public let explanation: String
@@ -29,14 +30,6 @@ public struct PreparedChange: Identifiable, Sendable {
 public struct ChangeResult: Sendable {
     public let snapshot: NeoSnapshot
     public let recoveryFolder: URL?
-}
-
-public final class StopRequest: @unchecked Sendable {
-    private let lock = NSLock()
-    private var requested = false
-    public init() {}
-    public func stop() { lock.lock(); requested = true; lock.unlock() }
-    public var isRequested: Bool { lock.lock(); defer { lock.unlock() }; return requested }
 }
 
 public struct BackupResult: Sendable {
@@ -57,11 +50,12 @@ extension DeviceService {
             let engine = try access.engine(for: file.connection)
             let limits = try engine.fileLimits(applet: file.applet)
             let replacement = try FileCodec.converted(TextFiles.read(source), applet: file.applet, limits: limits)
-            let memory = try engine.availableMemory(), attributes = try engine.attributes(applet: file.applet, index: file.index)
+            let memory = try engine.availableMemory()
+            let attributes = try engine.attributes(applet: file.applet, index: file.index)
             try limits.validate(replacement.count, allocation: attributes.allocation, available: memory.ram)
             let original = try engine.readFile(applet: file.applet, index: file.index)
             return PreparedChange(connection: file.connection, applet: applet,
-                                  items: [.init(file: node, original: original, replacement: replacement)], sourceName: source.lastPathComponent,
+                                  items: [.init(file: node, original: original, replacement: replacement)],
                                   title: "Replace ‘\(node.displayName)’?", action: "Replace",
                                   explanation: "The text on your Neo will be replaced with ‘\(source.lastPathComponent)’. This cannot be undone.")
         }
@@ -75,14 +69,15 @@ extension DeviceService {
             }
             let files = applet.files.filter { selected?.contains($0.id) ?? true }
             guard !files.isEmpty, selected == nil || Set(files.map(\.id)) == selected else { throw NeoError.disconnected }
-            let engine = try access.engine(for: connection), limits = try engine.fileLimits(applet: appletID)
+            let engine = try access.engine(for: connection)
+            let limits = try engine.fileLimits(applet: appletID)
             let empty = try FileCodec.converted("", applet: appletID, limits: limits)
             let items = try files.map { file in
                 PreparedChange.Item(file: file, original: try engine.readFile(applet: appletID, index: file.id.index), replacement: empty)
             }
             let all = selected == nil
             let title = all ? "Clear all files in ‘\(applet.name)’?" : (files.count == 1 ? "Clear ‘\(files[0].displayName)’?" : "Clear \(files.count.formatted()) selected files?")
-            return PreparedChange(connection: connection, applet: applet, items: items, sourceName: nil,
+            return PreparedChange(connection: connection, applet: applet, items: items,
                                   title: title, action: all ? "Clear All Files" : (files.count == 1 ? "Clear File" : "Clear Selected Files"),
                                   explanation: "The named contents on your Neo will be cleared. This cannot be undone.")
         }
@@ -163,8 +158,10 @@ extension DeviceService {
 
     private static func saveRecovery(_ change: PreparedChange, options: RecoveryOptions) throws -> URL {
         let root = options.folder.appendingPathComponent("Recovery Copies", isDirectory: true)
-        let now = Date(), formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US_POSIX"); formatter.calendar = Calendar(identifier: .gregorian)
+        let now = Date()
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.calendar = Calendar(identifier: .gregorian)
         formatter.dateFormat = "yyyy-MM-dd HH.mm.ss"
         let pending = try AtomicFileStore.createFolder(in: root, name: formatter.string(from: now) + " " + String(UUID().uuidString.prefix(8)), incomplete: true)
         var records: [[String: Any]] = []

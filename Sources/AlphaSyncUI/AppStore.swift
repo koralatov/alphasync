@@ -38,7 +38,6 @@ public final class AppStore: ObservableObject {
     @Published public var connectionIssue: String?
     @Published public var showImporter = false
     @Published public var showExportFolder = false
-    @Published public var showInspector = false
     @Published public private(set) var shuttingDown = false
     @Published private var activities = 0
     public let preferences: Preferences
@@ -125,14 +124,28 @@ public final class AppStore: ObservableObject {
         reconcileSelection()
     }
     private func run(_ title: String, _ action: @MainActor () async throws -> Void) async {
-        guard !busy else { notice = AppNotice("Please wait", "Wait for the current transfer to finish, then try again."); return }
-        activities += 1; epoch += 1; operationText = title
-        defer { activities -= 1; operationText = ""; progress = nil; stopRequest = nil }
+        guard !busy else {
+            notice = AppNotice("Please wait", "Wait for the current transfer to finish, then try again.")
+            return
+        }
+        activities += 1
+        epoch += 1
+        operationText = title
+        defer {
+            activities -= 1
+            operationText = ""
+            progress = nil
+            stopRequest = nil
+        }
         do { try await action() }
         catch {
             if error is CancellationError { return }
             notice = AppNotice("The operation could not be completed", error.localizedDescription)
-            if let result = try? await service.refresh() { devices = result.devices; connectionIssue = result.issue; reconcileSelection() }
+            if let result = try? await service.refresh() {
+                devices = result.devices
+                connectionIssue = result.issue
+                reconcileSelection()
+            }
         }
     }
     public func refresh() async {
@@ -145,7 +158,8 @@ public final class AppStore: ObservableObject {
         try Task.checkCancellation()
         guard !shuttingDown else { throw NeoError.cancelled }
         guard let applet = applet(for: id) else { throw NeoError.disconnected }
-        activities += 1; epoch += 1
+        activities += 1
+        epoch += 1
         defer { activities -= 1 }
         let bytes = try await service.read(id)
         try Task.checkCancellation()
@@ -235,9 +249,12 @@ public final class AppStore: ObservableObject {
     }
     public func shutdown() async {
         shuttingDown = true
-        monitor?.cancel(); monitor = nil
+        monitor?.cancel()
+        monitor = nil
         stopRequest?.stop()
-        while activities > 0 { try? await Task.sleep(for: .milliseconds(50)) }
+        while activities > 0 {
+            try? await Task.sleep(for: .milliseconds(50))
+        }
         await service.shutdown()
     }
 }

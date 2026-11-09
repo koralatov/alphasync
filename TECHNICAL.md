@@ -55,6 +55,10 @@ swift run --skip-build AlphaSyncUIChecks build/interface-checks
 
 Core regressions cover wire frames, truncated replies, character conversion, UTF-16 byte orders, dictionary bounds, unsupported text, file limits, low memory, exclusive exports, and incomplete folders. Simulated transfer checks include multi-block writes, read-back mismatches, changed originals, and a 2 MB import rejected before file-writing commands.
 
+The [manual regression workflow](.github/workflows/regression-checks.yml) checks an exact source commit on Intel and Apple Silicon without building app bundles or downloads.  It compiles the shared libraries and interface-check executable, runs core and simulated device-service tests, validates disposable package fixtures, and retains logs and interface captures.  Canonical CI reads `.xcode-version`; the Intel compatibility compiler remains an explicit separate pin.
+
+Device-service tests inject discovery and connection adapters created on the same serial executor used for real USB work.  They cover stale connection identities, recovery failure blocking writes, retained originals after a partial clear, verified creation followed by a failed refresh, incomplete backups, and cancellation.  The system attachment adapter owns and releases registry references; simulated adapters never open USB devices.
+
 The separate interface executable uses disposable sample snapshots and private preferences. It never opens a Neo or registers a login item. It checks native read-only text, fonts, and Return and Space handling for Clear and Replace, and captures the interface in Light and Dark appearances. This code is excluded from shipping app targets. Cached view images do not capture every system-composited toolbar or sidebar effect. Physical keyboard, accessibility, window-transition, and USB checks remain in the [manual checklist](tests/manual-checks.md).
 
 ```sh
@@ -75,6 +79,10 @@ There is no public `CommunicationUserHIDService` API in the SDK. A HID-only file
 The transport uses the public SDK’s refined Swift entry points, which import some Objective-C selectors with a double underscore. This is Apple’s `NS_REFINED_FOR_SWIFT` naming, not a private framework call. Endpoint descriptors are inspected only at the transport boundary. Binary messages and file contents use bounded Swift buffers.
 
 All USB handles, protocol transactions, and connection state belong to one serial executor. Async methods return immutable `Sendable` snapshots to the main actor. Reconnection creates a new UUID, so a queued request cannot be applied to a different connection. Only metadata is polled for unchanged devices; refresh and file reads are explicit operations. The launch helper reads registry metadata only and leaves mode changes and transfers to the main app.
+
+Failed keyboard-mode handoffs remain visible until explicit retry or detachment.  Background scans do not repeatedly send a failed handoff sequence.  Cancelled requests are skipped before execution, and read-only transfers check cancellation between file blocks.  Once a writing operation starts, writing and read-back verification are allowed to finish.  Transfer deadlines use `ContinuousClock`, while backup dates and retention continue to use calendar time.
+
+File-operation failures retain the underlying error, completed and verified file count, possible unverified write, and recovery location as structured values.  Presentation does not inspect English error sentences to infer whether device contents changed.
 
 ## Imports, exports, and file protection
 
