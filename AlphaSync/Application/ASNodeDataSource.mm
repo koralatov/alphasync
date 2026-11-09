@@ -313,9 +313,10 @@ static NSArray* filePathsFromPasteboard(NSPasteboard* pasteboard)
     BOOL replace = [item isKindOfClass:[ASFileNode class]];
     void (^start)(BOOL) = ^(BOOL allowed) {
         if (!allowed || [deviceController isBusy]) return;
-        [deviceController performTaskForNode:item refresh:YES task:^id(ASNode* working) {
+        id (^work)(ASNode*) = ^id(ASNode* working) {
             return @([(id<ASLoadProtocol>)working loadFromPaths:paths] > 0);
-        } completion:^(id result, NSString* error) {
+        };
+        void (^done)(id, NSString*) = ^(id result, NSString* error) {
             (void)result;
             if ([delegate conformsToProtocol:@protocol(ASDeviceAccessProtocol)])
             {
@@ -323,7 +324,9 @@ static NSArray* filePathsFromPasteboard(NSPasteboard* pasteboard)
                 else [delegate deviceDidLoad:paths[0] error:error sender:item];
             }
             [outlineView reloadData];
-        }];
+        };
+        if (replace) [deviceController performProtectedTaskForNode:item refresh:YES task:work completion:done];
+        else [deviceController performTaskForNode:item refresh:YES task:work completion:done];
     };
     if (replace && [delegate conformsToProtocol:@protocol(ASDeviceAccessProtocol)])
         [delegate confirmReplace:item with:paths[0] completion:start];

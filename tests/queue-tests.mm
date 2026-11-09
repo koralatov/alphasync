@@ -1,5 +1,6 @@
 #import "../AlphaSync/Application/ASDeviceController.h"
 #include <cstdio>
+#import "AQFileUtilities.h"
 #include <cstdlib>
 #define CHECK(value) do { if (!(value)) { std::fprintf(stderr, "%s:%d: %s\n", __FILE__, __LINE__, #value); std::abort(); } } while (false)
 
@@ -13,6 +14,7 @@
 @end
 @interface TestDeviceNode : ASDeviceNode
 - (id)initWithTestDevice:(ts::ASDevice*)value;
+@property BOOL failRecovery;
 @end
 @implementation TestDeviceNode
 - (id)initWithTestDevice:(ts::ASDevice*)value
@@ -24,6 +26,11 @@
         [self setDisplayName:@"Test Neo"];
     }
     return self;
+}
+- (NSString*)saveUnderPath:(NSString*)path
+{
+    if (_failRecovery) return nil;
+    return aq_WriteUniqueFile(path, @"Original", @"txt", [@"Keep this text" dataUsingEncoding:NSUTF8StringEncoding], NULL);
 }
 @end
 
@@ -91,6 +98,32 @@ int main()
         pumpUntil(^BOOL { return completed == 2; });
         CHECK(order == 2 && ![controller isBusy]);
 
+        NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+        NSString* recoveryRoot = [NSTemporaryDirectory() stringByAppendingPathComponent:[[NSUUID UUID] UUIDString]];
+        NSDictionary* oldDefaults = [[defaults dictionaryRepresentation] copy];
+        [defaults setObject:recoveryRoot forKey:@"BackupFolder"];
+        [defaults setBool:YES forKey:@"SaveRecoveryCopies"];
+        [defaults setInteger:0 forKey:@"RecoveryRetentionDays"];
+        __block BOOL modified = NO;
+        [controller performProtectedTaskForNode:display refresh:NO task:^id(ASNode* node) {
+            (void)node; modified = YES; return @YES;
+        } completion:^(id result, NSString* error) { CHECK(result && !error); ++completed; }];
+        pumpUntil(^BOOL { return completed == 3; });
+        CHECK(modified);
+        NSArray* copies = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[recoveryRoot stringByAppendingPathComponent:@"Recovery Copies"] error:nil];
+        CHECK([copies count] == 1 && ![copies[0] hasSuffix:@" (Incomplete)"]);
+        [worker setFailRecovery:YES];
+        modified = NO;
+        [controller performProtectedTaskForNode:display refresh:NO task:^id(ASNode* node) {
+            (void)node; modified = YES; return @YES;
+        } completion:^(id result, NSString* error) { CHECK(!result && [error containsString:@"No files on the Neo have been changed"]); ++completed; }];
+        pumpUntil(^BOOL { return completed == 4; });
+        CHECK(!modified);
+        for (NSString* key in @[@"BackupFolder", @"SaveRecoveryCopies", @"RecoveryRetentionDays"])
+            if (oldDefaults[key]) [defaults setObject:oldDefaults[key] forKey:key]; else [defaults removeObjectForKey:key];
+        [oldDefaults release];
+        CHECK([[NSFileManager defaultManager] removeItemAtPath:recoveryRoot error:nil]);
+
         // Disconnect between two queued requests.  The later request must never touch
         // the old device, even though its display copy is still retained by the caller.
         __block BOOL staleTaskExecuted = NO;
@@ -105,7 +138,7 @@ int main()
             (void)node; staleTaskExecuted = YES; return @YES;
         } completion:^(id result, NSString* error) { CHECK(!result && error); ++completed; }];
         dispatch_semaphore_signal(proceed);
-        pumpUntil(^BOOL { return completed == 4; });
+        pumpUntil(^BOOL { return completed == 6; });
         CHECK(!staleTaskExecuted && [[controller systemRoot] numberOfChildren] == 0);
         __block BOOL stopped = NO;
         [controller shutdownWithCompletion:^{ CHECK([NSThread isMainThread]); stopped = YES; }];

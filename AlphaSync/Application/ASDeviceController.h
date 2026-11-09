@@ -69,6 +69,8 @@
 - (void)performTaskForNode:(ASNode*)node refresh:(BOOL)refresh task:(id (^)(ASNode*))task
                completion:(void (^)(id result, NSString* error))completion;
 - (BOOL)isBusy;
+- (void)performProtectedTaskForNode:(ASNode*)node refresh:(BOOL)refresh task:(id (^)(ASNode*))task
+                       completion:(void (^)(id result, NSString* error))completion;
 - (void)shutdownWithCompletion:(void (^)(void))completion;
 
 - (BOOL)enable;

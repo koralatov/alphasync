@@ -57,6 +57,8 @@
     NSPathControl* backupFolderPath;
     NSButton* chooseFolderButton;
     NSButton* saveBackupLogsButton;
+    NSButton* saveRecoveryCopiesButton;
+    NSPopUpButton* recoveryRetention;
     NSButton* outletAutoRun;
 
     NSTextField* automaticLaunchStatusField;
@@ -69,6 +71,8 @@
 - (IBAction)actionFilterOption:(id)sender;
 - (IBAction)actionBackupFolder:(id)sender;
 - (IBAction)actionSaveBackupLogs:(id)sender;
+- (IBAction)actionRecoveryPreference:(id)sender;
+- (IBAction)actionOpenRecoveryCopies:(id)sender;
 - (IBAction)actionAutoRun:(id)sender;
 - (IBAction)actionPreferenceHelp:(id)sender;
 

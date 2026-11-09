@@ -33,6 +33,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/stat.h>
 #include "AQFileUtilities.h"
 
 /** Create a directory tree, with intermediate directories.
@@ -67,6 +68,14 @@ BOOL aq_RenameItemExclusively(NSString* source, NSString* destination, NSError**
 {
     if (error) *error = nil;
     if (renamex_np([source fileSystemRepresentation], [destination fileSystemRepresentation], RENAME_EXCL) == 0) return YES;
+    if (error) *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:nil];
+    return NO;
+}
+
+BOOL aq_CreatePrivateDirectory(NSString* path, NSError** error)
+{
+    if (error) *error = nil;
+    if (mkdir([path fileSystemRepresentation], 0700) == 0) return YES;
     if (error) *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:nil];
     return NO;
 }

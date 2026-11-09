@@ -203,11 +203,34 @@ static NSBox* ASPreferenceSeparator(void)
     [footer setAlignment:NSLayoutAttributeCenterY];
     [footer setSpacing:8];
 
+    saveRecoveryCopiesButton = [NSButton checkboxWithTitle:@"Save recovery copies by default" target:self action:@selector(actionRecoveryPreference:)];
+    [saveRecoveryCopiesButton setState:[[NSUserDefaults standardUserDefaults] boolForKey:@"SaveRecoveryCopies"] ? NSControlStateValueOn : NSControlStateValueOff];
+    recoveryRetention = [[[NSPopUpButton alloc] initWithFrame:NSZeroRect pullsDown:NO] autorelease];
+    NSArray* periods = @[@"7 days", @"30 days", @"90 days", @"Until I remove them"];
+    NSArray* days = @[@7, @30, @90, @0];
+    for (NSUInteger index = 0; index < [periods count]; ++index)
+    {
+        [recoveryRetention addItemWithTitle:periods[index]];
+        [[recoveryRetention lastItem] setTag:[days[index] integerValue]];
+    }
+    [recoveryRetention setTarget:self];
+    [recoveryRetention setAction:@selector(actionRecoveryPreference:)];
+    [recoveryRetention setAccessibilityLabel:@"Keep recovery copies"];
+    [recoveryRetention selectItemWithTag:[[NSUserDefaults standardUserDefaults] integerForKey:@"RecoveryRetentionDays"]];
+    NSButton* openRecovery = [NSButton buttonWithTitle:@"Open Recovery Copies" target:self action:@selector(actionOpenRecoveryCopies:)];
+    NSStackView* recoveryRow = [NSStackView stackViewWithViews:@[[NSTextField labelWithString:@"Keep copies:"], recoveryRetention, openRecovery]];
+    [recoveryRow setOrientation:NSUserInterfaceLayoutOrientationHorizontal];
+    [recoveryRow setAlignment:NSLayoutAttributeCenterY];
+    [recoveryRow setSpacing:8];
+
     NSStackView* form = ASPreferenceColumn(@[
         ASPreferenceSection(@"Files", @[files]),
         ASPreferenceSeparator(),
         ASPreferenceSection(@"Backups", @[folder, ASPreferenceNote(@"Quick Backup saves a separate copy of your files in this folder."),
                                          saveBackupLogsButton, ASPreferenceNote(@"Optional.  Saves a list of copied files and any errors inside each dated backup folder.")]),
+        ASPreferenceSeparator(),
+        ASPreferenceSection(@"Recovery copies", @[saveRecoveryCopiesButton, recoveryRow,
+            ASPreferenceNote(@"Recovery Copies inside your backup folder contains the original text. Expired copies move to Trash when a new copy is made.")]),
         ASPreferenceSeparator(),
         ASPreferenceSection(@"Automatic opening", @[outletAutoRun, automaticLaunchStatusField, settings]),
         ASPreferenceSeparator(),
@@ -256,6 +279,8 @@ static NSBox* ASPreferenceSeparator(void)
 {
     (void)notification;
     [automaticLaunchStatusField setStringValue:[applicationController automaticLaunchStatus]];
+    [saveRecoveryCopiesButton setState:[[NSUserDefaults standardUserDefaults] boolForKey:@"SaveRecoveryCopies"] ? NSControlStateValueOn : NSControlStateValueOff];
+    [recoveryRetention selectItemWithTag:[[NSUserDefaults standardUserDefaults] integerForKey:@"RecoveryRetentionDays"]];
     if (@available(macOS 13.0, *)) [loginItemsButton setHidden:NO];
     else [loginItemsButton setHidden:YES];
     [self fitWindowToContent];
@@ -334,6 +359,30 @@ static NSBox* ASPreferenceSeparator(void)
 {
     [[NSUserDefaults standardUserDefaults] setBool:[(NSButton*)sender state] == NSControlStateValueOn
                                            forKey:kASPreferenceKeySaveBackupLogs];
+}
+
+- (IBAction)actionRecoveryPreference:(id)sender
+{
+    (void)sender;
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setBool:[saveRecoveryCopiesButton state] == NSControlStateValueOn forKey:@"SaveRecoveryCopies"];
+    [defaults setInteger:[recoveryRetention selectedTag] forKey:@"RecoveryRetentionDays"];
+}
+
+- (IBAction)actionOpenRecoveryCopies:(id)sender
+{
+    (void)sender;
+    NSString* path = [[self backupFolder] stringByAppendingPathComponent:@"Recovery Copies"];
+    NSError* error = nil;
+    BOOL created = [[NSFileManager defaultManager] createDirectoryAtPath:path withIntermediateDirectories:YES
+        attributes:@{NSFilePosixPermissions: @0700} error:&error];
+    if (!created || ![[NSWorkspace sharedWorkspace] openURL:[NSURL fileURLWithPath:path isDirectory:YES]])
+    {
+        NSAlert* alert = [[[NSAlert alloc] init] autorelease];
+        [alert setMessageText:@"The recovery folder could not be opened."];
+        [alert setInformativeText:[error localizedDescription] ?: @"Check that your backup folder is available."];
+        [alert beginSheetModalForWindow:[self window] completionHandler:nil];
+    }
 }
 
 - (IBAction)actionPreferenceHelp:(id)sender

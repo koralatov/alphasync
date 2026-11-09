@@ -36,6 +36,7 @@
 #import "ASDeviceController.h"
 #import "ASPreferenceController.h"
 #import "AQFileUtilities.h"
+#include <errno.h>
 
 
 using namespace ts;
@@ -266,9 +267,9 @@ static NSTextField* ASBackupLabel(NSString* text)
         NSString* path = [final stringByAppendingString:@" (Incomplete)"];
         if ([manager fileExistsAtPath:final] || [manager fileExistsAtPath:path]) continue;
         NSError* error = nil;
-        if (![manager createDirectoryAtPath:path withIntermediateDirectories:NO attributes:permissions error:&error])
+        if (!aq_CreatePrivateDirectory(path, &error))
         {
-            if ([error code] == NSFileWriteFileExistsError) continue;
+            if ([[error domain] isEqual:NSPOSIXErrorDomain] && [error code] == EEXIST) continue;
             return NO;
         }
         currentSessionPath = [path copy];

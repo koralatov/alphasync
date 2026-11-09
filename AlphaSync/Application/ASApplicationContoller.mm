@@ -122,6 +122,8 @@ static NSMenuItem* ASAddHelpLink(NSMenu* menu, NSString* title, NSString* identi
     [defaults setObject:defaultBackupFolder forKey:kASPreferenceKeyBackupFolder];
     [defaults setObject:@(kASPreferenceDefaultSaveBackupLogs) forKey:kASPreferenceKeySaveBackupLogs];
 
+    [defaults setObject:@YES forKey:@"SaveRecoveryCopies"];
+    [defaults setObject:@30 forKey:@"RecoveryRetentionDays"];
     [[NSUserDefaults standardUserDefaults] registerDefaults:defaults];
 }
 
@@ -439,7 +441,7 @@ static NSMenuItem* ASAddHelpLink(NSMenu* menu, NSString* title, NSString* identi
     if (![selected conformsToProtocol:@protocol(ASDeleteProtocol)]) return;
     [self confirmDelete:selected completion:^(BOOL allowed) {
         if (!allowed || [deviceController isBusy]) return;
-        [deviceController performTaskForNode:selected refresh:YES task:^id(ASNode* working) {
+        [deviceController performProtectedTaskForNode:selected refresh:YES task:^id(ASNode* working) {
             return @([(id<ASDeleteProtocol>)working deleteSelf]);
         } completion:^(id result, NSString* error) {
             (void)result;
@@ -1073,10 +1075,18 @@ static NSMenuItem* ASAddHelpLink(NSMenu* menu, NSString* title, NSString* identi
     [alert setInformativeText:replace ?
         [NSString stringWithFormat:@"The text in this file on your Neo will be replaced with %@. This cannot be undone.", [path lastPathComponent]] :
         @"The selected contents on your Neo will be cleared. This cannot be undone."];
+    NSButton* recovery = [NSButton checkboxWithTitle:@"Save a recovery copy first" target:nil action:nil];
+    [recovery setState:[[NSUserDefaults standardUserDefaults] boolForKey:@"SaveRecoveryCopies"] ? NSControlStateValueOn : NSControlStateValueOff];
+    [recovery setToolTip:@"Saved inside your backup folder. Preferences controls how long copies are kept."];
+    [alert setAccessoryView:recovery];
     [alert setAlertStyle:NSAlertStyleWarning];
     [alert beginSheetModalForWindow:outletMainWindow completionHandler:^(NSModalResponse response) {
         BOOL allowed = response == NSAlertSecondButtonReturn;
-        if (allowed) [self setStatusBusy:replace ? @"Replacing file…" : @"Clearing files…"];
+        if (allowed)
+        {
+            [[NSUserDefaults standardUserDefaults] setBool:[recovery state] == NSControlStateValueOn forKey:@"SaveRecoveryCopies"];
+            [self setStatusBusy:replace ? @"Replacing file…" : @"Clearing files…"];
+        }
         completion(allowed);
         [self updateMainWindowConnectionState];
     }];

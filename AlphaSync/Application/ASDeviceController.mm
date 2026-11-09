@@ -31,6 +31,7 @@
  */
 
 #import "ASDeviceController.h"
+#import "AQFileUtilities.h"
 #import "ASPreferenceController.h"
 
 using namespace ts;
@@ -59,6 +60,67 @@ static void deviceDisconnect(ASDeviceFactory* factory, void* context, unsigned i
     (void)factory; (void)ident;
     @autoreleasepool { [(ASDeviceController*)context deviceDisconnected:device]; }
 }
+
+// A recovery copy must finish before the destructive task starts.
+static NSString* ASCreateRecoveryCopy(ASNode* node, NSString* root, NSInteger days, NSString** message)
+{
+    NSFileManager* manager = [NSFileManager defaultManager];
+    NSError* error = nil;
+    if (![root isAbsolutePath] || ![manager createDirectoryAtPath:root withIntermediateDirectories:YES
+        attributes:@{NSFilePosixPermissions: @0700} error:&error])
+    {
+        *message = @"The recovery folder could not be created. No files on the Neo have been changed. Check your backup folder in Preferences.";
+        return nil;
+    }
+    NSDate* now = [NSDate date];
+    NSDateFormatter* formatter = [[[NSDateFormatter alloc] init] autorelease];
+    [formatter setLocale:[[[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"] autorelease]];
+    [formatter setDateFormat:@"yyyy-MM-dd HH.mm.ss"];
+    NSString* name = [NSString stringWithFormat:@"%@ %@", [formatter stringFromDate:now], [[[NSUUID UUID] UUIDString] substringToIndex:8]];
+    NSString* final = [root stringByAppendingPathComponent:name];
+    NSString* pending = [final stringByAppendingString:@" (Incomplete)"];
+    if (!aq_CreatePrivateDirectory(pending, &error) || ![node saveUnderPath:pending])
+    {
+        *message = @"The recovery copy could not be saved. No files on the Neo have been changed. Check your backup folder and free disk space, then try again.";
+        return nil;
+    }
+    NSDictionary* information = @{@"formatVersion": @1, @"kind": @"AlphaSyncRecoveryCopy", @"createdAt": now,
+                                   @"sourceName": [node displayName] ?: @""};
+    NSData* data = [NSPropertyListSerialization dataWithPropertyList:information format:NSPropertyListXMLFormat_v1_0 options:0 error:&error];
+    if (!data || !aq_WriteUniqueFile(pending, @".recovery-information", @"plist", data, &error) ||
+        !aq_RenameItemExclusively(pending, final, &error))
+    {
+        *message = @"The recovery copy could not be finished. No files on the Neo have been changed. Check your backup folder and try again.";
+        return nil;
+    }
+    if (days > 0)
+    {
+        NSArray* names = [manager contentsOfDirectoryAtPath:root error:&error];
+        for (NSString* entry in names)
+        {
+            NSString* path = [root stringByAppendingPathComponent:entry];
+            NSDictionary* attributes = [manager attributesOfItemAtPath:path error:nil];
+            if (![attributes[NSFileType] isEqual:NSFileTypeDirectory] || [entry hasSuffix:@" (Incomplete)"]) continue;
+            NSData* metadata = [NSData dataWithContentsOfFile:[path stringByAppendingPathComponent:@".recovery-information.plist"]];
+            NSDictionary* record = metadata ? [NSPropertyListSerialization propertyListWithData:metadata options:0 format:NULL error:NULL] : nil;
+            if (![record isKindOfClass:[NSDictionary class]] || ![record[@"kind"] isEqual:@"AlphaSyncRecoveryCopy"] ||
+                ![record[@"createdAt"] isKindOfClass:[NSDate class]]) continue;
+            if ([now timeIntervalSinceDate:record[@"createdAt"]] <= days * 86400.0) continue;
+            if (![manager trashItemAtURL:[NSURL fileURLWithPath:path] resultingItemURL:NULL error:&error]) break;
+        }
+        if (error)
+        {
+            *message = [NSString stringWithFormat:@"A recovery copy was saved at %@, but older copies could not be moved to Trash: %@. No files on the Neo have been changed.", final, [error localizedDescription]];
+            return nil;
+        }
+    }
+    return final;
+}
+
+@interface ASDeviceController ()
+- (void)queueTaskForNode:(ASNode*)node refresh:(BOOL)refresh protected:(BOOL)protect
+                   task:(id (^)(ASNode*))task completion:(void (^)(id, NSString*))completion;
+@end
 
 @implementation ASDeviceController
 - (id)init
@@ -166,7 +228,24 @@ static void deviceDisconnect(ASDeviceFactory* factory, void* context, unsigned i
 - (void)performTaskForNode:(ASNode*)node refresh:(BOOL)refresh task:(id (^)(ASNode*))task
                completion:(void (^)(id result, NSString* error))completion
 {
+    [self queueTaskForNode:node refresh:refresh protected:NO task:task completion:completion];
+}
+
+- (void)performProtectedTaskForNode:(ASNode*)node refresh:(BOOL)refresh task:(id (^)(ASNode*))task
+                       completion:(void (^)(id result, NSString* error))completion
+{
+    [self queueTaskForNode:node refresh:refresh protected:YES task:task completion:completion];
+}
+
+- (void)queueTaskForNode:(ASNode*)node refresh:(BOOL)refresh protected:(BOOL)protect
+                   task:(id (^)(ASNode*))task completion:(void (^)(id, NSString*))completion
+{
     NSAssert([NSThread isMainThread], @"Schedule device work from the main thread.");
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    BOOL saveOriginal = protect && [defaults boolForKey:@"SaveRecoveryCopies"];
+    NSString* recoveryRoot = [[defaults stringForKey:@"BackupFolder"] stringByAppendingPathComponent:@"Recovery Copies"];
+    NSInteger retention = [defaults integerForKey:@"RecoveryRetentionDays"];
+    if (retention != 0 && retention != 7 && retention != 30 && retention != 90) retention = 30;
     ASDeviceNode* owner = [node isKindOfClass:[ASDeviceNode class]] ? (ASDeviceNode*)node : [node ancestorOfClass:[ASDeviceNode class]];
     ASAppletNode* applet = [node isKindOfClass:[ASAppletNode class]] ? (ASAppletNode*)node : [node ancestorOfClass:[ASAppletNode class]];
     NSNumber* identity = @([owner connectionID]);
@@ -202,13 +281,16 @@ static void deviceDisconnect(ASDeviceFactory* factory, void* context, unsigned i
         else
         {
             [selected setOperationError:nil];
-            result = task(selected);
-            if (!result || ([result isKindOfClass:[NSNumber class]] && ![result boolValue]))
+            NSString* recovery = saveOriginal ? ASCreateRecoveryCopy(selected, recoveryRoot, retention, &error) : nil;
+            BOOL protectionFailed = saveOriginal && !recovery;
+            if (!protectionFailed) result = task(selected);
+            if (!error && (!result || ([result isKindOfClass:[NSNumber class]] && ![result boolValue])))
             {
                 error = [selected operationError];
                 if (!error) error = @"The device operation could not be completed.";
             }
-            if (refresh)
+            if (error && recovery) error = [error stringByAppendingFormat:@"\n\nRecovery copy: %@", recovery];
+            if (refresh && !protectionFailed)
             {
                 [live reload];
                 [self publishDevice:live notification:kASDeviceControllerDataChanged];

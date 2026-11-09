@@ -382,7 +382,7 @@ static void checkPreferenceLayout(id preferences)
     NSView* content = [[preferences window] contentView];
     [content layoutSubtreeIfNeeded];
     for (NSString* key in @[@"outletFilterOption", @"outputFormatField", @"backupFolderPath", @"chooseFolderButton",
-                             @"saveBackupLogsButton", @"outletAutoRun", @"automaticLaunchStatusField", @"loginItemsButton"])
+                             @"saveBackupLogsButton", @"saveRecoveryCopiesButton", @"recoveryRetention", @"outletAutoRun", @"automaticLaunchStatusField", @"loginItemsButton"])
     {
         NSView* view = [preferences valueForKey:key];
         if ([view isHiddenOrHasHiddenAncestor]) continue;
