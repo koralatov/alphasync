@@ -1,0 +1,58 @@
+name: Interface capture check
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_commit:
+        description: Full source commit to check
+        required: true
+        default: '05df92170cdddd4fb392246443a0f75930db4ec2'
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  capture:
+    name: Capture check (Apple Silicon)
+    runs-on: macos-26
+    timeout-minutes: 15
+    steps:
+      - name: Require an exact source commit
+        env:
+          SOURCE_COMMIT: ${{ inputs.source_commit }}
+        run: '[[ "$SOURCE_COMMIT" =~ ^[0-9a-f]{40}$ ]]'
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ inputs.source_commit }}
+          persist-credentials: false
+      - name: Select the pinned compiler
+        run: |
+          selected_developer=/Applications/Xcode_26.6.app/Contents/Developer
+          test -d "$selected_developer"
+          printf 'DEVELOPER_DIR=%s\n' "$selected_developer" >> "$GITHUB_ENV"
+      - name: Record the source and host
+        env:
+          SOURCE_COMMIT: ${{ inputs.source_commit }}
+        run: |
+          test "$(git rev-parse HEAD)" = "$SOURCE_COMMIT"
+          test "$(uname -m)" = arm64
+          mkdir -p build/interface-checks
+          {
+            git rev-parse HEAD
+            sw_vers
+            uname -m
+            xcodebuild -version
+          } > build/interface-checks/source-and-host.txt
+      - name: Compile the interface-check executable
+        run: swift build --product AlphaSyncUIChecks
+      - name: Check native interface behaviour and capture both appearances
+        run: |
+          set -o pipefail
+          swift run --skip-build AlphaSyncUIChecks build/interface-checks 2>&1 | tee build/interface-checks/check.log
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: AlphaSync-capture-check-macos-26-${{ github.run_id }}
+          path: build/interface-checks/*
+          if-no-files-found: warn
