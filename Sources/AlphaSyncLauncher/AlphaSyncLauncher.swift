@@ -16,12 +16,11 @@ enum AlphaSyncLauncher {
 @MainActor
 private final class LaunchDelegate: NSObject, NSApplicationDelegate {
     private var monitor: Task<Void, Never>?
-    private let defaults = UserDefaults(suiteName: "com.tsoniq.AlphaSync")
     func applicationDidFinishLaunching(_ notification: Notification) {
         monitor = Task {
             var seen = Set<UInt64>()
             while !Task.isCancelled {
-                guard defaults?.bool(forKey: "AutoRun") == true else { NSApp.terminate(nil); return }
+                // ServiceManagement owns the helper’s lifetime. A delayed preference write must not stop a newly registered helper.
                 // Only registry metadata is read here. All USB ownership remains in the main app.
                 if let attached = try? NeoPresence.attachedIDs() {
                     let added = attached.subtracting(seen)

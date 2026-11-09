@@ -2,6 +2,15 @@ import Foundation
 import Combine
 import ServiceManagement
 
+@MainActor
+protocol LoginItemManaging: AnyObject {
+    var status: SMAppService.Status { get }
+    func register() throws
+    func unregister() throws
+}
+
+extension SMAppService: LoginItemManaging {}
+
 public enum FileFilter: Int, CaseIterable, Identifiable, Sendable {
     case alphaWord = 0, textApplets = 1, allApplets = 2
     public var id: Int { rawValue }
@@ -31,10 +40,15 @@ public final class Preferences: ObservableObject {
     @Published public var automaticOpening: Bool
     @Published public private(set) var loginStatus = ""
     private let defaults: UserDefaults
-    private let loginItem = SMAppService.loginItem(identifier: "com.tsoniq.AlphaSyncLauncher")
+    private let loginItem: any LoginItemManaging
 
-    public init(defaults: UserDefaults = .standard) {
+    public convenience init(defaults: UserDefaults = .standard) {
+        self.init(defaults: defaults, loginItem: SMAppService.loginItem(identifier: "com.tsoniq.AlphaSyncLauncher"))
+    }
+
+    init(defaults: UserDefaults, loginItem: any LoginItemManaging) {
         self.defaults = defaults
+        self.loginItem = loginItem
         defaults.register(defaults: ["FilterMode": 1, "BackupFolder": ("~/Documents/AlphaSync" as NSString).expandingTildeInPath,
                                      "SaveBackupLogs": false, "SaveRecoveryCopies": true, "RecoveryRetentionDays": 30, "AutoRun": false])
         filter = FileFilter(rawValue: defaults.integer(forKey: "FilterMode")) ?? .textApplets
@@ -56,11 +70,21 @@ public final class Preferences: ObservableObject {
         }
     }
     public func setAutomaticOpening(_ enabled: Bool) {
+        let previous = automaticOpening
+        automaticOpening = enabled
+        defaults.set(enabled, forKey: "AutoRun")
         do {
-            if enabled { try loginItem.register() } else { try loginItem.unregister() }
-            automaticOpening = enabled; defaults.set(enabled, forKey: "AutoRun")
+            if enabled {
+                if loginItem.status != .enabled && loginItem.status != .requiresApproval { try loginItem.register() }
+            } else { try loginItem.unregister() }
             refreshLoginStatus()
         } catch {
+            if enabled && loginItem.status == .requiresApproval {
+                refreshLoginStatus()
+                return
+            }
+            automaticOpening = previous
+            defaults.set(previous, forKey: "AutoRun")
             loginStatus = "Automatic opening could not be changed. \(error.localizedDescription)"
         }
     }

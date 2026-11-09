@@ -81,6 +81,9 @@ public struct SettingsView: View {
                 if case .success(let url) = result { preferences.backupFolder = url.resolvingSymlinksInPath() }
             }
             .onAppear { preferences.refreshLoginStatus() }
+            .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+                preferences.refreshLoginStatus()
+            }
     }
 }
 
