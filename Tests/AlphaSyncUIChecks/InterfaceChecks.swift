@@ -14,6 +14,18 @@ struct InterfaceChecks {
     }
     static func settle() { RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.35)) }
     static func descendants(_ root: NSView) -> [NSView] { [root] + root.subviews.flatMap(descendants) }
+    static func accessibilityElements(_ root: Any) -> [any NSAccessibilityProtocol] {
+        var elements: [any NSAccessibilityProtocol] = []
+        var visited = Set<ObjectIdentifier>()
+        func visit(_ value: Any) {
+            guard let element = value as? any NSAccessibilityProtocol,
+                  visited.insert(ObjectIdentifier(element as AnyObject)).inserted else { return }
+            elements.append(element)
+            for child in element.accessibilityChildren() ?? [] { visit(child) }
+        }
+        visit(root)
+        return elements
+    }
     static func window<V: View>(_ view: V, size: NSSize, title: String) -> NSWindow {
         let result = NSWindow(contentRect: NSRect(origin: .zero, size: size),
                               styleMask: [.titled, .closable, .resizable], backing: .buffered, defer: false)
@@ -109,9 +121,21 @@ struct InterfaceChecks {
             try capture(connected, "files-" + label, to: output); connected.close()
             store.connectionIssue = "A second Neo could not be opened. Close other Neo software and choose Try Again."
             let connectionWarning = window(MainView(store: store), size: NSSize(width: 820, height: 560), title: "AlphaSync")
-            try require(descendants(connectionWarning.contentView!).compactMap { $0 as? NSButton }.contains { $0.title == "Try Again" },
-                        "An error beside a connected Neo must offer a retry")
-            try capture(connectionWarning, "connection-warning-" + label, to: output); connectionWarning.close()
+            try capture(connectionWarning, "connection-warning-" + label, to: output)
+            let elements = accessibilityElements(connectionWarning)
+            let retry = elements.first {
+                $0.accessibilityRole() == .button &&
+                [$0.accessibilityTitle(), $0.accessibilityLabel()].contains("Try Again")
+            }
+            if retry == nil {
+                let description = elements.map {
+                    "\($0.accessibilityRole()?.rawValue ?? "unknown"): \($0.accessibilityTitle() ?? "") \($0.accessibilityLabel() ?? "")"
+                }.joined(separator: "\n")
+                print("Connected warning accessibility tree:\n" + description)
+            }
+            try require(retry?.isAccessibilityEnabled() == true && retry?.accessibilityFrame().isEmpty == false,
+                        "An error beside a connected Neo must expose a visible, enabled retry button")
+            connectionWarning.close()
             store.connectionIssue = nil
             let about = window(AboutView(), size: NSSize(width: 420, height: 570), title: "About AlphaSync")
             if let button = about.firstResponder as? NSButton {
