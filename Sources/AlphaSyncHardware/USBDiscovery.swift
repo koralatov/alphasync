@@ -16,7 +16,7 @@ enum USBDiscovery {
     static func property(_ service: io_registry_entry_t, _ name: String) -> Int? {
         let options = IOOptionBits(kIORegistryIterateRecursively | kIORegistryIterateParents)
         return (IORegistryEntrySearchCFProperty(service, kIOServicePlane, name as CFString,
-                                                kCFAllocatorDefault, options)?.takeRetainedValue() as? NSNumber)?.intValue
+                                                kCFAllocatorDefault, options) as? NSNumber)?.intValue
     }
 
     /// Returned service references are owned and must each be released by the caller.

@@ -11,7 +11,8 @@ final class USBHostTransport: NeoTransport {
     private var closed = false
 
     init(service: io_service_t) throws {
-        let host = try IOUSBHostInterface(ioService: service, options: [], queue: nil, interestHandler: nil)
+        // NS_REFINED_FOR_SWIFT imports these public SDK selectors with a double underscore.
+        let host = try IOUSBHostInterface(__ioService: service, options: [], queue: nil, interestHandler: nil)
         do {
             let configuration = host.configurationDescriptor
             let descriptor = host.interfaceDescriptor
@@ -47,7 +48,8 @@ final class USBHostTransport: NeoTransport {
         let buffer = try interface.ioData(withCapacity: maximum)
         buffer.length = maximum
         do {
-            let count = try input.sendIORequest(with: buffer, completionTimeout: timeout)
+            var count = 0
+            try input.__sendIORequest(with: buffer, bytesTransferred: &count, completionTimeout: timeout)
             guard count >= 0, count <= maximum else { throw NeoError.invalidData("The USB read count is invalid.") }
             return Data((buffer as Data).prefix(count))
         } catch {
@@ -72,7 +74,8 @@ final class USBHostTransport: NeoTransport {
                 if let base = raw.baseAddress { buffer.replaceBytes(in: NSRange(location: 0, length: length), withBytes: base) }
             }
             do {
-                let count = try output.sendIORequest(with: buffer, completionTimeout: remaining)
+                var count = 0
+                try output.__sendIORequest(with: buffer, bytesTransferred: &count, completionTimeout: remaining)
                 guard count == length else { throw NeoError.device("The Neo accepted only part of a command.") }
             } catch {
                 try? output.clearStall()
@@ -85,8 +88,8 @@ final class USBHostTransport: NeoTransport {
     func close() {
         guard !closed else { return }
         closed = true
-        try? input.abort()
-        try? output.abort()
+        try? input.__abort(with: .synchronous)
+        try? output.__abort(with: .synchronous)
         interface.destroy()
     }
     deinit { interface.destroy() }
