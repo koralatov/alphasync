@@ -12,16 +12,6 @@
 		4D962E450F1CA50D0018CDAA /* icon-applet.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 4D962E380F1CA50D0018CDAA /* icon-applet.pdf */; };
 		4D962E460F1CA50D0018CDAA /* icon-file-txt.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 4D962E390F1CA50D0018CDAA /* icon-file-txt.pdf */; };
 		4D962E470F1CA50D0018CDAA /* icon-neo.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 4D962E3A0F1CA50D0018CDAA /* icon-neo.pdf */; };
-		4D962E480F1CA50D0018CDAA /* icon-status-clear.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 4D962E3B0F1CA50D0018CDAA /* icon-status-clear.pdf */; };
-		4D962E490F1CA50D0018CDAA /* icon-status-green.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 4D962E3C0F1CA50D0018CDAA /* icon-status-green.pdf */; };
-		4D962E4A0F1CA50D0018CDAA /* icon-status-red.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 4D962E3D0F1CA50D0018CDAA /* icon-status-red.pdf */; };
-		4D962E4B0F1CA50D0018CDAA /* icon-status-yellow.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 4D962E3E0F1CA50D0018CDAA /* icon-status-yellow.pdf */; };
-		4D962E4C0F1CA50D0018CDAA /* icon-toolbar-backup.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 4D962E3F0F1CA50D0018CDAA /* icon-toolbar-backup.pdf */; };
-		4D962E4D0F1CA50D0018CDAA /* icon-toolbar-delete-disabled.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 4D962E400F1CA50D0018CDAA /* icon-toolbar-delete-disabled.pdf */; };
-		4D962E4E0F1CA50D0018CDAA /* icon-toolbar-delete-multiple.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 4D962E410F1CA50D0018CDAA /* icon-toolbar-delete-multiple.pdf */; };
-		4D962E4F0F1CA50D0018CDAA /* icon-toolbar-delete-single.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 4D962E420F1CA50D0018CDAA /* icon-toolbar-delete-single.pdf */; };
-		4D962E500F1CA50D0018CDAA /* icon-toolbar-info.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 4D962E430F1CA50D0018CDAA /* icon-toolbar-info.pdf */; };
-		4D962E510F1CA50D0018CDAA /* icon-toolbar-preview.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 4D962E440F1CA50D0018CDAA /* icon-toolbar-preview.pdf */; };
 		4D962E750F1CA73D0018CDAA /* icon-file-noselection.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 4D962E740F1CA73D0018CDAA /* icon-file-noselection.pdf */; };
 		4D96309A0F1D172C0018CDAA /* appletdump.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4D9630900F1D15D90018CDAA /* appletdump.cc */; };
 		4D9630A10F1D17F30018CDAA /* ASApplet.cc in Sources */ = {isa = PBXBuildFile; fileRef = A99A54660F0D39FF00BC68F1 /* ASApplet.cc */; };
@@ -61,7 +51,6 @@
 		A99A547A0F0D39FF00BC68F1 /* ASFileAttributes.cc in Sources */ = {isa = PBXBuildFile; fileRef = A99A54700F0D39FF00BC68F1 /* ASFileAttributes.cc */; };
 		A99A547B0F0D39FF00BC68F1 /* ASUserDictionaryFile.cc in Sources */ = {isa = PBXBuildFile; fileRef = A99A54730F0D39FF00BC68F1 /* ASUserDictionaryFile.cc */; };
 		A99A549A0F0D3AB700BC68F1 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A99A54990F0D3AB700BC68F1 /* IOKit.framework */; };
-		A99A54B60F0D43D900BC68F1 /* Backup.nib in Resources */ = {isa = PBXBuildFile; fileRef = A99A54B40F0D43D900BC68F1 /* Backup.nib */; };
         C01100000000000000000001 /* UniformTypeIdentifiers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01100000000000000000002 /* UniformTypeIdentifiers.framework */; };
         C01100000000000000000004 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
         C01100000000000000000005 /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01100000000000000000006 /* ServiceManagement.framework */; };
@@ -108,16 +97,6 @@
 		4D962E380F1CA50D0018CDAA /* icon-applet.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "icon-applet.pdf"; path = "Graphics/icon-applet.pdf"; sourceTree = "<group>"; };
 		4D962E390F1CA50D0018CDAA /* icon-file-txt.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "icon-file-txt.pdf"; path = "Graphics/icon-file-txt.pdf"; sourceTree = "<group>"; };
 		4D962E3A0F1CA50D0018CDAA /* icon-neo.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "icon-neo.pdf"; path = "Graphics/icon-neo.pdf"; sourceTree = "<group>"; };
-		4D962E3B0F1CA50D0018CDAA /* icon-status-clear.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "icon-status-clear.pdf"; path = "Graphics/icon-status-clear.pdf"; sourceTree = "<group>"; };
-		4D962E3C0F1CA50D0018CDAA /* icon-status-green.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "icon-status-green.pdf"; path = "Graphics/icon-status-green.pdf"; sourceTree = "<group>"; };
-		4D962E3D0F1CA50D0018CDAA /* icon-status-red.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "icon-status-red.pdf"; path = "Graphics/icon-status-red.pdf"; sourceTree = "<group>"; };
-		4D962E3E0F1CA50D0018CDAA /* icon-status-yellow.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "icon-status-yellow.pdf"; path = "Graphics/icon-status-yellow.pdf"; sourceTree = "<group>"; };
-		4D962E3F0F1CA50D0018CDAA /* icon-toolbar-backup.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "icon-toolbar-backup.pdf"; path = "Graphics/icon-toolbar-backup.pdf"; sourceTree = "<group>"; };
-		4D962E400F1CA50D0018CDAA /* icon-toolbar-delete-disabled.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "icon-toolbar-delete-disabled.pdf"; path = "Graphics/icon-toolbar-delete-disabled.pdf"; sourceTree = "<group>"; };
-		4D962E410F1CA50D0018CDAA /* icon-toolbar-delete-multiple.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "icon-toolbar-delete-multiple.pdf"; path = "Graphics/icon-toolbar-delete-multiple.pdf"; sourceTree = "<group>"; };
-		4D962E420F1CA50D0018CDAA /* icon-toolbar-delete-single.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "icon-toolbar-delete-single.pdf"; path = "Graphics/icon-toolbar-delete-single.pdf"; sourceTree = "<group>"; };
-		4D962E430F1CA50D0018CDAA /* icon-toolbar-info.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "icon-toolbar-info.pdf"; path = "Graphics/icon-toolbar-info.pdf"; sourceTree = "<group>"; };
-		4D962E440F1CA50D0018CDAA /* icon-toolbar-preview.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "icon-toolbar-preview.pdf"; path = "Graphics/icon-toolbar-preview.pdf"; sourceTree = "<group>"; };
 		4D962E740F1CA73D0018CDAA /* icon-file-noselection.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "icon-file-noselection.pdf"; path = "Graphics/icon-file-noselection.pdf"; sourceTree = "<group>"; };
 		4D9630890F1D15A80018CDAA /* AppletDump */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = AppletDump; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D9630900F1D15D90018CDAA /* appletdump.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = appletdump.cc; sourceTree = "<group>"; };
@@ -181,8 +160,6 @@
 		A99A54730F0D39FF00BC68F1 /* ASUserDictionaryFile.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = ASUserDictionaryFile.cc; sourceTree = "<group>"; };
 		A99A54740F0D39FF00BC68F1 /* ASUserDictionaryFile.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ASUserDictionaryFile.h; sourceTree = "<group>"; };
 		A99A54990F0D3AB700BC68F1 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
-		A99A54B50F0D43D900BC68F1 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/Backup.nib; sourceTree = "<group>"; };
-		A99A54F90F0D5F5100BC68F1 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/Inspector.nib; sourceTree = "<group>"; };
         C01100000000000000000002 /* UniformTypeIdentifiers.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UniformTypeIdentifiers.framework; path = System/Library/Frameworks/UniformTypeIdentifiers.framework; sourceTree = SDKROOT; };
         C01100000000000000000006 /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
 		62623E530502DA726AF5AC00 /* ASBackupReport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASBackupReport.h; sourceTree = "<group>"; };
@@ -297,22 +274,10 @@
 				4D962E380F1CA50D0018CDAA /* icon-applet.pdf */,
 				4D962E390F1CA50D0018CDAA /* icon-file-txt.pdf */,
 				4D962E3A0F1CA50D0018CDAA /* icon-neo.pdf */,
-				4D962E3B0F1CA50D0018CDAA /* icon-status-clear.pdf */,
-				4D962E3C0F1CA50D0018CDAA /* icon-status-green.pdf */,
-				4D962E3D0F1CA50D0018CDAA /* icon-status-red.pdf */,
-				4D962E3E0F1CA50D0018CDAA /* icon-status-yellow.pdf */,
-				4D962E3F0F1CA50D0018CDAA /* icon-toolbar-backup.pdf */,
-				4D962E400F1CA50D0018CDAA /* icon-toolbar-delete-disabled.pdf */,
-				4D962E410F1CA50D0018CDAA /* icon-toolbar-delete-multiple.pdf */,
-				4D962E420F1CA50D0018CDAA /* icon-toolbar-delete-single.pdf */,
-				4D962E430F1CA50D0018CDAA /* icon-toolbar-info.pdf */,
-				4D962E440F1CA50D0018CDAA /* icon-toolbar-preview.pdf */,
 				4D962E170F1C9EF60018CDAA /* icon-file-bin.pdf */,
 				8D1107310486CEB800E47090 /* Info.plist */,
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
 				29B97318FDCFA39411CA2CEA /* MainMenu.nib */,
-				A99A54B40F0D43D900BC68F1 /* Backup.nib */,
-				A99A54F80F0D5F5100BC68F1 /* Inspector.nib */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -525,21 +490,10 @@
 
 				8D11072A0486CEB800E47090 /* MainMenu.nib in Resources */,
 				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
-				A99A54B60F0D43D900BC68F1 /* Backup.nib in Resources */,
 				4D962E180F1C9EF60018CDAA /* icon-file-bin.pdf in Resources */,
 				4D962E450F1CA50D0018CDAA /* icon-applet.pdf in Resources */,
 				4D962E460F1CA50D0018CDAA /* icon-file-txt.pdf in Resources */,
 				4D962E470F1CA50D0018CDAA /* icon-neo.pdf in Resources */,
-				4D962E480F1CA50D0018CDAA /* icon-status-clear.pdf in Resources */,
-				4D962E490F1CA50D0018CDAA /* icon-status-green.pdf in Resources */,
-				4D962E4A0F1CA50D0018CDAA /* icon-status-red.pdf in Resources */,
-				4D962E4B0F1CA50D0018CDAA /* icon-status-yellow.pdf in Resources */,
-				4D962E4C0F1CA50D0018CDAA /* icon-toolbar-backup.pdf in Resources */,
-				4D962E4D0F1CA50D0018CDAA /* icon-toolbar-delete-disabled.pdf in Resources */,
-				4D962E4E0F1CA50D0018CDAA /* icon-toolbar-delete-multiple.pdf in Resources */,
-				4D962E4F0F1CA50D0018CDAA /* icon-toolbar-delete-single.pdf in Resources */,
-				4D962E500F1CA50D0018CDAA /* icon-toolbar-info.pdf in Resources */,
-				4D962E510F1CA50D0018CDAA /* icon-toolbar-preview.pdf in Resources */,
 				4D962E750F1CA73D0018CDAA /* icon-file-noselection.pdf in Resources */,
 				4DF7C99D0F1EB42600619084 /* AlphaSync Help in Resources */,
 				4D2E248F18106AF7002E5E7D /* App icon in Resources */,
@@ -687,22 +641,6 @@
 			name = MainMenu.nib;
 			sourceTree = "<group>";
 		};
-		A99A54B40F0D43D900BC68F1 /* Backup.nib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				A99A54B50F0D43D900BC68F1 /* English */,
-			);
-			name = Backup.nib;
-			sourceTree = "<group>";
-		};
-		A99A54F80F0D5F5100BC68F1 /* Inspector.nib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				A99A54F90F0D5F5100BC68F1 /* English */,
-			);
-			name = Inspector.nib;
-			sourceTree = "<group>";
-		};
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
@@ -735,6 +673,11 @@
 		4D96308C0F1D15A90018CDAA /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				STRIP_STYLE = all;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				DEPLOYMENT_POSTPROCESSING = YES;
+				STRIP_INSTALLED_PRODUCT = YES;
+				DEAD_CODE_STRIPPING = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -748,6 +691,11 @@
 		E864A82D283967F5B8F36856 /* ReleaseModern */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				STRIP_STYLE = all;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				DEPLOYMENT_POSTPROCESSING = YES;
+				STRIP_INSTALLED_PRODUCT = YES;
+				DEAD_CODE_STRIPPING = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -803,8 +751,13 @@
 		A95EFA670F17C94B00E1BDA9 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				STRIP_STYLE = all;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEPLOYMENT_POSTPROCESSING = YES;
+				STRIP_INSTALLED_PRODUCT = YES;
+				DEAD_CODE_STRIPPING = YES;
+				COPY_PHASE_STRIP = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "AlphaSyncLauncher-Info.plist";
@@ -823,8 +776,13 @@
 		CFC69FB6F95A37EDCE82DC4C /* ReleaseModern */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				STRIP_STYLE = all;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEPLOYMENT_POSTPROCESSING = YES;
+				STRIP_INSTALLED_PRODUCT = YES;
+				DEAD_CODE_STRIPPING = YES;
+				COPY_PHASE_STRIP = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "AlphaSyncLauncher-Info.plist";
@@ -869,7 +827,13 @@
 		C01FCF4C08A954540054247B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				STRIP_STYLE = all;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEPLOYMENT_POSTPROCESSING = YES;
+				STRIP_INSTALLED_PRODUCT = YES;
+				DEAD_CODE_STRIPPING = YES;
+				COPY_PHASE_STRIP = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = /Applications;
 				PRODUCT_NAME = AlphaSync;
@@ -881,7 +845,13 @@
 		7DDC292532B0C41B09752808 /* ReleaseModern */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				STRIP_STYLE = all;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEPLOYMENT_POSTPROCESSING = YES;
+				STRIP_INSTALLED_PRODUCT = YES;
+				DEAD_CODE_STRIPPING = YES;
+				COPY_PHASE_STRIP = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = /Applications;
 				PRODUCT_NAME = AlphaSync;
@@ -980,6 +950,10 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E7E3978206CD4AB3E5F1B4CD /* Universal.xcconfig */;
 			buildSettings = {
+				STRIP_STYLE = all;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEPLOYMENT_POSTPROCESSING = YES;
 				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = YES;
                 CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
                 GCC_TREAT_WARNINGS_AS_ERRORS = YES;
@@ -992,8 +966,8 @@
 				HEADER_SEARCH_PATHS = ("$(SRCROOT)/Application", "$(SRCROOT)/Driver", "$(SRCROOT)/Library", "$(SRCROOT)/Launcher");
 				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = macosx;
-				COPY_PHASE_STRIP = NO;
-				DEAD_CODE_STRIPPING = NO;
+				COPY_PHASE_STRIP = YES;
+				DEAD_CODE_STRIPPING = YES;
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_ENABLE_CPP_EXCEPTIONS = YES;
 				GCC_ENABLE_CPP_RTTI = YES;
@@ -1015,7 +989,7 @@
 				GCC_WARN_UNUSED_PARAMETER = YES;
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				STRIP_INSTALLED_PRODUCT = NO;
+				STRIP_INSTALLED_PRODUCT = YES;
 			};
 			name = Release;
 		};
@@ -1023,6 +997,10 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = D7B4C96AC8AF0BF3C8619F8B /* Modern.xcconfig */;
 			buildSettings = {
+				STRIP_STYLE = all;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEPLOYMENT_POSTPROCESSING = YES;
 				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = YES;
                 CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
                 GCC_TREAT_WARNINGS_AS_ERRORS = YES;
@@ -1035,8 +1013,8 @@
 				HEADER_SEARCH_PATHS = ("$(SRCROOT)/Application", "$(SRCROOT)/Driver", "$(SRCROOT)/Library", "$(SRCROOT)/Launcher");
 				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = macosx;
-				COPY_PHASE_STRIP = NO;
-				DEAD_CODE_STRIPPING = NO;
+				COPY_PHASE_STRIP = YES;
+				DEAD_CODE_STRIPPING = YES;
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_ENABLE_CPP_EXCEPTIONS = YES;
 				GCC_ENABLE_CPP_RTTI = YES;
@@ -1058,7 +1036,7 @@
 				GCC_WARN_UNUSED_PARAMETER = YES;
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				STRIP_INSTALLED_PRODUCT = NO;
+				STRIP_INSTALLED_PRODUCT = YES;
 			};
 			name = ReleaseModern;
 		};

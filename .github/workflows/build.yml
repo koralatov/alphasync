@@ -91,6 +91,13 @@ jobs:
             CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO archive
           scripts/verify-app.sh build/AlphaSync.xcarchive/Products/Applications/AlphaSync.app
           test ! -e build/AlphaSync.xcarchive/Products/Applications/AlphaSyncLauncher.app
+      - name: Verify separate crash symbols
+        run: scripts/verify-symbols.sh build/DerivedData/Build/Products/Release
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: AlphaSync-symbols-${{ matrix.runner }}-${{ github.sha }}
+          path: build/DerivedData/Build/Products/Release/*.dSYM
+          if-no-files-found: error
       - name: Package the universal app
         run: scripts/package-app.sh build/DerivedData/Build/Products/Release/AlphaSync.app universal build/downloads
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -155,6 +162,13 @@ jobs:
             CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO archive
           scripts/verify-app.sh build/Modern.xcarchive/Products/Applications/AlphaSync.app modern
           test ! -e build/Modern.xcarchive/Products/Applications/AlphaSyncLauncher.app
+      - name: Verify separate crash symbols
+        run: scripts/verify-symbols.sh build/ModernData/Build/Products/ReleaseModern
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: AlphaSync-symbols-modern-${{ github.sha }}
+          path: build/ModernData/Build/Products/ReleaseModern/*.dSYM
+          if-no-files-found: error
       - name: Package the modern app
         run: scripts/package-app.sh build/ModernData/Build/Products/ReleaseModern/AlphaSync.app modern build/downloads
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

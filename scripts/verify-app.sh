@@ -14,6 +14,10 @@ helper="$app/Contents/Library/LoginItems/AlphaSyncLauncher.app"
 help_book="$app/Contents/Resources/AlphaSync Help"
 test -s "$help_book/AlphaSync Help.helpindex"
 test -s "$help_book/licence.html"
+for unused in "$app"/Contents/Resources/icon-toolbar-*.pdf "$app"/Contents/Resources/icon-status-*.pdf \
+              "$app/Contents/Resources/Backup.nib" "$app/Contents/Resources/Inspector.nib"; do
+    test ! -e "$unused"
+done
 version=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$app/Contents/Info.plist")
 build_number=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$app/Contents/Info.plist")
 [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
