@@ -1,35 +1,20 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-        "http://www.w3.org/TR/html4/loose.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <link rel="stylesheet" type="text/css" href="css/alphasync.css">
-    <meta name="KEYWORDS" content="backup, quick backup">
-	<title>AlphaSync Quick Backup</title> 
+    <meta charset="utf-8">
+    <meta name="description" content="Backing up files in AlphaSync 1.6.">
+    <link rel="stylesheet" href="css/alphasync.css">
+    <title>Backing up files – AlphaSync Help</title>
 </head>
 <body>
-<img src="gfx/alphasync128.png" width="96" height="96" align="right" alt="AlphaSync Icon">
-
-<h2>Quick Backup</h2><hr>
-<p>To back up all files for all currently connected devices, click <strong>Backup</strong> in the toolbar or
-   press <code>Command-B</code>. All files that are accessible in the main window will be backed up, even
-   if they are not selected.</p>
-<p>Backups are saved in the AlphaSync folder in Documents by default.
-   The backup location can be changed in the <a href="preferences.html">preference settings</a>.</p>
-<p>Each Neo’s files are saved in a dated folder. Backup logs are off by default.
-To save a record of copied files and any errors, enable <strong>Save a backup log</strong> in Preferences.
-The log is saved inside that dated folder as <code>AlphaSync Backup Log.plist</code>.</p>
-<p>Each dated folder ends in <strong>(Incomplete)</strong> while its files are being copied.
-AlphaSync removes this label only when that Neo’s backup finishes successfully.
-A stopped, interrupted, or failed backup keeps the label, even when logs are off.</p>
-<p>The result shows the saved location. Use <strong>Open Backup Folder</strong> to open it in Finder.
-With more than one Neo, use <strong>Open Backup Folders</strong> to open their locations.</p>
-<p>The general backup location can also be opened in Finder from the AlphaSync File menu or by pressing
-   <code>Command-R</code></p>
-
+<p><a href="alphasync-help.html">AlphaSync Help</a></p>
+<h1>Backing up files</h1>
+<p>Click Backup to save the files included by the file filter in Settings. Each Neo has its own dated destination inside the selected backup folder.</p>
+<p>Backups use UTF-8 text for AlphaWord and dictionary files. Other applet files are saved as lossless XML.</p>
+<p>The destination starts with (Incomplete) in its name. This is removed only when that Neo’s files finish successfully. Existing backups are preserved. If the complete file list cannot be read, AlphaSync stops before treating a partial list as a complete backup.</p>
+<p>Stop finishes the current file before stopping. If a file fails, the result explains what was saved and lists any folders that were created. Open Backup Folder shows the saved files in Finder. Done dismisses the result.</p>
+<p>Backup logs are off by default. Enable Save a backup log in Settings if you need one. AlphaSync Backup Log.plist stays inside the dated folder and records relative paths, errors, and the final state.</p>
 <hr>
-<p>If AlphaSync cannot read the complete list of applets and files, the backup stops before copying. Reconnect your Neo and try again.</p>
-
-<p>Copyright &copy; 2009-2013 tSoniq.</p>
+<p>Original application © 2009–2013 tSoniq.</p>
 </body>
 </html>

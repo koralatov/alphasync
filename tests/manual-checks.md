@@ -1,107 +1,79 @@
-# Manual release checks
+# Manual checks for AlphaSync 1.6
 
-Record the exact app version, build number, source commit, macOS version, architecture, Neo model, result, and any failure. A deployment target check establishes how the executable was built; runtime and USB checks need the actual system and device.
+Record the app version, build, source commit, edition, exact macOS version, architecture, Neo model, result, and any failure. Hosted builds and simulated transfers do not establish physical USB or macOS 13 runtime compatibility.
 
-## Systems
+The [frozen 1.5.1 checklist](https://github.com/koralatov/alphasync/blob/v1.5.1/tests/manual-checks.md) retains the macOS 11 and 12 checks and Mike’s earlier macOS 12 report. Do not apply 1.6 changes to that release.
 
-| System | Check | Manual result |
-|---|---|---|
-| macOS 11, Intel | Minimum runtime and older login-item API | Not run |
-| macOS 11, Apple Silicon | Minimum runtime and older login-item API | Not run |
-| macOS 12, Intel or Apple Silicon | Final ZIP, physical USB, and older login-item API | Earlier build reported working by Mike. Exact build and coverage unspecified. Final 1.5.1 not run. |
+## Runtime coverage
 
-macOS 12.7.5 provides a useful older-system check. Passing there does not establish a result for macOS 11. The automated macOS 15 and 26 builds also do not fill either macOS 11 row.
+| System and edition | Required check | Result |
+| --- | --- | --- |
+| macOS 13, Intel, Universal | Minimum runtime, physical Neo, Settings, and login helper | Not run |
+| macOS 13, Apple Silicon, Universal | Minimum runtime and physical Neo | Not run |
+| macOS 13, Apple Silicon, Apple Silicon | Minimum runtime, physical Neo, and helper | Not run |
+| Later macOS, Intel, Universal | Physical transfers and full interface | Not run |
+| Later macOS, Apple Silicon, both editions | Physical transfers, full interface, and helper | Not run |
 
-Record the host with `sw_vers` and `uname -m`. If Xcode tools are installed, run `scripts/verify-app.sh /Applications/AlphaSync.app` to check both architectures, deployment targets, versions, dependencies, signatures, and window loading on that host.
+Use known-good independent backups and disposable Neo files for writing checks. Install and test one edition at a time. Preserve the original files separately.
 
-With the app running, change macOS Appearance between Light, Dark, and Auto in System Settings (System Preferences on macOS 11 and 12). Check the main list, selected and unselected rows, toolbar, Inspector previews and details, Preferences, backup sheet, alerts, file panels, and Apple Help Viewer. Check Increase Contrast and a different accent colour too. The app should update without restarting. Confirm that file renaming still accepts Return, cancels with Escape, and is unavailable during a transfer. `scripts/check-appearance.sh /Applications/AlphaSync.app build/appearance` provides automated appearance checks and screenshots without using a Neo; the system-setting and hardware checks still need a person.
+## Windows, appearance, and accessibility
 
-This checklist applies to the final 1.5.1 Universal download for macOS 11 and 12. Newer CI systems are build hosts, not additional supported downloads.
+- Open without a Neo. Confirm a compact connection message with the native cable symbol. Connect a Neo and check that the same window expands to fit the sidebar, file list, and every toolbar item. Disconnect the last Neo and check that it becomes compact again. Repeat with two Neos, full screen, and a sheet open.
+- Resize the connected window. Confirm that table columns, status, and available memory fit, with memory aligned at the trailing edge. Check long applet names and connection errors.
+- Change system appearance between Light, Dark, and Auto without restarting. Check the list, selection, toolbar, Settings, Inspector, About, sheets, file panels, and Help Viewer. Repeat with Increase Contrast, Reduce Motion, a different accent colour, and scroll bars always visible.
+- Use keyboard navigation and VoiceOver throughout. Confirm that control labels, disabled states, sidebar groups, file sizes, progress, and read-only text are understandable. Check all controls on a small screen.
+- Open About, close it after activating a link, and reopen it. No link should start with keyboard focus. Tab must still reach every link. Check version 1.6, build 148, the correct edition description, and the selected icon in About, Finder, and the Dock.
+- Inspect a file, applet, and Neo. General and Preview must stay open, details must be selectable, and previous file text must clear when the selection changes. Check long metadata and unknown limits.
+- Compare bytes and decimal KB with Finder, including 0, 1, 999, 1,000, 1,024, and 12,000 bytes. Exact values such as 51,200 bytes must use regional grouping and fit their fields.
 
-## Help menu
+## Reading and file actions
 
-- Open Help without a Neo and during a background transfer. Confirm that the system Search field is present, AlphaSync Help is the first app command, and Help remains the last menu. Test ⌘? and VoiceOver navigation.
-- Search for a command and a Help topic such as “backup”, “monospaced”, or “licence”. Open a result and check the current guide in Help Viewer. Repeat after moving or updating the app, including on macOS 11 and 12.
-- Open Licence while offline and compare it with the original notice. Check scrolling and Light and Dark appearance. Open Release Notes and confirm that its version and GitHub tag match About, rather than whichever release is newest online.
-- Check that AlphaSync on GitHub opens the repository in the default browser and Report Issue… opens GitHub’s new-issue form, with a report template and the app and system details. No text files or device identifiers should be included. Leave the report unsubmitted.
-- Check that Contact Us… opens an unsent message to mike@koralatov.com in the default mail app, with the correct version in its subject. Cancel the message. If a handler is unavailable, check the native error alert and Copy Link button.
+- Double-click a file’s name, icon, and Size cell. Each action should open one independent read-only window with the complete file. Empty space and applet selection must not open a file.
+- Read a long and an empty file. Resize, scroll, select, copy, and use the native Find bar, Find Next, Find Previous, and Use Selection for Find. Typing, paste, cut, delete, and dropped text must not change the preview or Neo.
+- Switch between Regular and Monospaced. Confirm system fonts and default size, preserved text and selection, independent open windows, and the remembered choice for newly opened windows.
+- Copy to Clipboard must copy all loaded text, including text beyond the visible window, without changing selection or scroll. Check its disabled states for loading, empty files, and failed reads. Check the native symbol beside Read-only.
+- Disconnect during a read, and close a loading window. Failed reads should explain the failure; closed windows must stay closed. Successfully loaded text must remain readable and copyable after disconnection.
+- Export selected files through Save to Mac and by dragging names into Finder. Existing files must remain intact, and another copy must get a unique name. Exports and backups must be UTF-8.
+- From All Files, right-click an unselected file. Open, Save, Rename, and Clear must refer to that file, rather than a previously selected row. A dropped text file must replace the named row only after confirmation.
+- Import several text files with no file selected. Change the selection while a longer import is active. Its original applet destination must remain fixed. If a later file fails, the message must acknowledge any files already added.
+- Rename a supported file. Reject unsupported or overlong names without silent truncation. Check successful verification, failure messages, and the refreshed list. Other applet formats must remain read-only.
+- Change the file filter while an excluded applet is selected. A valid visible selection must replace it. Check natural ordering of File 1, File 2, and File 10.
 
-## Preferences
+## Imports and destructive changes
 
-- Open Preferences, change the file filter, close the window, and reopen it. Confirm that the selected filter and main file list agree, including after restarting the app.
-- Choose a different backup folder, and make a Quick Backup there. Reopen the chooser and cancel it; the selected folder should stay the same. Check a long folder path and its full-path tooltip.
-- With macOS keyboard navigation enabled, use Tab, Shift-Tab, and Space to reach and operate the controls. Check the labels with VoiceOver and open Preferences Help using the help button.
-- Confirm that **Save a backup log** is unticked until enabled, including after upgrading. Enable it, restart the app, and check that it stays enabled. Disable it again and confirm that the choice is saved. Check the new control and explanation in Light and Dark Mode.
-- Check the grouped layout and readable status text in Light and Dark Mode on an older supported Mac. On macOS 11 and 12, the Login Items settings button should be absent.
-- On a small screen, confirm that Preferences fits the visible screen and scrolls to every control. Repeat with long status text and macOS set to show scroll bars always. Check keyboard navigation and VoiceOver through the scrollable form.
-- Check that recovery copies are enabled by default and retention starts at 30 days. Change both settings, restart, and confirm that they persist. Open Recovery Copies and confirm that Finder opens it within the selected backup folder.
-
-## Launcher
-
-Move the app to its final location before enabling automatic launching. On macOS 11 and 12, check enabling, disabling, logout and login, and reconnecting the Neo. An unknown saved registration state is expected when the older helper is not running.
-
-On macOS 13 and later, check the approval-required state, the settings button, granting and revoking approval, and returning to Preferences. Confirm that registration failures show the system’s error instead of an approval message.
-
-## Files and responsiveness
-
-Keep known-good backups before testing writes to the Neo.
-
-- Open the app without a Neo. Check the compact waiting window, native cable symbol, and USB instruction in Light and Dark Mode. Connect a Neo and confirm that the same window expands to the file viewer, initially 560 points wide. Disconnect and reconnect; a chosen file viewer size should be restored.
-- With two Neos, disconnect one and confirm that the file viewer stays open. Disconnect the last one to return to the waiting window. Check a connection failure and confirm that its explanation is visible.
-- Disconnect during a backup or file sheet. Read and dismiss the result before the parent shrinks. Repeat in full screen; the window should return to the compact size after leaving full screen. Check the animation with Reduce Motion enabled.
-- In the file viewer, check readable filenames and sizes, toolbar buttons, and status bar. Widen and narrow the window; the Name column should take up the extra space while Size keeps its width.
-- Check that Backup, Clear, and Info have matching native toolbar gaps, including after upgrading an unchanged toolbar from an older version. A deliberately customised toolbar should keep its layout. The available-memory count should stay at the right edge when resizing, and the progress spinner should appear beside the connection message during transfers.
-- Check an empty file and files of 1, 999, 1,000, 1,024, and 12,000 bytes. The list, Inspector summary, device memory, and available-memory status should use bytes below 1 KB and decimal KB from 1 KB upwards. Compare with Finder and check the Mac’s regional number formatting in Light and Dark Mode.
-- Check exact byte counts in file and applet details, including minimum and maximum file sizes, ROM, workspace RAM, and file RAM. Values such as 51,200 and 106,432 bytes should have grouping separators and fit their fields. Check singular ‘1 byte’, zero, an unavailable maximum, and the grouped byte limit in an oversized-file warning.
-- Open the Inspector for a file, applet, and Neo. Preview and More Info should stay open with bold headings, native separators, and aligned detail rows. Check long names and copyright text, select and copy a detail value, and switch between Light and Dark Mode.
-- Double-click a file’s name, icon, and Size cell. Each should open one separate read-only window, initially 640 × 480 points, containing the complete file. Double-clicking a device, applet, header, or empty space should not open a file. Confirm that Return still permits renaming in the main list and that Escape cancels it.
-- In the file window, scroll and copy text with the Edit menu and keyboard shortcuts. Try typing, pasting, cutting, deleting, and dropping text; the contents should remain unchanged. Resize to the minimum size and enlarge it again; long lines should wrap without horizontal scrolling. Check Light, Dark, and Auto appearance.
-- Switch between Regular and Monospaced. Both should use the system font and default size, retain the text and selection, and leave other open windows unchanged. New windows should remember the last choice, including after restarting AlphaSync. Close one file window and check that the app and other windows stay open.
-- Open empty and long files, disconnect during a read, and close a loading window. Empty files should be identified, failed reads should explain the problem, and a closed window should stay closed when its read finishes. After a successful read, disconnect the Neo and check that the opened text can still be read and copied.
-- Scroll through a long file preview and copy text from it. The preview should wrap and stay read-only. Change to an applet or Neo and check its icon preview. Clear the selection and select several items; previous details and preview text should disappear. Confirm that changing the selected item keeps the top of the Inspector in place and that closing and reopening it works.
-- Open the Clear warning for a file and an applet, and the Replace warning by dropping a file. Each should be a native sheet attached to the main window. Cancel should be the default and have the initial keyboard focus, with no focus ring on Replace, Clear File, or Clear All Files. Immediately pressing Space, Return, keypad Enter, or Escape should dismiss it without changing the Neo. Repeat with keyboard navigation enabled, then check that Tab can still deliberately reach the other controls. With disposable files and known-good backups, confirm that deliberately choosing Replace, Clear File, or Clear All Files changes only the named contents.
-- Select a file and check the **Clear File…** label, then select AlphaWord and check **Clear All Files…**. Each tooltip should name its target. Check that Backup, Clear, and Info all fit the default 560-point window without toolbar overflow in Light and Dark Mode, on macOS 11 and 12. Confirm that clearing remains disabled during transfers and for unsupported selections.
-- Copy files in both directions, including pound signs, accented letters, and curly quotes.
-- Import matching MacASCII, UTF-8, and UTF-16 files, including both UTF-16 byte orders with byte-order marks. Confirm that exported copies and backups use UTF-8 and preserve the text.
-- Import the same paragraphs with LF, CRLF, and CR endings. Check for the same paragraph breaks.
-- Import unsupported characters and oversized text. Confirm that an explanation appears and the existing device file is unchanged.
-- Drop a 2 MB plain-text file onto AlphaWord and onto an existing file. Both should reject it with the Neo’s maximum, before changing any device file. Also test a file above the per-file limit that still fits in the available memory, and files exactly at and just above the converted-size limit.
-- With little free memory, check that adding a file or growing an existing file reports insufficient space, while replacing a file with the same or a smaller allocation still works. Keep a known-good backup and use disposable files.
-- If size or memory information cannot be read, check that the import is blocked with a reconnect instruction. An unknown AlphaWord maximum should appear as ‘unavailable’ in the Inspector. Confirm that the warnings and grouped byte counts remain readable in Light and Dark Mode.
-- Export files and folders to Finder, and drop text files onto the Neo.
-- Start a longer transfer and confirm that windows still repaint and respond. Disconnect and reconnect, and check that queued work for the old connection fails rather than reaching the replacement connection.
+- Import matching MacASCII, UTF-8, and UTF-16 files, including both UTF-16 byte orders with byte-order marks. Check pound signs, supported accents, curly quotes, tabs, and paragraph breaks.
+- Import matching LF, CRLF, and CR text. Paragraph breaks must be consistent.
+- Import unsupported characters, including `≡` and emoji. The import must explain the character and leave device files unchanged.
+- Try a 2 MB text file when adding and replacing. Both must reject the converted size before any file-writing command. Check exact and just-over limits, and a file that fits free memory but exceeds the per-file limit.
+- With little free memory, check that a same-size or smaller replacement can succeed, while growth and creation preserve the reserve and reject insufficient space. Missing or damaged limit and memory replies must block writes.
+- Open Clear File, Clear Selected Files, Clear All Files, and Replace warnings. Check the named targets. Cancel must be the default and initial focus. Immediately press Space, Return, keypad Enter, and Escape, each on a fresh warning. None may change device data. Repeat with keyboard navigation enabled, then deliberately reach the destructive button with Tab.
+- With known-good backups and disposable files, deliberately confirm replacement and clearing. Only named contents may change. Clear All must include every file in that applet, including unbound files, and retain recovery material for all originals.
+- Change a file on the device after opening its warning if the hardware permits it. The stale operation must stop rather than overwrite a different original.
+- Keep windows responsive during transfers. Disconnect and reconnect another Neo while work is queued. Requests for the old connection must fail rather than reach the replacement device.
 
 ## Recovery and verification
 
-- With recovery enabled, replace and clear disposable files. Confirm that each original is readable as UTF-8 under Recovery Copies before the operation completes. Restore a copy onto the matching Neo file and compare all text, including empty files, accents, pound signs, and paragraph breaks.
-- Clear all files in a disposable AlphaWord test set. Check that the recovery folder contains every original, with no missing or truncated files. If the complete device file list cannot be read, the requested recovery must stop the clear.
-- Use an unwritable backup destination or a full test volume. A requested recovery copy must block replacement or clearing, leave the Neo unchanged, and explain the failure. Check that incomplete copies keep their marker and that existing copies are preserved.
-- On disposable recovery folders, test 7-, 30-, and 90-day expiry and keeping copies until removed. Only recognised expired complete recovery copies should move to Trash when a new copy is made. Incomplete folders, symlinks, and unrelated files must remain. Confirm that older copies can be recovered from Trash. Never adjust dates on the user’s real backups for this check.
-- Turn the recovery option off deliberately and confirm that the next sheet reflects it. Re-enable it. Cancelled sheets must not save a changed preference or start a destructive operation.
-- On real hardware, create, replace, and clear disposable files and confirm the final text on the Neo. Disconnect during a write or verification. Any failure after writing must say contents may have changed and include the recovery location when one was saved. Check that a failed rename is reported and the file list refreshes to the actual name.
-- Check natural ordering of names such as File 1, File 2, and File 10. Connect a Neo containing several longer files and confirm that ordinary list refreshes no longer read every complete file. Opening a reader or a visible Inspector preview must still load the complete text.
-- In a read-only file window, test Copy, Select All, Find, Find Next, Find Previous, and Use Selection for Find through both menus and shortcuts. Search and copying must leave the original text unchanged.
-- Check the native symbol beside Read-only. Copy to Clipboard should copy the complete loaded file, including text beyond the visible preview, while preserving the selection and scroll position. Paste into TextEdit and compare it. Repeat after disconnecting the Neo. Loading, empty, and failed reads must not enable copying unavailable text. Check both font choices, the minimum window size, Light and Dark Mode, and VoiceOver.
+- Recovery must initially be enabled, with 30-day retention. Change settings, restart, and confirm persistence. A warning’s temporary recovery choice must not change the saved preference.
+- Replace and clear disposable files. Confirm that readable originals, exact raw `.neo` bytes, and identification metadata exist before destructive work completes. Restore saved text onto the matching Neo file and compare it.
+- Use an unwritable destination or full disposable test volume. A failed requested recovery copy must block the destructive change and preserve existing copies.
+- On disposable recovery folders only, check 7-, 30-, and 90-day expiry and no expiry. Recognised complete expired copies should move to Trash. Incomplete folders, directory symlinks, unrelated files, and unrecognised metadata must remain.
+- Disconnect during writing or read-back verification. The warning must explain that device contents may already have changed and include any saved recovery location. A failure after an earlier file changed must not claim that no files changed.
 
 ## Backups
 
-- Interrupt file-list discovery, or use a test device with a reported count larger than its listed files. Backup must stop before copying and ask for reconnection. An unreadable count must not be treated as an empty applet.
+- With logging off, back up named, numbered, and empty files. Confirm only the files and applet folders appear in the dated destination. Repeat on the same day; completed backups must not be replaced.
+- Enable Save a backup log, restart, and repeat. Each dated destination must contain its own AlphaSync Backup Log.plist with version 3, relative paths, errors, and the final state. Turning logging off again must persist.
+- Interrupt discovery or make a reported count disagree with the enumerated files. Backup must stop without treating a partial list as complete.
+- Stop or disconnect between files, force a file failure, and use an unwritable destination. Saved files must be retained, failures shown, and unfinished folders marked (Incomplete), with logs off and on. A finished first Neo must remain complete if a second one fails.
+- Check counts, long folder paths, singular and plural wording, Open Backup Folder, and Open Backup Folders. Finder must open the actual dated locations. No created folder means no Finder button. Return should dismiss Done.
+- Quit during a transfer. The interface must remain responsive while pending work finishes and USB closes safely.
 
-- Back up named files, numbered file spaces, and empty files with logging off. Confirm that only the copied files and their applet folders appear in each dated destination, with no new logs or separate reports folder.
-- Enable **Save a backup log** and repeat. Each Neo’s dated folder should contain **AlphaSync Backup Log.plist**, listing only its files, saved paths, errors, and final state. Repeat on the same day and confirm that each dated destination keeps its own log. Changing the option during a backup should affect the next backup.
-- Check the completion sheet’s file count and dated folder path. Click **Open Backup Folder** and confirm that Finder opens that exact folder. **Done** should dismiss the sheet, including when Return is pressed.
-- With two Neos, confirm that both dated locations are listed and **Open Backup Folders** opens both. Check long paths in Light and Dark Mode, copy a displayed path, and confirm that the text and buttons fit.
-- Force a file failure and confirm that **Backup incomplete** shows saved and failed counts while still offering any folders that were created. A backup that created no folder should not offer a Finder button.
-- Repeat into the same destination. Confirm that completed files are not overwritten.
-- Choose an unwritable destination and confirm that copying stops with an explanation.
-- With logging enabled, cancel between files, and disconnect between files. Check their distinct log states and the files already saved. With two Neos, finish the first and stop during the second; the first log should stay complete while the second records the interruption.
-- With logs off and on, check that a dated backup starts with (Incomplete), and that only a successful Neo backup loses the suffix. Cancel, disconnect, and force-quit during disposable test backups. Their folders must remain marked incomplete, and any log must remain accurate. Check that version 2 relative log paths still locate the copied files after a successful folder rename. Inspect any hidden temporary files separately.
-- Quit during a transfer. Confirm that the app remains responsive while the current work finishes and the device closes.
+## Settings, launch helper, and Help
 
-## Distribution
+- Check saved filters, backup destination, log option, recovery settings, and regular or monospaced preference after upgrading from 1.5.1 and after restarting. Cancelling a folder chooser must preserve its prior value.
+- In Applications, enable automatic opening. Check registration errors, approval required, granting and revoking Login Items approval, logout and login, USB reconnection, and disabling it. Confirm the helper does not capture keyboard input or open another edition unexpectedly.
+- Open Help with no Neo and during a transfer. Check the system search field, last menu position, AlphaSync Help as the first app item, ⌘?, command search, and topic search.
+- Open Licence offline and compare it with LICENSE. Development release notes must open the 1.6 development notes, rather than a nonexistent public release. GitHub and issue commands must open the intended pages.
+- Contact Us must open an unsent message to mike@koralatov.com. Issue and contact forms may include only version, build, edition, system version, and process architecture. Leave reports and messages unsubmitted. Check the Copy Link fallback with an unavailable handler.
 
-- Open About, close it, and reopen it after using a link. No link should have keyboard focus on opening. With keyboard navigation enabled, confirm that Tab can still reach Project, Release notes, and Licence, and Space can activate a focused link.
-
-- Check Finder, the Dock, and About for the legacy Universal download. It should show the original green icon, version 1.5.1, build 147, and “For macOS 11 and macOS 12”. Check small and large icon sizes in Light and Dark Mode.
-
-Use the final download ZIP for a clean-install check on a second Mac. Record first-launch behaviour, opening every window, automatic launching, and a real transfer.
+Use the final development ZIP for a clean-install check on another Mac. Record results here before proposing a public 1.6 release.

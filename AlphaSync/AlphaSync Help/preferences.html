@@ -1,52 +1,22 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-        "http://www.w3.org/TR/html4/loose.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <link rel="stylesheet" type="text/css" href="css/alphasync.css">
-    <meta name="KEYWORDS" content="preferences, settings, setup">
-	<title>AlphaSync Preferences</title> 
+    <meta charset="utf-8">
+    <meta name="description" content="Settings in AlphaSync 1.6.">
+    <link rel="stylesheet" href="css/alphasync.css">
+    <title>Settings – AlphaSync Help</title>
 </head>
 <body>
-<img src="gfx/alphasync128.png" width="96" height="96" align="right" alt="AlphaSync Icon">
-
-<a name="PreferenceWindowAnchor"></a>
-
-<h1>Preferences</h1>
+<p><a href="alphasync-help.html">AlphaSync Help</a></p>
+<h1>Settings</h1>
+<p>Choose AlphaSync → Settings….</p>
+<h2>Files shown and backed up</h2><p>Choose AlphaWord files, AlphaWord and dictionary files, or all applet files. The same filter controls the main list and backups.</p>
+<h2>Backups</h2><p>Choose where backups and recovery copies are saved. Backup logs are off unless you enable Save a backup log. Exported text always uses UTF-8.</p>
+<h2>Recovery copies</h2><p>Save recovery copies by default is initially on. A Replace or Clear warning can override that choice for its own operation. Keep copies for 7, 30, or 90 days, or until you remove them. The default is 30 days.</p>
+<p>Open Recovery Copies opens the folder inside your backup destination. It is created when you first save a recovery copy. Restore text by importing its saved .txt file onto the matching Neo file. Keep the raw .neo files for recovery or diagnosis.</p>
+<p>Only recognised, complete expired copies move to Trash, when a new copy is made. Incomplete and unrelated folders are left alone.</p>
+<h2>Automatic opening</h2><p>Enable Open AlphaSync when a Neo is connected. The separate status explains whether Login Items approval is required. Use Open Login Items Settings to review the system’s setting.</p>
 <hr>
-
-<p>Open Preferences from the AlphaSync menu. Changes are saved automatically.</p>
-
-<h2>Files</h2>
-<p>Use <strong>Show</strong> to choose which files appear in the main window.
-Quick Backup includes only the files shown there.</p>
-<p>Exported files and backups always use UTF-8, preserving accented letters, currency symbols,
-and other characters supplied by the Neo. Preferences shows this as a fixed format.</p>
-<p>Imports still accept MacASCII (Mac Roman), UTF-8, and UTF-16. The input encoding is detected
-when a file is opened, independently of the export format.</p>
-
-<h2>Backups</h2>
-<p>The folder path shows where Quick Backup saves your files. Click <strong>Choose…</strong>
-to pick a different folder. Cancelling the chooser keeps the current folder.</p>
-<p><strong>Save a backup log</strong> is off by default. Enable it if you want a record of copied files and any errors.
-Each log is saved as <code>AlphaSync Backup Log.plist</code> inside the dated backup folder.
-Changing this option affects the next backup.</p>
-
-<h2>Recovery copies</h2>
-<p><strong>Save recovery copies by default</strong> keeps the original text before replacing or clearing it.
-It is on by default. You can change the choice in each warning. If the requested copy cannot be saved,
-AlphaSync stops without changing the Neo’s files.</p>
-<p>Use <strong>Open Recovery Copies</strong> to open the saved originals inside your backup folder.
-To restore one, drag its text file onto the matching file in AlphaSync.</p>
-<p>Keep copies for 7, 30, or 90 days, or choose <strong>Until I remove them</strong>.
-The default is 30 days. Expired copies move to Trash when a new recovery copy is made.
-Keep separate backups of important files.</p>
-
-<h2>Automatic opening</h2>
-<p>Select <strong>Open AlphaSync when a Neo is connected</strong> to open the app
-automatically when you plug in your Neo.</p>
-<p>The message below the tick box shows the current system status. On macOS 11 and 12, the older login-item API cannot always report registration status. Keep AlphaSync in Applications before enabling automatic opening.</p>
-<hr>
-<p>Copyright &copy; 2009-2013 tSoniq.</p>
+<p>Original application © 2009–2013 tSoniq.</p>
 </body>
 </html>

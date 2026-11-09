@@ -1,41 +1,20 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-        "http://www.w3.org/TR/html4/loose.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
-    <link rel="stylesheet" type="text/css" href="css/alphasync.css">
-    <meta name="KEYWORDS" content="discard, dispose, delete, clear, erase">
-	<title>AlphaSync Clearing Files</title> 
+    <meta name="description" content="Clearing files in AlphaSync 1.6.">
+    <link rel="stylesheet" href="css/alphasync.css">
+    <title>Clearing files – AlphaSync Help</title>
 </head>
 <body>
-<img src="gfx/alphasync128.png" width="96" height="96" align="right" alt="AlphaSync Icon">
-
-<h1>Clearing Files</h1><hr>
-<br>
-<br>
-<h2>Clearing a single file</h2>
-<br>
-<p>To clear a file’s contents, select it in the main window and click <strong>Clear File…</strong>.
-Read the warning, then choose <strong>Clear File</strong> to clear the file or <strong>Cancel</strong> to keep it.
-Cancel is the default.</p>
-<br>
-
-<h2>Clearing all AlphaWord files</h2>
-<br>
-<p>To clear all AlphaWord files, select AlphaWord in the main window and click <strong>Clear All Files…</strong>.
-The warning names the applet whose files will be cleared. Click <strong>Clear All Files</strong> to proceed.
-Cancel is the default.</p>
-
-<h2>Keeping the original text</h2>
-<p><strong>Save a recovery copy first</strong> is on by default. AlphaSync saves the original text inside
-<strong>Recovery Copies</strong> in your backup folder. If that copy cannot be completed, clearing stops.
-Preferences controls how long copies are kept and provides an <strong>Open Recovery Copies</strong> button.</p>
-<p>Clearing cannot be undone with the Edit menu. To restore saved text, drag the recovery text file
-onto the matching file in AlphaSync. Keep separate backups of important files.</p>
-<p>AlphaSync reads the contents back after clearing. If it cannot confirm the result, it explains that
-some contents may have changed. Check the Neo and your recovery copy before continuing.</p>
-
+<p><a href="alphasync-help.html">AlphaSync Help</a></p>
+<h1>Clearing files</h1>
+<p>Clearing removes the selected text on your Neo and cannot be undone.</p>
+<ol><li>Select one file for Clear File…, or several files in the same applet for Clear Selected Files….</li><li>To clear an entire applet, choose it in the sidebar and clear the file selection. The command becomes Clear All Files….</li><li>Read the warning and check the named files before proceeding.</li></ol>
+<p>Cancel is the default and has initial keyboard focus. Return or Space should cancel when the warning first opens. Tab can deliberately move focus to other controls.</p>
+<p>Save a recovery copy first is on by default. Each original is saved as readable text and raw Neo data before clearing starts. If the requested copy cannot be completed, no clearing starts. Use Open Recovery Copies in Settings to find the originals.</p>
+<p>Clearing is available for AlphaWord and user dictionary files. It is unavailable for other formats and during another operation. Changed files are read back to verify them. A failure after clearing starts can leave some files changed; the error includes the recovery location when a copy was saved.</p>
 <hr>
-<p>Copyright &copy; 2009-2013 tSoniq.</p>
+<p>Original application © 2009–2013 tSoniq.</p>
 </body>
 </html>
