@@ -51,10 +51,9 @@ public final class NeoProtocol {
         guard (0...0xffffff).contains(count) else { throw NeoError.invalidData("A transfer length is invalid.") }
         var result = Data()
         result.reserveCapacity(count)
-        let deadline = Date().addingTimeInterval(timeout)
+        let deadline = try TransferDeadline(timeout: timeout)
         while result.count < count {
-            let remaining = deadline.timeIntervalSinceNow
-            guard remaining > 0 else { throw NeoError.device("The Neo did not finish its reply in time. Reconnect it and try again.") }
+            let remaining = try deadline.remaining()
             let block = try transport.read(maximum: min(8, count - result.count), timeout: remaining)
             guard !block.isEmpty, block.count <= count - result.count else { throw NeoError.invalidData("A reply is incomplete.") }
             result.append(block)
@@ -154,8 +153,10 @@ public final class NeoProtocol {
         }
     }
 
-    private func rawRead(applet: UInt16, index: UInt8, maximum: Int) throws -> Data {
+    private func rawRead(applet: UInt16, index: UInt8, maximum: Int,
+                         checkingCancellation: () throws -> Void = {}) throws -> Data {
         guard (0...0xffffff).contains(maximum) else { throw NeoError.invalidData("A file allocation is invalid.") }
+        try checkingCancellation()
         var request = NeoMessage(command: 0x1c)
         try request.set(UInt32(maximum), at: 1, width: 3)
         try request.set(UInt32(index), at: 4, width: 1)
@@ -164,6 +165,7 @@ public final class NeoProtocol {
         var result = Data()
         result.reserveCapacity(maximum)
         while result.count < maximum {
+            try checkingCancellation()
             try transport.write(NeoMessage(command: 0x10).data, timeout: timeout)
             let reply = try receive()
             if reply.command == 0x4e { break }
@@ -176,10 +178,15 @@ public final class NeoProtocol {
         }
         return result
     }
-    public func readFile(applet: UInt16, index: UInt8) throws -> Data {
+    public func readFile(applet: UInt16, index: UInt8,
+                         checkingCancellation: () throws -> Void = {}) throws -> Data {
+        try checkingCancellation()
         let info = try attributes(applet: applet, index: index)
         guard info.allocation <= 0xffffff else { throw NeoError.invalidData("The file allocation is too large.") }
-        return try transaction { try rawRead(applet: applet, index: index, maximum: max(1, info.allocation)) }
+        try checkingCancellation()
+        return try transaction {
+            try rawRead(applet: applet, index: index, maximum: max(1, info.allocation), checkingCancellation: checkingCancellation)
+        }
     }
 
     private func writeBlocks(_ data: Data) throws {

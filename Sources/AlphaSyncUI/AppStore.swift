@@ -92,11 +92,13 @@ public final class AppStore: ObservableObject {
                     do {
                         let result = try await self.service.scan()
                         // A scan queued before a user operation must not replace its newer result.
-                        if observed == self.epoch && !self.busy {
+                        if !Task.isCancelled && observed == self.epoch && !self.busy {
                             self.devices = result.devices; self.connectionIssue = result.issue
                             self.reconcileSelection()
                         }
-                    } catch { self.connectionIssue = error.localizedDescription }
+                    } catch {
+                        if !Task.isCancelled && observed == self.epoch { self.connectionIssue = error.localizedDescription }
+                    }
                 }
                 try? await Task.sleep(for: .seconds(2))
             }
@@ -128,6 +130,7 @@ public final class AppStore: ObservableObject {
         defer { activities -= 1; operationText = ""; progress = nil; stopRequest = nil }
         do { try await action() }
         catch {
+            if error is CancellationError { return }
             notice = AppNotice("The operation could not be completed", error.localizedDescription)
             if let result = try? await service.refresh() { devices = result.devices; connectionIssue = result.issue; reconcileSelection() }
         }
@@ -139,11 +142,13 @@ public final class AppStore: ObservableObject {
         }
     }
     public func readText(_ id: NeoFileID) async throws -> String {
+        try Task.checkCancellation()
         guard !shuttingDown else { throw NeoError.cancelled }
         guard let applet = applet(for: id) else { throw NeoError.disconnected }
         activities += 1; epoch += 1
         defer { activities -= 1 }
         let bytes = try await service.read(id)
+        try Task.checkCancellation()
         return try FileCodec.text(bytes, applet: applet)
     }
     public func importFiles(_ urls: [URL]) async {
@@ -161,6 +166,7 @@ public final class AppStore: ObservableObject {
             var created = 0
             do {
                 for url in urls {
+                    try Task.checkCancellation()
                     let scoped = url.startAccessingSecurityScopedResource()
                     defer { if scoped { url.stopAccessingSecurityScopedResource() } }
                     if let target {

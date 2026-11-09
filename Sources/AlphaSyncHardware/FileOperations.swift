@@ -147,10 +147,13 @@ extension DeviceService {
     public func export(_ files: [NeoFileID], to destination: URL) async throws -> [URL] {
         try await perform { access in
             try files.map { id in
+                try access.checkCancellation()
                 let snapshot = try access.snapshot(for: id.connection)
                 guard let applet = snapshot.applets.first(where: { $0.id == id.applet }),
                       let file = applet.files.first(where: { $0.id == id }) else { throw NeoError.disconnected }
-                let raw = try access.engine(for: id.connection).readFile(applet: id.applet, index: id.index)
+                let raw = try access.engine(for: id.connection).readFile(applet: id.applet, index: id.index) {
+                    try access.checkCancellation()
+                }
                 let text = try FileCodec.text(raw, applet: applet)
                 return try AtomicFileStore.write(TextFiles.utf8(text), name: file.displayName,
                                                   extension: FileCodec.fileExtension(applet: id.applet), to: destination)

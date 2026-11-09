@@ -44,7 +44,7 @@ final class USBHostTransport: NeoTransport {
 
     func read(maximum: Int, timeout: TimeInterval) throws -> Data {
         guard !closed else { throw NeoError.disconnected }
-        guard (1...8).contains(maximum), timeout > 0 else { throw NeoError.invalidData("Invalid USB read bounds.") }
+        guard (1...8).contains(maximum), timeout.isFinite, timeout > 0 else { throw NeoError.invalidData("Invalid USB read bounds.") }
         let buffer = try interface.ioData(withCapacity: maximum)
         buffer.length = maximum
         do {
@@ -61,12 +61,11 @@ final class USBHostTransport: NeoTransport {
     func write(_ data: Data, timeout: TimeInterval) throws {
         guard !closed else { throw NeoError.disconnected }
         let bytes = Array(data)
-        let deadline = Date().addingTimeInterval(timeout)
+        let deadline = try TransferDeadline(timeout: timeout)
         var offset = 0
         while offset < bytes.count {
             let length = min(8, bytes.count - offset)
-            let remaining = deadline.timeIntervalSinceNow
-            guard remaining > 0 else { throw NeoError.device("The Neo did not accept its command in time.") }
+            let remaining = try deadline.remaining()
             let buffer = try interface.ioData(withCapacity: length)
             buffer.length = length
             let block = Array(bytes[offset..<(offset + length)])

@@ -12,6 +12,7 @@ extension DeviceService {
                        saveLog: Bool, stop: StopRequest,
                        progress: @escaping @Sendable (BackupProgress) -> Void) async throws -> BackupResult {
         try await perform { access in
+            func shouldStop() -> Bool { stop.isRequested || access.isCancellationRequested }
             // Validate all included lists before creating folders or treating a prefix as a complete backup.
             let snapshots = try connections.map { try access.update($0) }
             let expected = snapshots.reduce(0) { total, snapshot in
@@ -19,7 +20,7 @@ extension DeviceService {
             }
             var saved = 0, folders: [URL] = [], failures: [String] = []
             for snapshot in snapshots {
-                if stop.isRequested { break }
+                if shouldStop() { break }
                 let applets = snapshot.applets.filter { includedApplets?.contains($0.id) ?? true }
                 let files = applets.flatMap { applet in applet.files.map { (applet, $0) } }
                 if files.isEmpty { continue }
@@ -44,7 +45,7 @@ extension DeviceService {
                 var appletFolders: [UInt16: URL] = [:]
                 if !logFailed {
                     for (index, entry) in files.enumerated() {
-                        if stop.isRequested { break }
+                        if shouldStop() { break }
                         let (applet, file) = entry
                         progress(BackupProgress(saved: saved, expected: expected, fileName: file.displayName))
                         do {
@@ -76,10 +77,10 @@ extension DeviceService {
                     }
                 }
                 if !logFailed {
-                    do { try writeLog(stop.isRequested ? "cancelled" : (failed ? "incomplete" : "complete")) }
+                    do { try writeLog(shouldStop() ? "cancelled" : (failed ? "incomplete" : "complete")) }
                     catch { failed = true; failures.append("The final backup log could not be saved: \(error.localizedDescription)") }
                 }
-                if !failed && !stop.isRequested {
+                if !failed && !shouldStop() {
                     do {
                         let final = try AtomicFileStore.completeFolder(pending)
                         folders[folders.count - 1] = final
@@ -90,7 +91,7 @@ extension DeviceService {
                 }
             }
             progress(BackupProgress(saved: saved, expected: expected, fileName: ""))
-            return BackupResult(saved: saved, expected: expected, folders: folders, stopped: stop.isRequested, failures: failures)
+            return BackupResult(saved: saved, expected: expected, folders: folders, stopped: shouldStop(), failures: failures)
         }
     }
 }

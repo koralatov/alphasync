@@ -10,6 +10,7 @@ private final class SimulatedNeo: NeoTransport {
     var helloFailures = 0, helloAttempts = 0, resets = 0
     var corruptVerification = false
     var oversizedBlock = false
+    var readBlocks = 0
     var maximum: UInt32 = 51200
     private var blockRemaining = 0
     private var pending = Data()
@@ -76,6 +77,7 @@ private final class SimulatedNeo: NeoTransport {
             var block = Data(payload[readOffset..<(readOffset + size)])
             if corruptVerification && writes > 0 && readOffset == 0 { block[0] ^= 1 }
             readOffset += size
+            readBlocks += 1
             try replyData(0x4d, block)
         case 0x1f:
             writes += 1; pending = Data(); writingAttributes = false
@@ -115,6 +117,18 @@ final class ProtocolTests: XCTestCase {
     func testOversizedReplyIsRejectedBeforeReadingPayload() {
         let device = SimulatedNeo(); device.oversizedBlock = true
         XCTAssertThrowsError(try NeoProtocol(transport: device).readFile(applet: 0xa000, index: 1))
+        XCTAssertEqual(device.writes, 0)
+    }
+    func testCancelledReadStopsBetweenBlocksWithoutWritingFiles() {
+        let device = SimulatedNeo()
+        device.payload = Data(repeating: 65, count: 4096)
+        let engine = NeoProtocol(transport: device)
+        XCTAssertThrowsError(try engine.readFile(applet: 0xa000, index: 1) {
+            if device.readBlocks > 0 { throw CancellationError() }
+        }) { error in
+            XCTAssertTrue(error is CancellationError)
+        }
+        XCTAssertEqual(device.readBlocks, 1)
         XCTAssertEqual(device.writes, 0)
     }
     func testOversizedCreationSendsNoWritingCommand() {

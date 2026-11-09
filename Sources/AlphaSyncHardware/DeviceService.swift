@@ -23,12 +23,23 @@ public final class DeviceService: @unchecked Sendable {
     public init() {}
 
     public func perform<T: Sendable>(_ operation: @escaping @Sendable (IsolatedDeviceAccess) throws -> T) async throws -> T {
-        try await withCheckedThrowingContinuation { continuation in
-            queue.async { [self] in
-                guard !stopping else { continuation.resume(throwing: NeoError.disconnected); return }
-                do { continuation.resume(returning: try operation(IsolatedDeviceAccess(service: self))) }
-                catch { continuation.resume(throwing: error) }
+        let cancellation = StopRequest()
+        return try await withTaskCancellationHandler {
+            try Task.checkCancellation()
+            return try await withCheckedThrowingContinuation { continuation in
+                queue.async { [self] in
+                    guard !stopping else { continuation.resume(throwing: NeoError.disconnected); return }
+                    do {
+                        let access = IsolatedDeviceAccess(service: self, cancellation: cancellation)
+                        try access.checkCancellation()
+                        continuation.resume(returning: try operation(access))
+                    } catch {
+                        continuation.resume(throwing: error)
+                    }
+                }
             }
+        } onCancel: {
+            cancellation.stop()
         }
     }
 
@@ -39,7 +50,11 @@ public final class DeviceService: @unchecked Sendable {
         try await perform { access in try access.scan(refresh: true) }
     }
     public func read(_ file: NeoFileID) async throws -> Data {
-        try await perform { access in try access.engine(for: file.connection).readFile(applet: file.applet, index: file.index) }
+        try await perform { access in
+            try access.engine(for: file.connection).readFile(applet: file.applet, index: file.index) {
+                try access.checkCancellation()
+            }
+        }
     }
     public func shutdown() async {
         await withCheckedContinuation { continuation in
@@ -55,7 +70,18 @@ public final class DeviceService: @unchecked Sendable {
     /// Created only inside queue.async. Do not retain it or pass it to another executor.
     public final class IsolatedDeviceAccess {
         private unowned let service: DeviceService
-        fileprivate init(service: DeviceService) { self.service = service }
+        private let cancellation: StopRequest
+        fileprivate init(service: DeviceService, cancellation: StopRequest) {
+            self.service = service
+            self.cancellation = cancellation
+        }
+        var isCancellationRequested: Bool {
+            dispatchPrecondition(condition: .onQueue(service.queue))
+            return cancellation.isRequested
+        }
+        func checkCancellation() throws {
+            if isCancellationRequested { throw CancellationError() }
+        }
         public func engine(for generation: UUID) throws -> NeoProtocol {
             dispatchPrecondition(condition: .onQueue(service.queue))
             guard let connection = service.connections.values.first(where: { $0.generation == generation }) else { throw NeoError.disconnected }
