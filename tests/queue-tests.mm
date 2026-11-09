@@ -61,7 +61,7 @@ int main()
             [sorted addChild:child];
         }
         [sorted sortChildren];
-        CHECK([[[sorted children] valueForKey:@"displayName"] isEqual:@[@"File 1", @"File 2", @"File 10"]]);
+        CHECK(([[[sorted children] valueForKey:@"displayName"] isEqual:@[@"File 1", @"File 2", @"File 10"]]));
         ts::ASDevice* testDevice = &device;
         ASDeviceController* controller = [[ASDeviceController alloc] init];
         dispatch_queue_t queue = (dispatch_queue_t)[controller valueForKey:@"deviceQueue"];
