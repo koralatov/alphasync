@@ -85,7 +85,7 @@ static NSString* ASCreateRecoveryCopy(ASNode* node, NSString* root, NSInteger da
         return nil;
     }
     NSDictionary* information = @{@"formatVersion": @1, @"kind": @"AlphaSyncRecoveryCopy", @"createdAt": now,
-                                   @"sourceName": [node displayName] ?: @""};
+                                   @"sourceName": ([node displayName] ? [node displayName] : @"")};
     NSData* data = [NSPropertyListSerialization dataWithPropertyList:information format:NSPropertyListXMLFormat_v1_0 options:0 error:&error];
     if (!data || !aq_WriteUniqueFile(pending, @".recovery-information", @"plist", data, &error) ||
         !aq_RenameItemExclusively(pending, final, &error))

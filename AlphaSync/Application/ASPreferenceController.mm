@@ -380,7 +380,7 @@ static NSBox* ASPreferenceSeparator(void)
     {
         NSAlert* alert = [[[NSAlert alloc] init] autorelease];
         [alert setMessageText:@"The recovery folder could not be opened."];
-        [alert setInformativeText:[error localizedDescription] ?: @"Check that your backup folder is available."];
+        [alert setInformativeText:([error localizedDescription] ? [error localizedDescription] : @"Check that your backup folder is available.")];
         [alert beginSheetModalForWindow:[self window] completionHandler:nil];
     }
 }

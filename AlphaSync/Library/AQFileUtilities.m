@@ -58,7 +58,7 @@ NSString* aq_FormattedFileSize(unsigned long long byteCount)
 
 NSString* aq_SafePathComponent(NSString* name)
 {
-    NSString* safe = [[(name ?: @"") stringByReplacingOccurrencesOfString:@"/" withString:@"_"]
+    NSString* safe = [[(name ? name : @"") stringByReplacingOccurrencesOfString:@"/" withString:@"_"]
         stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@". "]];
     safe = [[safe componentsSeparatedByCharactersInSet:[NSCharacterSet controlCharacterSet]] componentsJoinedByString:@"_"];
     return [safe length] ? safe : @"Untitled";

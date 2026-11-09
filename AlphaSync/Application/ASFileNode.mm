@@ -85,6 +85,7 @@ static NSString* ASReadTextFile(NSString* path, ASDevice* device, const ASApplet
         if (error) *error = tooLarge;
         return nil;
     }
+    readError = nil;
     NSFileHandle* handle = [NSFileHandle fileHandleForReadingFromURL:url error:&readError];
     NSMutableData* data = [NSMutableData data];
     if (handle)
@@ -105,13 +106,13 @@ static NSString* ASReadTextFile(NSString* path, ASDevice* device, const ASApplet
     }
     if (!handle || readError)
     {
-        if (error) *error = [NSString stringWithFormat:@"The text file could not be read: %@", [readError localizedDescription] ?: @"The file is unavailable."];
+        if (error) *error = [NSString stringWithFormat:@"The text file could not be read: %@", ([readError localizedDescription] ? [readError localizedDescription] : @"The file is unavailable.")];
         return nil;
     }
     NSString* text = nil;
     BOOL lossy = NO;
     [NSString stringEncodingForData:data encodingOptions:@{
-        NSStringEncodingDetectionSuggestedEncodingsKey: @[@(NSUTF8StringEncoding), @(NSUnicodeStringEncoding), @(NSUTF16LittleEndianStringEncoding), @(NSUTF16BigEndianStringEncoding)],
+        NSStringEncodingDetectionSuggestedEncodingsKey: @[@(NSUTF8StringEncoding), @(NSUnicodeStringEncoding), @(NSUTF16LittleEndianStringEncoding), @(NSUTF16BigEndianStringEncoding), @(NSMacOSRomanStringEncoding)],
         NSStringEncodingDetectionUseOnlySuggestedEncodingsKey: @YES
     } convertedString:&text usedLossyConversion:&lossy];
     if (!text || lossy) text = [[[NSString alloc] initWithData:data encoding:NSMacOSRomanStringEncoding] autorelease];

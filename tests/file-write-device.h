@@ -4,6 +4,7 @@
 #include "ASDevice.h"
 #include "ASSettings.h"
 #include <cstdlib>
+#include <algorithm>
 #include <cstring>
 #include <deque>
 #include <vector>
