@@ -1,9 +1,33 @@
 #if os(macOS)
 import Foundation
+import Darwin
 import XCTest
 @testable import AlphaSyncCore
 
 final class FileStoreTests: XCTestCase {
+    func testImportsRejectSpecialFilesWithoutWaiting() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: false)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let pipe = root.appendingPathComponent("Pipe.txt")
+        XCTAssertEqual(mkfifo(pipe.path, 0o600), 0)
+        XCTAssertThrowsError(try TextFiles.read(pipe))
+        XCTAssertThrowsError(try TextFiles.read(root))
+        let file = root.appendingPathComponent("Text.txt")
+        try Data("Regular file".utf8).write(to: file)
+        let link = root.appendingPathComponent("Link.txt")
+        try FileManager.default.createSymbolicLink(at: link, withDestinationURL: file)
+        XCTAssertEqual(try TextFiles.read(link), "Regular file")
+    }
+
+    func testEmptyPasswordAttributesCannotBeSentToNeo() throws {
+        var raw = try NeoFileAttributes(name: "File 1").raw
+        raw.replaceSubrange(16..<24, with: Data(repeating: 0, count: 8))
+        let malformed = try NeoFileAttributes(raw: raw)
+        XCTAssertThrowsError(try malformed.validateForWriting())
+        XCTAssertNoThrow(try NeoFileAttributes(name: "File 1").validateForWriting())
+    }
+
     func testConcurrentExportsPreserveExistingFiles() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: false)

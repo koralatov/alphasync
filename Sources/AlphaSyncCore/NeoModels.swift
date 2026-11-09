@@ -42,6 +42,12 @@ public struct NeoFileAttributes: Equatable, Sendable {
         raw[37] = Self.spaces[fileSpace]
     }
 
+    public func validateForWriting() throws {
+        guard !name.isEmpty, !password.isEmpty else {
+            throw NeoError.device("The Neo returned an empty file name or password. Its attributes cannot safely be changed. No device files were changed.")
+        }
+    }
+
     public mutating func rename(_ name: String) throws {
         guard !name.isEmpty, !name.unicodeScalars.contains(where: { CharacterSet.controlCharacters.contains($0) }),
               let encoded = name.data(using: .windowsCP1252, allowLossyConversion: false), encoded.count <= 15 else {

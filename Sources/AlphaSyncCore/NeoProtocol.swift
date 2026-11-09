@@ -193,6 +193,7 @@ public final class NeoProtocol {
         guard readback == data else { throw NeoError.verificationFailed }
     }
     private func rawAttributes(_ attributes: NeoFileAttributes, applet: UInt16, index: UInt8) throws {
+        try attributes.validateForWriting()
         _ = try send(command(0x1d, value: UInt32(index), applet: applet), expecting: 0x5b)
         try writeBlocks(attributes.raw)
         var commit = NeoMessage(command: 0x1e)
@@ -236,6 +237,7 @@ public final class NeoProtocol {
     public func rename(applet: UInt16, index: UInt8, to name: String) throws {
         var info = try attributes(applet: applet, index: index)
         try info.rename(name)
+        try info.validateForWriting()
         try changing {
             try transaction { try rawAttributes(info, applet: applet, index: index) }
             guard try attributes(applet: applet, index: index).name == name else { throw NeoError.verificationFailed }

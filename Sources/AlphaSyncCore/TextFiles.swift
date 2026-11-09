@@ -1,11 +1,28 @@
 import Foundation
+#if os(macOS)
+import Darwin
+#endif
 
 public enum TextFiles {
     public static let maximumImportBytes = 4 * 1024 * 1024
 
     public static func read(_ url: URL) throws -> String {
+        #if os(macOS)
+        // Non-blocking open avoids waiting on a named pipe before the regular-file check.
+        let descriptor = open(url.path, O_RDONLY | O_NONBLOCK | O_CLOEXEC)
+        guard descriptor >= 0 else { throw NSError(domain: NSPOSIXErrorDomain, code: Int(errno)) }
+        let handle = FileHandle(fileDescriptor: descriptor, closeOnDealloc: true)
+        #else
         let handle = try FileHandle(forReadingFrom: url)
+        #endif
         defer { try? handle.close() }
+        #if os(macOS)
+        var attributes = stat()
+        guard fstat(handle.fileDescriptor, &attributes) == 0 else { throw NSError(domain: NSPOSIXErrorDomain, code: Int(errno)) }
+        guard attributes.st_mode & mode_t(S_IFMT) == mode_t(S_IFREG) else {
+            throw NeoError.device("Choose a regular text file. Folders, devices, and named pipes cannot be imported. No device files were changed.")
+        }
+        #endif
         let data = try handle.read(upToCount: maximumImportBytes + 1) ?? Data()
         guard data.count <= maximumImportBytes else {
             throw NeoError.device("This text file is larger than AlphaSync’s \(maximumImportBytes.formatted())-byte import limit. Shorten it or split it into smaller files. No device files were changed.")
