@@ -28,4 +28,5 @@
 - Develop on master with two targets sharing the same Swift core and SwiftUI application sources.
 - Both targets support macOS 13 and later. Universal includes x86_64 and arm64; Apple Silicon includes arm64 only.
 - Use public IOUSBHost bulk APIs for file transfers. The Neo’s HID keyboard interface cannot carry its bulk file protocol. Do not add a DriverKit extension or security bypass without a real hardware requirement.
-- Follow the milestones and data-protection requirements in `docs/1.6-migration.md`. Do not publish a release without a release request. The user has requested the first Swift release as version 2.0.
+- Follow the milestones and data-protection requirements in `docs/1.6-migration.md`. Do not publish a release without a release request.
+- Version 2.0, build 149 is published at immutable tag `v2.0`, source `a508da036db4516d65d98b0a33e1d031e96f8b88`. Do not move its tag or replace its assets. Choose a new version and build before a later release.
