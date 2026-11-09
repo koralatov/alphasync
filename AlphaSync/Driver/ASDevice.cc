@@ -251,6 +251,11 @@ namespace ts
             }
         }
 
+        if (result && !verifyFile(buffer, size, applet->appletID(), *fileIndex, raw))
+        {
+            error->failure = ASFileWriteFailure::VerificationFailed;
+            result = false;
+        }
         if (result) error->failure = ASFileWriteFailure::None;
         return dialogueEnd(result);
     }
@@ -274,6 +279,11 @@ namespace ts
         error->failure = ASFileWriteFailure::DeviceError;
         bool result = dialogueStart();
         if (result) result = rawWriteFile(buffer, size, applet->appletID(), fileIndex, raw);
+        if (result && !verifyFile(buffer, size, applet->appletID(), fileIndex, raw))
+        {
+            error->failure = ASFileWriteFailure::VerificationFailed;
+            result = false;
+        }
         if (result) error->failure = ASFileWriteFailure::None;
         return dialogueEnd(result);
     }
@@ -1238,6 +1248,14 @@ namespace ts
     error:
         fprintf(stderr, "Error in %s: last request: %02x, last response: %02x\n", __FUNCTION__, request.command(), response.command());
         return false;
+    }
+
+    bool ASDevice::verifyFile(const void* source, unsigned size, ASAppletID applet, int index, bool raw)
+    {
+        std::vector<uint8_t> readback(size);
+        unsigned actual = 0;
+        return rawReadFile(readback.data(), size, &actual, applet, index, raw) && actual == size &&
+            (size == 0 || memcmp(source, readback.data(), size) == 0);
     }
 
 

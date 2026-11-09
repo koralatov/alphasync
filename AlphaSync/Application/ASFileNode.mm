@@ -58,6 +58,8 @@ static NSString* ASFileWriteMessage(const ASFileWriteError& error)
         case ASFileWriteFailure::InsufficientMemory:
             return [NSString stringWithFormat:@"There isn’t enough free memory on the Neo.  This file needs %@ after conversion; up to %@ is available for this import.  Free some space on the Neo, then try again.  No files on the Neo have been changed.",
                     aq_FormattedByteCount(error.required), aq_FormattedByteCount(error.available)];
+        case ASFileWriteFailure::VerificationFailed:
+            return @"The file was sent, but its contents could not be verified on the Neo. The file may have changed. Check the connection and the file’s contents before continuing, and restore your recovery copy if needed.";
         default:
             return @"The file could not be written to the Neo.  Check the connection and try again.";
     }

@@ -45,7 +45,7 @@ namespace ts
     enum class ASFileWriteFailure
     {
         None, LimitsUnavailable, FileTooLarge, MemoryUnavailable,
-        FileUnavailable, InsufficientMemory, DeviceError
+        FileUnavailable, InsufficientMemory, DeviceError, VerificationFailed
     };
 
     // Validation describes the converted Neo data, before any file-writing command.
@@ -130,6 +130,7 @@ namespace ts
         bool rawSetFileAttributes(const uint8_t attr[kASFileAttributesSize], ASAppletID applet, int index);
         bool rawReadFile(void* dest, unsigned size, unsigned* actual, ASAppletID applet, int index, bool raw=false);
         bool rawWriteFile(const void* source, unsigned size, ASAppletID applet, int index, bool raw=false);
+        bool verifyFile(const void* source, unsigned size, ASAppletID applet, int index, bool raw);
 
 
         /** The derived class should call this once it has completed its initialisation.

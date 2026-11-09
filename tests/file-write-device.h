@@ -17,6 +17,7 @@ public:
     unsigned maximum = 51200, minimum = 512, maximumBytes = 4;
     unsigned freeRAM = 300 * 1024, allocation = 1024;
     unsigned attributeWrites = 0, fileWrites = 0;
+    bool corruptReadback = false;
     std::vector<uint8_t> saved = std::vector<uint8_t>(1024, 'o');
 
     static ts::ASApplet alphaWord()
@@ -131,6 +132,22 @@ protected:
                 allocation = static_cast<unsigned>(saved.size());
                 reply(ASMESSAGE_RESPONSE_CONFIRM_WRITE_FILE);
                 break;
+            case ASMESSAGE_REQUEST_READ_RAW_FILE:
+            case ASMESSAGE_REQUEST_READ_FILE:
+                readOffset = 0;
+                readLimit = std::min(request.argument(1, 3), static_cast<unsigned>(saved.size()));
+                reply(ASMESSAGE_RESPONSE_READ_FILE);
+                break;
+            case ASMESSAGE_REQUEST_BLOCK_READ:
+            {
+                unsigned count = std::min(1024u, readLimit - readOffset);
+                if (!count) { reply(ASMESSAGE_RESPONSE_BLOCK_READ_EMPTY); break; }
+                std::vector<uint8_t> block(saved.begin() + readOffset, saved.begin() + readOffset + count);
+                if (corruptReadback && readOffset == 0) block[0] ^= 1;
+                replyData(ASMESSAGE_RESPONSE_BLOCK_READ, block.data(), count);
+                readOffset += count;
+                break;
+            }
             default: std::abort();
         }
         return true;
@@ -141,6 +158,7 @@ private:
     std::vector<uint8_t> pending;
     bool writingFile = false;
     unsigned blockBytes = 0;
+    unsigned readOffset = 0, readLimit = 0;
 
     void enqueue(const ts::ASMessage& message)
     {

@@ -348,8 +348,14 @@ static NSImage* iconApplet = nil;              /**< Icon to use for applets. */
     if (shouldProceed)
     {
         didDelete = device->clearAllFiles(applet);
-
         [self reload];
+        if (didDelete)
+            for (ASFileNode* file in [self children])
+            {
+                NSString* text = [file fileData];
+                if (!text || [text length]) { didDelete = NO; break; }
+            }
+        if (!didDelete) [self setOperationError:@"The Neo could not confirm that all files were cleared. Some contents may have changed. Check the files and restore a recovery copy if needed."];
 
         if ([accessDelegate conformsToProtocol:@protocol(ASDeviceAccessProtocol)])
         {

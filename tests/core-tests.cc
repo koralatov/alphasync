@@ -544,8 +544,24 @@ static void testFileWriteLimits()
     CHECK(error.failure == ts::ASFileWriteFailure::FileUnavailable && !missing.fileWrites);
 }
 
+static void testWriteVerification()
+{
+    auto applet = FileWriteDevice::alphaWord();
+    std::vector<uint8_t> payload(1024, 'n');
+    for (bool corrupt : {false, true})
+    {
+        FileWriteDevice device;
+        device.corruptReadback = corrupt;
+        ts::ASFileWriteError error;
+        CHECK(device.writeFile(payload.data(), unsigned(payload.size()), &applet, 1, true, &error) == !corrupt);
+        CHECK(error.failure == (corrupt ? ts::ASFileWriteFailure::VerificationFailed : ts::ASFileWriteFailure::None));
+        CHECK(device.fileWrites == 1 && device.saved == payload);
+    }
+}
+
 int main()
 {
+    testWriteVerification();
     testUSBResponseValidation();
     testFileWriteLimits();
     testAlphaWordRoundTrip();
