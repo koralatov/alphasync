@@ -21,8 +21,11 @@ public enum AppMetadata {
         components.queryItems = [URLQueryItem(name: "subject", value: "AlphaSync \(version)"), URLQueryItem(name: "body", value: "\n\n" + diagnostics)]
         return components.url ?? URL(string: "mailto:mike@koralatov.com")!
     }
+    public static var edition: String {
+        Bundle.main.object(forInfoDictionaryKey: "ASBuildProfile") as? String ?? "Development"
+    }
     public static var diagnostics: String {
-        "AlphaSync \(version) (\(build))\n\(compatibility)\n\(ProcessInfo.processInfo.operatingSystemVersionString)\n" + architecture
+        "AlphaSync \(version) (\(build))\nEdition: \(edition)\n\(compatibility)\n\(ProcessInfo.processInfo.operatingSystemVersionString)\n" + architecture
     }
     public static var architecture: String {
         #if arch(arm64)

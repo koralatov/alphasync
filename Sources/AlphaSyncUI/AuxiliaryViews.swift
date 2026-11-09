@@ -121,7 +121,7 @@ public struct InspectorView: View {
                     else if file != nil { ProgressView("Reading preview…") }
                     else { Image(systemName: "gearshape").font(.system(size: 80)).frame(maxWidth: .infinity).foregroundStyle(.secondary) }
                 }
-            }.formStyle(.grouped)
+            }.formStyle(.grouped).textSelection(.enabled)
         }.frame(width: 400).frame(minHeight: 430, idealHeight: 560, maxHeight: 700)
             .task(id: file?.id) {
                 preview = nil; previewError = nil
