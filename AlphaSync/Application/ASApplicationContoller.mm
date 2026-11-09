@@ -415,7 +415,7 @@ static NSMenuItem* ASAddHelpLink(NSMenu* menu, NSString* title, NSString* identi
     {
         [inspectorPreviewFile release]; inspectorPreviewFile = nil;
     }
-    if (file && [[inspectorController window] isVisible] && ![file hasCompleteText] && file != inspectorPreviewFile && ![deviceController isBusy])
+    if (file && [file fileIsPlainText] && [[inspectorController window] isVisible] && ![file hasCompleteText] && file != inspectorPreviewFile && ![deviceController isBusy])
     {
         inspectorPreviewFile = [file retain];
         [deviceController performTaskForNode:file refresh:NO task:^id(ASNode* working) {

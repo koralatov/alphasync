@@ -64,6 +64,18 @@ static void deviceDisconnect(ASDeviceFactory* factory, void* context, unsigned i
 // A recovery copy must finish before the destructive task starts.
 static NSString* ASCreateRecoveryCopy(ASNode* node, NSString* root, NSInteger days, NSString** message)
 {
+    if ([node isKindOfClass:[ASFileNode class]] || [node isKindOfClass:[ASAppletNode class]]) [node reload];
+    if ([node isKindOfClass:[ASAppletNode class]])
+    {
+        ASAppletNode* appletNode = (ASAppletNode*)node;
+        unsigned count = 0, ram = 0;
+        if (![appletNode device]->getAppletResourceUsage(&count, &ram, [appletNode applet]) ||
+            count != [appletNode numberOfChildren])
+        {
+            *message = @"The Neo’s complete file list could not be read for the recovery copy. No files on the Neo have been changed. Check the connection and try again.";
+            return nil;
+        }
+    }
     NSFileManager* manager = [NSFileManager defaultManager];
     NSError* error = nil;
     if (![root isAbsolutePath] || ![manager createDirectoryAtPath:root withIntermediateDirectories:YES
@@ -75,6 +87,7 @@ static NSString* ASCreateRecoveryCopy(ASNode* node, NSString* root, NSInteger da
     NSDate* now = [NSDate date];
     NSDateFormatter* formatter = [[[NSDateFormatter alloc] init] autorelease];
     [formatter setLocale:[[[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"] autorelease]];
+    [formatter setCalendar:[[[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian] autorelease]];
     [formatter setDateFormat:@"yyyy-MM-dd HH.mm.ss"];
     NSString* name = [NSString stringWithFormat:@"%@ %@", [formatter stringFromDate:now], [[[NSUUID UUID] UUIDString] substringToIndex:8]];
     NSString* final = [root stringByAppendingPathComponent:name];
@@ -104,6 +117,7 @@ static NSString* ASCreateRecoveryCopy(ASNode* node, NSString* root, NSInteger da
             NSData* metadata = [NSData dataWithContentsOfFile:[path stringByAppendingPathComponent:@".recovery-information.plist"]];
             NSDictionary* record = metadata ? [NSPropertyListSerialization propertyListWithData:metadata options:0 format:NULL error:NULL] : nil;
             if (![record isKindOfClass:[NSDictionary class]] || ![record[@"kind"] isEqual:@"AlphaSyncRecoveryCopy"] ||
+                ![record[@"formatVersion"] isEqual:@1] ||
                 ![record[@"createdAt"] isKindOfClass:[NSDate class]]) continue;
             if ([now timeIntervalSinceDate:record[@"createdAt"]] <= days * 86400.0) continue;
             if (![manager trashItemAtURL:[NSURL fileURLWithPath:path] resultingItemURL:NULL error:&error]) break;

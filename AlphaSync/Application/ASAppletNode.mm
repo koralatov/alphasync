@@ -349,6 +349,10 @@ static NSImage* iconApplet = nil;              /**< Icon to use for applets. */
     {
         didDelete = device->clearAllFiles(applet);
         [self reload];
+        unsigned confirmedCount = 0, confirmedRAM = 0;
+        if (didDelete)
+            didDelete = device->getAppletResourceUsage(&confirmedCount, &confirmedRAM, applet) &&
+                        confirmedCount == [self numberOfChildren];
         if (didDelete)
             for (ASFileNode* file in [self children])
             {
