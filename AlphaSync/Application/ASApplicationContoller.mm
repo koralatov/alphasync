@@ -38,6 +38,10 @@
 #import "aq_launcher.h"
 #import "aq_launcherconfig.h"
 
+#ifndef AS_INTERFACE_CHECKS
+#define AS_INTERFACE_CHECKS 0
+#endif
+
 using namespace ts;
 
 #pragma mark    Forward Declarations

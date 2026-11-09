@@ -5,7 +5,3 @@
 #ifdef __OBJC__
     #import <Cocoa/Cocoa.h>
 #endif
-
-#ifndef AS_INTERFACE_CHECKS
-#define AS_INTERFACE_CHECKS 0
-#endif
