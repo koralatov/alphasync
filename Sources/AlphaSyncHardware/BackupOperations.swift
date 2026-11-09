@@ -50,7 +50,9 @@ extension DeviceService {
                         progress(BackupProgress(saved: saved, expected: expected, fileName: file.displayName))
                         do {
                             let engine = try access.engine(for: snapshot.connection)
-                            let raw = try engine.readFile(applet: applet.id, index: file.id.index)
+                            let raw = try engine.readFile(applet: applet.id, index: file.id.index) {
+                                if shouldStop() { throw CancellationError() }
+                            }
                             let text = try FileCodec.text(raw, applet: applet)
                             let folder: URL
                             if let existing = appletFolders[applet.id] { folder = existing }
@@ -63,6 +65,9 @@ extension DeviceService {
                             entries[index]["status"] = "saved"
                             entries[index]["path"] = folder.lastPathComponent + "/" + output.lastPathComponent
                             saved += 1
+                        } catch is CancellationError {
+                            entries[index]["status"] = "cancelled"
+                            break
                         } catch {
                             failed = true
                             let message = "\(file.displayName): \(error.localizedDescription)"

@@ -224,4 +224,60 @@ final class DeviceServiceTests: XCTestCase {
         XCTAssertEqual(observations.openCount, 3)
         await service.shutdown()
     }
+
+    func testStopInterruptsTheCurrentBackupReadAndKeepsEarlierFiles() async throws {
+        let started = expectation(description: "Second backup file is being read")
+        let gate = DispatchSemaphore(value: 0)
+        defer { gate.signal() }
+        let configuration = SimulatedConfiguration(beforeRead: { index in
+            if index == 2 { started.fulfill(); gate.wait() }
+        })
+        let service = makeService(configuration, observations: SimulatedObservations())
+        let snapshot = try await device(service)
+        let root = try temporaryFolder()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let stop = StopRequest()
+        let task = Task {
+            try await service.backup(connections: [snapshot.connection], includedApplets: nil, destination: root,
+                                     saveLog: true, stop: stop, progress: { _ in })
+        }
+        await fulfillment(of: [started], timeout: 3)
+        stop.stop()
+        gate.signal()
+        let result = try await task.value
+        XCTAssertTrue(result.stopped)
+        XCTAssertEqual(result.saved, 1)
+        XCTAssertTrue(result.failures.isEmpty)
+        let folder = try XCTUnwrap(result.folders.first)
+        XCTAssertTrue(folder.lastPathComponent.hasSuffix(AtomicFileStore.incompleteSuffix))
+        XCTAssertEqual(try String(contentsOf: folder.appendingPathComponent("AlphaWord/File 1.txt"), encoding: .utf8), "Original 1")
+        XCTAssertFalse(FileManager.default.fileExists(atPath: folder.appendingPathComponent("AlphaWord/File 2.txt").path))
+        let log = try XCTUnwrap(PropertyListSerialization.propertyList(from: Data(contentsOf: folder.appendingPathComponent("AlphaSync Backup Log.plist")), format: nil) as? [String: Any])
+        XCTAssertEqual(log["status"] as? String, "cancelled")
+        XCTAssertEqual((log["files"] as? [[String: Any]])?[1]["status"] as? String, "cancelled")
+        await service.shutdown()
+    }
+
+    func testTaskCancellationInterruptsAnActiveBackupRead() async throws {
+        let started = expectation(description: "Backup read is active")
+        let gate = DispatchSemaphore(value: 0)
+        defer { gate.signal() }
+        let service = makeService(SimulatedConfiguration(beforeRead: { _ in started.fulfill(); gate.wait() }),
+                                  observations: SimulatedObservations())
+        let snapshot = try await device(service)
+        let root = try temporaryFolder()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let task = Task {
+            try await service.backup(connections: [snapshot.connection], includedApplets: nil, destination: root,
+                                     saveLog: false, stop: StopRequest(), progress: { _ in })
+        }
+        await fulfillment(of: [started], timeout: 3)
+        task.cancel()
+        gate.signal()
+        let result = try await task.value
+        XCTAssertTrue(result.stopped)
+        XCTAssertEqual(result.saved, 0)
+        XCTAssertTrue(result.failures.isEmpty)
+        await service.shutdown()
+    }
 }
