@@ -334,7 +334,7 @@ public final class AppStore: ObservableObject {
     func cancelDictionaryImport(_ request: DictionaryImportRequest) {
         fileConfirmation = nil
         if request.completedFiles > 0 {
-            notice = AppNotice("Import stopped", "\(request.completedFiles.formatted()) files were already added and verified. Those files have been kept on your Neo.")
+            notice = AppNotice("Import stopped", request.completedFiles == 1 ? "One file was already added and verified. It has been kept on your Neo." : "\(request.completedFiles.formatted()) files were already added and verified. Those files have been kept on your Neo.")
         }
     }
     public func requestClear() async {

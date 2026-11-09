@@ -15,7 +15,7 @@ struct DictionaryImportConfirmation: View {
             Text(request.report.explanation).fixedSize(horizontal: false, vertical: true)
             Text("Continue with only the valid words? Replacing an existing file still requires the usual Replace confirmation.")
                 .fixedSize(horizontal: false, vertical: true)
-            if request.completedFiles > 0 { Text("\(request.completedFiles.formatted()) files were already added and verified.").foregroundStyle(.secondary) }
+            if request.completedFiles > 0 { Text(request.completedFiles == 1 ? "One file was already added and verified." : "\(request.completedFiles.formatted()) files were already added and verified.").foregroundStyle(.secondary) }
             HStack {
                 Spacer()
                 Button("Continue", action: confirm)
