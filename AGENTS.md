@@ -12,7 +12,7 @@
 - Work on master unless the user requests another branch.
 - Keep changes in small, focused commits. Explain what changed and why in simple English.
 - For the time being, defer automated tests until the compile or build stage, unless the user explicitly asks for tests earlier. Review code and diffs only during routine edits.
-- Keep routine commits from starting CI by including `[skip ci]` in their messages. During the 1.6 migration, compile and test only at a documented major milestone or completion. Omit the marker for those milestone checks.
+- Keep routine commits from starting CI by including `[skip ci]` in their messages. During major migrations, compile and test only at a documented major milestone or completion. Omit the marker for those milestone checks.
 - End commit messages with: Made with CalxGPT (GPT-6.1 Sol Max)
 - Prioritise correctness, safety, and the protection of the user’s files and device contents.
 - Use standard native macOS components and public Apple frameworks. Respect the system appearance and accessibility settings.
@@ -21,11 +21,11 @@
 
 - Version 1.5.1, build 147 is the final supported macOS 11 and 12 release. Build only the legacy Universal app for it.
 - Preserve the exact published source on `legacy-macos-11-12` and `v1.5.1`. Do not merge, push, or force changes onto those frozen references or replace their release assets.
-- Continue future development on master. Version 1.6 will require a newer macOS version.
+- Continue future development on master. Version 2.0 and later require macOS 13 or later.
 
-## Version 1.6
+## Version 2.0
 
 - Develop on master with two targets sharing the same Swift core and SwiftUI application sources.
 - Both targets support macOS 13 and later. Universal includes x86_64 and arm64; Apple Silicon includes arm64 only.
 - Use public IOUSBHost bulk APIs for file transfers. The Neo’s HID keyboard interface cannot carry its bulk file protocol. Do not add a DriverKit extension or security bypass without a real hardware requirement.
-- Follow the milestones and data-protection requirements in `docs/1.6-migration.md`. Do not publish 1.6 without a release request.
+- Follow the milestones and data-protection requirements in `docs/1.6-migration.md`. Do not publish a release without a release request. The user has requested the first Swift release as version 2.0.

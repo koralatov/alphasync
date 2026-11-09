@@ -2,14 +2,14 @@
 
 AlphaSync copies text files between your Mac and an AlphaSmart Neo. It can also back up your Neo and open automatically when you connect it.
 
-## Version 1.6
+## Version 2.0
 
-Version 1.6 is in development and requires **macOS 13 or later**. It has not been released yet.
+Version 2.0 is the first release of the Swift rewrite and requires **macOS 13 or later**. The version number marks the change from the earlier Objective-C and Objective-C++ application.
 
-There will be two downloads from the same release:
+Choose one download from the [2.0 release](https://github.com/koralatov/alphasync/releases/tag/v2.0):
 
-- **Universal:** for Intel and Apple Silicon Macs.
-- **Apple Silicon:** for Macs with an M-series chip.
+- [**Universal**](https://github.com/koralatov/alphasync/releases/download/v2.0/AlphaSync-2.0-149-macOS-13-universal.zip): for Intel and Apple Silicon Macs.
+- [**Apple Silicon**](https://github.com/koralatov/alphasync/releases/download/v2.0/AlphaSync-2.0-149-macOS-13-apple-silicon.zip): for Macs with an M-series chip.
 
 Both offer the same file-transfer features. Install one edition. You can find your macOS version and chip in **Apple menu → About This Mac**.
 
@@ -17,7 +17,7 @@ Both offer the same file-transfer features. Install one edition. You can find yo
 
 [Download AlphaSync 1.5.1 for macOS 11 and 12](https://github.com/koralatov/alphasync/releases/download/v1.5.1/AlphaSync-1.5.1-147-macOS-11-12-universal.zip).
 
-This is the final version for these systems, on Intel and Apple Silicon. Its [release page](https://github.com/koralatov/alphasync/releases/tag/v1.5.1), downloads, and [legacy source](https://github.com/koralatov/alphasync/tree/legacy-macos-11-12) are preserved. Development of 1.6 does not change them.
+This is the final version for these systems, on Intel and Apple Silicon. Its [release page](https://github.com/koralatov/alphasync/releases/tag/v1.5.1), downloads, and [legacy source](https://github.com/koralatov/alphasync/tree/legacy-macos-11-12) are preserved. They remain separate from version 2.0.
 
 ## Install
 
@@ -28,7 +28,7 @@ This is the final version for these systems, on Intel and Apple Silicon. Its [re
 
 If macOS blocks the app, follow [Apple’s instructions for opening a downloaded app](https://support.apple.com/en-gb/102445). On macOS 11 and 12, the approval is in **System Preferences → Security & Privacy → General**. On newer systems, look in **System Settings → Privacy & Security**.
 
-## Use version 1.6
+## Use version 2.0
 
 Connect your Neo with a USB cable. AlphaSync expands from its connection message to show your files. Choose an applet in the sidebar.
 
@@ -52,6 +52,8 @@ Backup logs are off unless you enable them in Settings. Each log stays inside it
 To open AlphaSync whenever you connect your Neo, enable automatic opening in Settings. Keep the app in Applications and follow any Login Items approval prompt.
 
 AlphaSync follows your Mac’s Light or Dark appearance.
+
+The downloads have ad hoc signatures and are not Apple-notarised. The [release notes](releases/2.0.md) describe the build checks and the remaining physical Neo and macOS 13 testing.
 
 ## Help and support
 

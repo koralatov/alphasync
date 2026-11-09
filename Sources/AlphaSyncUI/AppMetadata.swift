@@ -1,13 +1,13 @@
 import Foundation
 
 public enum AppMetadata {
-    public static var version: String { Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.6" }
+    public static var version: String { Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "2.0" }
     public static var build: String { Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "Development" }
     public static var compatibility: String { Bundle.main.object(forInfoDictionaryKey: "ASCompatibilityDescription") as? String ?? "For macOS 13 and later" }
     public static let project = URL(string: "https://github.com/koralatov/alphasync")!
     public static var development: Bool { Bundle.main.object(forInfoDictionaryKey: "ASReleaseChannel") as? String != "stable" }
     public static var releaseNotes: URL {
-        development ? project.appendingPathComponent("blob/master/releases/1.6.md") : project.appendingPathComponent("releases/tag/v" + version)
+        development ? project.appendingPathComponent("blob/master/releases/" + version + ".md") : project.appendingPathComponent("releases/tag/v" + version)
     }
     public static var licence: URL { project.appendingPathComponent(development ? "blob/master/LICENSE" : "blob/v" + version + "/LICENSE") }
     public static var issues: URL {
