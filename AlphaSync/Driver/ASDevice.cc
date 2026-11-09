@@ -439,23 +439,22 @@ namespace ts
      */
     bool ASDevice::rawReadAppletHeaders(uint8_t* buffer, int index, unsigned count, unsigned* actual)
     {
-        assert(count <= 7);     // Reading more than 7 headers will cause a crash on some Neos (1k buffer overflow?)
-
+        if (!actual) return false;
         *actual = 0;
+        // Never send an oversized header request to the Neo.
+        if (!buffer || index < 0 || !count || count > 7) return false;
         memset(buffer, 0, kASAppletHeaderSize * count);
-
-        if (count > 7) return false;    // Don't trash the Neo!
 
         ASMessage message(ASMESSAGE_REQUEST_LIST_APPLETS);
         message.setArgument((unsigned)index, 1, 4);
         message.setArgument(count, 5, 2);
-        bool result = (sendRequestAndGetResponse(&message), ASMESSAGE_RESPONSE_LIST_APPLETS);
+        bool result = sendRequestAndGetResponse(&message, ASMESSAGE_RESPONSE_LIST_APPLETS);
         if (!result) return false;                              // Error handling command
 
         unsigned size = message.argument(1, 4);
         unsigned expectedChecksum = message.argument(5, 2);
 
-        if (size > (count * kASAppletHeaderSize))
+        if (size > (count * kASAppletHeaderSize) || size % kASAppletHeaderSize != 0)
         {
             fprintf(stderr, "%s: reply will return too much data!\n", __FUNCTION__);
             return false;                                       // Unexpected data overrun
@@ -466,14 +465,6 @@ namespace ts
         unsigned actualBytes;
         result = read(buffer, size, &actualBytes);
         if (!result || actualBytes != size) return false;       // Unexpected read failure
-
-        if ((actualBytes % kASAppletHeaderSize) != 0)
-        {
-            fprintf(stderr, "%s: warning: read returned a partial header (expected header size %u, bytes read %u)\n",
-                __FUNCTION__, kASAppletHeaderSize, actualBytes);
-            assert(0);
-            // the partial header will be ignored rather than treated as an error (unless the checksum is also invalid)
-        }
 
         unsigned actualChecksum = calculateDataChecksum(buffer, actualBytes);
         if (actualChecksum != expectedChecksum)
@@ -921,7 +912,7 @@ namespace ts
         if (!result) return result;
 
         ASMessage message(ASMESSAGE_REQUEST_RESTART);
-        result = (sendRequestAndGetResponse(&message), ASMESSAGE_RESPONSE_RESTART);
+        result = sendRequestAndGetResponse(&message, ASMESSAGE_RESPONSE_RESTART);
 
         return dialogueEnd(result);
     }
@@ -951,25 +942,24 @@ namespace ts
 
 
         ASMessage message(ASMESSAGE_REQUEST_VERSION);
-        result = (sendRequestAndGetResponse(&message), ASMESSAGE_RESPONSE_VERSION);
+        result = sendRequestAndGetResponse(&message, ASMESSAGE_RESPONSE_VERSION);
         if (result)
         {
             unsigned size = message.argument(1, 4);
             unsigned expectedChecksum = message.argument(5, 2);
 
             uint8_t buffer[1024];
-            if (size >= sizeof buffer) size = sizeof buffer - 1;
-            memset(buffer, 0, sizeof buffer);
-
-            unsigned actual;
-            if (!read(buffer, size, &actual)) return false;
-
-            buffer[actual] = 0;
+            if (size < 8 || size > sizeof buffer) return dialogueEnd(false);
+            unsigned actual = 0;
+            if (!read(buffer, size, &actual) || actual != size) return dialogueEnd(false);
             unsigned actualChecksum = calculateDataChecksum(buffer, actual);
             if (actualChecksum != expectedChecksum)
             {
-                // OS 3.6 Neo device appear to calculate the checksum wrongly (off by one error?)
-                fprintf(stderr, "%s: ignoring data checksum error: wanted %04x, got %04x\n", __FUNCTION__, expectedChecksum, actualChecksum);
+                // Some UK OS 3.6 Neos report 3.4 and have a checksum off by one.
+                unsigned difference = (actualChecksum - expectedChecksum) & 0xffff;
+                bool knownQuirk = buffer[4] == 3 && (buffer[5] == 4 || buffer[5] == 6) &&
+                    (difference == 1 || difference == 0xffff);
+                if (!knownQuirk) return dialogueEnd(false);
             }
             /* The returned data appears to contain:
              *
@@ -979,19 +969,23 @@ namespace ts
              *   6-24   Human readable version as ASCII and zero terminator.
              *  25-63   Build date and time.
              */
-            uint32_t unknown = uint32_t(buffer[0] << 24) | uint32_t(buffer[1] << 16) | uint32_t(buffer[2] << 8) | uint32_t(buffer[3] << 0);
+            const char* name = reinterpret_cast<const char*>(buffer + 6);
+            const char* end = reinterpret_cast<const char*>(buffer + actual);
+            const char* nameEnd = static_cast<const char*>(memchr(name, 0, static_cast<size_t>(end - name)));
+            if (!nameEnd || nameEnd + 1 >= end) return dialogueEnd(false);
+            const char* date = nameEnd + 1;
+            const char* dateEnd = static_cast<const char*>(memchr(date, 0, static_cast<size_t>(end - date)));
+            if (!dateEnd) return dialogueEnd(false);
+            size_t nameLength = std::min(static_cast<size_t>(nameEnd - name), size_t(63));
+            size_t dateLength = std::min(static_cast<size_t>(dateEnd - date), size_t(63));
+            memcpy(systemName, name, nameLength);
+            memcpy(systemDate, date, dateLength);
+            systemName[nameLength] = 0;
+            systemDate[dateLength] = 0;
             *major = buffer[4];
             *minor = buffer[5];
-            const char* name = (const char*)&buffer[6];
-            const char* date = name + strlen(name) + 1;
-            strncpy(systemName, name, 64);
-            strncpy(systemDate, date, 64);
-            systemName[63] = 0;
-            systemDate[63] = 0;
-            for (long i = (long)strlen(systemName)-1; i >= 0 && isspace(systemName[i]); i--) systemName[i] = 0;
-            for (long i = (long)strlen(systemDate)-1; i >= 0 && isspace(systemDate[i]); i--) systemDate[i] = 0;
-
-            fprintf(stderr, "OS Revision %u.%u   %08x    '%s'  '%s'\n", *major, *minor, unknown, systemName, systemDate);
+            while (nameLength && isspace(static_cast<unsigned char>(systemName[nameLength - 1]))) systemName[--nameLength] = 0;
+            while (dateLength && isspace(static_cast<unsigned char>(systemDate[dateLength - 1]))) systemDate[--dateLength] = 0;
         }
 
         return dialogueEnd(result);
@@ -1199,6 +1193,7 @@ namespace ts
 
         if (!sendRequest(&request)) goto error;
         if (!getResponse(&response)) goto error;
+        if (response.command() != ASMESSAGE_RESPONSE_READ_FILE) goto error;
         if (!readExtendedData(dest, size, actual)) goto error;
 
         return true;

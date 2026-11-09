@@ -163,6 +163,7 @@ public:
     std::vector<std::vector<uint8_t>> replies;
     unsigned reads = 0;
     using ts::ASDevice::rawReadFile;
+    using ts::ASDevice::rawReadAppletHeaders;
 
     void reply(unsigned command, unsigned length = 0, unsigned checksum = 0)
     {
@@ -197,7 +198,7 @@ static void testUSBReadBounds()
     for (unsigned length : {0u, 8u})
     {
         MockDevice device;
-        device.reply(ASMESSAGE_RESPONSE_BLOCK_READ);
+        device.reply(ASMESSAGE_RESPONSE_READ_FILE);
         device.reply(ASMESSAGE_RESPONSE_BLOCK_READ, length);
         uint8_t output[4] = {};
         unsigned actual = 99;
@@ -205,7 +206,7 @@ static void testUSBReadBounds()
         CHECK(actual == 0 && device.reads == 2);
     }
     MockDevice device;
-    device.reply(ASMESSAGE_RESPONSE_BLOCK_READ);
+    device.reply(ASMESSAGE_RESPONSE_READ_FILE);
     device.reply(ASMESSAGE_RESPONSE_BLOCK_READ, 2, 3);
     device.replies.push_back({1, 2});
     device.reply(ASMESSAGE_RESPONSE_BLOCK_READ, 2, 7);
@@ -217,7 +218,7 @@ static void testUSBReadBounds()
     CHECK(output[0] == 1 && output[3] == 4);
 
     MockDevice badChecksum;
-    badChecksum.reply(ASMESSAGE_RESPONSE_BLOCK_READ);
+    badChecksum.reply(ASMESSAGE_RESPONSE_READ_FILE);
     badChecksum.replies[0][7] ^= 1;
     CHECK(!badChecksum.rawReadFile(output, sizeof output, &actual, 0, 0));
     CHECK(actual == 0 && badChecksum.reads == 1);
@@ -255,6 +256,43 @@ static void replyHandshake(MockDevice& device)
     device.replies.push_back({'S', 'w', 'i', 't', 'c', 'h', 'e', 'd'});
 }
 
+static void testUSBResponseValidation()
+{
+    MockDevice restart;
+    replyHandshake(restart);
+    restart.reply(ASMESSAGE_ERROR_PARAMETER);
+    CHECK(!restart.restart());
+
+    MockDevice headers;
+    headers.reply(ASMESSAGE_ERROR_PARAMETER);
+    uint8_t header[kASAppletHeaderSize];
+    unsigned actual = 99;
+    CHECK(!headers.rawReadAppletHeaders(header, 0, 1, &actual) && actual == 0);
+
+    MockDevice wrongRead;
+    wrongRead.reply(ASMESSAGE_ERROR_PARAMETER);
+    uint8_t data[4];
+    CHECK(!wrongRead.rawReadFile(data, sizeof data, &actual, 0, 0) && actual == 0);
+
+    // Small replies exercise the bounded parser without replaying the crash case.
+    for (bool terminated : {false, true})
+    {
+        MockDevice version;
+        replyHandshake(version);
+        std::vector<uint8_t> payload = {0, 0, 0, 0, 3, 3, 'N', 'e', 'o', 0, 'D', 'a', 't', 'e'};
+        if (terminated) payload.push_back(0);
+        unsigned checksum = 0;
+        for (uint8_t byte : payload) checksum += byte;
+        version.reply(ASMESSAGE_RESPONSE_VERSION, unsigned(payload.size()), checksum);
+        version.replies.push_back(payload);
+        unsigned major = 99, minor = 99;
+        char name[64], date[64];
+        CHECK(version.systemVersion(&major, &minor, name, date) == terminated);
+        if (terminated) CHECK(major == 3 && minor == 3 && std::strcmp(name, "Neo") == 0 && std::strcmp(date, "Date") == 0);
+        else CHECK(major == 0 && minor == 0 && !name[0] && !date[0]);
+    }
+}
+
 static void testFailedDeviceLoadPreservesData()
 {
     const uint8_t original[] = {1, 2, 3};
@@ -278,7 +316,7 @@ static void testFailedDeviceLoadPreservesData()
     failedTransfer.reply(ASMESSAGE_RESPONSE_GET_FILE_ATTRIBUTES, kASFileAttributesSize, checksum);
     failedTransfer.replies.emplace_back(attributes.rawData(), attributes.rawData() + kASFileAttributesSize);
     replyHandshake(failedTransfer);
-    failedTransfer.reply(ASMESSAGE_RESPONSE_BLOCK_READ);
+    failedTransfer.reply(ASMESSAGE_RESPONSE_READ_FILE);
     failedTransfer.reply(ASMESSAGE_ERROR_PROTOCOL);
     CHECK(!file.load(&failedTransfer, &applet, 0));
     CHECK(file.fileSize() == sizeof original);
@@ -508,6 +546,7 @@ static void testFileWriteLimits()
 
 int main()
 {
+    testUSBResponseValidation();
     testFileWriteLimits();
     testAlphaWordRoundTrip();
     testAlphaWordLineEndings();
