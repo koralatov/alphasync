@@ -27,7 +27,7 @@ public struct NeoFileAttributes: Equatable, Sendable {
         let reader = BinaryReader(raw)
         _ = try reader.string(at: 0, count: 16)
         _ = try reader.string(at: 16, count: 8)
-        self.raw = Data(raw)
+        self.raw = Data(Array(raw))
     }
 
     public init(name: String, minimum: Int = 512, allocation: Int = 512, fileSpace: Int = 0) throws {
@@ -43,7 +43,7 @@ public struct NeoFileAttributes: Equatable, Sendable {
     }
 
     public mutating func rename(_ name: String) throws {
-        guard !name.isEmpty, !name.contains(where: { $0.isNewline }), !name.contains("\0"),
+        guard !name.isEmpty, !name.unicodeScalars.contains(where: { CharacterSet.controlCharacters.contains($0) }),
               let encoded = name.data(using: .windowsCP1252, allowLossyConversion: false), encoded.count <= 15 else {
             throw NeoError.device("Use a name of 1 to 15 supported characters, without line breaks.")
         }
