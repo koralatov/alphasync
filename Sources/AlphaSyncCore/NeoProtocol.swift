@@ -18,14 +18,30 @@ public final class NeoProtocol {
     }
     public func close() { transport.close() }
 
-    private func transaction<T>(_ operation: () throws -> T) throws -> T {
-        try transport.write(Data([1]), timeout: 0.5)
-        let version = try transport.read(maximum: 8, timeout: 0.5)
-        guard version.count == 2, try BinaryReader(version).integer(at: 0, width: 2) >= 0x0230 else {
-            throw NeoError.device("The Neo did not enter file-transfer mode. Reconnect it and try again.")
+    private func handshake() throws {
+        var last: any Error = NeoError.device("The Neo did not enter file-transfer mode. Reconnect it and try again.")
+        for attempt in 0..<3 {
+            do {
+                try transport.write(Data([1]), timeout: 0.5)
+                let version = try transport.read(maximum: 8, timeout: 0.5)
+                guard version.count == 2, try BinaryReader(version).integer(at: 0, width: 2) >= 0x0230 else {
+                    throw NeoError.device("The Neo did not enter file-transfer mode. Reconnect it and try again.")
+                }
+                return
+            } catch { last = error }
+            if attempt < 2 {
+                try? transport.write(Self.reset, timeout: 0.5)
+                // Only the serial device executor waits; the main actor remains responsive.
+                Thread.sleep(forTimeInterval: 0.1)
+            }
         }
-        try transport.write(Self.reset, timeout: timeout)
+        throw last
+    }
+
+    private func transaction<T>(_ operation: () throws -> T) throws -> T {
         defer { try? transport.write(Self.reset, timeout: timeout) }
+        try handshake()
+        try transport.write(Self.reset, timeout: timeout)
         try transport.write(Data([0x3f, 0x53, 0x77, 0x74, 0x63, 0x68, 0, 0]), timeout: timeout)
         guard try readExactly(8) == Data("Switched".utf8) else { throw NeoError.invalidData("The system applet did not acknowledge selection.") }
         return try operation()

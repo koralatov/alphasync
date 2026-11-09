@@ -92,5 +92,5 @@ final class USBHostTransport: NeoTransport {
         try? output.__abort(with: .synchronous)
         interface.destroy()
     }
-    deinit { interface.destroy() }
+    deinit { if !closed { interface.destroy() } }
 }

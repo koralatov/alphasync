@@ -7,6 +7,7 @@ private final class SimulatedNeo: NeoTransport {
     var payload = Data(repeating: 0xa7, count: 512)
     var commands: [UInt8] = []
     var writes = 0
+    var helloFailures = 0, helloAttempts = 0, resets = 0
     var corruptVerification = false
     var oversizedBlock = false
     var maximum: UInt32 = 51200
@@ -37,9 +38,14 @@ private final class SimulatedNeo: NeoTransport {
             if blockRemaining == 0 { try reply(0x43) }
             return
         }
-        if data == Data([1]) { incoming.append(contentsOf: [2, 0x30]); return }
+        if data == Data([1]) {
+            helloAttempts += 1
+            if helloFailures > 0 { helloFailures -= 1; incoming.append(0); return }
+            incoming.append(contentsOf: [2, 0x30]); return
+        }
         if data.count == 8, data.first == 0x3f {
             if data[data.startIndex + 1] == 0x53 { incoming.append(Data("Switched".utf8)) }
+            else { resets += 1 }
             return
         }
         let frame = try NeoMessage(data: data)
@@ -87,6 +93,20 @@ private final class SimulatedNeo: NeoTransport {
 }
 
 final class ProtocolTests: XCTestCase {
+    func testTransientHandshakeFailureCanRecoverWithoutWritingFiles() throws {
+        let device = SimulatedNeo(); device.helloFailures = 1
+        XCTAssertEqual(try NeoProtocol(transport: device).readFile(applet: 0xa000, index: 1), device.payload)
+        XCTAssertGreaterThanOrEqual(device.resets, 1)
+        XCTAssertEqual(device.writes, 0)
+    }
+    func testHandshakeRetriesAreBoundedAndLeaveAReset() {
+        let device = SimulatedNeo(); device.helloFailures = 10
+        XCTAssertThrowsError(try NeoProtocol(transport: device).availableMemory())
+        XCTAssertEqual(device.helloAttempts, 3)
+        XCTAssertGreaterThanOrEqual(device.resets, 3)
+        XCTAssertTrue(device.commands.isEmpty)
+    }
+
     func testReadFileMatchesDeviceBytes() throws {
         let device = SimulatedNeo()
         let engine = NeoProtocol(transport: device)
