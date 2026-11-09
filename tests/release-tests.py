@@ -1,4 +1,4 @@
-"""Check that mismatched or incomplete downloads cannot form one release."""
+"""Reject incomplete, altered, or mismatched legacy release assets."""
 import hashlib
 from pathlib import Path
 import subprocess
@@ -14,89 +14,86 @@ class ReleaseTests(unittest.TestCase):
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
+        self.package_dir = self.root / 'universal'
+        self.package_dir.mkdir()
 
-    def package(self, variant, version='1.4.0', build='140', source='a' * 40,
-                signing='development', architectures=None):
-        label = 'macOS-11-26-universal' if variant == 'universal' else 'macOS-27-apple-silicon'
-        minimum = '11.0' if variant == 'universal' else '27.0'
-        architectures = architectures or ('x86_64 arm64' if variant == 'universal' else 'arm64')
-        directory = self.root / variant
-        directory.mkdir()
-        name = f'AlphaSync-{version}-{build}-{label}.zip'
-        data = b'packaged build contents for ' + variant.encode()
-        digest = hashlib.sha256(data).hexdigest()
-        (directory / name).write_bytes(data)
-        (directory / (name + '.sha256')).write_text(f'{digest}  {name}\n')
-        (directory / (name + '.build-information.txt')).write_text(
-            f'Version: {version}\nBuild: {build}\nSource commit: {source}\n'
-            f'Variant: {variant}\nMinimum macOS: {minimum}\nArchitectures: {architectures}\n'
-            f'Signing: {signing}\nArchive: {name}\nSHA-256: {digest}\n\nCompiler details\n')
-        return directory / name
+    def package(self, version='1.5.1', build='147', source='a' * 40,
+                architectures='x86_64 arm64', supported='11 and 12', symbols_source=None):
+        stem = f'AlphaSync-{version}-{build}-macOS-11-12-universal'
+        for symbols in (False, True):
+            name = stem + ('-symbols.zip' if symbols else '.zip')
+            data = b'crash symbols' if symbols else b'legacy app'
+            digest = hashlib.sha256(data).hexdigest()
+            (self.package_dir / name).write_bytes(data)
+            (self.package_dir / (name + '.sha256')).write_text(f'{digest}  {name}\n')
+            report = (f'Version: {version}\nBuild: {build}\n'
+                      f'Source commit: {(symbols_source or source) if symbols else source}\n')
+            if not symbols:
+                report += (f'Variant: universal\nMinimum macOS: 11.0\nSupported macOS: {supported}\n'
+                           f'Architectures: {architectures}\nSigning: development\n')
+            report += f'Archive: {name}\nSHA-256: {digest}\n\nCompiler or UUID details\n'
+            (self.package_dir / (name + '.build-information.txt')).write_text(report)
+        return self.package_dir / (stem + '.zip')
 
     def collect(self, *options, succeeds=False):
         output = self.root / 'release'
-        result = subprocess.run([sys.executable, str(COLLECTOR), '--universal', str(self.root / 'universal'),
-                                 '--modern', str(self.root / 'modern'), '--output', str(output), *options],
-                                text=True, capture_output=True)
+        result = subprocess.run([sys.executable, str(COLLECTOR), '--universal', str(self.package_dir),
+                                 '--output', str(output), *options], text=True, capture_output=True)
         self.assertEqual(result.returncode, 0 if succeeds else 1, result.stderr)
         if succeeds:
-            self.assertEqual(len(list(output.glob('*.zip'))), 2)
-            self.assertTrue((output / 'release-notes.md').exists())
+            self.assertEqual(len(list(output.glob('*.zip'))), 2)  # One app, one symbol archive.
+            self.assertEqual(len(list(output.iterdir())), 7)
         else:
             self.assertFalse(output.exists())
 
-    def test_matching_downloads(self):
-        self.package('universal')
-        self.package('modern')
-        self.collect(succeeds=True)
+    def test_complete_legacy_release(self):
+        self.package()
+        self.collect('--tag', 'v1.5.1', '--source-commit', 'a' * 40, succeeds=True)
 
-    def test_two_component_release_version(self):
-        self.package('universal', version='1.5', build='146')
-        self.package('modern', version='1.5', build='146')
-        self.collect('--tag', 'v1.5', succeeds=True)
-
-    def test_invalid_version(self):
-        for version in ('1', '1.5.0.1', '1.5-beta'):
-            with self.subTest(version=version), tempfile.TemporaryDirectory() as directory:
-                self.root = Path(directory)
-                self.package('universal', version=version)
-                self.package('modern', version=version)
-                self.collect()
-
-    def test_different_release_identifiers(self):
-        for change in ({'version': '1.4.1'}, {'build': '141'}, {'source': 'b' * 40}):
-            with self.subTest(change=change), tempfile.TemporaryDirectory() as directory:
-                self.root = Path(directory)
-                self.package('universal')
-                self.package('modern', **change)
-                self.collect()
-
-    def test_missing_download(self):
-        self.package('universal')
+    def test_wrong_version(self):
+        self.package(version='1.6')
         self.collect()
 
-    def test_changed_archive(self):
-        self.package('universal')
-        archive = self.package('modern')
-        archive.write_bytes(b'incomplete or replaced archive')
+    def test_wrong_build(self):
+        self.package(build='146')
         self.collect()
 
-    def test_wrong_modern_architectures(self):
-        self.package('universal')
-        self.package('modern', architectures='x86_64 arm64')
+    def test_wrong_architecture(self):
+        self.package(architectures='arm64')
         self.collect()
 
-    def test_signing_and_tag_requirements(self):
-        self.package('universal')
-        self.package('modern')
+    def test_wrong_supported_systems(self):
+        self.package(supported='11 through 26')
+        self.collect()
+
+    def test_changed_app(self):
+        self.package().write_bytes(b'changed app')
+        self.collect()
+
+    def test_changed_symbols(self):
+        self.package()
+        next(self.package_dir.glob('*-symbols.zip')).write_bytes(b'changed symbols')
+        self.collect()
+
+    def test_missing_symbols(self):
+        self.package()
+        next(self.package_dir.glob('*-symbols.zip')).unlink()
+        self.collect()
+
+    def test_mismatched_symbols(self):
+        self.package(symbols_source='b' * 40)
+        self.collect()
+
+    def test_unexpected_modern_download(self):
+        self.package()
+        (self.package_dir / 'AlphaSync-modern.zip').write_bytes(b'wrong edition')
+        self.collect()
+
+    def test_publication_requirements(self):
+        self.package()
         self.collect('--require-notarised')
-        self.collect('--tag', 'v1.4.1')
+        self.collect('--tag', 'v1.5')
         self.collect('--source-commit', 'b' * 40)
-
-    def test_matching_notarised_downloads(self):
-        self.package('universal', signing='notarised')
-        self.package('modern', signing='notarised')
-        self.collect('--require-notarised', '--tag', 'v1.4.0', '--source-commit', 'a' * 40, succeeds=True)
 
 
 if __name__ == '__main__':

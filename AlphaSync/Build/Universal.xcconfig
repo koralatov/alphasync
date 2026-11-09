@@ -1,7 +1,7 @@
 #include "Version.xcconfig"
 
-// One app for Intel and Apple Silicon on macOS 11 through 26.
+// One app for Intel and Apple Silicon on macOS 11 and 12.
 ARCHS = x86_64 arm64
 MACOSX_DEPLOYMENT_TARGET = 11.0
-AS_COMPATIBILITY_DESCRIPTION = For macOS 11 to macOS 26
+AS_COMPATIBILITY_DESCRIPTION = For macOS 11 and macOS 12
 AS_APP_ICON_NAME = application

@@ -5,7 +5,7 @@ app=${1:-build/DerivedData/Build/Products/Release/AlphaSync.app}
 repository=$(cd "$(dirname "$0")/.." && pwd)
 source "$repository/scripts/build-profile.sh" "${2:-universal}"
 if [[ $# -gt 3 || ( $# -eq 3 && "$3" != --skip-launch ) ]]; then
-    printf 'Usage: %s [app] [universal|modern] [--skip-launch]\n' "$0" >&2
+    printf 'Usage: %s [app] [universal] [--skip-launch]\n' "$0" >&2
     exit 1
 fi
 minimum=$profile_minimum
@@ -29,10 +29,7 @@ icon=$(sed -n 's/^AS_APP_ICON_NAME *= *//p' "$profile_configuration")
 test -n "$icon"
 test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIconFile' "$app/Contents/Info.plist")" = "$icon"
 test -s "$app/Contents/Resources/$icon.icns"
-case "$profile_variant" in
-    universal) test ! -e "$app/Contents/Resources/application-modern.icns" ;;
-    modern) test ! -e "$app/Contents/Resources/application.icns" ;;
-esac
+test ! -e "$app/Contents/Resources/application-modern.icns"
 icon_check_directory=$(mktemp -d "${TMPDIR:-/tmp}/alphasync-icon-check.XXXXXX")
 trap 'rm -rf "$icon_check_directory"' EXIT
 /usr/bin/iconutil --convert iconset --output "$icon_check_directory/selected.iconset" "$app/Contents/Resources/$icon.icns"

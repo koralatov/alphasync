@@ -2,7 +2,7 @@
 set -euo pipefail
 
 if [[ $# -lt 3 || $# -gt 4 ]]; then
-    printf 'Usage: %s app universal|modern output-directory [development|notarised]\n' "$0" >&2
+    printf 'Usage: %s app universal output-directory [development|notarised]\n' "$0" >&2
     exit 1
 fi
 repository=$(cd "$(dirname "$0")/.." && pwd)
@@ -39,6 +39,7 @@ digest=$(awk '{ print $1 }' "$output/$filename.sha256")
 {
     printf 'Version: %s\nBuild: %s\nSource commit: %s\n' "$version" "$build_number" "$(git -C "$repository" rev-parse HEAD)"
     printf 'Variant: %s\nMinimum macOS: %s\nArchitectures: %s\n' "$profile_variant" "$profile_minimum" "$profile_architectures"
+    printf 'Supported macOS: %s\n' "$profile_supported"
     printf 'Signing: %s\nArchive: %s\nSHA-256: %s\n\n' "$signing" "$filename" "$digest"
     xcodebuild -version
     xcrun --sdk macosx --show-sdk-version

@@ -4,7 +4,7 @@ set -euo pipefail
 repository=$(cd "$(dirname "$0")/.." && pwd)
 cd "$repository"
 if [[ $# -gt 2 ]]; then
-    printf 'Usage: %s [universal|modern] [output-directory]\n' "$0" >&2
+    printf 'Usage: %s [universal] [output-directory]\n' "$0" >&2
     exit 1
 fi
 source "$repository/scripts/build-profile.sh" "${1:-universal}"
