@@ -116,9 +116,10 @@ static NSStackView* ASAboutColumn(NSArray<NSView*>* views, CGFloat spacing)
 
 - (void)openLink:(NSButton*)sender
 {
-    NSArray* urls = @[@"https://github.com/koralatov/alphasync",
-                      @"https://github.com/koralatov/alphasync/releases",
-                      @"https://github.com/koralatov/alphasync/blob/master/LICENSE"];
+    NSString* version = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+    NSString* releaseURL = [NSString stringWithFormat:@"https://github.com/koralatov/alphasync/releases/tag/v%@", version];
+    NSString* licenceURL = [NSString stringWithFormat:@"https://github.com/koralatov/alphasync/blob/v%@/LICENSE", version];
+    NSArray* urls = @[@"https://github.com/koralatov/alphasync", releaseURL, licenceURL];
     NSInteger index = [sender tag];
     if (index >= 0 && (NSUInteger)index < [urls count])
         [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urls[(NSUInteger)index]]];
