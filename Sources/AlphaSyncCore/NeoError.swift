@@ -28,3 +28,12 @@ public enum NeoError: Error, LocalizedError, Equatable, Sendable {
         }
     }
 }
+
+public struct NeoWriteError: Error, LocalizedError, Sendable {
+    public let reason: String
+    public init(reason: String) { self.reason = reason }
+    public var errorDescription: String? {
+        if reason.contains("may already have changed") { return reason }
+        return "The Neo could not confirm the change. Device contents may already have changed. " + reason
+    }
+}

@@ -202,6 +202,11 @@ public final class NeoProtocol {
     }
 
     /// Validation happens again immediately before the transaction that can change device contents.
+    private func changing<T>(_ operation: () throws -> T) throws -> T {
+        do { return try operation() }
+        catch { throw NeoWriteError(reason: error.localizedDescription) }
+    }
+
     public func writeFile(_ data: Data, applet: UInt16, index: UInt8, expectedOriginal: Data) throws {
         let limits = try fileLimits(applet: applet)
         let info = try attributes(applet: applet, index: index)
@@ -210,7 +215,7 @@ public final class NeoProtocol {
         guard try readFile(applet: applet, index: index) == expectedOriginal else {
             throw NeoError.device("The file changed after the warning opened. Review the current file and try again. No device files were changed.")
         }
-        try transaction { try rawWrite(data, applet: applet, index: index) }
+        try transaction { try changing { try rawWrite(data, applet: applet, index: index) } }
     }
     public func createFile(_ data: Data, name: String, applet: UInt16) throws -> UInt8 {
         let limits = try fileLimits(applet: applet)
@@ -221,16 +226,20 @@ public final class NeoProtocol {
         let index = UInt8(usage.count + 1)
         let attributes = try NeoFileAttributes(name: name, minimum: data.count, allocation: data.count)
         try transaction {
-            try rawAttributes(attributes, applet: applet, index: index)
-            try rawWrite(data, applet: applet, index: index)
+            try changing {
+                try rawAttributes(attributes, applet: applet, index: index)
+                try rawWrite(data, applet: applet, index: index)
+            }
         }
         return index
     }
     public func rename(applet: UInt16, index: UInt8, to name: String) throws {
         var info = try attributes(applet: applet, index: index)
         try info.rename(name)
-        try transaction { try rawAttributes(info, applet: applet, index: index) }
-        guard try attributes(applet: applet, index: index).name == name else { throw NeoError.verificationFailed }
+        try changing {
+            try transaction { try rawAttributes(info, applet: applet, index: index) }
+            guard try attributes(applet: applet, index: index).name == name else { throw NeoError.verificationFailed }
+        }
     }
 
     public func snapshot(connection: UUID, registryID: UInt64) throws -> NeoSnapshot {

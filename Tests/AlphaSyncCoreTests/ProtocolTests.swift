@@ -116,7 +116,8 @@ final class ProtocolTests: XCTestCase {
         let device = SimulatedNeo(); device.corruptVerification = true
         let engine = NeoProtocol(transport: device), original = device.payload
         XCTAssertThrowsError(try engine.writeFile(Data(repeating: 66, count: 512), applet: 0xa000, index: 1, expectedOriginal: original)) { error in
-            XCTAssertEqual(error as? NeoError, .verificationFailed)
+            XCTAssertNotNil(error as? NeoWriteError)
+            XCTAssertTrue(error.localizedDescription.contains("may already have changed"))
         }
         XCTAssertEqual(device.writes, 1)
     }
