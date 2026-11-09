@@ -33,7 +33,8 @@ public enum FileFilter: Int, CaseIterable, Identifiable, Sendable {
 @MainActor
 public final class Preferences: ObservableObject {
     @Published public var filter: FileFilter { didSet { defaults.set(filter.rawValue, forKey: "FilterMode") } }
-    @Published public var backupFolder: URL { didSet { defaults.set(backupFolder.path, forKey: "BackupFolder") } }
+    @Published public private(set) var backupFolder: URL
+    @Published public private(set) var backupLocationIssue: String?
     @Published public var saveBackupLogs: Bool { didSet { defaults.set(saveBackupLogs, forKey: "SaveBackupLogs") } }
     @Published public var saveRecoveryCopies: Bool { didSet { defaults.set(saveRecoveryCopies, forKey: "SaveRecoveryCopies") } }
     @Published public var retentionDays: Int { didSet { defaults.set(retentionDays, forKey: "RecoveryRetentionDays") } }
@@ -59,6 +60,50 @@ public final class Preferences: ObservableObject {
         retentionDays = [0, 7, 30, 90].contains(days) ? days : 30
         automaticOpening = defaults.bool(forKey: "AutoRun")
         refreshLoginStatus()
+    }
+    public func selectBackupFolder(_ chosen: URL) throws {
+        let folder = chosen.resolvingSymlinksInPath()
+        guard try folder.resourceValues(forKeys: [.isDirectoryKey]).isDirectory == true else {
+            throw CocoaError(.fileReadUnsupportedScheme)
+        }
+        let bookmark = try folder.bookmarkData(options: [], includingResourceValuesForKeys: nil, relativeTo: nil)
+        defaults.set(bookmark, forKey: "BackupFolderBookmark")
+        defaults.set(folder.path, forKey: "BackupFolder")
+        backupFolder = folder
+        backupLocationIssue = nil
+    }
+
+    /// A failed saved bookmark never falls back to creating its old path.
+    public func resolvedBackupFolder() throws -> URL {
+        do {
+            if let bookmark = defaults.data(forKey: "BackupFolderBookmark") {
+                var stale = false
+                let folder = try URL(resolvingBookmarkData: bookmark, options: [.withoutUI, .withoutMounting],
+                                     relativeTo: nil, bookmarkDataIsStale: &stale).resolvingSymlinksInPath()
+                guard try folder.resourceValues(forKeys: [.isDirectoryKey]).isDirectory == true else { throw CocoaError(.fileNoSuchFile) }
+                if stale {
+                    defaults.set(try folder.bookmarkData(options: [], includingResourceValuesForKeys: nil, relativeTo: nil), forKey: "BackupFolderBookmark")
+                }
+                defaults.set(folder.path, forKey: "BackupFolder")
+                backupFolder = folder
+            } else {
+                var directory: ObjCBool = false
+                if FileManager.default.fileExists(atPath: backupFolder.path, isDirectory: &directory) {
+                    guard directory.boolValue else { throw CocoaError(.fileNoSuchFile) }
+                    try selectBackupFolder(backupFolder)
+                } else {
+                    let initial = URL(fileURLWithPath: ("~/Documents/AlphaSync" as NSString).expandingTildeInPath, isDirectory: true)
+                    guard backupFolder.standardizedFileURL == initial.standardizedFileURL else { throw CocoaError(.fileNoSuchFile) }
+                }
+            }
+            backupLocationIssue = nil
+            return backupFolder
+        } catch {
+            let message = "The saved backup folder is unavailable. Connect its drive or choose the folder again in Settings.\n\n\(backupFolder.path)\n\n\(error.localizedDescription)"
+            backupLocationIssue = message
+            throw NSError(domain: NSCocoaErrorDomain, code: NSFileReadNoSuchFileError,
+                          userInfo: [NSLocalizedDescriptionKey: message, NSUnderlyingErrorKey: error])
+        }
     }
     public func refreshLoginStatus() {
         switch loginItem.status {

@@ -44,6 +44,7 @@ public struct AboutView: View {
 public struct SettingsView: View {
     @ObservedObject private var preferences: Preferences
     @State private var choosingFolder = false
+    @State private var folderError: String?
     public init(preferences: Preferences) { self.preferences = preferences }
     public var body: some View {
         Form {
@@ -57,6 +58,7 @@ public struct SettingsView: View {
                         Button("Choose…") { choosingFolder = true }
                     }
                 }
+                if let issue = preferences.backupLocationIssue { Text(issue).font(.callout).foregroundStyle(.secondary).textSelection(.enabled) }
                 Toggle("Save a backup log", isOn: $preferences.saveBackupLogs)
                 Text("Logs are off unless you enable them. Each log stays inside its dated backup folder.").font(.callout).foregroundStyle(.secondary)
             }
@@ -66,7 +68,8 @@ public struct SettingsView: View {
                     Text("7 days").tag(7); Text("30 days").tag(30); Text("90 days").tag(90); Text("Until I remove them").tag(0)
                 }
                 Button("Open Recovery Copies") {
-                    AppActions.openFolder(preferences.backupFolder.appendingPathComponent("Recovery Copies", isDirectory: true))
+                    do { AppActions.openFolder(try preferences.resolvedBackupFolder().appendingPathComponent("Recovery Copies", isDirectory: true)) }
+                    catch { folderError = error.localizedDescription }
                 }
                 Text("Original text and raw Neo bytes are saved before replacement or clearing. A failed requested copy stops the change. Expired recognised copies move to Trash when a new copy is made.")
                     .font(.callout).foregroundStyle(.secondary)
@@ -78,11 +81,22 @@ public struct SettingsView: View {
             }
         }.formStyle(.grouped).frame(width: 560).frame(minHeight: 500, idealHeight: 610, maxHeight: 700)
             .fileImporter(isPresented: $choosingFolder, allowedContentTypes: [.folder]) { result in
-                if case .success(let url) = result { preferences.backupFolder = url.resolvingSymlinksInPath() }
+                do {
+                    let url = try result.get()
+                    let scoped = url.startAccessingSecurityScopedResource()
+                    defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+                    try preferences.selectBackupFolder(url)
+                } catch {
+                    if (error as NSError).code != NSUserCancelledError { folderError = error.localizedDescription }
+                }
             }
-            .onAppear { preferences.refreshLoginStatus() }
+            .alert("The backup folder could not be opened", isPresented: Binding(get: { folderError != nil }, set: { if !$0 { folderError = nil } })) {
+                Button("OK", role: .cancel) { folderError = nil }
+            } message: { Text(folderError ?? "") }
+            .onAppear { preferences.refreshLoginStatus(); _ = try? preferences.resolvedBackupFolder() }
             .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
                 preferences.refreshLoginStatus()
+                _ = try? preferences.resolvedBackupFolder()
             }
     }
 }

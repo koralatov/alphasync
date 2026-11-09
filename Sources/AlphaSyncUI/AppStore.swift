@@ -312,8 +312,11 @@ public final class AppStore: ObservableObject {
     }
     public func confirm(_ change: PreparedChange, saveRecovery: Bool) async {
         pendingChange = nil
-        let options = RecoveryOptions(enabled: saveRecovery, folder: preferences.backupFolder, retentionDays: preferences.retentionDays)
         await run("Saving recovery copies and changing files…") {
+            let folder = saveRecovery ? try preferences.resolvedBackupFolder() : preferences.backupFolder
+            let scoped = saveRecovery && folder.startAccessingSecurityScopedResource()
+            defer { if scoped { folder.stopAccessingSecurityScopedResource() } }
+            let options = RecoveryOptions(enabled: saveRecovery, folder: folder, retentionDays: preferences.retentionDays)
             let result = try await service.apply(change, recovery: options)
             replace(result.snapshot)
         }
@@ -362,9 +365,12 @@ public final class AppStore: ObservableObject {
     }
     public func backup() async {
         let identities = devices.map(\.connection)
-        let included = preferences.filter.appletIDs, folder = preferences.backupFolder, logs = preferences.saveBackupLogs
+        let included = preferences.filter.appletIDs, logs = preferences.saveBackupLogs
         guard !identities.isEmpty else { return }
         await run("Starting the backup…") {
+            let folder = try preferences.resolvedBackupFolder()
+            let scoped = folder.startAccessingSecurityScopedResource()
+            defer { if scoped { folder.stopAccessingSecurityScopedResource() } }
             let request = StopRequest(); stopRequest = request
             backupResult = try await service.backup(connections: identities, includedApplets: included, destination: folder,
                                                      saveLog: logs, stop: request) { [weak self] value in
