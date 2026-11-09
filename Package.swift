@@ -17,6 +17,7 @@ let package = Package(
         .target(name: "AlphaSyncUI", dependencies: ["AlphaSyncCore", "AlphaSyncHardware"],
                 linkerSettings: [.linkedFramework("ServiceManagement")]),
         .executableTarget(name: "AlphaSyncUIChecks", dependencies: ["AlphaSyncUI"], path: "Tests/AlphaSyncUIChecks"),
-        .testTarget(name: "AlphaSyncCoreTests", dependencies: ["AlphaSyncCore"])
+        .testTarget(name: "AlphaSyncCoreTests", dependencies: ["AlphaSyncCore"]),
+        .testTarget(name: "AlphaSyncHardwareTests", dependencies: ["AlphaSyncHardware"])
     ]
 )

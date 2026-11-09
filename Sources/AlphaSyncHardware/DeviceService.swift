@@ -17,7 +17,7 @@ public final class DeviceService: @unchecked Sendable {
         var snapshot: NeoSnapshot
     }
     private var connections: [UInt64: Connection] = [:]
-    private var attemptedKeyboardDevices = Set<UInt64>()
+    private var modeSwitchState = ModeSwitchState()
     private var stopping = false
 
     public init() {}
@@ -107,8 +107,8 @@ public final class DeviceService: @unchecked Sendable {
                     issue = "The Neo could not be opened. \(error.localizedDescription)"
                 }
             }
-            do { try USBDiscovery.enterTransferMode(attempted: &service.attemptedKeyboardDevices) }
-            catch { issue = error.localizedDescription }
+            USBDiscovery.enterTransferMode(state: &service.modeSwitchState, retryFailures: refresh)
+            if let modeIssue = service.modeSwitchState.issue { issue = modeIssue }
             return DiscoveryResult(devices: service.connections.values.map(\.snapshot).sorted { $0.registryID < $1.registryID }, issue: issue)
         }
     }

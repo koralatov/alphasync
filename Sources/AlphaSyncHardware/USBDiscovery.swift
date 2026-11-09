@@ -43,30 +43,41 @@ enum USBDiscovery {
     }
 
     /// Only the Neo’s output-report interface is opened. No keyboard input is requested or observed.
-    static func enterTransferMode(attempted: inout Set<UInt64>) throws {
+    static func enterTransferMode(state: inout ModeSwitchState, retryFailures: Bool) {
         let manager = IOHIDManagerCreate(kCFAllocatorDefault, IOOptionBits(0))
         IOHIDManagerSetDeviceMatching(manager, [kIOHIDVendorIDKey: vendor, kIOHIDProductIDKey: keyboardProduct] as CFDictionary)
         let devices = IOHIDManagerCopyDevices(manager) as? Set<IOHIDDevice> ?? []
-        var attached = Set<UInt64>()
-        defer { attempted.formIntersection(attached) }
+        var attached: [UInt64: IOHIDDevice] = [:]
         for device in devices {
             let service = IOHIDDeviceGetService(device)
             guard property(service, "bInterfaceNumber") == 1 else { continue }
             var id: UInt64 = 0
             guard IORegistryEntryGetRegistryEntryID(service, &id) == KERN_SUCCESS else { continue }
-            attached.insert(id)
-            guard attempted.insert(id).inserted else { continue }
-            let opened = IOHIDDeviceOpen(device, IOOptionBits(0))
-            guard opened == kIOReturnSuccess else {
-                throw NeoError.device("macOS could not open the Neo’s mode-switch interface (\(opened)). Close other Neo software and reconnect it.")
+            attached[id] = device
+        }
+        state.retainAttached(Set(attached.keys))
+        for id in attached.keys.sorted() {
+            guard let device = attached[id], state.shouldAttempt(id, retryFailures: retryFailures) else { continue }
+            do {
+                try switchMode(device)
+                state.recordSuccess(id)
+            } catch {
+                state.recordFailure(id, message: error.localizedDescription)
             }
-            defer { IOHIDDeviceClose(device, IOOptionBits(0)) }
-            for code: UInt8 in 0xe0...0xe4 {
-                var report = code
-                let status = IOHIDDeviceSetReport(device, kIOHIDReportTypeOutput, 0, &report, 1)
-                guard status == kIOReturnSuccess else {
-                    throw NeoError.device("The Neo could not switch to file-transfer mode (\(status)). Reconnect it and try again.")
-                }
+        }
+    }
+
+    private static func switchMode(_ device: IOHIDDevice) throws {
+        let opened = IOHIDDeviceOpen(device, IOOptionBits(0))
+        guard opened == kIOReturnSuccess else {
+            throw NeoError.device("macOS could not open the Neo’s mode-switch interface (\(opened)).  Close other Neo software and choose Try Again, or reconnect it.")
+        }
+        defer { IOHIDDeviceClose(device, IOOptionBits(0)) }
+        for code: UInt8 in 0xe0...0xe4 {
+            var report = code
+            let status = IOHIDDeviceSetReport(device, kIOHIDReportTypeOutput, 0, &report, 1)
+            guard status == kIOReturnSuccess else {
+                throw NeoError.device("The Neo could not switch to file-transfer mode (\(status)).  Choose Try Again, or reconnect it.")
             }
         }
     }
