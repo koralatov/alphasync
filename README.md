@@ -13,6 +13,8 @@ Choose one download from the [2.0 release](https://github.com/koralatov/alphasyn
 
 Both offer the same file-transfer features. Install one edition. You can find your macOS version and chip in **Apple menu → About This Mac**.
 
+Version 2.0.1 is being developed on master. The links above remain the published 2.0 downloads.
+
 ## macOS 11 and 12
 
 [Download AlphaSync 1.5.1 for macOS 11 and 12](https://github.com/koralatov/alphasync/releases/download/v1.5.1/AlphaSync-1.5.1-147-macOS-11-12-universal.zip).
