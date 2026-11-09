@@ -2,16 +2,19 @@
 set -euo pipefail
 
 if [[ $# -lt 3 || $# -gt 4 ]]; then
-    printf 'Usage: %s app universal|apple-silicon output-directory [development|notarised]\n' "$0" >&2
+    printf 'Usage: %s app universal|apple-silicon output-directory [ad-hoc|development|notarised]\n' "$0" >&2
     exit 1
 fi
 repository=$(cd "$(dirname "$0")/.." && pwd)
 app=$1
 source "$repository/scripts/build-profile.sh" "$2"
 output=$3
-signing=${4:-development}
+signing=${4:-ad-hoc}
 case "$signing" in
-    development) ;;
+    ad-hoc|development)
+        details=$(codesign -d --verbose=4 "$app" 2>&1)
+        [[ "$details" == *'Signature=adhoc'* ]] || { printf 'An ad hoc signature was expected.\n' >&2; exit 1; }
+        ;;
     notarised)
         xcrun stapler validate "$app"
         spctl --assess --type execute "$app"

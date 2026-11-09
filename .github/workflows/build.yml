@@ -3,13 +3,20 @@ name: Build and test
 on:
   push:
   pull_request:
+  workflow_dispatch:
+    inputs:
+      publish_release:
+        description: Publish the stable release after both host jobs and package verification pass
+        required: true
+        default: false
+        type: boolean
 
 permissions:
   contents: read
 
 concurrency:
-  group: swift-apps-${{ github.ref }}
-  cancel-in-progress: true
+  group: swift-apps-${{ github.ref }}-${{ github.event_name }}-${{ inputs.publish_release || false }}
+  cancel-in-progress: ${{ !inputs.publish_release }}
 
 jobs:
   swift-apps:
@@ -29,7 +36,7 @@ jobs:
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Select the pinned compiler
@@ -75,7 +82,7 @@ jobs:
               scripts/package-symbols.sh "$products" "$profile" "build/downloads/$profile"
             fi
           done
-      - name: Collect matching development editions
+      - name: Collect matching app editions
         if: matrix.package && steps.apps.outcome == 'success'
         run: |
           version=$(sed -n 's/^MARKETING_VERSION *= *//p' AlphaSync/Build/Version.xcconfig)
@@ -86,7 +93,7 @@ jobs:
       - name: Check native interface behaviour and capture both appearances
         if: always() && steps.shared.outcome == 'success'
         run: swift run --skip-build AlphaSyncUIChecks build/interface-checks
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
           name: AlphaSync-interface-and-logs-${{ matrix.runner }}-${{ github.sha }}
@@ -94,9 +101,44 @@ jobs:
             build/interface-checks/*
             build/logs/*
           if-no-files-found: warn
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: success() && matrix.package
         with:
-          name: AlphaSync-1.6-development-${{ github.sha }}
+          name: AlphaSync-packages-${{ github.sha }}
           path: build/validated-downloads/*
           if-no-files-found: error
+
+  publish:
+    name: Verify downloads and publish
+    if: github.event_name == 'workflow_dispatch' && inputs.publish_release
+    needs: swift-apps
+    runs-on: macos-26
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Select the pinned compiler
+        run: |
+          selected_developer="/Applications/Xcode_$(cat .xcode-version).app/Contents/Developer"
+          test -d "$selected_developer"
+          printf 'DEVELOPER_DIR=%s\n' "$selected_developer" >> "$GITHUB_ENV"
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: AlphaSync-packages-${{ github.sha }}
+          path: build/release-assets
+      - name: Verify the downloaded release packages
+        run: scripts/verify-release.sh build/release-assets
+      - name: Publish the verified release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: python3 scripts/publish-release.py
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: AlphaSync-publication-record-${{ github.sha }}
+          path: build/release-verification/*
+          if-no-files-found: warn

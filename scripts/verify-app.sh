@@ -22,6 +22,7 @@ build_number=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$app/Content
 [[ "$build_number" =~ ^[1-9][0-9]*$ ]]
 test "$version" = "$(sed -n 's/^MARKETING_VERSION *= *//p' "$repository/AlphaSync/Build/Version.xcconfig")"
 test "$build_number" = "$(sed -n 's/^CURRENT_PROJECT_VERSION *= *//p' "$repository/AlphaSync/Build/Version.xcconfig")"
+test "$(/usr/libexec/PlistBuddy -c 'Print :ASReleaseChannel' "$app/Contents/Info.plist")" = "$(sed -n 's/^AS_RELEASE_CHANNEL *= *//p' "$repository/AlphaSync/Build/Version.xcconfig")"
 test "$(/usr/libexec/PlistBuddy -c 'Print :ASBuildProfile' "$app/Contents/Info.plist")" = "$profile_variant"
 compatibility=$(sed -n 's/^AS_COMPATIBILITY_DESCRIPTION *= *//p' "$profile_configuration")
 test "$(/usr/libexec/PlistBuddy -c 'Print :ASCompatibilityDescription' "$app/Contents/Info.plist")" = "$compatibility"
@@ -58,6 +59,11 @@ for bundle in "$app" "$helper"; do
         done <<< "$libraries"
     done
     codesign --verify --strict "$bundle"
+    details=$(codesign -d --verbose=4 "$bundle" 2>&1)
+    flags=$(printf '%s\n' "$details" | sed -n 's/^CodeDirectory .*flags=0x\([[:xdigit:]]*\).*/\1/p')
+    if [[ -z "$flags" ]] || (( (16#$flags & 0x10000) == 0 )); then
+        printf 'The hardened runtime is missing from %s.\n' "$bundle" >&2; exit 1
+    fi
 done
 codesign --verify --deep --strict "$app"
 if [[ "${3:-}" != --skip-launch ]]; then

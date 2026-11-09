@@ -53,7 +53,7 @@ def read_edition(directory, profile, version, build, source, require_notarised=F
         raise ValueError(f'Wrong version, source, or deployment profile: {directory}')
     if set(fields['Architectures'].split()) != architectures:
         raise ValueError(f'Wrong architectures: {directory}')
-    if fields['Signing'] not in ['development', 'notarised']:
+    if fields['Signing'] not in ['development', 'ad-hoc', 'notarised']:
         raise ValueError(f'Unknown signing state: {directory}')
     if require_notarised and fields['Signing'] != 'notarised':
         raise ValueError(f'A notarised package is required: {directory}')
