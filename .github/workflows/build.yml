@@ -8,37 +8,77 @@ permissions:
   contents: read
 
 jobs:
-  swift-core:
-    name: Swift file protection milestone
-    runs-on: macos-26
-    timeout-minutes: 15
+  swift-apps:
+    name: Swift apps (${{ matrix.host }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - host: Apple Silicon
+            runner: macos-26
+            xcode: '26.6'
+            package: true
+          - host: Intel
+            runner: macos-15-intel
+            xcode: '16.4'
+            package: false
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
       - name: Select the pinned compiler
+        env:
+          XCODE_VERSION: ${{ matrix.xcode }}
         run: |
-          version=$(cat .xcode-version)
-          selected_developer="/Applications/Xcode_$version.app/Contents/Developer"
+          selected_developer="/Applications/Xcode_$XCODE_VERSION.app/Contents/Developer"
           test -d "$selected_developer"
           printf 'DEVELOPER_DIR=%s\n' "$selected_developer" >> "$GITHUB_ENV"
-      - name: Retain the public USB SDK interface for the transport migration
+      - name: Check generated target definitions
         run: |
-          mkdir -p build/usb-sdk
-          sdk=$(xcrun --sdk macosx --show-sdk-path)
-          cp "$sdk"/System/Library/Frameworks/IOUSBHost.framework/Headers/*.h build/usb-sdk/
-          xcrun swift-symbolgraph-extract -module-name IOUSBHost -target arm64-apple-macos13.0 \
-            -sdk "$sdk" -output-dir build/usb-sdk
-          for path in "$sdk"/System/Library/Frameworks/IOUSBHost.framework/Modules/*/*.swiftinterface "$DEVELOPER_DIR"/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/IOUSBHost.swiftmodule/*.swiftinterface; do
-            if [[ -f "$path" ]]; then cp "$path" build/usb-sdk/; fi
-          done
-      - name: Compile the Swift transport and run protocol regressions
+          python3 scripts/generate-project.py
+          git diff --exit-code -- AlphaSync/AlphaSync.xcodeproj
+      - name: Compile Swift and run core, protocol, and file-protection regressions
         run: |
-          swift build --target AlphaSyncHardware
+          swift build --product AlphaSyncUIChecks
           swift test --parallel
+      - name: Build both native app targets
+        env:
+          PACKAGE_EDITIONS: ${{ matrix.package }}
+        run: |
+          mkdir -p build/logs
+          profiles=(universal)
+          if [[ "$PACKAGE_EDITIONS" == true ]]; then profiles+=(apple-silicon); fi
+          for profile in "${profiles[@]}"; do
+            source scripts/build-profile.sh "$profile"
+            if ! xcodebuild -project AlphaSync/AlphaSync.xcodeproj -scheme "$profile_scheme" \
+              -configuration Release -destination 'generic/platform=macOS' \
+              -derivedDataPath build/DerivedData build > "build/logs/$profile.log" 2>&1; then
+              tail -n 100 "build/logs/$profile.log"
+              exit 1
+            fi
+            products="build/DerivedData/Build/Products/Release/$profile"
+            scripts/verify-app.sh "$products/AlphaSync.app" "$profile"
+            scripts/verify-symbols.sh "$products"
+            if [[ "$PACKAGE_EDITIONS" == true ]]; then
+              scripts/package-app.sh "$products/AlphaSync.app" "$profile" "build/downloads/$profile"
+              scripts/package-symbols.sh "$products" "$profile" "build/downloads/$profile"
+            fi
+          done
+      - name: Check native interface behaviour and capture both appearances
+        run: swift run --skip-build AlphaSyncUIChecks build/interface-checks
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
-          name: AlphaSync-USB-SDK-${{ github.sha }}
-          path: build/usb-sdk/*
+          name: AlphaSync-interface-and-logs-${{ matrix.runner }}-${{ github.sha }}
+          path: |
+            build/interface-checks/*
+            build/logs/*
+          if-no-files-found: warn
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: success() && matrix.package
+        with:
+          name: AlphaSync-1.6-development-${{ github.sha }}
+          path: build/downloads/*/*
           if-no-files-found: error
