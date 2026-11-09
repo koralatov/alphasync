@@ -1085,6 +1085,11 @@ static void checkAppearances(id controller, NSWindowController* backup, NSString
 
 static void checkHelpMenu(id controller)
 {
+    NSMenu* edit = [[[NSApp mainMenu] itemWithTitle:@"Edit"] submenu];
+    requireInterface(edit && [[edit itemWithTitle:@"Copy"] action] == @selector(copy:) &&
+                     [[edit itemWithTitle:@"Select All"] action] == @selector(selectAll:), @"Standard Edit commands are missing.");
+    NSMenu* find = [[edit itemWithTitle:@"Find"] submenu];
+    requireInterface([[find itemWithTitle:@"Find…"] action] == @selector(performTextFinderAction:), @"The native Find command is missing.");
     NSMenu* menu = [NSApp helpMenu];
     requireInterface(menu && [[[[NSApp mainMenu] itemArray] lastObject] submenu] == menu,
                      [NSString stringWithFormat:@"The native Help menu is not registered at the end of the menu bar.  Registered: %@; menus: %@; Help items: %@",

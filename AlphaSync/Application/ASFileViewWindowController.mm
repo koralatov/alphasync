@@ -48,6 +48,8 @@ static NSString* const ASFileViewMonospacedKey = @"FileViewerMonospaced";
         [textView setRichText:NO];
         [textView setImportsGraphics:NO];
         [textView setAllowsUndo:NO];
+        [textView setUsesFindBar:YES];
+        [textView setIncrementalSearchingEnabled:YES];
         [textView setTextColor:[NSColor textColor]];
         [textView setBackgroundColor:[NSColor textBackgroundColor]];
         [textView setTextContainerInset:NSMakeSize(16, 16)];

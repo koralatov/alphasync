@@ -77,6 +77,7 @@ enum ASAlertStatus
 - (void)setStatusImmediateIdle;
 - (void)setupToolbar;
 - (void)setupHelpMenu;
+- (void)setupEditMenu;
 - (void)setupStatusBar;
 - (void)setupConnectionView;
 - (void)updateMainWindowConnectionState;
@@ -890,6 +891,7 @@ static NSMenuItem* ASAddHelpLink(NSMenu* menu, NSString* title, NSString* identi
 
 - (void)setupHelpMenu
 {
+    [self setupEditMenu];
     NSBundle* bundle = [NSBundle mainBundle];
     NSString* version = [bundle objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
     NSString* build = [bundle objectForInfoDictionaryKey:@"CFBundleVersion"];
@@ -936,6 +938,39 @@ static NSMenuItem* ASAddHelpLink(NSMenu* menu, NSString* title, NSString* identi
     [main addItem:heading];
     [NSApp setHelpMenu:help];
     [[NSHelpManager sharedHelpManager] registerBooksInBundle:bundle];
+}
+
+- (void)setupEditMenu
+{
+    NSMenu* main = [NSApp mainMenu];
+    if ([main itemWithTitle:@"Edit"]) return;
+    NSMenu* edit = [[[NSMenu alloc] initWithTitle:@"Edit"] autorelease];
+    [edit addItemWithTitle:@"Undo" action:@selector(undo:) keyEquivalent:@"z"];
+    NSMenuItem* redo = [edit addItemWithTitle:@"Redo" action:@selector(redo:) keyEquivalent:@"z"];
+    [redo setKeyEquivalentModifierMask:NSEventModifierFlagCommand | NSEventModifierFlagShift];
+    [edit addItem:[NSMenuItem separatorItem]];
+    [edit addItemWithTitle:@"Cut" action:@selector(cut:) keyEquivalent:@"x"];
+    [edit addItemWithTitle:@"Copy" action:@selector(copy:) keyEquivalent:@"c"];
+    [edit addItemWithTitle:@"Paste" action:@selector(paste:) keyEquivalent:@"v"];
+    [edit addItemWithTitle:@"Select All" action:@selector(selectAll:) keyEquivalent:@"a"];
+    [edit addItem:[NSMenuItem separatorItem]];
+    NSMenu* find = [[[NSMenu alloc] initWithTitle:@"Find"] autorelease];
+    NSArray* titles = @[@"Find…", @"Find Next", @"Find Previous", @"Use Selection for Find"];
+    NSArray* keys = @[@"f", @"g", @"g", @"e"];
+    NSArray* actions = @[@(NSTextFinderActionShowFindInterface), @(NSTextFinderActionNextMatch),
+                         @(NSTextFinderActionPreviousMatch), @(NSTextFinderActionSetSearchString)];
+    for (NSUInteger index = 0; index < [titles count]; ++index)
+    {
+        NSMenuItem* item = [find addItemWithTitle:titles[index] action:@selector(performTextFinderAction:) keyEquivalent:keys[index]];
+        [item setTag:[actions[index] integerValue]];
+        if (index == 2) [item setKeyEquivalentModifierMask:NSEventModifierFlagCommand | NSEventModifierFlagShift];
+    }
+    NSMenuItem* findHeading = [edit addItemWithTitle:@"Find" action:nil keyEquivalent:@""];
+    [findHeading setSubmenu:find];
+    NSMenuItem* heading = [[[NSMenuItem alloc] initWithTitle:@"Edit" action:nil keyEquivalent:@""] autorelease];
+    [heading setSubmenu:edit];
+    NSInteger fileIndex = [main indexOfItemWithTitle:@"File"];
+    [main insertItem:heading atIndex:fileIndex >= 0 ? fileIndex + 1 : 1];
 }
 
 - (IBAction)actionShowLicence:(id)sender
