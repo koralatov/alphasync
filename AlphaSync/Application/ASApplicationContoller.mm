@@ -216,11 +216,11 @@ static NSMenuItem* ASAddHelpLink(NSMenu* menu, NSString* title, NSString* identi
     [outletFileView setDraggingSourceOperationMask:NSDragOperationEvery forLocal:NO];
     [outletFileView setAutoresizesOutlineColumn:NO];
 
-    // Keep the initial window compact, with most of its width available for names.
+    // Leave enough room for the native toolbar, including the Clear All Files label.
     [outletFileView setColumnAutoresizingStyle:NSTableViewFirstColumnOnlyAutoresizingStyle];
     [[outletFileView tableColumnWithIdentifier:@"Size"] setWidth:130.0];
     NSSize initialSize = [[outletMainWindow contentView] bounds].size;
-    initialSize.width = 480.0;
+    initialSize.width = 560.0;
     [outletMainWindow setContentSize:initialSize];
 
     deviceController = [[ASDeviceController alloc] init];

@@ -307,6 +307,17 @@ static void sampleConnection(id controller, id device, BOOL connected)
     [[NSNotificationCenter defaultCenter] postNotificationName:connected ? @"ASDeviceConnected" : @"ASDeviceDisconnected" object:device];
 }
 
+static void checkToolbarFits(NSWindow* window, NSToolbar* toolbar)
+{
+    [[window contentView] layoutSubtreeIfNeeded];
+    [window displayIfNeeded];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
+    for (NSToolbarItem* item in [toolbar items])
+        if ([[item itemIdentifier] hasPrefix:@"ToolbarItem:"])
+            requireInterface([[toolbar visibleItems] containsObject:item],
+                             [NSString stringWithFormat:@"The default window hides %@ in toolbar overflow at %.0f points.", [item label], NSWidth([window frame])]);
+}
+
 static void checkConnectionStates(id controller)
 {
     NSWindow* window = [controller valueForKey:@"outletMainWindow"];
@@ -339,8 +350,21 @@ static void checkConnectionStates(id controller)
     id first = [[[NSClassFromString(@"ASNode") alloc] init] autorelease];
     id second = [[[NSClassFromString(@"ASNode") alloc] init] autorelease];
     sampleConnection(controller, first, YES);
-    requireInterface([window contentView] == files && [window toolbar] == toolbar && NSWidth([window frame]) >= 480,
+    requireInterface([window contentView] == files && [window toolbar] == toolbar && NSWidth([window frame]) >= 560,
                      @"Connecting did not restore the file viewer and its toolbar.");
+    checkToolbarFits(window, toolbar);
+    for (NSToolbarItem* item in [toolbar items])
+        if ([[item itemIdentifier] isEqualToString:@"ToolbarItem:Delete"])
+        {
+            NSString* label = [[item label] copy];
+            BOOL validates = [item autovalidates];
+            [item setAutovalidates:NO];
+            [item setLabel:@"Clear All Files…"];
+            checkToolbarFits(window, toolbar);
+            [item setLabel:label];
+            [item setAutovalidates:validates];
+            [label release];
+        }
     NSSize initialSize = [window frame].size;
     NSRect resized = [window frame];
     resized.size = NSMakeSize(620, 560);
