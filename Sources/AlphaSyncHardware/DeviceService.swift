@@ -1,5 +1,4 @@
 import Foundation
-import IOKit
 import AlphaSyncCore
 
 public struct DiscoveryResult: Sendable {
@@ -13,16 +12,23 @@ public final class DeviceService: @unchecked Sendable {
     private let queue = DispatchQueue(label: "com.koralatov.alphasync.usb", qos: .userInitiated)
     private struct Connection {
         let generation: UUID
-        let engine: NeoProtocol
+        let engine: any DeviceConnection
         var snapshot: NeoSnapshot
     }
     private var connections: [UInt64: Connection] = [:]
-    private var modeSwitchState = ModeSwitchState()
+    private let discoveryFactory: @Sendable () -> any DeviceDiscovery
+    private var discovery: (any DeviceDiscovery)?
     private var stopping = false
 
-    public init() {}
+    public convenience init() {
+        self.init(discoveryFactory: { SystemDeviceDiscovery() })
+    }
 
-    public func perform<T: Sendable>(_ operation: @escaping @Sendable (IsolatedDeviceAccess) throws -> T) async throws -> T {
+    init(discoveryFactory: @escaping @Sendable () -> any DeviceDiscovery) {
+        self.discoveryFactory = discoveryFactory
+    }
+
+    func perform<T: Sendable>(_ operation: @escaping @Sendable (IsolatedDeviceAccess) throws -> T) async throws -> T {
         let cancellation = StopRequest()
         return try await withTaskCancellationHandler {
             try Task.checkCancellation()
@@ -68,7 +74,7 @@ public final class DeviceService: @unchecked Sendable {
     }
 
     /// Created only inside queue.async. Do not retain it or pass it to another executor.
-    public final class IsolatedDeviceAccess {
+    final class IsolatedDeviceAccess {
         private unowned let service: DeviceService
         private let cancellation: StopRequest
         fileprivate init(service: DeviceService, cancellation: StopRequest) {
@@ -82,17 +88,17 @@ public final class DeviceService: @unchecked Sendable {
         func checkCancellation() throws {
             if isCancellationRequested { throw CancellationError() }
         }
-        public func engine(for generation: UUID) throws -> NeoProtocol {
+        func engine(for generation: UUID) throws -> any DeviceConnection {
             dispatchPrecondition(condition: .onQueue(service.queue))
             guard let connection = service.connections.values.first(where: { $0.generation == generation }) else { throw NeoError.disconnected }
             return connection.engine
         }
-        public func snapshot(for generation: UUID) throws -> NeoSnapshot {
+        func snapshot(for generation: UUID) throws -> NeoSnapshot {
             dispatchPrecondition(condition: .onQueue(service.queue))
             guard let connection = service.connections.values.first(where: { $0.generation == generation }) else { throw NeoError.disconnected }
             return connection.snapshot
         }
-        public func update(_ generation: UUID) throws -> NeoSnapshot {
+        func update(_ generation: UUID) throws -> NeoSnapshot {
             dispatchPrecondition(condition: .onQueue(service.queue))
             guard let key = service.connections.first(where: { $0.value.generation == generation })?.key,
                   var connection = service.connections[key] else { throw NeoError.disconnected }
@@ -103,8 +109,9 @@ public final class DeviceService: @unchecked Sendable {
         }
         fileprivate func scan(refresh: Bool = false) throws -> DiscoveryResult {
             dispatchPrecondition(condition: .onQueue(service.queue))
-            let found = try USBDiscovery.interfaces()
-            defer { for interface in found { IOObjectRelease(interface.service) } }
+            let discovery = service.discovery ?? service.discoveryFactory()
+            service.discovery = discovery
+            let found = try discovery.devices()
             let attached = Set(found.map(\.registryID))
             for key in Array(service.connections.keys) where !attached.contains(key) {
                 service.connections.removeValue(forKey: key)?.engine.close()
@@ -121,10 +128,10 @@ public final class DeviceService: @unchecked Sendable {
                     }
                     continue
                 }
-                var opened: NeoProtocol?
+                var opened: (any DeviceConnection)?
                 do {
-                    let transport = try USBHostTransport(service: item.service)
-                    let engine = NeoProtocol(transport: transport); opened = engine
+                    let engine = try item.open()
+                    opened = engine
                     let generation = UUID()
                     let snapshot = try engine.snapshot(connection: generation, registryID: item.registryID)
                     service.connections[item.registryID] = Connection(generation: generation, engine: engine, snapshot: snapshot)
@@ -133,8 +140,7 @@ public final class DeviceService: @unchecked Sendable {
                     issue = "The Neo could not be opened. \(error.localizedDescription)"
                 }
             }
-            USBDiscovery.enterTransferMode(state: &service.modeSwitchState, retryFailures: refresh)
-            if let modeIssue = service.modeSwitchState.issue { issue = modeIssue }
+            if let modeIssue = discovery.modeSwitchIssue(retryFailures: refresh) { issue = modeIssue }
             return DiscoveryResult(devices: service.connections.values.map(\.snapshot).sorted { $0.registryID < $1.registryID }, issue: issue)
         }
     }
