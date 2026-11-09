@@ -2,6 +2,7 @@
 #import "AQFileUtilities.h"
 #import "ASNode.h"
 #import "ASFileViewWindowController.h"
+#import "ASDeviceAccessProtocol.h"
 #include <math.h>
 #include <stdio.h>
 
@@ -231,76 +232,51 @@ static void captureWindow(NSWindow* window, NSString* directory, NSString* name)
 
 static void checkClearConfirmation(id controller)
 {
-    // Invoke only the warning.  These display-only nodes never clear a real file.
+    NSWindow* parent = [controller valueForKey:@"outletMainWindow"];
     for (NSString* className in @[@"ASFileNode", @"ASAppletNode"])
     {
         id node = [[[NSClassFromString(className) alloc] performSelector:NSSelectorFromString(@"initForDisplay")] autorelease];
         [node setValue:@"Example" forKey:@"displayName"];
-        for (NSString* input in @[@"Default", @"Cancel", @"OK"])
+        for (NSNumber* replacement in @[@NO, @YES])
         {
-            __block BOOL sent = NO, safeDefault = NO, timedOut = NO;
-            __block NSTimeInterval readyAt = 0;
-            NSDate* deadline = [NSDate dateWithTimeIntervalSinceNow:5];
-            NSTimer* timer = [NSTimer timerWithTimeInterval:0.05 repeats:YES block:^(NSTimer* tick) {
-                if ([deadline timeIntervalSinceNow] <= 0)
-                {
-                    timedOut = YES;
-                    [tick invalidate];
-                    [NSApp abortModal];
-                    return;
-                }
-                NSWindow* window = [NSApp modalWindow];
-                if (sent || !window) return;
+            BOOL replace = [replacement boolValue];
+            if (replace && [className isEqualToString:@"ASAppletNode"]) continue;
+            NSString* command = replace ? @"Replace" : ([className isEqualToString:@"ASAppletNode"] ? @"Clear All Files" : @"Clear File");
+            for (NSNumber* confirm in @[@NO, @YES])
+            {
+                __block BOOL finished = NO, allowed = NO;
+                void (^completion)(BOOL) = ^(BOOL value) { allowed = value; finished = YES; };
+                if (replace) [(id<ASDeviceAccessProtocol>)controller confirmReplace:node with:@"/tmp/Example.txt" completion:completion];
+                else [(id<ASDeviceAccessProtocol>)controller confirmDelete:node completion:completion];
+                NSDate* deadline = [NSDate dateWithTimeIntervalSinceNow:5];
                 NSButton* cancel = nil;
                 NSButton* proceed = nil;
-                NSMutableArray* views = [NSMutableArray arrayWithObject:[window contentView]];
-                while ([views count])
+                while ((!cancel || !proceed) && [deadline timeIntervalSinceNow] > 0)
                 {
-                    NSView* view = [[[views lastObject] retain] autorelease];
-                    [views removeLastObject];
-                    [views addObjectsFromArray:[view subviews]];
-                    if (![view isKindOfClass:[NSButton class]]) continue;
-                    NSButton* button = (NSButton*)view;
-                    if ([[button title] isEqualToString:@"Cancel"]) cancel = button;
-                    if ([[button title] isEqualToString:@"OK"]) proceed = button;
+                    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];
+                    NSMutableArray* views = [NSMutableArray array];
+                    if ([parent attachedSheet]) [views addObject:[[parent attachedSheet] contentView]];
+                    while ([views count])
+                    {
+                        NSView* view = [[[views lastObject] retain] autorelease];
+                        [views removeLastObject];
+                        [views addObjectsFromArray:[view subviews]];
+                        if (![view isKindOfClass:[NSButton class]]) continue;
+                        if ([[(NSButton*)view title] isEqualToString:@"Cancel"]) cancel = (NSButton*)view;
+                        if ([[(NSButton*)view title] isEqualToString:command]) proceed = (NSButton*)view;
+                    }
                 }
-                if (!cancel || !proceed || ![window isVisible] || ![cancel isEnabled] || ![proceed isEnabled])
-                {
-                    readyAt = 0;
-                    return;
-                }
-                NSTimeInterval now = [[NSProcessInfo processInfo] systemUptime];
-                if (readyAt == 0) readyAt = now;
-                if (now - readyAt < 0.5) return;
-                safeDefault = [window defaultButtonCell] == [cancel cell] && [[proceed keyEquivalent] length] == 0;
-                NSButton* chosen = [input isEqualToString:@"OK"] ? proceed : cancel;
-                // Hosted runners do not reliably grant an app keyboard focus.
-                // Exercise the response published by the native button instead.
-                fprintf(stderr, "Clear response %s %s: tag=%ld, safe default=%d.\n",
-                    [className UTF8String], [input UTF8String], (long)[chosen tag], safeDefault);
-                sent = YES;
-                [NSApp stopModalWithCode:[chosen tag]];
-            }];
-            [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSModalPanelRunLoopMode];
-            SEL selector = NSSelectorFromString(@"deviceWillDelete:sender:");
-            NSInvocation* call = [NSInvocation invocationWithMethodSignature:[controller methodSignatureForSelector:selector]];
-            [call setSelector:selector];
-            [call setArgument:&node atIndex:2];
-            [call setArgument:&node atIndex:3];
-            [call invokeWithTarget:controller];
-            BOOL shouldProceed = NO;
-            [call getReturnValue:&shouldProceed];
-            [timer invalidate];
-            requireInterface(sent && safeDefault && !timedOut,
-                [NSString stringWithFormat:@"Clear check %@ input %@: sent=%d, default=%d, timeout=%d, proceed=%d.",
-                    className, input,
-                    sent, safeDefault, timedOut, shouldProceed]);
-            requireInterface(shouldProceed == [input isEqualToString:@"OK"],
-                             @"The default or Cancel response allowed clearing, or OK failed to confirm.");
-            [controller performSelector:NSSelectorFromString(@"displayStatusTimerDone")];
+                requireInterface(cancel && proceed && [[parent attachedSheet] defaultButtonCell] == [cancel cell] &&
+                                 [[proceed keyEquivalent] length] == 0, @"A destructive sheet has no safe Cancel default or explicit action label.");
+                [([confirm boolValue] ? proceed : cancel) performClick:nil];
+                while (!finished && [deadline timeIntervalSinceNow] > 0)
+                    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.01]];
+                requireInterface(finished && allowed == [confirm boolValue], @"A destructive sheet returned the wrong response.");
+                [controller performSelector:NSSelectorFromString(@"displayStatusTimerDone")];
+            }
         }
     }
-    puts("File and applet Clear warnings have Cancel as the native default, reject cancellation responses, and accept only OK without clearing test data.");
+    puts("Native Replace and Clear sheets keep Cancel as the default and require an explicit destructive choice.");
 }
 
 static void checkConnectionLayout(id controller)

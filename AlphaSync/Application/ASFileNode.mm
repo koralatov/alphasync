@@ -644,10 +644,6 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
         BOOL shouldProceed = TRUE;
 
         id accessDelegate = [self delegate];
-        if ([accessDelegate conformsToProtocol:@protocol(ASDeviceAccessProtocol)])
-        {
-            shouldProceed = [accessDelegate deviceWillReplace:self with:path sender:self];
-        }
 
         if (shouldProceed)
         {
@@ -702,10 +698,6 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
     BOOL didDeleteFile = FALSE;
 
     id accessDelegate = [self delegate];
-    if ([accessDelegate conformsToProtocol:@protocol(ASDeviceAccessProtocol)])
-    {
-        shouldProceed = [accessDelegate deviceWillDelete:self sender:self];
-    }
 
     if (shouldProceed)
     {

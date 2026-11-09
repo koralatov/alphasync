@@ -419,12 +419,15 @@ static NSMenuItem* ASAddHelpLink(NSMenu* menu, NSString* title, NSString* identi
 
     if ([deviceController isBusy] || [outletFileView numberOfSelectedRows] != 1) return;
     ASNode* selected = [outletFileView itemAtRow:[outletFileView selectedRow]];
-    if (![selected conformsToProtocol:@protocol(ASDeleteProtocol)] || ![self deviceWillDelete:selected sender:selected]) return;
-    [deviceController performTaskForNode:selected refresh:YES task:^id(ASNode* working) {
-        return @([(id<ASDeleteProtocol>)working deleteSelf]);
-    } completion:^(id result, NSString* error) {
-        (void)result;
-        [self deviceDidDelete:selected error:error sender:selected];
+    if (![selected conformsToProtocol:@protocol(ASDeleteProtocol)]) return;
+    [self confirmDelete:selected completion:^(BOOL allowed) {
+        if (!allowed || [deviceController isBusy]) return;
+        [deviceController performTaskForNode:selected refresh:YES task:^id(ASNode* working) {
+            return @([(id<ASDeleteProtocol>)working deleteSelf]);
+        } completion:^(id result, NSString* error) {
+            (void)result;
+            [self deviceDidDelete:selected error:error sender:selected];
+        }];
     }];
 }
 
@@ -1004,73 +1007,39 @@ static NSMenuItem* ASAddHelpLink(NSMenu* menu, NSString* title, NSString* identi
 }
 
 
-- (BOOL)deviceWillReplace:(ASNode*)target with:(NSString*)path sender:(id)sender
+- (void)confirmActionFor:(ASNode*)target replacing:(NSString*)path completion:(void (^)(BOOL))completion
 {
-    (void)path;
-    (void)sender;
-
-    NSAlert* alert = [[NSAlert alloc] init];
-    [[alert addButtonWithTitle:@"OK"] setKeyEquivalent:@"\r"];
-    [[alert addButtonWithTitle:@"Cancel"] setKeyEquivalent:@"\033"];
-    [alert setMessageText:[NSString stringWithFormat:@"Overwrite file %@?", [target displayName]]];
-    [alert setInformativeText:@"This operation can not be undone."];
-    [alert setAlertStyle:NSAlertStyleWarning];
-
-    NSModalResponse button = [alert runModal];
-    BOOL shouldProceed = (button == NSAlertFirstButtonReturn);
-    [alert release];
-
-    if (shouldProceed)
-    {
-        NSString* statusText = [NSString stringWithFormat:@"Loading %@", [target displayName]];
-        [self setStatusBusy:statusText];
-    }
-    return shouldProceed;
-}
-
-
-
-- (BOOL)deviceWillDelete:(ASNode*)target sender:(id)sender
-{
-    (void)sender;
-
-    NSAlert* alert = [[NSAlert alloc] init];
+    NSAlert* alert = [[[NSAlert alloc] init] autorelease];
+    BOOL replace = path != nil;
+    BOOL all = [target isKindOfClass:[ASAppletNode class]];
     NSButton* cancel = [alert addButtonWithTitle:@"Cancel"];
     [cancel setKeyEquivalent:@"\r"];
     [cancel setKeyEquivalentModifierMask:0];
-    [[alert addButtonWithTitle:@"OK"] setKeyEquivalent:@""];
-
-    if ([target isMemberOfClass:[ASFileNode class]])
-    {
-        [alert setMessageText:[NSString stringWithFormat:@"Clear file %@?", [target displayName]]];
-        [alert setInformativeText:@"This operation can not be undone."];
-        [alert setAlertStyle:NSAlertStyleWarning];
-    }
-    else if ([target isMemberOfClass:[ASAppletNode class]])
-    {
-        [alert setMessageText:[NSString stringWithFormat:@"Clear all files for %@?", [target displayName]]];
-        [alert setInformativeText:@"This operation can not be undone."];
-        [alert setAlertStyle:NSAlertStyleCritical];
-    }
-    else
-    {
-        [alert setMessageText:[NSString stringWithFormat:@"Clear %@?", [target displayName]]];
-        [alert setInformativeText:@"This operation can not be undone."];
-        [alert setAlertStyle:NSAlertStyleWarning];
-    }
-
-    NSModalResponse button = [alert runModal];
-    BOOL shouldProceed = (button == NSAlertSecondButtonReturn);
-    [alert release];
-
-    if (shouldProceed)
-    {
-        NSString* statusText = [NSString stringWithFormat:@"Deleting %@", [target displayName]];
-        [self setStatusBusy:statusText];
-    }
-    return shouldProceed;
+    NSString* command = replace ? @"Replace" : (all ? @"Clear All Files" : @"Clear File");
+    [[alert addButtonWithTitle:command] setKeyEquivalent:@""];
+    NSString* question = replace ? @"Replace file %@?" : (all ? @"Clear all files for %@?" : @"Clear file %@?");
+    [alert setMessageText:[NSString stringWithFormat:question, [target displayName]]];
+    [alert setInformativeText:replace ?
+        [NSString stringWithFormat:@"The text in this file on your Neo will be replaced with %@. This cannot be undone.", [path lastPathComponent]] :
+        @"The selected contents on your Neo will be cleared. This cannot be undone."];
+    [alert setAlertStyle:NSAlertStyleWarning];
+    [alert beginSheetModalForWindow:outletMainWindow completionHandler:^(NSModalResponse response) {
+        BOOL allowed = response == NSAlertSecondButtonReturn;
+        if (allowed) [self setStatusBusy:replace ? @"Replacing file…" : @"Clearing files…"];
+        completion(allowed);
+        [self updateMainWindowConnectionState];
+    }];
 }
 
+- (void)confirmReplace:(ASNode*)target with:(NSString*)path completion:(void (^)(BOOL))completion
+{
+    [self confirmActionFor:target replacing:path completion:completion];
+}
+
+- (void)confirmDelete:(ASNode*)target completion:(void (^)(BOOL))completion
+{
+    [self confirmActionFor:target replacing:nil completion:completion];
+}
 
 - (void)deviceDidLoad:(NSString*)path error:(NSString*)error sender:(id)sender
 {

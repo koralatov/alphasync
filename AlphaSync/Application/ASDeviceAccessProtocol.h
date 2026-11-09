@@ -35,8 +35,8 @@
 
 - (BOOL)deviceWillSave:(ASNode*)source to:(NSString*)path sender:(id)sender;
 - (BOOL)deviceWillLoad:(NSString*)path sender:(id)sender;
-- (BOOL)deviceWillReplace:(ASNode*)target with:(NSString*)path sender:(id)sender;
-- (BOOL)deviceWillDelete:(ASNode*)node sender:(id)sender;
+- (void)confirmReplace:(ASNode*)target with:(NSString*)path completion:(void (^)(BOOL))completion;
+- (void)confirmDelete:(ASNode*)target completion:(void (^)(BOOL))completion;
 
 - (void)deviceDidSave:(ASNode*)source error:(NSString*)error sender:(id)sender;
 - (void)deviceDidLoad:(NSString*)path error:(NSString*)error sender:(id)sender;

@@ -344,10 +344,6 @@ static NSImage* iconApplet = nil;              /**< Icon to use for applets. */
     BOOL didDelete = FALSE;
 
     id accessDelegate = [self delegate];
-    if ([accessDelegate conformsToProtocol:@protocol(ASDeviceAccessProtocol)])
-    {
-        shouldProceed = [accessDelegate deviceWillDelete:self sender:self];
-    }
 
     if (shouldProceed)
     {

@@ -310,23 +310,27 @@ static NSArray* filePathsFromPasteboard(NSPasteboard* pasteboard)
     if (![paths count] || ![item conformsToProtocol:@protocol(ASLoadProtocol)] || ![item loadPermittedFromPaths:paths]) return NO;
     id delegate = [item delegate];
     BOOL replace = [item isKindOfClass:[ASFileNode class]];
-    if ([delegate conformsToProtocol:@protocol(ASDeviceAccessProtocol)])
+    void (^start)(BOOL) = ^(BOOL allowed) {
+        if (!allowed || [deviceController isBusy]) return;
+        [deviceController performTaskForNode:item refresh:YES task:^id(ASNode* working) {
+            return @([(id<ASLoadProtocol>)working loadFromPaths:paths] > 0);
+        } completion:^(id result, NSString* error) {
+            (void)result;
+            if ([delegate conformsToProtocol:@protocol(ASDeviceAccessProtocol)])
+            {
+                if (replace) [delegate deviceDidReplace:item error:error sender:item];
+                else [delegate deviceDidLoad:paths[0] error:error sender:item];
+            }
+            [outlineView reloadData];
+        }];
+    };
+    if (replace && [delegate conformsToProtocol:@protocol(ASDeviceAccessProtocol)])
+        [delegate confirmReplace:item with:paths[0] completion:start];
+    else
     {
-        BOOL allowed = replace ? [delegate deviceWillReplace:item with:paths[0] sender:item] :
-                                 [delegate deviceWillLoad:paths[0] sender:item];
-        if (!allowed) return NO;
+        BOOL allowed = ![delegate conformsToProtocol:@protocol(ASDeviceAccessProtocol)] || [delegate deviceWillLoad:paths[0] sender:item];
+        start(allowed);
     }
-    [deviceController performTaskForNode:item refresh:YES task:^id(ASNode* working) {
-        return @([(id<ASLoadProtocol>)working loadFromPaths:paths] > 0);
-    } completion:^(id result, NSString* error) {
-        (void)result;
-        if ([delegate conformsToProtocol:@protocol(ASDeviceAccessProtocol)])
-        {
-            if (replace) [delegate deviceDidReplace:item error:error sender:item];
-            else [delegate deviceDidLoad:paths[0] error:error sender:item];
-        }
-        [outlineView reloadData];
-    }];
     return YES;
 }
 
