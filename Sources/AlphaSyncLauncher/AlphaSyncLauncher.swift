@@ -21,14 +21,24 @@ private final class LaunchDelegate: NSObject, NSApplicationDelegate {
     private var launchState = NeoLaunchState()
     func applicationDidFinishLaunching(_ notification: Notification) {
         monitor = Task {
-            while !Task.isCancelled {
-                // ServiceManagement owns the helper’s lifetime. A delayed preference write must not stop a newly registered helper.
-                // Only registry metadata is read here. All USB ownership remains in the main app.
-                if let attached = try? NeoPresence.attachedIDs() {
-                    launchState.observe(attached)
-                    attemptLaunch()
+            var failures = 0
+            while !Task.isCancelled && failures < 3 {
+                do {
+                    for try await _ in NeoPresence.attachmentEvents() {
+                        guard !Task.isCancelled else { return }
+                        // Only registry metadata is read here. USB ownership remains in the main app.
+                        launchState.observe(try NeoPresence.attachedIDs())
+                        attemptLaunch()
+                    }
+                    return
+                } catch {
+                    if Task.isCancelled { return }
+                    NSLog("Neo attachment monitoring failed: %@", error.localizedDescription)
+                    failures += 1
+                    if failures < 3 {
+                        do { try await Task.sleep(for: .seconds(failures)) } catch { return }
+                    }
                 }
-                try? await Task.sleep(for: .seconds(2))
             }
         }
     }

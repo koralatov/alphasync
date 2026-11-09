@@ -18,6 +18,7 @@ public final class DeviceService: @unchecked Sendable {
     private var connections: [UInt64: Connection] = [:]
     private var connectionFailures: [UInt64: String] = [:]
     private let discoveryFactory: @Sendable () -> any DeviceDiscovery
+    private let eventSource: @Sendable () -> AsyncThrowingStream<Void, Error>
     private var discovery: (any DeviceDiscovery)?
     private var stopping = false
 
@@ -25,9 +26,13 @@ public final class DeviceService: @unchecked Sendable {
         self.init(discoveryFactory: { SystemDeviceDiscovery() })
     }
 
-    init(discoveryFactory: @escaping @Sendable () -> any DeviceDiscovery) {
+    init(discoveryFactory: @escaping @Sendable () -> any DeviceDiscovery,
+         eventSource: @escaping @Sendable () -> AsyncThrowingStream<Void, Error> = { NeoPresence.attachmentEvents() }) {
         self.discoveryFactory = discoveryFactory
+        self.eventSource = eventSource
     }
+
+    public func attachmentEvents() -> AsyncThrowingStream<Void, Error> { eventSource() }
 
     func perform<T: Sendable>(_ operation: @escaping @Sendable (IsolatedDeviceAccess) throws -> T) async throws -> T {
         let cancellation = StopRequest()

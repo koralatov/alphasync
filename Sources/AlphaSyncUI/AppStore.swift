@@ -59,7 +59,7 @@ public final class AppStore: ObservableObject {
     @Published public var sidebar: SidebarSelection?
     @Published public var selection = Set<NeoFileID>()
     @Published public var notice: AppNotice?
-    @Published var fileConfirmation: FileConfirmation?
+    @Published var fileConfirmation: FileConfirmation? { didSet { resumeAttachmentScan() } }
     public var pendingChange: PreparedChange? {
         get { if case .change(let change) = fileConfirmation { return change }; return nil }
         set { fileConfirmation = newValue.map(FileConfirmation.change) }
@@ -114,6 +114,11 @@ public final class AppStore: ObservableObject {
     public var canImport: Bool { !busy && importApplet?.canWrite == true }
     public var stopRequest: StopRequest?
     private var monitor: Task<Void, Never>?
+    private var scanTask: Task<Void, Never>?
+    private var scanPending = false
+    private var monitorGeneration = UUID()
+    private var monitoringIssue: String?
+    private var discoveryIssue: String?
     private var epoch = 0
     private let monitoringEnabled: Bool
     private var importRequest: ImportTarget?
@@ -122,30 +127,60 @@ public final class AppStore: ObservableObject {
     public init(service: DeviceService = DeviceService(), preferences: Preferences? = nil, monitoringEnabled: Bool = true) {
         self.service = service; self.preferences = preferences ?? Preferences(); self.monitoringEnabled = monitoringEnabled
     }
+    deinit { monitor?.cancel(); scanTask?.cancel() }
     public func applet(for id: NeoFileID) -> NeoApplet? {
         devices.first { $0.connection == id.connection }?.applets.first { $0.id == id.applet }
     }
     public func start() {
         guard monitoringEnabled, monitor == nil, !shuttingDown else { return }
+        let events = service.attachmentEvents()
+        let generation = UUID()
+        monitorGeneration = generation
+        monitoringIssue = nil
+        updateConnectionIssue()
         monitor = Task { [weak self] in
-            while !Task.isCancelled {
-                guard let self else { return }
-                if !self.busy {
-                    let observed = self.epoch
-                    do {
-                        let result = try await self.service.scan()
-                        // A scan queued before a user operation must not replace its newer result.
-                        if !Task.isCancelled && observed == self.epoch && !self.busy {
-                            self.devices = result.devices; self.connectionIssue = result.issue
-                            self.reconcileSelection()
-                        }
-                    } catch {
-                        if !Task.isCancelled && observed == self.epoch { self.connectionIssue = error.localizedDescription }
-                    }
+            defer { if self?.monitorGeneration == generation { self?.monitor = nil } }
+            do {
+                for try await _ in events {
+                    guard !Task.isCancelled, let self else { return }
+                    self.scanPending = true
+                    self.resumeAttachmentScan()
                 }
-                try? await Task.sleep(for: .seconds(2))
+            } catch {
+                if !Task.isCancelled {
+                    self?.monitoringIssue = error.localizedDescription
+                    self?.updateConnectionIssue()
+                }
             }
         }
+    }
+    private func resumeAttachmentScan() {
+        guard monitoringEnabled, scanPending, scanTask == nil, !busy, !shuttingDown else { return }
+        scanPending = false
+        scanTask = Task { [weak self] in
+            guard let self else { return }
+            defer { self.scanTask = nil; self.resumeAttachmentScan() }
+            guard !self.busy, !self.shuttingDown else { self.scanPending = true; return }
+            let observed = self.epoch
+            do {
+                let result = try await self.service.scan()
+                guard !Task.isCancelled, !self.shuttingDown else { return }
+                if observed == self.epoch && !self.busy {
+                    self.devices = result.devices; self.discoveryIssue = result.issue
+                    self.updateConnectionIssue()
+                    self.reconcileSelection()
+                } else { self.scanPending = true }
+            } catch {
+                if !Task.isCancelled && !self.shuttingDown {
+                    self.discoveryIssue = error.localizedDescription
+                    self.updateConnectionIssue()
+                }
+            }
+        }
+    }
+    private func updateConnectionIssue() {
+        let messages = [monitoringIssue, discoveryIssue].compactMap { $0 }
+        connectionIssue = messages.isEmpty ? nil : messages.joined(separator: "\n\n")
     }
     public func reconcileSelection() {
         if let sidebar {
@@ -181,6 +216,7 @@ public final class AppStore: ObservableObject {
             operationText = ""
             progress = nil
             stopRequest = nil
+            resumeAttachmentScan()
         }
         do { try await action() }
         catch {
@@ -189,7 +225,8 @@ public final class AppStore: ObservableObject {
             if let result = try? await service.refresh() {
                 devices = result.devices
                 contentRevision = UUID()
-                connectionIssue = result.issue
+                discoveryIssue = result.issue
+                updateConnectionIssue()
                 reconcileSelection()
             }
         }
@@ -197,10 +234,12 @@ public final class AppStore: ObservableObject {
     public func refresh() async {
         await run("Refreshing files…") {
             let result = try await service.refresh(retryConnections: true)
-            devices = result.devices; connectionIssue = result.issue
+            devices = result.devices; discoveryIssue = result.issue
+            updateConnectionIssue()
             contentRevision = UUID()
             reconcileSelection()
         }
+        start()
     }
     public func readText(_ id: NeoFileID) async throws -> String {
         try Task.checkCancellation()
@@ -208,7 +247,7 @@ public final class AppStore: ObservableObject {
         guard let applet = applet(for: id) else { throw NeoError.disconnected }
         activities += 1
         epoch += 1
-        defer { activities -= 1 }
+        defer { activities -= 1; resumeAttachmentScan() }
         let bytes = try await service.read(id)
         try Task.checkCancellation()
         return try FileCodec.text(bytes, applet: applet)
@@ -386,6 +425,8 @@ public final class AppStore: ObservableObject {
         shuttingDown = true
         monitor?.cancel()
         monitor = nil
+        scanTask?.cancel()
+        scanPending = false
         stopRequest?.stop()
         while activities > 0 {
             try? await Task.sleep(for: .milliseconds(50))

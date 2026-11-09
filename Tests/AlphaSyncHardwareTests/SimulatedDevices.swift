@@ -20,6 +20,18 @@ final class SimulatedObservations: @unchecked Sendable {
     private var closes = 0
     private var opens = 0
     private var retries: [Bool] = []
+    private var scans = 0
+
+    func didScan() {
+        lock.lock()
+        defer { lock.unlock() }
+        scans += 1
+    }
+    var scanCount: Int {
+        lock.lock()
+        defer { lock.unlock() }
+        return scans
+    }
 
     func didOpen() {
         lock.lock()
@@ -92,7 +104,8 @@ final class SimulatedDiscovery: DeviceDiscovery {
     }
 
     func devices() throws -> [any DeviceAttachment] {
-        observations.attachedIDs().map {
+        observations.didScan()
+        return observations.attachedIDs().map {
             SimulatedAttachment(registryID: $0, configuration: configuration, observations: observations)
         }
     }
