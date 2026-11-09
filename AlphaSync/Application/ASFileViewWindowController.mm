@@ -30,6 +30,9 @@ static NSString* const ASFileViewMonospacedKey = @"FileViewerMonospaced";
                                                      trackingMode:NSSegmentSwitchTrackingSelectOne
                                                            target:self action:@selector(changeFontStyle:)];
         [fontStyle setAccessibilityLabel:@"Text font"];
+        [fontStyle setSegmentDistribution:NSSegmentDistributionFillEqually];
+        [(NSSegmentedCell*)[fontStyle cell] setToolTip:@"Use the regular system font" forSegment:0];
+        [(NSSegmentedCell*)[fontStyle cell] setToolTip:@"Use the monospaced system font" forSegment:1];
         [fontStyle setSelectedSegment:[[NSUserDefaults standardUserDefaults] boolForKey:ASFileViewMonospacedKey] ? 1 : 0];
         NSStackView* fontBar = [NSStackView stackViewWithViews:@[fontLabel, fontStyle]];
         [fontBar setOrientation:NSUserInterfaceLayoutOrientationHorizontal];
