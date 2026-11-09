@@ -28,7 +28,7 @@ jobs:
           RELEASE_TAG: ${{ inputs.tag }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          [[ "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          [[ "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+(\.[0-9]+)?$ ]]
           commit=$(gh api "repos/$GITHUB_REPOSITORY/commits/$RELEASE_TAG" --jq .sha)
           [[ "$commit" =~ ^[0-9a-f]{40}$ ]]
           printf 'commit=%s\n' "$commit" >> "$GITHUB_OUTPUT"

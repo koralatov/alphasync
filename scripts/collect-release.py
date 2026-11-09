@@ -27,7 +27,7 @@ def read_package(directory, variant, require_notarised):
                 'Architectures', 'Signing', 'Archive', 'SHA-256'}
     if set(fields) != required:
         raise ValueError(f'Incomplete build report: {reports[0]}')
-    if not re.fullmatch(r'\d+\.\d+\.\d+', fields['Version']):
+    if not re.fullmatch(r'[0-9]+\.[0-9]+(?:\.[0-9]+)?', fields['Version']):
         raise ValueError('Invalid version number.')
     if not re.fullmatch(r'[1-9]\d*', fields['Build']):
         raise ValueError('Invalid build number.')

@@ -50,6 +50,19 @@ class ReleaseTests(unittest.TestCase):
         self.package('modern')
         self.collect(succeeds=True)
 
+    def test_two_component_release_version(self):
+        self.package('universal', version='1.5', build='146')
+        self.package('modern', version='1.5', build='146')
+        self.collect('--tag', 'v1.5', succeeds=True)
+
+    def test_invalid_version(self):
+        for version in ('1', '1.5.0.1', '1.5-beta'):
+            with self.subTest(version=version), tempfile.TemporaryDirectory() as directory:
+                self.root = Path(directory)
+                self.package('universal', version=version)
+                self.package('modern', version=version)
+                self.collect()
+
     def test_different_release_identifiers(self):
         for change in ({'version': '1.4.1'}, {'build': '141'}, {'source': 'b' * 40}):
             with self.subTest(change=change), tempfile.TemporaryDirectory() as directory:

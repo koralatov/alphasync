@@ -273,7 +273,7 @@ jobs:
           RELEASE_MESSAGE: ${{ github.event.head_commit.message }}
         run: |
           version=$(sed -n 's/^MARKETING_VERSION *= *//p' AlphaSync/Build/Version.xcconfig)
-          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          [[ "$version" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]]
           subject=${RELEASE_MESSAGE%%$'\n'*}
           test "$subject" = "Release AlphaSync $version"
           test -s "releases/$version.md"

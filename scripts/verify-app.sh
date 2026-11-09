@@ -20,7 +20,7 @@ for unused in "$app"/Contents/Resources/icon-toolbar-*.pdf "$app"/Contents/Resou
 done
 version=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$app/Contents/Info.plist")
 build_number=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$app/Contents/Info.plist")
-[[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+[[ "$version" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]]
 [[ "$build_number" =~ ^[1-9][0-9]*$ ]]
 compatibility=$(sed -n 's/^AS_COMPATIBILITY_DESCRIPTION *= *//p' "$profile_configuration")
 test -n "$compatibility"
