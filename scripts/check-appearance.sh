@@ -7,8 +7,9 @@ if [[ $# -ne 2 ]]; then
 fi
 
 repository=$(cd "$(dirname "$0")/.." && pwd)
+interface_checker=$("$repository/scripts/build-interface-checker.sh" "$1")
 python3 "$repository/scripts/run-interface-check.py" --timeout 300 \
-    "$1/Contents/MacOS/AlphaSync" --smoke-test --appearance-snapshots "$2"
+    "$interface_checker" --smoke-test --appearance-snapshots "$2"
 
 checker="$2/../help-appearance"
 xcrun clang -fblocks -Wall -Wextra -Werror "$repository/tests/help-appearance.m" \

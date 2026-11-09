@@ -245,7 +245,7 @@ static NSMenuItem* ASAddHelpLink(NSMenu* menu, NSString* title, NSString* identi
     [self updateMainWindowConnectionState];
 
     // Interface checks must not capture a connected Neo or change login-item registration.
-    if (![[[NSProcessInfo processInfo] arguments] containsObject:@"--smoke-test"])
+    if (!AS_INTERFACE_CHECKS)
         [deviceController enable];
     [dataSource reloadData:outletFileView];
 
@@ -307,7 +307,7 @@ static NSMenuItem* ASAddHelpLink(NSMenu* menu, NSString* title, NSString* identi
     frame.size = size;
     if ([outletMainWindow screen]) frame = [outletMainWindow constrainFrameRect:frame toScreen:[outletMainWindow screen]];
     BOOL animate = [outletMainWindow isVisible] && ![[NSWorkspace sharedWorkspace] accessibilityDisplayShouldReduceMotion] &&
-                   ![[[NSProcessInfo processInfo] arguments] containsObject:@"--smoke-test"];
+                   !AS_INTERFACE_CHECKS;
     [outletMainWindow setFrame:frame display:YES animate:animate];
 }
 
@@ -1343,7 +1343,7 @@ static NSMenuItem* ASAddHelpLink(NSMenu* menu, NSString* title, NSString* identi
 - (void)setupAutoRun:(float)secondsToWait
 {
     if (!launcherInstallPath) launcherInstallPath = [[self launcherInstallPath] retain];
-    if ([[[NSProcessInfo processInfo] arguments] containsObject:@"--smoke-test"]) return;
+    if (AS_INTERFACE_CHECKS) return;
     BOOL shouldAutoRun = [[NSUserDefaults standardUserDefaults] boolForKey:kASPreferenceKeyAutoRun];
     if (!launcherInstallPath) return;
 

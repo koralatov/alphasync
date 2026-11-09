@@ -64,7 +64,9 @@ done
 
 codesign --verify --deep --strict "$app"
 if [[ "${3:-}" != --skip-launch ]]; then
+    test "$("$app/Contents/MacOS/AlphaSync" --version)" = "AlphaSync $version (build $build_number)"
+    checker=$("$repository/scripts/build-interface-checker.sh" "$app")
     python3 "$repository/scripts/run-interface-check.py" --timeout 180 \
-        "$app/Contents/MacOS/AlphaSync" --smoke-test
+        "$checker" --smoke-test
 fi
 printf 'Verified %s app, macOS %s minimum, architectures %s.\n' "$profile_variant" "$minimum" "$expected_architectures"
