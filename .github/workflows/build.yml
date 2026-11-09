@@ -57,6 +57,7 @@ jobs:
           swift build --product AlphaSyncUIChecks
           swift test --parallel
           python3 Tests/Packaging/check-packages.py
+          python3 Tests/Packaging/check-publication.py
       - name: Build both native app targets
         id: apps
         if: always() && steps.shared.outcome == 'success'
@@ -114,6 +115,9 @@ jobs:
     needs: swift-apps
     runs-on: macos-26
     timeout-minutes: 15
+    concurrency:
+      group: alphasync-release-publication
+      cancel-in-progress: false
     permissions:
       contents: write
     steps:

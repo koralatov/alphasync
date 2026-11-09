@@ -70,6 +70,8 @@ Repeat with `apple-silicon` for that edition. Verification checks exact architec
 
 Successful CI runs retain development app ZIPs, separate symbol ZIPs, SHA-256 checksums, build reports with the source commit, and interface screenshots on the [Actions page](https://github.com/koralatov/alphasync/actions). Artifacts expire. Public releases require an explicit manual workflow request. Both host jobs and a second check of the downloaded packages must pass before publication. Version 2.0 uses ad hoc signatures; it is not Apple-notarised. The separate `scripts/release.sh` route remains available for a Developer ID signed and notarised release when the required signing identity and notary profile are supplied.
 
+Interrupted publication can resume an unpublished draft for the exact tested source and original package bytes. The publisher checks all existing asset hashes, uploads only missing files, and removes only expected empty `starter` assets left by failed GitHub uploads. Different hashes, unexpected assets, another source, prereleases, and public or immutable releases stop publication without replacing completed files. Re-run the failed publication job with the original successful build artifacts; a fresh build whose bytes differ cannot overwrite that draft. Publication jobs are serialised across branches. Disposable command fixtures exercise this policy without contacting GitHub.
+
 ## USB and concurrency
 
 Use Apple’s public **IOUSBHost** framework for bulk transfers. The Neo appears as USB vendor `081e`, product `bd04` in keyboard mode. Public HID output reports `e0` through `e4`, sent only to interface 1, switch it to the `bd01` file-transfer device. The proprietary file protocol uses bulk endpoints, not keyboard input reports.

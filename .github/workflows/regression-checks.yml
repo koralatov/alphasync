@@ -71,6 +71,7 @@ jobs:
         run: |
           set -o pipefail
           python3 Tests/Packaging/check-packages.py 2>&1 | tee build/regression-checks/packages.log
+          python3 Tests/Packaging/check-publication.py 2>&1 | tee build/regression-checks/publication.log
       - name: Check native interface behaviour
         run: |
           set -o pipefail
