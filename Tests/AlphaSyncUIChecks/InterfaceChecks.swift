@@ -37,14 +37,17 @@ struct InterfaceChecks {
             throw CheckFailure(description: "Cannot create the capture background")
         }
         opaque.size = bitmap.size
-        NSGraphicsContext.saveGraphicsState()
-        NSGraphicsContext.current = context
+        guard let image = bitmap.cgImage else { throw CheckFailure(description: "Cannot read the captured pixels") }
         window.effectiveAppearance.performAsCurrentDrawingAppearance {
-            NSColor.windowBackgroundColor.setFill()
+            let canvas = context.cgContext
             let bounds = NSRect(origin: .zero, size: bitmap.size)
-            bounds.fill(); bitmap.draw(in: bounds)
+            canvas.setBlendMode(.copy)
+            canvas.setFillColor(NSColor.windowBackgroundColor.cgColor)
+            canvas.fill(bounds)
+            canvas.setBlendMode(.normal)
+            canvas.draw(image, in: bounds)
         }
-        NSGraphicsContext.restoreGraphicsState()
+        try require((opaque.colorAt(x: 0, y: 0)?.alphaComponent ?? 0) > 0.99, "Capture background must be opaque")
         guard let bytes = opaque.representation(using: .png, properties: [:]) else { throw CheckFailure(description: "Cannot encode \(name)") }
         try bytes.write(to: output.appendingPathComponent(name + ".png"), options: .atomic)
     }
