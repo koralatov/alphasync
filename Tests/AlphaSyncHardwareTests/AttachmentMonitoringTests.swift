@@ -15,22 +15,26 @@ private final class EventFeed: Sendable {
         let terminated = terminated
         continuation.onTermination = { _ in terminated.stop() }
     }
+    func monitor() -> AttachmentMonitor {
+        let continuation = continuation
+        return AttachmentMonitor(events: stream, cancel: { continuation.finish() })
+    }
 }
 
 private final class EventFeeds: @unchecked Sendable {
     private let lock = NSLock()
     private var feeds: [EventFeed]
     init(_ feeds: [EventFeed]) { self.feeds = feeds }
-    func next() -> AsyncThrowingStream<Void, Error> {
+    func next() -> AttachmentMonitor {
         lock.lock()
         defer { lock.unlock() }
-        return feeds.removeFirst().stream
+        return feeds.removeFirst().monitor()
     }
 }
 
 @MainActor
 final class AttachmentMonitoringTests: XCTestCase {
-    private func store(_ observations: SimulatedObservations, events: @escaping @Sendable () -> AsyncThrowingStream<Void, Error>,
+    private func store(_ observations: SimulatedObservations, events: @escaping @Sendable () -> AttachmentMonitor,
                        configuration: SimulatedConfiguration = SimulatedConfiguration()) -> AppStore {
         let domain = "AlphaSync-AttachmentTests-" + UUID().uuidString
         addTeardownBlock { UserDefaults(suiteName: domain)?.removePersistentDomain(forName: domain) }
@@ -46,7 +50,7 @@ final class AttachmentMonitoringTests: XCTestCase {
 
     func testAttachmentEventsDiscoverAndRemoveDevicesAndCancelCleanly() async throws {
         let observations = SimulatedObservations(), feed = EventFeed()
-        let store = store(observations, events: { feed.stream })
+        let store = store(observations, events: { feed.monitor() })
         store.start()
         feed.continuation.yield(())
         try await eventually { store.devices.count == 1 }
@@ -67,7 +71,7 @@ final class AttachmentMonitoringTests: XCTestCase {
         let observations = SimulatedObservations(), feed = EventFeed(), reading = StopRequest()
         let gate = DispatchSemaphore(value: 0)
         defer { gate.signal() }
-        let store = store(observations, events: { feed.stream }, configuration: SimulatedConfiguration(beforeRead: { _ in
+        let store = store(observations, events: { feed.monitor() }, configuration: SimulatedConfiguration(beforeRead: { _ in
             reading.stop(); gate.wait()
         }))
         store.start()
@@ -86,7 +90,7 @@ final class AttachmentMonitoringTests: XCTestCase {
 
     func testEventsWhileAConfirmationIsOpenAreNotLost() async throws {
         let observations = SimulatedObservations(), feed = EventFeed()
-        let store = store(observations, events: { feed.stream })
+        let store = store(observations, events: { feed.monitor() })
         store.start()
         feed.continuation.yield(())
         try await eventually { store.devices.count == 1 }
@@ -123,7 +127,9 @@ final class NativeAttachmentTests: XCTestCase {
     func testNativeMonitorProducesAnInitialEventAndCanBeCancelled() async throws {
         let initial = expectation(description: "Initial USB attachment event")
         let task = Task {
-            for try await _ in NeoPresence.attachmentEvents() { initial.fulfill(); break }
+            let observer = NeoPresence.monitorAttachments()
+            defer { observer.cancel() }
+            for try await _ in observer.events { initial.fulfill(); break }
         }
         await fulfillment(of: [initial], timeout: 3)
         task.cancel()

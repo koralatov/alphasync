@@ -133,15 +133,18 @@ public final class AppStore: ObservableObject {
     }
     public func start() {
         guard monitoringEnabled, monitor == nil, !shuttingDown else { return }
-        let events = service.attachmentEvents()
+        let observer = service.attachmentMonitor()
         let generation = UUID()
         monitorGeneration = generation
         monitoringIssue = nil
         updateConnectionIssue()
         monitor = Task { [weak self] in
-            defer { if self?.monitorGeneration == generation { self?.monitor = nil } }
+            defer {
+                observer.cancel()
+                if self?.monitorGeneration == generation { self?.monitor = nil }
+            }
             do {
-                for try await _ in events {
+                for try await _ in observer.events {
                     guard !Task.isCancelled, let self else { return }
                     self.scanPending = true
                     self.resumeAttachmentScan()

@@ -2,6 +2,17 @@ import Foundation
 import IOKit
 import AlphaSyncCore
 
+public final class AttachmentMonitor: Sendable {
+    public let events: AsyncThrowingStream<Void, Error>
+    private let cancellation: @Sendable () -> Void
+    init(events: AsyncThrowingStream<Void, Error>, cancel: @escaping @Sendable () -> Void) {
+        self.events = events
+        cancellation = cancel
+    }
+    public func cancel() { cancellation() }
+    deinit { cancellation() }
+}
+
 /// IOKit ports, iterators, and callback state belong only to this private serial queue.
 private final class USBNotifications: @unchecked Sendable {
     private let queue = DispatchQueue(label: "com.koralatov.alphasync.attachments")
@@ -13,12 +24,12 @@ private final class USBNotifications: @unchecked Sendable {
 
     init(_ continuation: AsyncThrowingStream<Void, Error>.Continuation) { self.continuation = continuation }
 
-    static func events() -> AsyncThrowingStream<Void, Error> {
-        AsyncThrowingStream(bufferingPolicy: .bufferingNewest(1)) { continuation in
-            let owner = USBNotifications(continuation)
-            continuation.onTermination = { _ in owner.cancel() }
-            owner.start()
-        }
+    static func monitor() -> AttachmentMonitor {
+        let (events, continuation) = AsyncThrowingStream<Void, Error>.makeStream(bufferingPolicy: .bufferingNewest(1))
+        let owner = USBNotifications(continuation)
+        continuation.onTermination = { [weak owner] _ in owner?.cancel() }
+        owner.start()
+        return AttachmentMonitor(events: events, cancel: { owner.cancel() })
     }
 
     private func start() {
@@ -75,7 +86,12 @@ private final class USBNotifications: @unchecked Sendable {
         if changed && !stopped { continuation.yield(()) }
     }
 
-    private func cancel() { queue.async { self.stop() } }
+    private func cancel() {
+        queue.async {
+            self.stop()
+            self.continuation.finish()
+        }
+    }
 
     private func stop() {
         dispatchPrecondition(condition: .onQueue(queue))
@@ -103,6 +119,6 @@ private func terminatedInterfaces(_ context: UnsafeMutableRawPointer?, _ iterato
 }
 
 extension NeoPresence {
-    /// Metadata-only attachment notifications. Cancelling the stream releases its native observer.
-    public static func attachmentEvents() -> AsyncThrowingStream<Void, Error> { USBNotifications.events() }
+    /// Metadata-only attachment notifications. Cancel when leaving the event loop, including an early return.
+    public static func monitorAttachments() -> AttachmentMonitor { USBNotifications.monitor() }
 }

@@ -24,7 +24,9 @@ private final class LaunchDelegate: NSObject, NSApplicationDelegate {
             var failures = 0
             while !Task.isCancelled && failures < 3 {
                 do {
-                    for try await _ in NeoPresence.attachmentEvents() {
+                    let observer = NeoPresence.monitorAttachments()
+                    defer { observer.cancel() }
+                    for try await _ in observer.events {
                         guard !Task.isCancelled else { return }
                         // Only registry metadata is read here. USB ownership remains in the main app.
                         launchState.observe(try NeoPresence.attachedIDs())
