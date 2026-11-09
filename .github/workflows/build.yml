@@ -44,10 +44,12 @@ jobs:
           python3 scripts/generate-project.py
           git diff --exit-code -- AlphaSync/AlphaSync.xcodeproj
       - name: Compile Swift and run core, protocol, and file-protection regressions
+        id: shared
         run: |
           swift build --product AlphaSyncUIChecks
           swift test --parallel
       - name: Build both native app targets
+        if: always() && steps.shared.outcome == 'success'
         env:
           PACKAGE_EDITIONS: ${{ matrix.package }}
         run: |
@@ -71,6 +73,7 @@ jobs:
             fi
           done
       - name: Check native interface behaviour and capture both appearances
+        if: always() && steps.shared.outcome == 'success'
         run: swift run --skip-build AlphaSyncUIChecks build/interface-checks
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()

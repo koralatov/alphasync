@@ -79,7 +79,10 @@ for edition, scheme, config_file in [('universal', 'AlphaSyncUniversal', 'Univer
         settings = dict(PRODUCT_NAME=product_name, PRODUCT_BUNDLE_IDENTIFIER='com.tsoniq.' + product_name,
                         GENERATE_INFOPLIST_FILE='NO', INFOPLIST_FILE='AlphaSyncLauncher-Info.plist' if helper else 'Info.plist',
                         CONFIGURATION_BUILD_DIR='$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/$(AS_BUILD_PROFILE)',
-                        SKIP_INSTALL='YES' if helper else 'NO', COMBINE_HIDPI_IMAGES='YES')
+                        SKIP_INSTALL='YES' if helper else 'NO', COMBINE_HIDPI_IMAGES='YES',
+                        SWIFT_INCLUDE_PATHS='$(inherited) $(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)',
+                        LIBRARY_SEARCH_PATHS='$(inherited) $(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)',
+                        FRAMEWORK_SEARCH_PATHS='$(inherited) $(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/PackageFrameworks')
         if not helper:
             settings['LD_RUNPATH_SEARCH_PATHS'] = '$(inherited) @executable_path/../Frameworks'
         product = add(key + '-package', 'XCSwiftPackageProductDependency', package=package,
