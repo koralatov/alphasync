@@ -94,7 +94,7 @@ public struct InspectorView: View {
             }.padding(18)
             Divider()
             Form {
-                Section("General") {
+                Section("More Information") {
                     if let file {
                         LabeledContent("Kind:", value: FileCodec.fileExtension(applet: file.id.applet) == "txt" ? "Text file" : "Applet data")
                         LabeledContent("Size:", value: FileSize.exact(file.size))

@@ -23,7 +23,7 @@ Use known-good independent backups and disposable Neo files for writing checks. 
 - Change system appearance between Light, Dark, and Auto without restarting. Check the list, selection, toolbar, Settings, Inspector, About, sheets, file panels, and Help Viewer. Repeat with Increase Contrast, Reduce Motion, a different accent colour, and scroll bars always visible.
 - Use keyboard navigation and VoiceOver throughout. Confirm that control labels, disabled states, sidebar groups, file sizes, progress, and read-only text are understandable. Check all controls on a small screen.
 - Open About, close it after activating a link, and reopen it. No link should start with keyboard focus. Tab must still reach every link. Check version 1.6, build 148, the correct edition description, and the selected icon in About, Finder, and the Dock.
-- Inspect a file, applet, and Neo. General and Preview must stay open, details must be selectable, and previous file text must clear when the selection changes. Check long metadata and unknown limits.
+- Inspect a file, applet, and Neo. More Information and Preview must stay open, details must be selectable, and previous file text must clear when the selection changes. Check long metadata and unknown limits.
 - Compare bytes and decimal KB with Finder, including 0, 1, 999, 1,000, 1,024, and 12,000 bytes. Exact values such as 51,200 bytes must use regional grouping and fit their fields.
 
 ## Reading and file actions
