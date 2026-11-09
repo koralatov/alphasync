@@ -113,6 +113,19 @@ public struct MainView: View {
                 store.importDroppedFiles(urls) != nil
             }
         }
+        .safeAreaInset(edge: .top, spacing: 0) {
+            if let issue = store.connectionIssue {
+                VStack(spacing: 0) {
+                    HStack(alignment: .top, spacing: 12) {
+                        Label(issue, systemImage: "exclamationmark.triangle")
+                            .textSelection(.enabled).fixedSize(horizontal: false, vertical: true)
+                        Spacer(minLength: 8)
+                        Button("Try Again") { Task { await store.refresh() } }.disabled(store.busy)
+                    }.padding(12)
+                    Divider()
+                }.background(.bar)
+            }
+        }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             VStack(spacing: 0) {
                 Divider()

@@ -107,6 +107,12 @@ struct InterfaceChecks {
             let connected = window(MainView(store: store), size: NSSize(width: 820, height: 560), title: "AlphaSync")
             try require(connected.contentView!.bounds.width >= 760, "Connected window is too narrow")
             try capture(connected, "files-" + label, to: output); connected.close()
+            store.connectionIssue = "A second Neo could not be opened. Close other Neo software and choose Try Again."
+            let connectionWarning = window(MainView(store: store), size: NSSize(width: 820, height: 560), title: "AlphaSync")
+            try require(descendants(connectionWarning.contentView!).compactMap { $0 as? NSButton }.contains { $0.title == "Try Again" },
+                        "An error beside a connected Neo must offer a retry")
+            try capture(connectionWarning, "connection-warning-" + label, to: output); connectionWarning.close()
+            store.connectionIssue = nil
             let about = window(AboutView(), size: NSSize(width: 420, height: 570), title: "About AlphaSync")
             if let button = about.firstResponder as? NSButton {
                 try require(!["Project", "Release notes", "Licence"].contains(button.title), "An About link received initial focus")
