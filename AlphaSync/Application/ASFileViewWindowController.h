@@ -9,6 +9,7 @@
     NSSegmentedControl* fontStyle;
     NSTextField* statusLabel;
     NSProgressIndicator* progress;
+    NSImageView* readOnlyIcon;
     BOOL closed;
 }
 

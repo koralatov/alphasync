@@ -70,12 +70,24 @@ static NSString* const ASFileViewMonospacedKey = @"FileViewerMonospaced";
         [progress setDisplayedWhenStopped:NO];
         [[progress widthAnchor] constraintEqualToConstant:16].active = YES;
         [[progress heightAnchor] constraintEqualToConstant:16].active = YES;
+        readOnlyIcon = [[[NSImageView alloc] initWithFrame:NSZeroRect] autorelease];
+        NSImage* readOnlySymbol = [NSImage imageWithSystemSymbolName:@"pencil.slash" accessibilityDescription:nil];
+        NSImage* readOnlyImage = readOnlySymbol ? [readOnlySymbol imageWithSymbolConfiguration:
+            [NSImageSymbolConfiguration configurationWithPointSize:[NSFont systemFontSize] weight:NSFontWeightRegular]] :
+            [NSImage imageNamed:NSImageNameLockLockedTemplate];
+        [readOnlyIcon setImage:readOnlyImage];
+        [readOnlyIcon setContentTintColor:[NSColor secondaryLabelColor]];
+        [readOnlyIcon setImageScaling:NSImageScaleProportionallyDown];
+        [readOnlyIcon setAccessibilityElement:NO];
+        [readOnlyIcon setHidden:YES];
+        [[readOnlyIcon widthAnchor] constraintEqualToConstant:16].active = YES;
+        [[readOnlyIcon heightAnchor] constraintEqualToConstant:16].active = YES;
         statusLabel = [NSTextField wrappingLabelWithString:@"Reading from Neo…"];
         [statusLabel setSelectable:YES];
         [statusLabel setTextColor:[NSColor secondaryLabelColor]];
         [statusLabel setContentCompressionResistancePriority:NSLayoutPriorityDefaultLow forOrientation:NSLayoutConstraintOrientationHorizontal];
         [statusLabel setContentCompressionResistancePriority:NSLayoutPriorityRequired forOrientation:NSLayoutConstraintOrientationVertical];
-        NSStackView* statusBar = [NSStackView stackViewWithViews:@[progress, statusLabel]];
+        NSStackView* statusBar = [NSStackView stackViewWithViews:@[progress, readOnlyIcon, statusLabel]];
         [statusBar setOrientation:NSUserInterfaceLayoutOrientationHorizontal];
         [statusBar setAlignment:NSLayoutAttributeCenterY];
         [statusBar setSpacing:8];
@@ -146,6 +158,7 @@ static NSString* const ASFileViewMonospacedKey = @"FileViewerMonospaced";
 {
     [progress stopAnimation:self];
     [progress setHidden:YES];
+    [readOnlyIcon setHidden:error != nil];
     [textView setString:error ? @"" : (text ?: @"")];
     [self applyFont];
     [textView scrollRangeToVisible:NSMakeRange(0, 0)];

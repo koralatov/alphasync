@@ -748,7 +748,7 @@ static void checkFileViewLayout(ASFileViewWindowController* viewer)
     NSString* expectedMode = [[[viewer window] effectiveAppearance] bestMatchFromAppearancesWithNames:modes];
     requireInterface([[viewer window] isMemberOfClass:[NSWindow class]] && [[viewer window] appearance] == nil,
                      @"The file viewer is not a standard window inheriting the system appearance.");
-    for (NSView* view in @[content, text, scroll, [viewer valueForKey:@"fontStyle"], [viewer valueForKey:@"statusLabel"], [viewer valueForKey:@"progress"]])
+    for (NSView* view in @[content, text, scroll, [viewer valueForKey:@"fontStyle"], [viewer valueForKey:@"statusLabel"], [viewer valueForKey:@"progress"], [viewer valueForKey:@"readOnlyIcon"]])
     {
         requireInterface([view appearance] == nil && ![NSStringFromClass([view class]) hasPrefix:@"AS"],
                          [NSString stringWithFormat:@"The file viewer control %@ overrides its appearance or uses a custom view.", NSStringFromClass([view class])]);
@@ -759,9 +759,10 @@ static void checkFileViewLayout(ASFileViewWindowController* viewer)
                      @"The file viewer permits editing or prevents text selection.");
     requireInterface(NSWidth([text frame]) <= NSWidth([[scroll contentView] bounds]) + 1 && ![scroll hasHorizontalScroller],
                      @"The file viewer does not wrap its text to the visible width.");
-    for (NSString* key in @[@"fontStyle", @"statusLabel"])
+    for (NSString* key in @[@"fontStyle", @"statusLabel", @"readOnlyIcon"])
     {
         NSView* view = [viewer valueForKey:key];
+        if ([view isHiddenOrHasHiddenAncestor]) continue;
         NSRect frame = [view convertRect:[view bounds] toView:content];
         requireInterface(NSContainsRect(NSInsetRect([content bounds], -1, -1), frame), @"A file viewer control is outside the window.");
     }
@@ -808,6 +809,9 @@ static void checkFileViews(id controller)
         NSTextView* text = [first valueForKey:@"textView"];
         requireInterface([[text string] isEqualToString:[worker text]] && [worker readOffMain] && ![queue refreshed],
                          @"The viewer used a partial preview, read on the main thread, or refreshed the device.");
+        NSImageView* readOnly = [first valueForKey:@"readOnlyIcon"];
+        requireInterface(![readOnly isHidden] && [[readOnly image] isTemplate] && ![readOnly isAccessibilityElement],
+                         @"The read-only indicator lacks its native template icon or repeats the spoken label.");
         [[first window] makeFirstResponder:text];
         [text setSelectedRange:NSMakeRange(0, 5)];
         NSPasteboard* copyBoard = [NSPasteboard pasteboardWithUniqueName];
@@ -847,7 +851,8 @@ static void checkFileViews(id controller)
         [[failed window] setContentSize:NSMakeSize(400, 300)];
         checkFileViewLayout(failed);
         requireInterface([[[failed valueForKey:@"textView"] string] length] == 0 &&
-                         [[[failed valueForKey:@"statusLabel"] stringValue] containsString:@"couldn’t read"], @"A failed read displayed stale text or no explanation.");
+                         [[[failed valueForKey:@"statusLabel"] stringValue] containsString:@"couldn’t read"] &&
+                         [[failed valueForKey:@"readOnlyIcon"] isHidden], @"A failed read displayed stale text or no explanation.");
         [worker setFailRead:NO];
         [worker setText:@""];
         [controller performSelector:NSSelectorFromString(@"openFile:") withObject:file];
