@@ -202,4 +202,26 @@ final class DeviceServiceTests: XCTestCase {
         }
         await service.shutdown()
     }
+
+    func testFailedConnectionsWaitForExplicitRetryOrReconnection() async throws {
+        let observations = SimulatedObservations()
+        let service = makeService(SimulatedConfiguration(failOpen: true), observations: observations)
+        let initial = try await service.scan()
+        XCTAssertNotNil(initial.issue)
+        XCTAssertEqual(observations.openCount, 1)
+        _ = try await service.scan()
+        let recovered = try await service.refresh()
+        XCTAssertEqual(recovered.issue, initial.issue)
+        XCTAssertEqual(observations.openCount, 1)
+        _ = try await service.refresh(retryConnections: true)
+        XCTAssertEqual(observations.openCount, 2)
+        XCTAssertEqual(observations.modeSwitchRetries, [false, false, false, true])
+        observations.setAttached([])
+        let detached = try await service.scan()
+        XCTAssertNil(detached.issue)
+        observations.setAttached([1])
+        _ = try await service.scan()
+        XCTAssertEqual(observations.openCount, 3)
+        await service.shutdown()
+    }
 }

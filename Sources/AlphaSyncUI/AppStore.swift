@@ -171,7 +171,7 @@ public final class AppStore: ObservableObject {
     }
     public func refresh() async {
         await run("Refreshing files…") {
-            let result = try await service.refresh()
+            let result = try await service.refresh(retryConnections: true)
             devices = result.devices; connectionIssue = result.issue
             contentRevision = UUID()
             reconcileSelection()

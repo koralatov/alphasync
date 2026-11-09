@@ -201,4 +201,16 @@ final class AppStoreTests: XCTestCase {
         XCTAssertTrue(message.contains("The saved files have been kept."))
         await store.shutdown()
     }
+
+    func testErrorRecoveryDoesNotRetryModeSwitchFailures() async throws {
+        let observations = SimulatedObservations()
+        let store = makeStore(SimulatedConfiguration(failingRead: 2), observations: observations)
+        await store.refresh()
+        store.beginExport()
+        await store.finishExport(.success(try temporaryFolder()))?.value
+        XCTAssertEqual(observations.modeSwitchRetries, [true, false])
+        await store.refresh()
+        XCTAssertEqual(observations.modeSwitchRetries, [true, false, true])
+        await store.shutdown()
+    }
 }

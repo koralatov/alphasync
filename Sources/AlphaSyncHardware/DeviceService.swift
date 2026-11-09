@@ -16,6 +16,7 @@ public final class DeviceService: @unchecked Sendable {
         var snapshot: NeoSnapshot
     }
     private var connections: [UInt64: Connection] = [:]
+    private var connectionFailures: [UInt64: String] = [:]
     private let discoveryFactory: @Sendable () -> any DeviceDiscovery
     private var discovery: (any DeviceDiscovery)?
     private var stopping = false
@@ -55,8 +56,8 @@ public final class DeviceService: @unchecked Sendable {
     public func scan() async throws -> DiscoveryResult {
         try await perform { access in try access.scan() }
     }
-    public func refresh() async throws -> DiscoveryResult {
-        try await perform { access in try access.scan(refresh: true) }
+    public func refresh(retryConnections: Bool = false) async throws -> DiscoveryResult {
+        try await perform { access in try access.scan(refresh: true, retryConnections: retryConnections) }
     }
     public func read(_ file: NeoFileID) async throws -> Data {
         try await perform { access in
@@ -112,27 +113,29 @@ public final class DeviceService: @unchecked Sendable {
             service.connections[key] = connection
             return value
         }
-        fileprivate func scan(refresh: Bool = false) throws -> DiscoveryResult {
+        fileprivate func scan(refresh: Bool = false, retryConnections: Bool = false) throws -> DiscoveryResult {
             dispatchPrecondition(condition: .onQueue(service.queue))
             let discovery = service.discovery ?? service.discoveryFactory()
             service.discovery = discovery
             let found = try discovery.devices()
             let attached = Set(found.map(\.registryID))
+            service.connectionFailures = service.connectionFailures.filter { attached.contains($0.key) }
             for key in Array(service.connections.keys) where !attached.contains(key) {
                 service.connections.removeValue(forKey: key)?.engine.close()
             }
-            var issue: String?
             for item in found {
                 if let connection = service.connections[item.registryID] {
                     if refresh {
                         do { _ = try update(connection.generation) }
                         catch {
                             service.connections.removeValue(forKey: item.registryID)?.engine.close()
-                            issue = error.localizedDescription
+                            service.connectionFailures[item.registryID] = error.localizedDescription
                         }
                     }
                     continue
                 }
+                // A failed connection waits for an explicit retry or physical reconnection.
+                if service.connectionFailures[item.registryID] != nil && !retryConnections { continue }
                 var opened: (any DeviceConnection)?
                 do {
                     let engine = try item.open()
@@ -140,13 +143,16 @@ public final class DeviceService: @unchecked Sendable {
                     let generation = UUID()
                     let snapshot = try engine.snapshot(connection: generation, registryID: item.registryID)
                     service.connections[item.registryID] = Connection(generation: generation, engine: engine, snapshot: snapshot)
+                    service.connectionFailures.removeValue(forKey: item.registryID)
                 } catch {
                     opened?.close()
-                    issue = "The Neo could not be opened. \(error.localizedDescription)"
+                    service.connectionFailures[item.registryID] = "The Neo could not be opened. \(error.localizedDescription)"
                 }
             }
-            if let modeIssue = discovery.modeSwitchIssue(retryFailures: refresh) { issue = modeIssue }
-            return DiscoveryResult(devices: service.connections.values.map(\.snapshot).sorted { $0.registryID < $1.registryID }, issue: issue)
+            var issues = service.connectionFailures.keys.sorted().compactMap { service.connectionFailures[$0] }
+            if let modeIssue = discovery.modeSwitchIssue(retryFailures: retryConnections) { issues.append(modeIssue) }
+            return DiscoveryResult(devices: service.connections.values.map(\.snapshot).sorted { $0.registryID < $1.registryID },
+                                   issue: issues.isEmpty ? nil : issues.joined(separator: "\n\n"))
         }
     }
 }

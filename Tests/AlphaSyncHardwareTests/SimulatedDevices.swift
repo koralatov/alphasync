@@ -8,6 +8,7 @@ struct SimulatedConfiguration: Sendable {
     var failingWriteNumber: Int?
     var failRefreshAfterWriting = false
     var beforeRead: (@Sendable (UInt8) -> Void)?
+    var failOpen = false
 }
 
 /// Only observations cross executors.  Device data remains inside the simulated connection.
@@ -16,6 +17,32 @@ final class SimulatedObservations: @unchecked Sendable {
     private var attached: [UInt64] = [1]
     private var writes = 0
     private var closes = 0
+    private var opens = 0
+    private var retries: [Bool] = []
+
+    func didOpen() {
+        lock.lock()
+        defer { lock.unlock() }
+        opens += 1
+    }
+
+    func didCheckModeSwitch(retryFailures: Bool) {
+        lock.lock()
+        defer { lock.unlock() }
+        retries.append(retryFailures)
+    }
+
+    var openCount: Int {
+        lock.lock()
+        defer { lock.unlock() }
+        return opens
+    }
+
+    var modeSwitchRetries: [Bool] {
+        lock.lock()
+        defer { lock.unlock() }
+        return retries
+    }
 
     func setAttached(_ ids: [UInt64]) {
         lock.lock()
@@ -69,7 +96,10 @@ final class SimulatedDiscovery: DeviceDiscovery {
         }
     }
 
-    func modeSwitchIssue(retryFailures: Bool) -> String? { nil }
+    func modeSwitchIssue(retryFailures: Bool) -> String? {
+        observations.didCheckModeSwitch(retryFailures: retryFailures)
+        return nil
+    }
 }
 
 private final class SimulatedAttachment: DeviceAttachment {
@@ -84,7 +114,9 @@ private final class SimulatedAttachment: DeviceAttachment {
     }
 
     func open() throws -> any DeviceConnection {
-        try SimulatedConnection(configuration, observations)
+        observations.didOpen()
+        if configuration.failOpen { throw NeoError.device("Simulated open failure") }
+        return try SimulatedConnection(configuration, observations)
     }
 }
 
