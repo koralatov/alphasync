@@ -16,6 +16,9 @@
 
 <p>Double-click a file in AlphaSync to open it in a separate read-only window.
 You can resize the window, scroll through the complete file, and select text to copy it.</p>
+<p>Use <strong>Edit → Select All</strong> and <strong>Edit → Copy</strong> to copy text.
+Use <strong>Edit → Find → Find…</strong> to show the standard search bar.
+These commands leave the Neo’s file unchanged.</p>
 <p>Use <strong>Font</strong> to choose <strong>Regular</strong> or <strong>Monospaced</strong>.
 Both use the system font and default size. AlphaSync remembers your choice for new windows.</p>
 <p>The opened text remains available if you disconnect the Neo. To view later changes made on
@@ -23,11 +26,9 @@ the Neo, close the file window, refresh AlphaSync’s file list, and open the fi
 
 <h3>Copying Files from a Neo to a Mac</h3>
 
-<p>To copy a file from the Neo, click on the file in the main window and drag it either to the destination. Files can be dragged to
-the finder window to create a copy on disk, or directly in to an application window (such as Word or Pages) to paste the text
-directly in to the application.</p>
-<p>Dragging a device or applet name to the finder will create a new folder on your Mac that will contain all of the files
-that were dragged.</p>
+<p>Drag a file from AlphaSync to a Finder folder to save a complete copy on your Mac.
+To copy text into another app, open the file in AlphaSync, select the text, and use Copy and Paste.</p>
+<p>Dragging a device or applet name to Finder creates a new folder containing its files.</p>
 
 <h3>Copying Files from a Mac to the Neo</h3>
 
@@ -35,7 +36,11 @@ that were dragged.</p>
 <p>Dragging a file to an Applet icon will attempt to create a new file with a suitable name. These are not
 directly bound to one of the File keys on the Neo, but must be opened. When using AlphaWord, type <b><code>cmd-O</code></b>
 to open a file copied in this way.</p>
-<p>Dragging on to a File icon will attempt to over write the file on the Neo with the new file contents.</p>
+<p>Dragging onto an existing file shows a warning before replacing its text.
+<strong>Cancel</strong> is the default. Click <strong>Replace</strong> to proceed.</p>
+<p><strong>Save a recovery copy first</strong> is on by default. It saves the original text in
+<strong>Recovery Copies</strong> inside your backup folder. If the requested copy cannot be completed,
+the replacement stops. You can find the originals and choose how long to keep them in Preferences.</p>
 
 <p><b>Only plain text files may be copied to AlphaWord or to the User Dictionary.</b> AlphaSync accepts
 MacASCII (Mac Roman), UTF-8, and UTF-16. To copy a document from Microsoft Word or another word processor,
@@ -45,6 +50,8 @@ If it exceeds the maximum file size or the available memory, the warning explain
 Shorten the text or split it into smaller files, then try again. Rejected imports leave your Neo’s files unchanged.</p>
 <p>If AlphaSync cannot read the file-size limit or available memory, it stops the import.
 Disconnect and reconnect the Neo, then try again.</p>
+<p>After sending a file, AlphaSync reads it back to check the contents. If verification fails,
+the warning explains that the Neo’s file may have changed. Check the file and your recovery copy before continuing.</p>
 
 <hr>
 <p>Copyright &copy; 2009-2013 tSoniq.</p>

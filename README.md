@@ -39,17 +39,23 @@ Your Mac remembers that you allowed this copy of AlphaSync. You can then open it
 
 Open AlphaSync and connect your Neo with a USB cable. Your Neo’s files appear in the window.
 
-- **Read a file:** double-click it to open a read-only window. Use **Font** to choose **Regular** or **Monospaced**. You can select and copy the text.
+- **Read a file:** double-click it to open a read-only window. Use **Font** to choose **Regular** or **Monospaced**. Use **Edit → Copy**, **Select All**, or **Find → Find…** to work with the text.
 - **Copy files to your Mac:** drag them from AlphaSync into a Finder folder.
 - **Copy text files to your Neo:** drag them from Finder into AlphaSync.
 - **Back up your files:** click **Backup**. You can choose where backups are saved in **Preferences**.
 - **Clear files:** select a file for **Clear File…**, or select **AlphaWord** for **Clear All Files…**. The warning names what will be cleared, and **Cancel** is the default.
 
-Back up the files on your Neo before replacing or clearing them.
+Replacing and clearing files show a warning attached to the main window. **Cancel** is the default. To proceed, click **Replace**, **Clear File**, or **Clear All Files**.
+
+**Save a recovery copy first** is on by default. AlphaSync saves the original text before changing it. If the copy cannot be saved, the change stops. In **Preferences**, use **Open Recovery Copies** to find saved originals inside your backup folder. To restore one, drag its text file onto the matching file in AlphaSync.
+
+Preferences lets you keep recovery copies for 7, 30, or 90 days, or until you remove them. The default is 30 days. Expired copies move to Trash when a new recovery copy is made. You can turn recovery copies off in Preferences or in a warning. Keep separate backups of important files.
 
 If a text file is too large for your Neo, AlphaSync explains the limit and leaves your files unchanged. Shorten the text or split it into smaller files, then try again.
 
 Backup logs are off by default. If you want a record of copied files and any errors, enable **Save a backup log** in **Preferences**. The log is saved inside each dated backup folder.
+
+A backup folder ends in **(Incomplete)** until that Neo’s backup finishes successfully. If you stop a backup or a file cannot be copied, the folder keeps this label. The result shows the location and offers a button to open it in Finder.
 
 To have AlphaSync open whenever you connect your Neo, turn on automatic opening in **Preferences**. Keep the app in Applications, and follow any approval prompts shown in Preferences.
 
