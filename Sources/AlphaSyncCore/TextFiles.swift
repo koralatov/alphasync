@@ -38,9 +38,13 @@ public enum TextFiles {
             }
             return text
         }
-        if let text = String(data: data, encoding: .utf8) {
-            return text.hasPrefix("\u{feff}") ? String(text.dropFirst()) : text
+        if data.starts(with: [0xef, 0xbb, 0xbf]) {
+            guard let text = String(data: data.dropFirst(3), encoding: .utf8) else {
+                throw NeoError.device("The UTF-8 text file is damaged or incomplete.  No device files were changed.")
+            }
+            return text
         }
+        if let text = String(data: data, encoding: .utf8) { return text }
         guard let text = String(data: data, encoding: .macOSRoman) else {
             throw NeoError.device("This file is not supported text. Use MacASCII, UTF-8, or UTF-16.")
         }

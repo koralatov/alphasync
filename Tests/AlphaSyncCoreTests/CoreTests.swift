@@ -92,6 +92,15 @@ final class CoreTests: XCTestCase {
         XCTAssertEqual(String(data: TextFiles.utf8("a\r\nb\rc"), encoding: .utf8), "a\nb\nc")
     }
 
+    func testDeclaredUTF8NeverFallsBackToMacRoman() throws {
+        let marker = Data([0xef, 0xbb, 0xbf])
+        XCTAssertEqual(try TextFiles.decode(marker), "")
+        XCTAssertEqual(try TextFiles.decode(marker + Data("£ café".utf8)), "£ café")
+        for invalid in [[0x41, 0xc3], [0x80], [0xc0, 0x80], [0xed, 0xa0, 0x80], [0xf0, 0x9f, 0x92]] as [[UInt8]] {
+            XCTAssertThrowsError(try TextFiles.decode(marker + Data(invalid)))
+        }
+    }
+
     func testLimitsDoNotTrustMissingOrTruncatedSettings() throws {
         let settings = Data([1, 2, 0x10, 0x10, 0, 4, 0, 0, 0xc8, 0])
         XCTAssertEqual(try NeoSettings.alphaWordLimits(settings).maximum, 51200)
