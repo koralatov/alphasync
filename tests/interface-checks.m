@@ -379,8 +379,15 @@ static void checkConnectionStates(id controller)
 
 static void checkPreferenceLayout(id preferences)
 {
-    NSView* content = [[preferences window] contentView];
+    NSWindow* window = [preferences window];
+    NSScrollView* scroll = [preferences valueForKey:@"preferencesScrollView"];
+    NSView* content = [scroll documentView];
+    [[window contentView] layoutSubtreeIfNeeded];
     [content layoutSubtreeIfNeeded];
+    requireInterface([scroll isMemberOfClass:[NSScrollView class]] && [scroll hasVerticalScroller] && ![scroll hasHorizontalScroller],
+                     @"Preferences needs a standard vertical scroll view.");
+    requireInterface(NSHeight([window frame]) <= NSHeight([[window screen] visibleFrame]) + 1,
+                     @"Preferences is taller than the visible screen.");
     for (NSString* key in @[@"outletFilterOption", @"outputFormatField", @"backupFolderPath", @"chooseFolderButton",
                              @"saveBackupLogsButton", @"saveRecoveryCopiesButton", @"recoveryRetention", @"outletAutoRun", @"automaticLaunchStatusField", @"loginItemsButton"])
     {

@@ -63,6 +63,7 @@
 
     NSTextField* automaticLaunchStatusField;
     NSButton* loginItemsButton;
+    NSScrollView* preferencesScrollView;
     ASApplicationController* applicationController;
 }
 

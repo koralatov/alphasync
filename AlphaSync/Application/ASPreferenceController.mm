@@ -69,6 +69,12 @@ static NSBox* ASPreferenceSeparator(void)
     return separator;
 }
 
+static NSInteger ASRecoveryRetentionDays(void)
+{
+    NSInteger days = [[NSUserDefaults standardUserDefaults] integerForKey:@"RecoveryRetentionDays"];
+    return days == 0 || days == 7 || days == 30 || days == 90 ? days : 30;
+}
+
 @interface ASPreferenceController ()
 - (void)buildWindow;
 - (void)updateBackupFolder;
@@ -216,7 +222,7 @@ static NSBox* ASPreferenceSeparator(void)
     [recoveryRetention setTarget:self];
     [recoveryRetention setAction:@selector(actionRecoveryPreference:)];
     [recoveryRetention setAccessibilityLabel:@"Keep recovery copies"];
-    [recoveryRetention selectItemWithTag:[[NSUserDefaults standardUserDefaults] integerForKey:@"RecoveryRetentionDays"]];
+    [recoveryRetention selectItemWithTag:ASRecoveryRetentionDays()];
     NSButton* openRecovery = [NSButton buttonWithTitle:@"Open Recovery Copies" target:self action:@selector(actionOpenRecoveryCopies:)];
     NSStackView* recoveryRow = [NSStackView stackViewWithViews:@[[NSTextField labelWithString:@"Keep copies:"], recoveryRetention, openRecovery]];
     [recoveryRow setOrientation:NSUserInterfaceLayoutOrientationHorizontal];
@@ -237,19 +243,32 @@ static NSBox* ASPreferenceSeparator(void)
         footer
     ], 18);
     NSView* content = [window contentView];
-    [content addSubview:form];
+    preferencesScrollView = [[[NSScrollView alloc] initWithFrame:[content bounds]] autorelease];
+    [preferencesScrollView setTranslatesAutoresizingMaskIntoConstraints:NO];
+    [preferencesScrollView setHasVerticalScroller:YES];
+    [preferencesScrollView setAutohidesScrollers:YES];
+    [preferencesScrollView setDrawsBackground:NO];
+    [preferencesScrollView setBorderType:NSNoBorder];
+    NSView* document = [[[NSView alloc] initWithFrame:[content bounds]] autorelease];
+    [preferencesScrollView setDocumentView:document];
+    [content addSubview:preferencesScrollView];
+    [document addSubview:form];
     [NSLayoutConstraint activateConstraints:@[
-        [[form widthAnchor] constraintEqualToConstant:512],
-        [[form leadingAnchor] constraintEqualToAnchor:[content leadingAnchor] constant:24],
-        [[form trailingAnchor] constraintEqualToAnchor:[content trailingAnchor] constant:-24],
-        [[form topAnchor] constraintEqualToAnchor:[content topAnchor] constant:24],
-        [[form bottomAnchor] constraintEqualToAnchor:[content bottomAnchor] constant:-20]
+        [[preferencesScrollView leadingAnchor] constraintEqualToAnchor:[content leadingAnchor]],
+        [[preferencesScrollView trailingAnchor] constraintEqualToAnchor:[content trailingAnchor]],
+        [[preferencesScrollView topAnchor] constraintEqualToAnchor:[content topAnchor]],
+        [[preferencesScrollView bottomAnchor] constraintEqualToAnchor:[content bottomAnchor]],
+        [[form leadingAnchor] constraintEqualToAnchor:[document leadingAnchor] constant:24],
+        [[form trailingAnchor] constraintEqualToAnchor:[document trailingAnchor] constant:-24],
+        [[form topAnchor] constraintEqualToAnchor:[document topAnchor] constant:24],
+        [[form bottomAnchor] constraintEqualToAnchor:[document bottomAnchor] constant:-20]
     ]];
     [window setInitialFirstResponder:outletFilterOption];
     [outletFilterOption selectItemWithTag:[self displayOption]];
     [self updateBackupFolder];
     [outletAutoRun setState:[self autoRun] ? NSControlStateValueOn : NSControlStateValueOff];
     [self refreshAutomaticLaunchStatus:nil];
+    [document scrollPoint:NSMakePoint(0, NSMaxY([document bounds]))];
     [[self window] center];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshAutomaticLaunchStatus:)
                                                 name:NSApplicationDidBecomeActiveNotification object:nil];
@@ -267,12 +286,20 @@ static NSBox* ASPreferenceSeparator(void)
 - (void)fitWindowToContent
 {
     NSWindow* window = [self window];
-    NSSize size = [[window contentView] fittingSize];
-    // Preserve the top edge when a system status needs more (or less) room.
+    NSView* document = [preferencesScrollView documentView];
+    [document setFrameSize:NSMakeSize(NSWidth([[preferencesScrollView contentView] bounds]), NSHeight([document frame]))];
+    [document layoutSubtreeIfNeeded];
+    CGFloat height = [document fittingSize].height;
+    NSScreen* screen = [window screen] ? [window screen] : [NSScreen mainScreen];
+    NSRect available = [screen visibleFrame];
+    CGFloat titleHeight = NSHeight([window frame]) - NSHeight([[window contentView] bounds]);
+    NSSize size = NSMakeSize(560, MIN(height, MAX(200, NSHeight(available) - titleHeight - 40)));
     NSRect frame = [window frame];
     [window setContentSize:size];
+    [[window contentView] layoutSubtreeIfNeeded];
+    [document setFrameSize:NSMakeSize(NSWidth([[preferencesScrollView contentView] bounds]), height)];
     NSRect resized = [window frame];
-    [window setFrameOrigin:NSMakePoint(NSMinX(frame), NSMaxY(frame) - NSHeight(resized))];
+    [window setFrameOrigin:NSMakePoint(NSMinX(frame), MAX(NSMinY(available), MIN(NSMaxY(frame), NSMaxY(available)) - NSHeight(resized)))];
 }
 
 - (void)refreshAutomaticLaunchStatus:(NSNotification*)notification
@@ -280,7 +307,7 @@ static NSBox* ASPreferenceSeparator(void)
     (void)notification;
     [automaticLaunchStatusField setStringValue:[applicationController automaticLaunchStatus]];
     [saveRecoveryCopiesButton setState:[[NSUserDefaults standardUserDefaults] boolForKey:@"SaveRecoveryCopies"] ? NSControlStateValueOn : NSControlStateValueOff];
-    [recoveryRetention selectItemWithTag:[[NSUserDefaults standardUserDefaults] integerForKey:@"RecoveryRetentionDays"]];
+    [recoveryRetention selectItemWithTag:ASRecoveryRetentionDays()];
     if (@available(macOS 13.0, *)) [loginItemsButton setHidden:NO];
     else [loginItemsButton setHidden:YES];
     [self fitWindowToContent];
