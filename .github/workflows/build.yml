@@ -8,8 +8,28 @@ permissions:
   contents: read
 
 jobs:
+  changes:
+    name: Check which builds are needed
+    runs-on: ubuntu-latest
+    outputs:
+      build: ${{ steps.scope.outputs.build }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Check build filtering and release pairing
+        run: |
+          python3 tests/build-scope-tests.py
+          python3 tests/release-tests.py
+      - name: Check changed files
+        id: scope
+        run: python3 scripts/check-build-scope.py
+
   macos:
     name: ${{ matrix.runner }} with Xcode ${{ matrix.xcode }}
+    needs: changes
+    if: needs.changes.outputs.build == 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -108,6 +128,8 @@ jobs:
 
   modern:
     name: Apple Silicon, macOS 27, pinned Xcode
+    needs: changes
+    if: needs.changes.outputs.build == 'true'
     runs-on: xcode-27
     timeout-minutes: 20
     steps:
@@ -179,6 +201,8 @@ jobs:
 
   default-xcode:
     name: Default Xcode source check, separate from releases
+    needs: changes
+    if: needs.changes.outputs.build == 'true'
     runs-on: xcode-27
     timeout-minutes: 15
     continue-on-error: true
