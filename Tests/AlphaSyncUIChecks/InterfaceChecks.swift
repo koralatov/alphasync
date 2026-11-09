@@ -14,14 +14,36 @@ struct InterfaceChecks {
     }
     static func settle() { RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.35)) }
     static func descendants(_ root: NSView) -> [NSView] { [root] + root.subviews.flatMap(descendants) }
-    static func accessibilityElements(_ root: Any) -> [any NSAccessibilityProtocol] {
-        var elements: [any NSAccessibilityProtocol] = []
+    struct AccessibleElement {
+        let object: NSObject
+        // Public accessibility getters do not require formal protocol conformance.
+        func value(_ key: String, getter: Selector) -> Any? {
+            guard object.responds(to: getter) else { return nil }
+            return object.value(forKey: key)
+        }
+        var role: String? { value("accessibilityRole", getter: #selector(NSAccessibilityProtocol.accessibilityRole)) as? String }
+        var title: String? { value("accessibilityTitle", getter: #selector(NSAccessibilityProtocol.accessibilityTitle)) as? String }
+        var label: String? { value("accessibilityLabel", getter: #selector(NSAccessibilityProtocol.accessibilityLabel)) as? String }
+        var enabled: Bool {
+            (value("accessibilityEnabled", getter: #selector(NSAccessibilityProtocol.isAccessibilityEnabled)) as? NSNumber)?.boolValue ?? false
+        }
+        var frame: NSRect? {
+            (value("accessibilityFrame", getter: #selector(NSAccessibilityProtocol.accessibilityFrame)) as? NSValue)?.rectValue
+        }
+        var children: [Any] {
+            value("accessibilityChildren", getter: #selector(NSAccessibilityProtocol.accessibilityChildren)) as? [Any] ?? []
+        }
+    }
+    static func accessibilityElements(_ root: Any) -> [AccessibleElement] {
+        var elements: [AccessibleElement] = []
         var visited = Set<ObjectIdentifier>()
         func visit(_ value: Any) {
-            guard let element = value as? any NSAccessibilityProtocol,
-                  visited.insert(ObjectIdentifier(element as AnyObject)).inserted else { return }
+            guard let object = value as? NSObject, visited.insert(ObjectIdentifier(object)).inserted else { return }
+            let element = AccessibleElement(object: object)
             elements.append(element)
-            for child in element.accessibilityChildren() ?? [] { visit(child) }
+            for child in element.children { visit(child) }
+            if let view = object as? NSView { for child in view.subviews { visit(child) } }
+            if let window = object as? NSWindow, let content = window.contentView { visit(content) }
         }
         visit(root)
         return elements
@@ -124,16 +146,16 @@ struct InterfaceChecks {
             try capture(connectionWarning, "connection-warning-" + label, to: output)
             let elements = accessibilityElements(connectionWarning)
             let retry = elements.first {
-                $0.accessibilityRole() == .button &&
-                [$0.accessibilityTitle(), $0.accessibilityLabel()].contains("Try Again")
+                $0.role == NSAccessibility.Role.button.rawValue &&
+                [$0.title, $0.label].contains("Try Again")
             }
             if retry == nil {
-                let description = elements.map {
-                    "\($0.accessibilityRole()?.rawValue ?? "unknown"): \($0.accessibilityTitle() ?? "") \($0.accessibilityLabel() ?? "")"
+                let description = elements.prefix(80).map {
+                    "\(type(of: $0.object)) \($0.role ?? "unknown"): \($0.title ?? "") \($0.label ?? "")"
                 }.joined(separator: "\n")
                 print("Connected warning accessibility tree:\n" + description)
             }
-            try require(retry?.isAccessibilityEnabled() == true && retry?.accessibilityFrame().isEmpty == false,
+            try require(retry?.enabled == true && retry?.frame?.isEmpty == false,
                         "An error beside a connected Neo must expose a visible, enabled retry button")
             connectionWarning.close()
             store.connectionIssue = nil
