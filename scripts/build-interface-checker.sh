@@ -40,9 +40,9 @@ if [[ ! -f "$cache/fingerprint" || "$(cat "$cache/fingerprint")" != "$fingerprin
     for source in "${sources[@]}"; do
         object="$cache/objects/$(basename "${source%.*}").o"
         compiler=clang
-        extra=()
-        case "$source" in *.cc|*.mm) compiler=clang++; extra=(-std=c++17);; esac
-        xcrun "$compiler" "${flags[@]}" "${extra[@]}" -c "$source" -o "$object"
+        compile_flags=("${flags[@]}")
+        case "$source" in *.cc|*.mm) compiler=clang++; compile_flags+=(-std=c++17);; esac
+        xcrun "$compiler" "${compile_flags[@]}" -c "$source" -o "$object"
         objects+=("$object")
     done
     xcrun clang++ "-mmacosx-version-min=$minimum" -isysroot "$sdk" "${objects[@]}" \
