@@ -55,6 +55,22 @@ NSString* aq_FormattedFileSize(unsigned long long byteCount)
     return [formatter stringFromByteCount:(long long)byteCount];
 }
 
+NSString* aq_SafePathComponent(NSString* name)
+{
+    NSString* safe = [[(name ?: @"") stringByReplacingOccurrencesOfString:@"/" withString:@"_"]
+        stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@". "]];
+    safe = [[safe componentsSeparatedByCharactersInSet:[NSCharacterSet controlCharacterSet]] componentsJoinedByString:@"_"];
+    return [safe length] ? safe : @"Untitled";
+}
+
+BOOL aq_RenameItemExclusively(NSString* source, NSString* destination, NSError** error)
+{
+    if (error) *error = nil;
+    if (renamex_np([source fileSystemRepresentation], [destination fileSystemRepresentation], RENAME_EXCL) == 0) return YES;
+    if (error) *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:nil];
+    return NO;
+}
+
 NSString* aq_FormattedByteCount(unsigned long long byteCount)
 {
     NSNumberFormatter* formatter = [[[NSNumberFormatter alloc] init] autorelease];

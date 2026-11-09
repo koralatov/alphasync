@@ -18,7 +18,7 @@
             file[@"status"] = @"pending";
             [files addObject:file];
         }
-        contents = [@{@"formatVersion": @1, @"status": @"in progress", @"startedAt": [NSDate date], @"files": files} mutableCopy];
+        contents = [@{@"formatVersion": @2, @"status": @"in progress", @"startedAt": [NSDate date], @"files": files} mutableCopy];
         NSData* data = [NSPropertyListSerialization dataWithPropertyList:contents format:NSPropertyListXMLFormat_v1_0 options:0 error:error];
         NSString* name = data ? aq_WriteUniqueFile(folder, @"AlphaSync Backup Log", @"plist", data, error) : nil;
         if (!name)
@@ -52,7 +52,11 @@
     if (index >= [files count]) return NO;
     NSMutableDictionary* file = files[index];
     file[@"status"] = path ? @"saved" : @"failed";
-    if (path) file[@"path"] = path;
+    if (path)
+    {
+        NSString* prefix = [[[reportURL URLByDeletingLastPathComponent] path] stringByAppendingString:@"/"];
+        file[@"path"] = [path hasPrefix:prefix] ? [path substringFromIndex:[prefix length]] : path;
+    }
     if (message) file[@"error"] = message;
     return [self save:error];
 }

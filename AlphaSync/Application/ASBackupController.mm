@@ -138,6 +138,7 @@ static NSTextField* ASBackupLabel(NSString* text)
     [backupItems release];
     [backupReport release];
     [currentSessionPath release];
+    [currentSessionFinalPath release];
     [backupSessionPaths release];
     [super dealloc];
 }
@@ -244,44 +245,38 @@ static NSTextField* ASBackupLabel(NSString* text)
  */
 - (BOOL)makeNewDeviceSessionPath:(NSString*)deviceName
 {
-    [currentSessionPath release];
-    currentSessionPath = nil;
-
-    /* Find a unique path string, formed from <root-path>/<device-name>/<date> and optionally appending an index
-     * number to make the path unique. The <root-path> is specified in the user preferences.
-     */
+    [currentSessionPath release]; currentSessionPath = nil;
+    [currentSessionFinalPath release]; currentSessionFinalPath = nil;
+    sessionFailedFiles = 0;
     NSString* rootPath = [[NSUserDefaults standardUserDefaults] stringForKey:kASPreferenceKeyBackupFolder];
-    if (!rootPath) return FALSE;
-
+    if (![rootPath isAbsolutePath]) return NO;
+    if (deviceName) rootPath = [rootPath stringByAppendingPathComponent:aq_SafePathComponent(deviceName)];
     NSDateFormatter* formatter = [[[NSDateFormatter alloc] init] autorelease];
     [formatter setLocale:[[[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"] autorelease]];
     [formatter setCalendar:[[[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian] autorelease]];
     [formatter setDateFormat:@"yyyy-MM-dd"];
     NSString* dateName = [formatter stringFromDate:[NSDate date]];
-
-
-    if (deviceName) rootPath = [rootPath stringByAppendingPathComponent:[deviceName stringByReplacingOccurrencesOfString:@"/" withString:@"_"]];
-
-    NSString* path = [rootPath stringByAppendingPathComponent:dateName];
-
-    NSFileManager* fileManager = [NSFileManager defaultManager];
-    int uniqueID = 1;
-    while ([fileManager fileExistsAtPath:path])
+    NSFileManager* manager = [NSFileManager defaultManager];
+    NSDictionary* permissions = @{NSFilePosixPermissions: @0700};
+    if (![manager createDirectoryAtPath:rootPath withIntermediateDirectories:YES attributes:permissions error:nil]) return NO;
+    for (int index = 0; index <= kDeviceBackupMaxBackupsInOneDay; ++index)
     {
-        if (uniqueID > kDeviceBackupMaxBackupsInOneDay) return FALSE;
-        NSString* uniqueSuffix = [NSString stringWithFormat:@"%@ (%d)", dateName, uniqueID];
-        path = [rootPath stringByAppendingPathComponent:uniqueSuffix];
-        uniqueID ++;
+        NSString* name = index ? [NSString stringWithFormat:@"%@ (%d)", dateName, index] : dateName;
+        NSString* final = [rootPath stringByAppendingPathComponent:name];
+        NSString* path = [final stringByAppendingString:@" (Incomplete)"];
+        if ([manager fileExistsAtPath:final] || [manager fileExistsAtPath:path]) continue;
+        NSError* error = nil;
+        if (![manager createDirectoryAtPath:path withIntermediateDirectories:NO attributes:permissions error:&error])
+        {
+            if ([error code] == NSFileWriteFileExistsError) continue;
+            return NO;
+        }
+        currentSessionPath = [path copy];
+        currentSessionFinalPath = [final copy];
+        [backupSessionPaths addObject:path];
+        return YES;
     }
-
-
-    /* Create the path.
-     */
-    if (!aq_FileUtilitiesCreateDirectoriesForPath(path)) return FALSE;
-
-    currentSessionPath = [path retain];
-    [backupSessionPaths addObject:path];
-    return TRUE;
+    return NO;
 }
 
 
@@ -496,7 +491,7 @@ static NSTextField* ASBackupLabel(NSString* text)
         if (!currentSessionPath) failure = @"Unable to create the backup folder.";
         else
         {
-            NSString* path = [currentSessionPath stringByAppendingPathComponent:[[item appletName] stringByReplacingOccurrencesOfString:@"/" withString:@"_"]];
+            NSString* path = [currentSessionPath stringByAppendingPathComponent:aq_SafePathComponent([item appletName])];
             if (aq_FileUtilitiesCreateDirectoriesForPath(path))
             {
                 NSString* filename = [(ASFileNode*)working saveUnderPath:path error:&failure];
@@ -517,6 +512,7 @@ static NSTextField* ASBackupLabel(NSString* text)
         if (!path)
         {
             ++failedFiles;
+            ++sessionFailedFiles;
             failure = failure ?: @"The file could not be exported.";
         }
         NSError* reportError = nil;
@@ -528,15 +524,27 @@ static NSTextField* ASBackupLabel(NSString* text)
             return;
         }
         BOOL deviceFinished = nextBackupItem == [backupItems count] || [backupItems[nextBackupItem] newDevice];
-        if (backupReport && deviceFinished)
+        if (deviceFinished)
         {
-            if (![backupReport finishWithStatus:@"complete" message:@"Backup finished for this Neo." error:&reportError])
+            if (backupReport && ![backupReport finishWithStatus:@"complete" message:@"Backup finished for this Neo." error:&reportError])
             {
                 [self stopBackup:[NSString stringWithFormat:@"Backup stopped because its log could not be saved: %@", [reportError localizedDescription]] status:@"failed"];
                 return;
             }
             [backupReport release];
             backupReport = nil;
+            if (!sessionFailedFiles && !pendingStopMessage)
+            {
+                NSError* error = nil;
+                if (!aq_RenameItemExclusively(currentSessionPath, currentSessionFinalPath, &error))
+                {
+                    [self stopBackup:[NSString stringWithFormat:@"The files were copied, but the folder could not be marked complete: %@", [error localizedDescription]] status:@"failed"];
+                    return;
+                }
+                NSUInteger index = [backupSessionPaths indexOfObject:currentSessionPath];
+                if (index != NSNotFound) [backupSessionPaths replaceObjectAtIndex:index withObject:currentSessionFinalPath];
+                [currentSessionPath release]; currentSessionPath = [currentSessionFinalPath copy];
+            }
         }
         bytesSoFar += static_cast<uint64_t>(MAX([file fileSize], 0));
         double progress = bytesToBackup ? double(bytesSoFar) / double(bytesToBackup) : double(nextBackupItem) / double([backupItems count]);

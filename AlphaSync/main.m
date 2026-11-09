@@ -572,6 +572,8 @@ static void checkBackupLogs(id controller, NSWindowController* backup)
             requireInterface([paths count] == (scenario == 4 ? 0 : 2), @"A dated Neo backup folder is missing.");
             for (NSUInteger device = 0; device < [paths count]; ++device)
             {
+                BOOL incomplete = (scenario == 2 && device == 1) || (scenario == 3 && device == 0);
+                requireInterface([paths[device] hasSuffix:@" (Incomplete)"] == incomplete, @"A backup folder has the wrong completion marker.");
                 NSString* log = [paths[device] stringByAppendingPathComponent:@"AlphaSync Backup Log.plist"];
                 requireInterface([manager fileExistsAtPath:log] == (scenario != 0), @"Backup logs did not follow the option captured at the start.");
                 if (scenario == 0) continue;

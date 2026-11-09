@@ -45,6 +45,8 @@
     NSButton* openBackupButton;
 
     NSString* currentSessionPath;
+    NSString* currentSessionFinalPath;
+    NSUInteger sessionFailedFiles;
     NSMutableArray* backupSessionPaths;
     NSMutableArray* backupItems;
     ASBackupReport* backupReport;

@@ -37,6 +37,8 @@ extern "C" {
 #endif
 
 extern BOOL aq_FileUtilitiesCreateDirectoriesForPath(NSString* directoryPath);
+extern NSString* aq_SafePathComponent(NSString* name);
+extern BOOL aq_RenameItemExclusively(NSString* source, NSString* destination, NSError** error);
 
 // Compact Finder-style bytes/KB, or an exact byte count with localised grouping.
 extern NSString* aq_FormattedFileSize(unsigned long long byteCount);
