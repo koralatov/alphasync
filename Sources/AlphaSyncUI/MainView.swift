@@ -1,6 +1,5 @@
 import SwiftUI
 import UniformTypeIdentifiers
-import CoreTransferable
 import AlphaSyncCore
 import AlphaSyncHardware
 
@@ -91,7 +90,7 @@ public struct MainView: View {
             Table(store.files, selection: $store.selection) {
                 TableColumn("Name") { file in
                     Label(file.displayName, systemImage: "doc.text")
-                        .draggable(FileDrag(file: file.id, service: store.service, folder: store.temporaryExports))
+                        .draggable(FileDrag(file: file.id, service: store.service, staging: store.temporaryExports))
                         .dropDestination(for: URL.self) { urls, _ in
                             store.importDroppedFiles(urls, replacing: file.id) != nil
                         }
@@ -144,18 +143,4 @@ public enum FileSize {
         return formatter.string(fromByteCount: Int64(value))
     }
     public static func exact(_ value: Int) -> String { "\(value.formatted()) " + (value == 1 ? "byte" : "bytes") }
-}
-
-private struct FileDrag: Transferable, Sendable {
-    let file: NeoFileID
-    let service: DeviceService
-    let folder: URL
-    static var transferRepresentation: some TransferRepresentation {
-        FileRepresentation(exportedContentType: .plainText) { item in
-            let temporary = try AtomicFileStore.createFolder(in: item.folder, name: UUID().uuidString)
-            let urls = try await item.service.export([item.file], to: temporary)
-            guard let url = urls.first else { throw NeoError.device("The file could not be exported.") }
-            return SentTransferredFile(url)
-        }
-    }
 }

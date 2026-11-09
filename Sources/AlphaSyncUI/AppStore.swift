@@ -55,7 +55,7 @@ public final class AppStore: ObservableObject {
     @Published private var activities = 0
     public let preferences: Preferences
     public let service: DeviceService
-    public let temporaryExports = FileManager.default.temporaryDirectory.appendingPathComponent("AlphaSync-Exports-" + UUID().uuidString, isDirectory: true)
+    public let temporaryExports = TemporaryExports()
     public var busy: Bool { activities > 0 || shuttingDown || pendingChange != nil }
     public var connected: Bool { !devices.isEmpty }
     public var chosenDevice: NeoSnapshot? { devices.first { $0.connection == sidebar?.connection } ?? devices.first }

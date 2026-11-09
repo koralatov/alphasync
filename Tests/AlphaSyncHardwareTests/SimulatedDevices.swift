@@ -9,6 +9,7 @@ struct SimulatedConfiguration: Sendable {
     var failRefreshAfterWriting = false
     var beforeRead: (@Sendable (UInt8) -> Void)?
     var failOpen = false
+    var appletID = NeoApplet.alphaWord
 }
 
 /// Only observations cross executors.  Device data remains inside the simulated connection.
@@ -135,7 +136,11 @@ private final class SimulatedConnection: DeviceConnection {
         guard (0...255).contains(configuration.fileCount) else { throw NeoError.invalidData("Invalid simulated file count") }
         for number in 0..<configuration.fileCount {
             let index = UInt8(number + 1)
-            contents[index] = try AlphaWordCodec.encode("Original \(number + 1)", limits: limits)
+            switch configuration.appletID {
+            case NeoApplet.alphaWord: contents[index] = try AlphaWordCodec.encode("Original \(number + 1)", limits: limits)
+            case NeoApplet.dictionary: contents[index] = try DictionaryCodec.encode("Original")
+            default: contents[index] = Data([index, 0, 1, 2])
+            }
             names[index] = "File \(number + 1)"
         }
     }
@@ -146,8 +151,10 @@ private final class SimulatedConnection: DeviceConnection {
         if configuration.failRefreshAfterWriting && writes > 0 { throw NeoError.disconnected }
         var header = Data(repeating: 0, count: NeoApplet.headerSize)
         header.replaceSubrange(0..<4, with: [0xc0, 0xff, 0xee, 0xad])
-        header[20] = 0xa0
-        header.replaceSubrange(24..<33, with: Data("AlphaWord".utf8))
+        header[20] = UInt8(configuration.appletID >> 8)
+        header[21] = UInt8(configuration.appletID & 0xff)
+        let name = configuration.appletID == NeoApplet.alphaWord ? "AlphaWord" : "Test Applet"
+        header.replaceSubrange(24..<(24 + name.utf8.count), with: Data(name.utf8))
         var applet = try NeoApplet(header: header)
         applet.limits = limits
         applet.files = try contents.keys.sorted().map { index in

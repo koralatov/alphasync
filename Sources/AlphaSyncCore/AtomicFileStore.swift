@@ -107,16 +107,16 @@ public enum AtomicFileStore {
         }
     }
 
-    private static func readRegularFile(_ url: URL, maximum: Int) throws -> Data {
+    static func readRegularFile(_ url: URL, maximum: Int) throws -> Data {
         let descriptor = open(url.path, O_RDONLY | O_NOFOLLOW | O_NONBLOCK | O_CLOEXEC)
         guard descriptor >= 0 else { throw posixError() }
         let handle = FileHandle(fileDescriptor: descriptor, closeOnDealloc: true)
         defer { try? handle.close() }
         var attributes = stat()
         guard fstat(descriptor, &attributes) == 0, attributes.st_mode & mode_t(S_IFMT) == mode_t(S_IFREG),
-              attributes.st_size <= Int64(maximum) else { throw NeoError.device("Recovery metadata is not a small regular file.") }
+              attributes.st_size <= Int64(maximum) else { throw NeoError.device("Metadata is not a small regular file.") }
         let bytes = try handle.read(upToCount: maximum + 1) ?? Data()
-        guard bytes.count <= maximum else { throw NeoError.device("Recovery metadata is too large.") }
+        guard bytes.count <= maximum else { throw NeoError.device("Metadata is too large.") }
         return bytes
     }
     private static func posixError() -> NSError { NSError(domain: NSPOSIXErrorDomain, code: Int(errno)) }
