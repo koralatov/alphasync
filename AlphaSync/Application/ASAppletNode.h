@@ -44,6 +44,7 @@
     unsigned minFileSize;
     unsigned ramUsed;
     unsigned fileCount;
+    BOOL fileListComplete;
 }
 
 - (id)initWithDevice:(ts::ASDevice*)dev appletIndex:(int)appletIndex;

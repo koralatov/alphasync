@@ -124,11 +124,24 @@ static void checkImportLimits(NSString* directory)
     TestImportAppletNode* applet = [[TestImportAppletNode alloc] initWithTestDevice:&device];
     [applet readLimits];
     CHECK([applet fileSizeLimitKnown] && [applet maxFileSize] == 51200);
+    CHECK(![applet listingIsComplete]); // Neo reports one file, but none was enumerated.
+    ASNode* listedFile = [[[ASNode alloc] init] autorelease];
+    [applet addChild:listedFile];
+    [applet readLimits];
+    CHECK([applet listingIsComplete]);
+    device.usageReadable = false;
+    [applet readLimits];
+    CHECK(![applet listingIsComplete]);
+    [applet removeAllChildren];
+    [applet readLimits];
+    CHECK(![applet listingIsComplete]); // An unreadable count is not an empty applet.
+    device.usageReadable = true;
     device.settingsReadable = false;
     [applet readLimits];
     CHECK(![applet fileSizeLimitKnown]);
     ASAppletNode* copy = (ASAppletNode*)[applet copyForDisplay];
     CHECK(![copy fileSizeLimitKnown]);
+    CHECK(![copy listingIsComplete]);
     [copy release];
     [applet release];
     device.settingsReadable = true;

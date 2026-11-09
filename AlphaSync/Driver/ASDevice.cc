@@ -50,6 +50,7 @@ namespace ts
     void ASDevice::clearEnumeratedApplets()
     {
         m_applets.clear();
+        m_appletListComplete = false;
     }
 
 
@@ -62,6 +63,7 @@ namespace ts
     void ASDevice::initialise()
     {
         assert(m_applets.empty());
+        m_appletListComplete = false;
 
         bool result = dialogueStart();
         if (!result) return;
@@ -84,16 +86,21 @@ namespace ts
             for (unsigned i = 0; i < headerCount; i++)
             {
                 auto applet = std::make_unique<ASApplet>();
-                applet->loadHeader(&buffer[i * kASAppletHeaderSize]);
+                if (!applet->loadHeader(&buffer[i * kASAppletHeaderSize]))
+                {
+                    result = false;
+                    break;
+                }
                 m_applets.push_back(std::move(applet));
             }
+            if (!result) break;
 
             appletCount += headerCount;
 
             if (headerCount < 7) break;     // short read, so no more attributes to fetch
         }
 
-        dialogueEnd(result);
+        m_appletListComplete = dialogueEnd(result);
     }
 
 

@@ -48,6 +48,12 @@
 @end
 
 // File exports and scheduling for backup checks only.  No USB device is opened.
+@interface ASInterfaceIncompleteNode : ASNode
+@end
+@implementation ASInterfaceIncompleteNode
+- (BOOL)listingIsComplete { return NO; }
+@end
+
 @interface ASInterfaceBackupFile : ASNode
 @property BOOL failExport;
 @end
@@ -599,7 +605,7 @@ static void checkBackupLogs(id controller, NSWindowController* backup)
     NSWindow* parent = [controller valueForKey:@"outletMainWindow"];
     @try
     {
-        for (NSUInteger scenario = 0; scenario < 5; ++scenario)
+        for (NSUInteger scenario = 0; scenario < 6; ++scenario)
         {
             NSString* folder = [temporary stringByAppendingPathComponent:[NSString stringWithFormat:@"%lu", (unsigned long)scenario]];
             [defaults setObject:folder forKey:@"BackupFolder"];
@@ -609,7 +615,7 @@ static void checkBackupLogs(id controller, NSWindowController* backup)
             {
                 ASNode* neo = [[[ASNode alloc] init] autorelease];
                 [neo setDisplayName:device == 0 ? @"First Neo" : @"Second Neo"];
-                ASNode* applet = [[[ASNode alloc] init] autorelease];
+                ASNode* applet = [[[(scenario == 5 ? [ASInterfaceIncompleteNode class] : [ASNode class]) alloc] init] autorelease];
                 [applet setDisplayName:@"AlphaWord"];
                 for (NSUInteger index = 0; index < 2; ++index)
                 {
@@ -630,10 +636,14 @@ static void checkBackupLogs(id controller, NSWindowController* backup)
             while ([backup valueForKey:@"backupItems"] && [deadline timeIntervalSinceNow] > 0)
                 [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.01]];
             requireInterface([backup valueForKey:@"backupItems"] == nil, @"The sample backup did not finish.");
-            NSArray* titles = @[@"Backup complete", @"Backup complete", @"Backup stopped", @"Backup incomplete", @"No files to back up"];
+            NSArray* titles = @[@"Backup complete", @"Backup complete", @"Backup stopped", @"Backup incomplete", @"No files to back up", @"Backup incomplete"];
             requireInterface([[[backup valueForKey:@"outletFilesRemaining"] stringValue] isEqualToString:titles[scenario]], @"A backup result changed when logging was optional.");
             NSArray* paths = [backup valueForKey:@"backupSessionPaths"];
-            requireInterface([paths count] == (scenario == 4 ? 0 : 2), @"A dated Neo backup folder is missing.");
+            requireInterface([paths count] == (scenario >= 4 ? 0 : 2), @"A dated Neo backup folder is missing.");
+            if (scenario == 5)
+                requireInterface([queue completed] == 0 && ![manager fileExistsAtPath:folder] &&
+                                 [[[backup valueForKey:@"outletBackupItem"] stringValue] containsString:@"Reconnect"],
+                                 @"An incomplete listing was copied or reported as a complete backup.");
             for (NSUInteger device = 0; device < [paths count]; ++device)
             {
                 BOOL incomplete = (scenario == 2 && device == 1) || (scenario == 3 && device == 0);

@@ -42,6 +42,7 @@
     NSString* systemInfo;
     unsigned availableRam;
     unsigned availableRom;
+    BOOL appletListComplete;
 }
 
 - (id)initWithDevice:(ts::ASDevice*)dev;

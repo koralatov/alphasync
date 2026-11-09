@@ -79,6 +79,12 @@
 }
 
 - (void)copyDisplayFieldsTo:(ASNode*)snapshot { (void)snapshot; }
+- (BOOL)listingIsComplete
+{
+    for (ASNode* child in [self children])
+        if (![child listingIsComplete]) return NO;
+    return YES;
+}
 - (NSString*)operationError { return operationError; }
 - (void)setOperationError:(NSString*)error
 {

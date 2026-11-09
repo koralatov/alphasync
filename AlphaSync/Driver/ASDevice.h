@@ -75,7 +75,8 @@ namespace ts
             m_identity(0),
             m_appletHeaderData(0),
             m_appletHeaderCount(0),
-            m_applets()
+            m_applets(),
+            m_appletListComplete(false)
         {
             // Nothing
         }
@@ -95,6 +96,7 @@ namespace ts
 
         const ASApplet* appletAtIndex(int appletIndex);
         const ASApplet* appletForID(ASAppletID appletID);
+        bool appletListComplete() const { return m_appletListComplete; }
 
         bool getAppletResourceUsage(unsigned* fc, unsigned* ram, const ASApplet* applet);
 
@@ -168,6 +170,7 @@ namespace ts
         uint8_t* m_appletHeaderData;                        /**< Locally cached copy of the applet header data. */
         unsigned m_appletHeaderCount;                       /**< The number of applet headers present on the device. */
         std::vector<std::unique_ptr<ASApplet>> m_applets;                    /**< Applet list for the device. */
+        bool m_appletListComplete;
 
         void clearEnumeratedApplets();
         bool sendRequest(const ASMessage* request);

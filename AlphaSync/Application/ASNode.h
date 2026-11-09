@@ -64,6 +64,8 @@
 
 - (void)refresh;
 - (void)reload;
+// Cached enumeration status only. Safe to query on the display tree.
+- (BOOL)listingIsComplete;
 
 - (NSImage*)smallIcon;
 - (NSImage*)largeIcon;

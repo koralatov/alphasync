@@ -299,6 +299,12 @@ static NSTextField* ASBackupLabel(NSString* text)
     [backupSessionPaths removeAllObjects];
     [self showBackupProgress];
 
+    if (![root listingIsComplete])
+    {
+        [self stopBackup:@"AlphaSync could not read the complete list of applets and files on your Neo. No files were copied. Reconnect your Neo and try again." status:@"failed"];
+        return NO;
+    }
+
     for (NSUInteger i = 0; i != [root numberOfChildren]; i++)
     {
         ASDeviceNode* deviceNode = (ASDeviceNode*)[root childAtIndex:i];
@@ -374,10 +380,10 @@ static NSTextField* ASBackupLabel(NSString* text)
     else
     {
         summary = [NSString stringWithFormat:@"AlphaSync saved %lu of %@.", (unsigned long)saved, ASBackupFileCount(total)];
-        if (failedFiles) summary = [summary stringByAppendingFormat:@"  %@ could not be backed up.", ASBackupFileCount(failedFiles)];
-        if (pending) summary = [summary stringByAppendingFormat:@"  %@ %@ not copied.", ASBackupFileCount(pending), pending == 1 ? @"was" : @"were"];
-        if (!completed && ![message isEqualToString:@"Cancelled"]) summary = [summary stringByAppendingFormat:@"  %@", message];
-        summary = [summary stringByAppendingFormat:@"  The original files on your %@ have not been changed.", backupDeviceCount > 1 ? @"Neos" : @"Neo"];
+        if (failedFiles) summary = [summary stringByAppendingFormat:@" %@ could not be backed up.", ASBackupFileCount(failedFiles)];
+        if (pending) summary = [summary stringByAppendingFormat:@" %@ %@ not copied.", ASBackupFileCount(pending), pending == 1 ? @"was" : @"were"];
+        if (!completed && ![message isEqualToString:@"Cancelled"]) summary = [summary stringByAppendingFormat:@" %@", message];
+        summary = [summary stringByAppendingFormat:@" The original files on your %@ have not been changed.", backupDeviceCount > 1 ? @"Neos" : @"Neo"];
     }
     NSError* reportError = nil;
     if (backupReport && ![backupReport finishWithStatus:status message:summary error:&reportError])

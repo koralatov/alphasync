@@ -107,6 +107,12 @@ static NSImage* iconApplet = nil;              /**< Icon to use for applets. */
     snapshot->minFileSize = minFileSize;
     snapshot->maxFileSize = maxFileSize;
     snapshot->fileSizeLimitKnown = fileSizeLimitKnown;
+    snapshot->fileListComplete = fileListComplete;
+}
+
+- (BOOL)listingIsComplete
+{
+    return fileListComplete && [super listingIsComplete];
 }
 
 - (ASDeviceNode*)deviceNode
@@ -180,7 +186,8 @@ static NSImage* iconApplet = nil;              /**< Icon to use for applets. */
  */
 - (void)refresh
 {
-    device->getAppletResourceUsage(&fileCount, &ramUsed, applet);
+    BOOL countKnown = device->getAppletResourceUsage(&fileCount, &ramUsed, applet);
+    fileListComplete = countKnown && fileCount == [self numberOfChildren];
 
     [self setIcon:iconApplet];
     [self setDisplayName:[NSString stringWithCString:applet->appletName() encoding:NSWindowsCP1252StringEncoding]];

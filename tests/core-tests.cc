@@ -164,6 +164,7 @@ public:
     unsigned reads = 0;
     using ts::ASDevice::rawReadFile;
     using ts::ASDevice::rawReadAppletHeaders;
+    using ts::ASDevice::initialise;
 
     void reply(unsigned command, unsigned length = 0, unsigned checksum = 0)
     {
@@ -192,6 +193,31 @@ public:
         return true;
     }
 };
+
+static void testIncompleteAppletEnumeration()
+{
+    for (unsigned scenario = 0; scenario < 3; ++scenario)
+    {
+        MockDevice device;
+        device.replies.push_back({0x02, 0x30});
+        device.replies.push_back({'S', 'w', 'i', 't', 'c', 'h', 'e', 'd'});
+        unsigned count = scenario == 1 ? 7 : 1;
+        std::vector<uint8_t> headers(kASAppletHeaderSize * count, 0);
+        unsigned checksum = 0;
+        for (unsigned index = 0; index < count; ++index)
+            ts::as_EndianWriteU32(headers.data() + index * kASAppletHeaderSize + kASAppletHeaderOffsetSignature,
+                                 scenario == 2 ? 0 : kASAppletSignature);
+        for (uint8_t byte : headers) checksum += byte;
+        device.reply(ASMESSAGE_RESPONSE_LIST_APPLETS, unsigned(headers.size()), checksum & 0xffff);
+        device.replies.push_back(headers);
+        if (scenario == 1) device.reply(ASMESSAGE_ERROR_PARAMETER);
+        CHECK(!device.appletListComplete());
+        device.initialise();
+        CHECK(device.appletListComplete() == (scenario == 0));
+        CHECK((device.appletAtIndex(0) != nullptr) == (scenario != 2));
+        CHECK(device.reads == device.replies.size());
+    }
+}
 
 static void testUSBReadBounds()
 {
@@ -561,6 +587,7 @@ static void testWriteVerification()
 
 int main()
 {
+    testIncompleteAppletEnumeration();
     testWriteVerification();
     testUSBResponseValidation();
     testFileWriteLimits();

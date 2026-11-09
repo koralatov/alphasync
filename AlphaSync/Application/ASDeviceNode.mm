@@ -111,6 +111,12 @@ static NSImage* iconDeviceNeo = nil;              /**< Icon to use for Neo mk1 d
     snapshot->systemInfo = [systemInfo copy];
     snapshot->availableRam = availableRam;
     snapshot->availableRom = availableRom;
+    snapshot->appletListComplete = appletListComplete;
+}
+
+- (BOOL)listingIsComplete
+{
+    return appletListComplete && [super listingIsComplete];
 }
 
 - (ts::ASDevice*)device
@@ -183,6 +189,7 @@ static NSImage* iconDeviceNeo = nil;              /**< Icon to use for Neo mk1 d
     if (systemInfo) [systemInfo release];
 
     const ASApplet* systemApplet = device->appletForID(kASAppletID_System);
+    appletListComplete = systemApplet && device->appletListComplete();
     if (systemApplet)
     {
         device->systemVersion(&major, &minor, build, date);
