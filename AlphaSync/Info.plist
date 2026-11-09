@@ -28,9 +28,15 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
-	<key>NSMainNibFile</key>
-	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>ASBuildProfile</key>
+	<string>$(AS_BUILD_PROFILE)</string>
+	<key>ASReleaseChannel</key>
+	<string>$(AS_RELEASE_CHANNEL)</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.utilities</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>Copyright © tSoniq 2009–2013. All rights reserved.</string>
 </dict>
 </plist>

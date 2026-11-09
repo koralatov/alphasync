@@ -1,3 +1,4 @@
-// The legacy app and its helper share this release version and build.
-MARKETING_VERSION = 1.5.1
-CURRENT_PROJECT_VERSION = 147
+// Shared development version for both apps and their launch helpers.
+MARKETING_VERSION = 1.6
+CURRENT_PROJECT_VERSION = 148
+AS_RELEASE_CHANNEL = development

@@ -1,0 +1,9 @@
+#include "Version.xcconfig"
+
+// Dedicated arm64 app. Architecture-specific integrations belong only to this target.
+ARCHS = arm64
+MACOSX_DEPLOYMENT_TARGET = 13.0
+AS_BUILD_PROFILE = apple-silicon
+AS_COMPATIBILITY_DESCRIPTION = For macOS 13 and later (Apple Silicon)
+AS_APP_ICON_NAME = application-modern
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) AS_SILICON_EDITION

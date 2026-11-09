@@ -1,1093 +1,765 @@
 // !$*UTF8*$!
 {
-	archiveVersion = 1;
-	classes = {
+	"archiveVersion" = 1;
+	"classes" = {
 	};
-	objectVersion = 54;
-	objects = {
-
-/* Begin PBXBuildFile section */
-		4D2E248F18106AF7002E5E7D /* App icon in Resources */ = {isa = PBXBuildFile; fileRef = C01100000000000000000010 /* App icon */; };
-		4D962E180F1C9EF60018CDAA /* icon-file-bin.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 4D962E170F1C9EF60018CDAA /* icon-file-bin.pdf */; };
-		4D962E450F1CA50D0018CDAA /* icon-applet.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 4D962E380F1CA50D0018CDAA /* icon-applet.pdf */; };
-		4D962E460F1CA50D0018CDAA /* icon-file-txt.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 4D962E390F1CA50D0018CDAA /* icon-file-txt.pdf */; };
-		4D962E470F1CA50D0018CDAA /* icon-neo.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 4D962E3A0F1CA50D0018CDAA /* icon-neo.pdf */; };
-		4D962E750F1CA73D0018CDAA /* icon-file-noselection.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 4D962E740F1CA73D0018CDAA /* icon-file-noselection.pdf */; };
-		4D96309A0F1D172C0018CDAA /* appletdump.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4D9630900F1D15D90018CDAA /* appletdump.cc */; };
-		4D9630A10F1D17F30018CDAA /* ASApplet.cc in Sources */ = {isa = PBXBuildFile; fileRef = A99A54660F0D39FF00BC68F1 /* ASApplet.cc */; };
-		4D9630AF0F1D432C0018CDAA /* ASSettings.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4D9630AE0F1D432C0018CDAA /* ASSettings.cc */; };
-		4DD223AF0F1B5C8F006F004F /* launcher.icns in Resources */ = {isa = PBXBuildFile; fileRef = 4DD223AE0F1B5C8F006F004F /* launcher.icns */; };
-		4DF7C99D0F1EB42600619084 /* AlphaSync Help in Resources */ = {isa = PBXBuildFile; fileRef = 4DF7C9840F1EB42600619084 /* AlphaSync Help */; };
-		8D11072A0486CEB800E47090 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 29B97318FDCFA39411CA2CEA /* MainMenu.nib */; };
-		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
-		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
-		A95EFA5B0F17C91400E1BDA9 /* aq_launcher.m in Sources */ = {isa = PBXBuildFile; fileRef = A95EFA560F17C90D00E1BDA9 /* aq_launcher.m */; };
-		A95EFAE70F17C96A00E1BDA9 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
-		A95EFAE80F17C97900E1BDA9 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
-		A95EFAEA0F17C98F00E1BDA9 /* aq_launchermain.m in Sources */ = {isa = PBXBuildFile; fileRef = A95EFA590F17C90D00E1BDA9 /* aq_launchermain.m */; };
-		A95EFAEB0F17C99500E1BDA9 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A99A54990F0D3AB700BC68F1 /* IOKit.framework */; };
-		A95EFB890F17C99600E1BDA9 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
-		A95EFCD90F17CA7600E1BDA9 /* AlphaSyncLauncher.app in Copy Login Items */ = {isa = PBXBuildFile; fileRef = A95EFA620F17C94B00E1BDA9 /* AlphaSyncLauncher.app */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		A95EFD2C0F17D06000E1BDA9 /* AQFileUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = A95EFD2B0F17D06000E1BDA9 /* AQFileUtilities.m */; };
-		A95EFD360F17D60F00E1BDA9 /* AQFileUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = A95EFD2B0F17D06000E1BDA9 /* AQFileUtilities.m */; };
-		A96033A30F15D66B0046DBC1 /* AQTreeNode.m in Sources */ = {isa = PBXBuildFile; fileRef = A96033A20F15D66B0046DBC1 /* AQTreeNode.m */; };
-		A99A4DF20F18D2F400BFDBAB /* ASGenericFile.cc in Sources */ = {isa = PBXBuildFile; fileRef = A99A4DF10F18D2F400BFDBAB /* ASGenericFile.cc */; };
-		A99A54540F0D39E400BC68F1 /* ASAppletNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = A99A54390F0D39E400BC68F1 /* ASAppletNode.mm */; };
-		A99A54550F0D39E400BC68F1 /* ASApplicationContoller.mm in Sources */ = {isa = PBXBuildFile; fileRef = A99A543B0F0D39E400BC68F1 /* ASApplicationContoller.mm */; };
-		A99A54560F0D39E400BC68F1 /* ASBackupController.mm in Sources */ = {isa = PBXBuildFile; fileRef = A99A543D0F0D39E400BC68F1 /* ASBackupController.mm */; };
-		A99A54580F0D39E400BC68F1 /* ASDeviceController.mm in Sources */ = {isa = PBXBuildFile; fileRef = A99A54420F0D39E400BC68F1 /* ASDeviceController.mm */; };
-		A99A54590F0D39E400BC68F1 /* ASInspectorWindowController.mm in Sources */ = {isa = PBXBuildFile; fileRef = A99A54440F0D39E400BC68F1 /* ASInspectorWindowController.mm */; };
-		A99A545A0F0D39E400BC68F1 /* ASDeviceNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = A99A54460F0D39E400BC68F1 /* ASDeviceNode.mm */; };
-		A99A545C0F0D39E400BC68F1 /* ASFileNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = A99A544A0F0D39E400BC68F1 /* ASFileNode.mm */; };
-		A99A545D0F0D39E400BC68F1 /* ASLoadSaveProtocol.mm in Sources */ = {isa = PBXBuildFile; fileRef = A99A544C0F0D39E400BC68F1 /* ASLoadSaveProtocol.mm */; };
-		A99A545E0F0D39E400BC68F1 /* ASNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = A99A544E0F0D39E400BC68F1 /* ASNode.mm */; };
-		A99A545F0F0D39E400BC68F1 /* ASNodeDataSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = A99A54500F0D39E400BC68F1 /* ASNodeDataSource.mm */; };
-		A99A54600F0D39E400BC68F1 /* ASPreferenceController.mm in Sources */ = {isa = PBXBuildFile; fileRef = A99A54520F0D39E400BC68F1 /* ASPreferenceController.mm */; };
-		A99A54750F0D39FF00BC68F1 /* ASAlphaWordFile.cc in Sources */ = {isa = PBXBuildFile; fileRef = A99A54640F0D39FF00BC68F1 /* ASAlphaWordFile.cc */; };
-		A99A54760F0D39FF00BC68F1 /* ASApplet.cc in Sources */ = {isa = PBXBuildFile; fileRef = A99A54660F0D39FF00BC68F1 /* ASApplet.cc */; };
-		A99A54770F0D39FF00BC68F1 /* ASDevice.cc in Sources */ = {isa = PBXBuildFile; fileRef = A99A54690F0D39FF00BC68F1 /* ASDevice.cc */; };
-		A99A54780F0D39FF00BC68F1 /* ASDeviceFactory.cc in Sources */ = {isa = PBXBuildFile; fileRef = A99A546B0F0D39FF00BC68F1 /* ASDeviceFactory.cc */; };
-		A99A54790F0D39FF00BC68F1 /* ASFile.cc in Sources */ = {isa = PBXBuildFile; fileRef = A99A546E0F0D39FF00BC68F1 /* ASFile.cc */; };
-		A99A547A0F0D39FF00BC68F1 /* ASFileAttributes.cc in Sources */ = {isa = PBXBuildFile; fileRef = A99A54700F0D39FF00BC68F1 /* ASFileAttributes.cc */; };
-		A99A547B0F0D39FF00BC68F1 /* ASUserDictionaryFile.cc in Sources */ = {isa = PBXBuildFile; fileRef = A99A54730F0D39FF00BC68F1 /* ASUserDictionaryFile.cc */; };
-		A99A549A0F0D3AB700BC68F1 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A99A54990F0D3AB700BC68F1 /* IOKit.framework */; };
-        C01100000000000000000001 /* UniformTypeIdentifiers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01100000000000000000002 /* UniformTypeIdentifiers.framework */; };
-        C01100000000000000000004 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
-        C01100000000000000000005 /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01100000000000000000006 /* ServiceManagement.framework */; };
-		4ABCBDDC395974B75A43B8E8 /* ASBackupReport.mm in Sources */ = {isa = PBXBuildFile; fileRef = E41551F125E170A143893D41 /* ASBackupReport.mm */; };
-		4F4037857F8284AEB6168760 /* ASAboutWindowController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2988E42F47B3BF6ADF1A6831 /* ASAboutWindowController.mm */; };
-		F01100000000000000000001 /* ASFileViewWindowController.mm in Sources */ = {isa = PBXBuildFile; fileRef = F01100000000000000000003 /* ASFileViewWindowController.mm */; };
-/* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		4D71AF0F1168775300535F73 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = A95EFA610F17C94B00E1BDA9;
-			remoteInfo = AlphaSyncLauncher;
+	"objectVersion" = 56;
+	"objects" = {
+		"D354C7E8230FE6AD5A9D443A" = {
+			"isa" = "XCLocalSwiftPackageReference";
+			"relativePath" = "..";
 		};
-/* End PBXContainerItemProxy section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-        C01100000000000000000003 /* Copy Login Items */ = {
-            isa = PBXCopyFilesBuildPhase;
-            buildActionMask = 2147483647;
-            dstPath = Contents/Library/LoginItems;
-            dstSubfolderSpec = 1;
-            files = (A95EFCD90F17CA7600E1BDA9 /* AlphaSyncLauncher.app in Copy Login Items */, );
-            name = "Copy Login Items";
-            runOnlyForDeploymentPostprocessing = 0;
-        };
-/* End PBXCopyFilesBuildPhase section */
-
-/* Begin PBXFileReference section */
-		089C165DFE840E0CC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
-		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
-		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		29B97319FDCFA39411CA2CEA /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/MainMenu.nib; sourceTree = "<group>"; };
-		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
-		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		32CA4F630368D1EE00C91783 /* AlphaSync_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlphaSync_Prefix.pch; sourceTree = "<group>"; };
-		4D2E248E18106AF7002E5E7D /* application.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; path = application.iconset; sourceTree = "<group>"; };
-		C01100000000000000000010 /* App icon */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = "App icon"; path = "$(AS_APP_ICON_NAME).icns"; sourceTree = DERIVED_FILE_DIR; };
-		C01100000000000000000011 /* application-modern.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Graphics/application-modern.png"; sourceTree = "<group>"; };
-		4D962E170F1C9EF60018CDAA /* icon-file-bin.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "icon-file-bin.pdf"; path = "Graphics/icon-file-bin.pdf"; sourceTree = "<group>"; };
-		4D962E380F1CA50D0018CDAA /* icon-applet.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "icon-applet.pdf"; path = "Graphics/icon-applet.pdf"; sourceTree = "<group>"; };
-		4D962E390F1CA50D0018CDAA /* icon-file-txt.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "icon-file-txt.pdf"; path = "Graphics/icon-file-txt.pdf"; sourceTree = "<group>"; };
-		4D962E3A0F1CA50D0018CDAA /* icon-neo.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "icon-neo.pdf"; path = "Graphics/icon-neo.pdf"; sourceTree = "<group>"; };
-		4D962E740F1CA73D0018CDAA /* icon-file-noselection.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "icon-file-noselection.pdf"; path = "Graphics/icon-file-noselection.pdf"; sourceTree = "<group>"; };
-		4D9630890F1D15A80018CDAA /* AppletDump */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = AppletDump; sourceTree = BUILT_PRODUCTS_DIR; };
-		4D9630900F1D15D90018CDAA /* appletdump.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = appletdump.cc; sourceTree = "<group>"; };
-		4D9630AC0F1D3F2E0018CDAA /* ASSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASSettings.h; sourceTree = "<group>"; };
-		4D9630AE0F1D432C0018CDAA /* ASSettings.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ASSettings.cc; sourceTree = "<group>"; };
-		4DD223AE0F1B5C8F006F004F /* launcher.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = launcher.icns; path = ../Graphics/launcher.icns; sourceTree = "<group>"; };
-		4DF7C9840F1EB42600619084 /* AlphaSync Help */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "AlphaSync Help"; sourceTree = "<group>"; };
-		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		8D1107320486CEB800E47090 /* AlphaSync.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AlphaSync.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		A95EFA560F17C90D00E1BDA9 /* aq_launcher.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = aq_launcher.m; sourceTree = "<group>"; };
-		A95EFA570F17C90D00E1BDA9 /* aq_launcher.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = aq_launcher.h; sourceTree = "<group>"; };
-		A95EFA580F17C90D00E1BDA9 /* aq_launcherconfig.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = aq_launcherconfig.h; sourceTree = "<group>"; };
-		A95EFA590F17C90D00E1BDA9 /* aq_launchermain.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = aq_launchermain.m; sourceTree = "<group>"; };
-		A95EFA5A0F17C90D00E1BDA9 /* aq_launcherprivate.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = aq_launcherprivate.h; sourceTree = "<group>"; };
-		A95EFA620F17C94B00E1BDA9 /* AlphaSyncLauncher.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AlphaSyncLauncher.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		A95EFA640F17C94B00E1BDA9 /* AlphaSyncLauncher-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "AlphaSyncLauncher-Info.plist"; path = "../AlphaSyncLauncher-Info.plist"; sourceTree = "<group>"; };
-		A95EFD2A0F17D06000E1BDA9 /* AQFileUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AQFileUtilities.h; sourceTree = "<group>"; };
-		A95EFD2B0F17D06000E1BDA9 /* AQFileUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AQFileUtilities.m; sourceTree = "<group>"; };
-		A96033A10F15D66B0046DBC1 /* AQTreeNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AQTreeNode.h; sourceTree = "<group>"; };
-		A96033A20F15D66B0046DBC1 /* AQTreeNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AQTreeNode.m; sourceTree = "<group>"; };
-		A99A4DF00F18D2F400BFDBAB /* ASGenericFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASGenericFile.h; sourceTree = "<group>"; };
-		A99A4DF10F18D2F400BFDBAB /* ASGenericFile.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ASGenericFile.cc; sourceTree = "<group>"; };
-		A99A54380F0D39E400BC68F1 /* ASAppletNode.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ASAppletNode.h; sourceTree = "<group>"; };
-		A99A54390F0D39E400BC68F1 /* ASAppletNode.mm */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.objcpp; path = ASAppletNode.mm; sourceTree = "<group>"; };
-		A99A543A0F0D39E400BC68F1 /* ASApplicationContoller.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ASApplicationContoller.h; sourceTree = "<group>"; };
-		A99A543B0F0D39E400BC68F1 /* ASApplicationContoller.mm */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.objcpp; path = ASApplicationContoller.mm; sourceTree = "<group>"; };
-		A99A543C0F0D39E400BC68F1 /* ASBackupController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ASBackupController.h; sourceTree = "<group>"; };
-		A99A543D0F0D39E400BC68F1 /* ASBackupController.mm */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.objcpp; path = ASBackupController.mm; sourceTree = "<group>"; };
-		A99A543E0F0D39E400BC68F1 /* ASDeviceAccessProtocol.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ASDeviceAccessProtocol.h; sourceTree = "<group>"; };
-		A99A54410F0D39E400BC68F1 /* ASDeviceController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ASDeviceController.h; sourceTree = "<group>"; };
-		A99A54420F0D39E400BC68F1 /* ASDeviceController.mm */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.objcpp; path = ASDeviceController.mm; sourceTree = "<group>"; };
-		A99A54430F0D39E400BC68F1 /* ASInspectorWindowController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ASInspectorWindowController.h; sourceTree = "<group>"; };
-		A99A54440F0D39E400BC68F1 /* ASInspectorWindowController.mm */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.objcpp; path = ASInspectorWindowController.mm; sourceTree = "<group>"; };
-		A99A54450F0D39E400BC68F1 /* ASDeviceNode.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ASDeviceNode.h; sourceTree = "<group>"; };
-		A99A54460F0D39E400BC68F1 /* ASDeviceNode.mm */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.objcpp; path = ASDeviceNode.mm; sourceTree = "<group>"; };
-		A99A54490F0D39E400BC68F1 /* ASFileNode.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ASFileNode.h; sourceTree = "<group>"; };
-		A99A544A0F0D39E400BC68F1 /* ASFileNode.mm */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.objcpp; path = ASFileNode.mm; sourceTree = "<group>"; };
-		A99A544B0F0D39E400BC68F1 /* ASLoadSaveProtocol.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ASLoadSaveProtocol.h; sourceTree = "<group>"; };
-		A99A544C0F0D39E400BC68F1 /* ASLoadSaveProtocol.mm */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.objcpp; path = ASLoadSaveProtocol.mm; sourceTree = "<group>"; };
-		A99A544D0F0D39E400BC68F1 /* ASNode.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ASNode.h; sourceTree = "<group>"; };
-		A99A544E0F0D39E400BC68F1 /* ASNode.mm */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.objcpp; path = ASNode.mm; sourceTree = "<group>"; };
-		A99A544F0F0D39E400BC68F1 /* ASNodeDataSource.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ASNodeDataSource.h; sourceTree = "<group>"; };
-		A99A54500F0D39E400BC68F1 /* ASNodeDataSource.mm */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.objcpp; path = ASNodeDataSource.mm; sourceTree = "<group>"; };
-		A99A54510F0D39E400BC68F1 /* ASPreferenceController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ASPreferenceController.h; sourceTree = "<group>"; };
-		A99A54520F0D39E400BC68F1 /* ASPreferenceController.mm */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.objcpp; path = ASPreferenceController.mm; sourceTree = "<group>"; };
-		A99A54640F0D39FF00BC68F1 /* ASAlphaWordFile.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = ASAlphaWordFile.cc; sourceTree = "<group>"; };
-		A99A54650F0D39FF00BC68F1 /* ASAlphaWordFile.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ASAlphaWordFile.h; sourceTree = "<group>"; };
-		A99A54660F0D39FF00BC68F1 /* ASApplet.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = ASApplet.cc; sourceTree = "<group>"; };
-		A99A54670F0D39FF00BC68F1 /* ASApplet.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ASApplet.h; sourceTree = "<group>"; };
-		A99A54680F0D39FF00BC68F1 /* ASAppletID.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ASAppletID.h; sourceTree = "<group>"; };
-		A99A54690F0D39FF00BC68F1 /* ASDevice.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = ASDevice.cc; sourceTree = "<group>"; };
-		A99A546A0F0D39FF00BC68F1 /* ASDevice.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ASDevice.h; sourceTree = "<group>"; };
-		A99A546B0F0D39FF00BC68F1 /* ASDeviceFactory.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = ASDeviceFactory.cc; sourceTree = "<group>"; };
-		A99A546C0F0D39FF00BC68F1 /* ASDeviceFactory.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ASDeviceFactory.h; sourceTree = "<group>"; };
-		A99A546D0F0D39FF00BC68F1 /* ASEndian.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ASEndian.h; sourceTree = "<group>"; };
-		A99A546E0F0D39FF00BC68F1 /* ASFile.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = ASFile.cc; sourceTree = "<group>"; };
-		A99A546F0F0D39FF00BC68F1 /* ASFile.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ASFile.h; sourceTree = "<group>"; };
-		A99A54700F0D39FF00BC68F1 /* ASFileAttributes.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = ASFileAttributes.cc; sourceTree = "<group>"; };
-		A99A54710F0D39FF00BC68F1 /* ASFileAttributes.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ASFileAttributes.h; sourceTree = "<group>"; };
-		A99A54720F0D39FF00BC68F1 /* ASMessage.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ASMessage.h; sourceTree = "<group>"; };
-		A99A54730F0D39FF00BC68F1 /* ASUserDictionaryFile.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = ASUserDictionaryFile.cc; sourceTree = "<group>"; };
-		A99A54740F0D39FF00BC68F1 /* ASUserDictionaryFile.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ASUserDictionaryFile.h; sourceTree = "<group>"; };
-		A99A54990F0D3AB700BC68F1 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
-        C01100000000000000000002 /* UniformTypeIdentifiers.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UniformTypeIdentifiers.framework; path = System/Library/Frameworks/UniformTypeIdentifiers.framework; sourceTree = SDKROOT; };
-        C01100000000000000000006 /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
-		62623E530502DA726AF5AC00 /* ASBackupReport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASBackupReport.h; sourceTree = "<group>"; };
-		E41551F125E170A143893D41 /* ASBackupReport.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ASBackupReport.mm; sourceTree = "<group>"; };
-		E7E3978206CD4AB3E5F1B4CD /* Universal.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Universal.xcconfig; sourceTree = "<group>"; };
-		D7B4C96AC8AF0BF3C8619F8B /* Modern.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Modern.xcconfig; sourceTree = "<group>"; };
-		85CDB32AAC2D3B860B22908E /* Version.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Version.xcconfig; sourceTree = "<group>"; };
-		1D2AB5E8AD17E38DCF755E8F /* ASAboutWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASAboutWindowController.h; sourceTree = "<group>"; };
-		2988E42F47B3BF6ADF1A6831 /* ASAboutWindowController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASAboutWindowController.mm; sourceTree = "<group>"; };
-		F01100000000000000000002 /* ASFileViewWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASFileViewWindowController.h; sourceTree = "<group>"; };
-		F01100000000000000000003 /* ASFileViewWindowController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASFileViewWindowController.mm; sourceTree = "<group>"; };
-/* End PBXFileReference section */
-
-/* Begin PBXFrameworksBuildPhase section */
-		4D9630870F1D15A80018CDAA /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
+		"C0AD73F7F475418886CB42A0" = {
+			"isa" = "PBXFileReference";
+			"path" = "../Sources/AlphaSyncApp/AlphaSyncApp.swift";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
 		};
-		8D11072E0486CEB800E47090 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				A99A549A0F0D3AB700BC68F1 /* IOKit.framework in Frameworks */,
-                C01100000000000000000001 /* UniformTypeIdentifiers.framework in Frameworks */,
-                C01100000000000000000005 /* ServiceManagement.framework in Frameworks */,
-				A95EFAE70F17C96A00E1BDA9 /* Cocoa.framework in Frameworks */,
-				A95EFAE80F17C97900E1BDA9 /* Foundation.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
+		"9B291E50F1C419CD61C90B07" = {
+			"isa" = "PBXFileReference";
+			"path" = "../Sources/AlphaSyncLauncher/AlphaSyncLauncher.swift";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
 		};
-		A95EFA600F17C94B00E1BDA9 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				A95EFAEB0F17C99500E1BDA9 /* IOKit.framework in Frameworks */,
-                C01100000000000000000004 /* Cocoa.framework in Frameworks */,
-				A95EFB890F17C99600E1BDA9 /* Foundation.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
+		"725B98672F241AD1E888B241" = {
+			"isa" = "PBXFileReference";
+			"path" = "../Sources/AlphaSyncSilicon/EditionGuard.swift";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
 		};
-/* End PBXFrameworksBuildPhase section */
-
-/* Begin PBXGroup section */
-		1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */,
-                C01100000000000000000002 /* UniformTypeIdentifiers.framework */,
-                C01100000000000000000006 /* ServiceManagement.framework */,
-			);
-			name = "Linked Frameworks";
-			sourceTree = "<group>";
+		"18FF38AFD06F0F1A4BEF911C" = {
+			"isa" = "PBXFileReference";
+			"path" = "AlphaSync Help";
+			"lastKnownFileType" = "folder";
+			"sourceTree" = "<group>";
 		};
-		1058C7A2FEA54F0111CA2CBB /* Other Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				29B97324FDCFA39411CA2CEA /* AppKit.framework */,
-				13E42FB307B3F0F600E4EEF1 /* CoreData.framework */,
-				29B97325FDCFA39411CA2CEA /* Foundation.framework */,
-				A99A54990F0D3AB700BC68F1 /* IOKit.framework */,
-			);
-			name = "Other Frameworks";
-			sourceTree = "<group>";
+		"773809ADDEEDE8F1D440BF3E" = {
+			"isa" = "PBXFileReference";
+			"path" = "$(AS_APP_ICON_NAME).icns";
+			"lastKnownFileType" = "image.icns";
+			"sourceTree" = "DERIVED_FILE_DIR";
 		};
-		19C28FACFE9D520D11CA2CBB /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				8D1107320486CEB800E47090 /* AlphaSync.app */,
-				A95EFA620F17C94B00E1BDA9 /* AlphaSyncLauncher.app */,
-				4D9630890F1D15A80018CDAA /* AppletDump */,
-			);
-			name = Products;
-			sourceTree = "<group>";
+		"13B5637121AD624888447927" = {
+			"isa" = "PBXFileReference";
+			"path" = "Graphics/launcher.icns";
+			"lastKnownFileType" = "image.icns";
+			"sourceTree" = "<group>";
 		};
-		29B97314FDCFA39411CA2CEA /* AlphaSync */ = {
-			isa = PBXGroup;
-			children = (
-				34A6F206D8A48389402ABBA3 /* Build */,
-				4D2E248E18106AF7002E5E7D /* application.iconset */,
-				C01100000000000000000010 /* App icon */,
-				C01100000000000000000011 /* application-modern.png */,
-				A99A54330F0D39C400BC68F1 /* Application */,
-				A95EFA530F17C8EF00E1BDA9 /* Launcher */,
-				4D96308D0F1D15B50018CDAA /* AppletDump */,
-				A99A54300F0D39A400BC68F1 /* Library */,
-				A99A542D0F0D398500BC68F1 /* Driver */,
-				29B97315FDCFA39411CA2CEA /* Other Sources */,
-				29B97317FDCFA39411CA2CEA /* Resources */,
-				29B97323FDCFA39411CA2CEA /* Frameworks */,
-				19C28FACFE9D520D11CA2CBB /* Products */,
-			);
-			name = AlphaSync;
-			sourceTree = "<group>";
+		"9A35A91C61B0408CE0E0B09B" = {
+			"isa" = "PBXFileReference";
+			"path" = "Build/Version.xcconfig";
+			"lastKnownFileType" = "text.xcconfig";
+			"sourceTree" = "<group>";
 		};
-		29B97315FDCFA39411CA2CEA /* Other Sources */ = {
-			isa = PBXGroup;
-			children = (
-				32CA4F630368D1EE00C91783 /* AlphaSync_Prefix.pch */,
-				29B97316FDCFA39411CA2CEA /* main.m */,
-			);
-			name = "Other Sources";
-			sourceTree = "<group>";
+		"5FACDCABF0A98F429D0C246C" = {
+			"isa" = "PBXFileReference";
+			"path" = "../Sources";
+			"lastKnownFileType" = "folder";
+			"sourceTree" = "<group>";
 		};
-		29B97317FDCFA39411CA2CEA /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				4DF7C9840F1EB42600619084 /* AlphaSync Help */,
-				4D962E740F1CA73D0018CDAA /* icon-file-noselection.pdf */,
-				4D962E380F1CA50D0018CDAA /* icon-applet.pdf */,
-				4D962E390F1CA50D0018CDAA /* icon-file-txt.pdf */,
-				4D962E3A0F1CA50D0018CDAA /* icon-neo.pdf */,
-				4D962E170F1C9EF60018CDAA /* icon-file-bin.pdf */,
-				8D1107310486CEB800E47090 /* Info.plist */,
-				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
-				29B97318FDCFA39411CA2CEA /* MainMenu.nib */,
-			);
-			name = Resources;
-			sourceTree = "<group>";
+		"77342188C6E85BBD7921C307" = {
+			"isa" = "PBXFileReference";
+			"path" = "Build/Universal.xcconfig";
+			"lastKnownFileType" = "text.xcconfig";
+			"sourceTree" = "<group>";
 		};
-		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */,
-				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
+		"064CF45A2345987DF9B39194" = {
+			"isa" = "PBXFileReference";
+			"explicitFileType" = "wrapper.application";
+			"path" = "AlphaSync.app";
+			"sourceTree" = "BUILT_PRODUCTS_DIR";
 		};
-		4D96308D0F1D15B50018CDAA /* AppletDump */ = {
-			isa = PBXGroup;
-			children = (
-				4D9630900F1D15D90018CDAA /* appletdump.cc */,
-			);
-			path = AppletDump;
-			sourceTree = "<group>";
+		"267BACB7F0C9773C7BA6B0D1" = {
+			"isa" = "PBXFileReference";
+			"explicitFileType" = "wrapper.application";
+			"path" = "AlphaSyncLauncher.app";
+			"sourceTree" = "BUILT_PRODUCTS_DIR";
 		};
-		A95EFA530F17C8EF00E1BDA9 /* Launcher */ = {
-			isa = PBXGroup;
-			children = (
-				A95EFA640F17C94B00E1BDA9 /* AlphaSyncLauncher-Info.plist */,
-				A95EFA560F17C90D00E1BDA9 /* aq_launcher.m */,
-				A95EFA570F17C90D00E1BDA9 /* aq_launcher.h */,
-				A95EFA580F17C90D00E1BDA9 /* aq_launcherconfig.h */,
-				A95EFA590F17C90D00E1BDA9 /* aq_launchermain.m */,
-				A95EFA5A0F17C90D00E1BDA9 /* aq_launcherprivate.h */,
-				4DD223AE0F1B5C8F006F004F /* launcher.icns */,
-			);
-			path = Launcher;
-			sourceTree = "<group>";
+		"46F39E51695CAE028882C75A" = {
+			"isa" = "XCSwiftPackageProductDependency";
+			"package" = "D354C7E8230FE6AD5A9D443A";
+			"productName" = "AlphaSyncHardware";
 		};
-		A99A542D0F0D398500BC68F1 /* Driver */ = {
-			isa = PBXGroup;
-			children = (
-				A99A54640F0D39FF00BC68F1 /* ASAlphaWordFile.cc */,
-				A99A54650F0D39FF00BC68F1 /* ASAlphaWordFile.h */,
-				A99A54660F0D39FF00BC68F1 /* ASApplet.cc */,
-				A99A54670F0D39FF00BC68F1 /* ASApplet.h */,
-				A99A54680F0D39FF00BC68F1 /* ASAppletID.h */,
-				A99A54690F0D39FF00BC68F1 /* ASDevice.cc */,
-				A99A546A0F0D39FF00BC68F1 /* ASDevice.h */,
-				A99A546B0F0D39FF00BC68F1 /* ASDeviceFactory.cc */,
-				A99A546C0F0D39FF00BC68F1 /* ASDeviceFactory.h */,
-				A99A546D0F0D39FF00BC68F1 /* ASEndian.h */,
-				A99A546E0F0D39FF00BC68F1 /* ASFile.cc */,
-				A99A546F0F0D39FF00BC68F1 /* ASFile.h */,
-				A99A54700F0D39FF00BC68F1 /* ASFileAttributes.cc */,
-				A99A54710F0D39FF00BC68F1 /* ASFileAttributes.h */,
-				A99A54720F0D39FF00BC68F1 /* ASMessage.h */,
-				A99A54730F0D39FF00BC68F1 /* ASUserDictionaryFile.cc */,
-				A99A54740F0D39FF00BC68F1 /* ASUserDictionaryFile.h */,
-				A99A4DF00F18D2F400BFDBAB /* ASGenericFile.h */,
-				A99A4DF10F18D2F400BFDBAB /* ASGenericFile.cc */,
-				4D9630AC0F1D3F2E0018CDAA /* ASSettings.h */,
-				4D9630AE0F1D432C0018CDAA /* ASSettings.cc */,
-			);
-			path = Driver;
-			sourceTree = "<group>";
+		"8A46ABC18CB1FA87643F8D18" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "9B291E50F1C419CD61C90B07";
 		};
-		A99A54300F0D39A400BC68F1 /* Library */ = {
-			isa = PBXGroup;
-			children = (
-				A96033A10F15D66B0046DBC1 /* AQTreeNode.h */,
-				A96033A20F15D66B0046DBC1 /* AQTreeNode.m */,
-				A95EFD2A0F17D06000E1BDA9 /* AQFileUtilities.h */,
-				A95EFD2B0F17D06000E1BDA9 /* AQFileUtilities.m */,
+		"B8D82582F532CB3700AD717B" = {
+			"isa" = "PBXSourcesBuildPhase";
+			"buildActionMask" = 2147483647;
+			"files" = (
+				"8A46ABC18CB1FA87643F8D18",
 			);
-			path = Library;
-			sourceTree = "<group>";
+			"runOnlyForDeploymentPostprocessing" = 0;
 		};
-		A99A54330F0D39C400BC68F1 /* Application */ = {
-			isa = PBXGroup;
-			children = (
-				A99A54380F0D39E400BC68F1 /* ASAppletNode.h */,
-				A99A54390F0D39E400BC68F1 /* ASAppletNode.mm */,
-				1D2AB5E8AD17E38DCF755E8F /* ASAboutWindowController.h */,
-				2988E42F47B3BF6ADF1A6831 /* ASAboutWindowController.mm */,
-				A99A543A0F0D39E400BC68F1 /* ASApplicationContoller.h */,
-				A99A543B0F0D39E400BC68F1 /* ASApplicationContoller.mm */,
-				A99A543C0F0D39E400BC68F1 /* ASBackupController.h */,
-				A99A543D0F0D39E400BC68F1 /* ASBackupController.mm */,
-				62623E530502DA726AF5AC00 /* ASBackupReport.h */,
-				E41551F125E170A143893D41 /* ASBackupReport.mm */,
-				A99A543E0F0D39E400BC68F1 /* ASDeviceAccessProtocol.h */,
-				A99A54410F0D39E400BC68F1 /* ASDeviceController.h */,
-				A99A54420F0D39E400BC68F1 /* ASDeviceController.mm */,
-				A99A54430F0D39E400BC68F1 /* ASInspectorWindowController.h */,
-				A99A54440F0D39E400BC68F1 /* ASInspectorWindowController.mm */,
-				A99A54450F0D39E400BC68F1 /* ASDeviceNode.h */,
-				A99A54460F0D39E400BC68F1 /* ASDeviceNode.mm */,
-				F01100000000000000000002 /* ASFileViewWindowController.h */,
-				F01100000000000000000003 /* ASFileViewWindowController.mm */,
-				A99A54490F0D39E400BC68F1 /* ASFileNode.h */,
-				A99A544A0F0D39E400BC68F1 /* ASFileNode.mm */,
-				A99A544B0F0D39E400BC68F1 /* ASLoadSaveProtocol.h */,
-				A99A544C0F0D39E400BC68F1 /* ASLoadSaveProtocol.mm */,
-				A99A544D0F0D39E400BC68F1 /* ASNode.h */,
-				A99A544E0F0D39E400BC68F1 /* ASNode.mm */,
-				A99A544F0F0D39E400BC68F1 /* ASNodeDataSource.h */,
-				A99A54500F0D39E400BC68F1 /* ASNodeDataSource.mm */,
-				A99A54510F0D39E400BC68F1 /* ASPreferenceController.h */,
-				A99A54520F0D39E400BC68F1 /* ASPreferenceController.mm */,
-			);
-			path = Application;
-			sourceTree = "<group>";
+		"8EA3DA8FA4CA871491134A66" = {
+			"isa" = "PBXBuildFile";
+			"productRef" = "46F39E51695CAE028882C75A";
 		};
-		34A6F206D8A48389402ABBA3 /* Build */ = {
-			isa = PBXGroup;
-			children = (
-				85CDB32AAC2D3B860B22908E /* Version.xcconfig */,
-				E7E3978206CD4AB3E5F1B4CD /* Universal.xcconfig */,
-				D7B4C96AC8AF0BF3C8619F8B /* Modern.xcconfig */,
+		"B433007A5D2EADED8636712F" = {
+			"isa" = "PBXFrameworksBuildPhase";
+			"buildActionMask" = 2147483647;
+			"files" = (
+				"8EA3DA8FA4CA871491134A66",
 			);
-			path = Build;
-			sourceTree = "<group>";
+			"runOnlyForDeploymentPostprocessing" = 0;
 		};
-/* End PBXGroup section */
-
-/* Begin PBXNativeTarget section */
-		4D9630880F1D15A80018CDAA /* AppletDump */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 4D96308E0F1D15B50018CDAA /* Build configuration list for PBXNativeTarget "AppletDump" */;
-			buildPhases = (
-				4D9630860F1D15A80018CDAA /* Sources */,
-				4D9630870F1D15A80018CDAA /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = AppletDump;
-			productName = AppletDump;
-			productReference = 4D9630890F1D15A80018CDAA /* AppletDump */;
-			productType = "com.apple.product-type.tool";
+		"690803F82C898C69C3AD6089" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "13B5637121AD624888447927";
 		};
-		8D1107260486CEB800E47090 /* AlphaSync */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = C01FCF4A08A954540054247B /* Build configuration list for PBXNativeTarget "AlphaSync" */;
-			buildPhases = (
-				C01100000000000000000012 /* Build app icon */,
-				8D1107290486CEB800E47090 /* Resources */,
-				F01200000000000000000001 /* Build Help */,
-				8D11072C0486CEB800E47090 /* Sources */,
-				8D11072E0486CEB800E47090 /* Frameworks */,
-                C01100000000000000000003 /* Copy Login Items */,
+		"809D7F30617AAF6EC5C658E6" = {
+			"isa" = "PBXResourcesBuildPhase";
+			"buildActionMask" = 2147483647;
+			"files" = (
+				"690803F82C898C69C3AD6089",
 			);
-			buildRules = (
-			);
-			dependencies = (
-				4D71AF101168775300535F73 /* PBXTargetDependency */,
-			);
-			name = AlphaSync;
-			productInstallPath = "$(HOME)/Applications";
-			productName = AlphaSync;
-			productReference = 8D1107320486CEB800E47090 /* AlphaSync.app */;
-			productType = "com.apple.product-type.application";
+			"runOnlyForDeploymentPostprocessing" = 0;
 		};
-		A95EFA610F17C94B00E1BDA9 /* AlphaSyncLauncher */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = A95EFA650F17C94B00E1BDA9 /* Build configuration list for PBXNativeTarget "AlphaSyncLauncher" */;
-			buildPhases = (
-				A95EFA5E0F17C94B00E1BDA9 /* Resources */,
-				A95EFA5F0F17C94B00E1BDA9 /* Sources */,
-				A95EFA600F17C94B00E1BDA9 /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = AlphaSyncLauncher;
-			productName = AlphaSyncLauncher;
-			productReference = A95EFA620F17C94B00E1BDA9 /* AlphaSyncLauncher.app */;
-			productType = "com.apple.product-type.application";
-		};
-/* End PBXNativeTarget section */
-
-/* Begin PBXProject section */
-		29B97313FDCFA39411CA2CEA /* Project object */ = {
-			isa = PBXProject;
-			attributes = {
-				LastUpgradeCheck = 0410;
+		"3DC9F9E938581D9FC91B0FAB" = {
+			"isa" = "XCBuildConfiguration";
+			"name" = "Debug";
+			"buildSettings" = {
+				"PRODUCT_NAME" = "AlphaSyncLauncher";
+				"PRODUCT_BUNDLE_IDENTIFIER" = "com.tsoniq.AlphaSyncLauncher";
+				"GENERATE_INFOPLIST_FILE" = "NO";
+				"INFOPLIST_FILE" = "AlphaSyncLauncher-Info.plist";
+				"CONFIGURATION_BUILD_DIR" = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/$(AS_BUILD_PROFILE)";
+				"SKIP_INSTALL" = "YES";
+				"COMBINE_HIDPI_IMAGES" = "YES";
 			};
-			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "AlphaSync" */;
-			compatibilityVersion = "Xcode 12.0";
-			developmentRegion = English;
-			hasScannedForEncodings = 1;
-			knownRegions = (
-				en,
+			"baseConfigurationReference" = "77342188C6E85BBD7921C307";
+		};
+		"BE7916712664F904EB5B0E83" = {
+			"isa" = "XCBuildConfiguration";
+			"name" = "Release";
+			"buildSettings" = {
+				"PRODUCT_NAME" = "AlphaSyncLauncher";
+				"PRODUCT_BUNDLE_IDENTIFIER" = "com.tsoniq.AlphaSyncLauncher";
+				"GENERATE_INFOPLIST_FILE" = "NO";
+				"INFOPLIST_FILE" = "AlphaSyncLauncher-Info.plist";
+				"CONFIGURATION_BUILD_DIR" = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/$(AS_BUILD_PROFILE)";
+				"SKIP_INSTALL" = "YES";
+				"COMBINE_HIDPI_IMAGES" = "YES";
+			};
+			"baseConfigurationReference" = "77342188C6E85BBD7921C307";
+		};
+		"A3F48CEEC2F107C316591C42" = {
+			"isa" = "XCConfigurationList";
+			"buildConfigurations" = (
+				"3DC9F9E938581D9FC91B0FAB",
+				"BE7916712664F904EB5B0E83",
 			);
-			mainGroup = 29B97314FDCFA39411CA2CEA /* AlphaSync */;
-			projectDirPath = "";
-			projectRoot = "";
-			targets = (
-				8D1107260486CEB800E47090 /* AlphaSync */,
-				A95EFA610F17C94B00E1BDA9 /* AlphaSyncLauncher */,
-				4D9630880F1D15A80018CDAA /* AppletDump */,
+			"defaultConfigurationIsVisible" = 0;
+			"defaultConfigurationName" = "Release";
+		};
+		"E8B239F2F50847286987A6CA" = {
+			"isa" = "PBXNativeTarget";
+			"name" = "AlphaSyncUniversalLauncher";
+			"productName" = "AlphaSyncLauncher";
+			"productReference" = "267BACB7F0C9773C7BA6B0D1";
+			"productType" = "com.apple.product-type.application";
+			"buildConfigurationList" = "A3F48CEEC2F107C316591C42";
+			"buildPhases" = (
+				"B8D82582F532CB3700AD717B",
+				"B433007A5D2EADED8636712F",
+				"809D7F30617AAF6EC5C658E6",
+			);
+			"buildRules" = (
+			);
+			"dependencies" = (
+			);
+			"packageProductDependencies" = (
+				"46F39E51695CAE028882C75A",
 			);
 		};
-/* End PBXProject section */
-
-/* Begin PBXResourcesBuildPhase section */
-		8D1107290486CEB800E47090 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-
-				8D11072A0486CEB800E47090 /* MainMenu.nib in Resources */,
-				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
-				4D962E180F1C9EF60018CDAA /* icon-file-bin.pdf in Resources */,
-				4D962E450F1CA50D0018CDAA /* icon-applet.pdf in Resources */,
-				4D962E460F1CA50D0018CDAA /* icon-file-txt.pdf in Resources */,
-				4D962E470F1CA50D0018CDAA /* icon-neo.pdf in Resources */,
-				4D962E750F1CA73D0018CDAA /* icon-file-noselection.pdf in Resources */,
-				4DF7C99D0F1EB42600619084 /* AlphaSync Help in Resources */,
-				4D2E248F18106AF7002E5E7D /* App icon in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
+		"493F3F324DB43D21BD110F72" = {
+			"isa" = "XCSwiftPackageProductDependency";
+			"package" = "D354C7E8230FE6AD5A9D443A";
+			"productName" = "AlphaSyncUI";
 		};
-		A95EFA5E0F17C94B00E1BDA9 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				4DD223AF0F1B5C8F006F004F /* launcher.icns in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
+		"828E479E0FCBEACAD1643B37" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "C0AD73F7F475418886CB42A0";
 		};
-/* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		C01100000000000000000012 /* Build app icon */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = ();
-			inputPaths = (
+		"905969D1CED5BCD5FB85D066" = {
+			"isa" = "PBXSourcesBuildPhase";
+			"buildActionMask" = 2147483647;
+			"files" = (
+				"828E479E0FCBEACAD1643B37",
+			);
+			"runOnlyForDeploymentPostprocessing" = 0;
+		};
+		"95FAC59AE076D7F4B24DFA21" = {
+			"isa" = "PBXBuildFile";
+			"productRef" = "493F3F324DB43D21BD110F72";
+		};
+		"215BE9785FC2CDEF55B43C1C" = {
+			"isa" = "PBXFrameworksBuildPhase";
+			"buildActionMask" = 2147483647;
+			"files" = (
+				"95FAC59AE076D7F4B24DFA21",
+			);
+			"runOnlyForDeploymentPostprocessing" = 0;
+		};
+		"9B6069B8C2AE1A783F717082" = {
+			"isa" = "PBXShellScriptBuildPhase";
+			"buildActionMask" = 2147483647;
+			"files" = (
+			);
+			"runOnlyForDeploymentPostprocessing" = 0;
+			"name" = "Build app icon";
+			"shellPath" = "/bin/bash";
+			"shellScript" = "bash \"$SRCROOT/../scripts/build-app-icon.sh\"\n";
+			"inputPaths" = (
 				"$(SRCROOT)/../scripts/build-app-icon.sh",
-				"$(SRCROOT)/Graphics/application-modern.png",
 				"$(SRCROOT)/application.iconset",
-				"$(SRCROOT)/application.iconset/icon_16x16.png",
-				"$(SRCROOT)/application.iconset/icon_16x16@2x.png",
-				"$(SRCROOT)/application.iconset/icon_32x32.png",
-				"$(SRCROOT)/application.iconset/icon_32x32@2x.png",
-				"$(SRCROOT)/application.iconset/icon_128x128.png",
-				"$(SRCROOT)/application.iconset/icon_128x128@2x.png",
-				"$(SRCROOT)/application.iconset/icon_256x256.png",
-				"$(SRCROOT)/application.iconset/icon_256x256@2x.png",
-				"$(SRCROOT)/application.iconset/icon_512x512.png",
-				"$(SRCROOT)/application.iconset/icon_512x512@2x.png",
+				"$(SRCROOT)/Graphics/application-modern.png",
 			);
-			name = "Build app icon";
-			outputPaths = (
+			"outputPaths" = (
 				"$(DERIVED_FILE_DIR)/AppIconBuild",
 				"$(DERIVED_FILE_DIR)/$(AS_APP_ICON_NAME).icns",
 			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/bash;
-			shellScript = "bash \"$SRCROOT/../scripts/build-app-icon.sh\"\n";
 		};
-		F01200000000000000000001 /* Build Help */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = ();
-			inputPaths = (
+		"C5B012C0962E1C78DEFFC45F" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "18FF38AFD06F0F1A4BEF911C";
+		};
+		"7A534DD737FF29C6732F408F" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "773809ADDEEDE8F1D440BF3E";
+		};
+		"AD5D24B91688A1FA206665BD" = {
+			"isa" = "PBXResourcesBuildPhase";
+			"buildActionMask" = 2147483647;
+			"files" = (
+				"C5B012C0962E1C78DEFFC45F",
+				"7A534DD737FF29C6732F408F",
+			);
+			"runOnlyForDeploymentPostprocessing" = 0;
+		};
+		"26138C7EC98FA5F1B48F4E1D" = {
+			"isa" = "PBXShellScriptBuildPhase";
+			"buildActionMask" = 2147483647;
+			"files" = (
+			);
+			"runOnlyForDeploymentPostprocessing" = 0;
+			"name" = "Build offline Help";
+			"alwaysOutOfDate" = 1;
+			"shellPath" = "/bin/bash";
+			"shellScript" = "bash \"$SRCROOT/../scripts/build-help.sh\"\n";
+			"inputPaths" = (
 				"$(SRCROOT)/../scripts/build-help.sh",
 				"$(SRCROOT)/../LICENSE",
 				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/AlphaSync Help/alphasync-help.html",
 			);
-			name = "Build Help";
-			outputPaths = (
+			"outputPaths" = (
 				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/AlphaSync Help/licence.html",
 				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/AlphaSync Help/AlphaSync Help.helpindex",
 			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/bash;
-			shellScript = "bash \"$SRCROOT/../scripts/build-help.sh\"\n";
 		};
-/* End PBXShellScriptBuildPhase section */
-
-
-/* Begin PBXSourcesBuildPhase section */
-		4D9630860F1D15A80018CDAA /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				4D96309A0F1D172C0018CDAA /* appletdump.cc in Sources */,
-				4D9630A10F1D17F30018CDAA /* ASApplet.cc in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		8D11072C0486CEB800E47090 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				8D11072D0486CEB800E47090 /* main.m in Sources */,
-				A99A54540F0D39E400BC68F1 /* ASAppletNode.mm in Sources */,
-				4F4037857F8284AEB6168760 /* ASAboutWindowController.mm in Sources */,
-				A99A54550F0D39E400BC68F1 /* ASApplicationContoller.mm in Sources */,
-				A99A54560F0D39E400BC68F1 /* ASBackupController.mm in Sources */,
-				4ABCBDDC395974B75A43B8E8 /* ASBackupReport.mm in Sources */,
-				A99A54580F0D39E400BC68F1 /* ASDeviceController.mm in Sources */,
-				A99A54590F0D39E400BC68F1 /* ASInspectorWindowController.mm in Sources */,
-				A99A545A0F0D39E400BC68F1 /* ASDeviceNode.mm in Sources */,
-				A99A545C0F0D39E400BC68F1 /* ASFileNode.mm in Sources */,
-				F01100000000000000000001 /* ASFileViewWindowController.mm in Sources */,
-				A99A545D0F0D39E400BC68F1 /* ASLoadSaveProtocol.mm in Sources */,
-				A99A545E0F0D39E400BC68F1 /* ASNode.mm in Sources */,
-				A99A545F0F0D39E400BC68F1 /* ASNodeDataSource.mm in Sources */,
-				A99A54600F0D39E400BC68F1 /* ASPreferenceController.mm in Sources */,
-				A99A54750F0D39FF00BC68F1 /* ASAlphaWordFile.cc in Sources */,
-				A99A54760F0D39FF00BC68F1 /* ASApplet.cc in Sources */,
-				A99A54770F0D39FF00BC68F1 /* ASDevice.cc in Sources */,
-				A99A54780F0D39FF00BC68F1 /* ASDeviceFactory.cc in Sources */,
-				A99A54790F0D39FF00BC68F1 /* ASFile.cc in Sources */,
-				A99A547A0F0D39FF00BC68F1 /* ASFileAttributes.cc in Sources */,
-				A99A547B0F0D39FF00BC68F1 /* ASUserDictionaryFile.cc in Sources */,
-				A96033A30F15D66B0046DBC1 /* AQTreeNode.m in Sources */,
-				A95EFA5B0F17C91400E1BDA9 /* aq_launcher.m in Sources */,
-				A95EFD360F17D60F00E1BDA9 /* AQFileUtilities.m in Sources */,
-				A99A4DF20F18D2F400BFDBAB /* ASGenericFile.cc in Sources */,
-				4D9630AF0F1D432C0018CDAA /* ASSettings.cc in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		A95EFA5F0F17C94B00E1BDA9 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				A95EFAEA0F17C98F00E1BDA9 /* aq_launchermain.m in Sources */,
-				A95EFD2C0F17D06000E1BDA9 /* AQFileUtilities.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		4D71AF101168775300535F73 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = A95EFA610F17C94B00E1BDA9 /* AlphaSyncLauncher */;
-			targetProxy = 4D71AF0F1168775300535F73 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
-
-/* Begin PBXVariantGroup section */
-		089C165CFE840E0CC02AAC07 /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				089C165DFE840E0CC02AAC07 /* English */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-		29B97318FDCFA39411CA2CEA /* MainMenu.nib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				29B97319FDCFA39411CA2CEA /* English */,
-			);
-			name = MainMenu.nib;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
-
-/* Begin XCBuildConfiguration section */
-		4D96308B0F1D15A90018CDAA /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				COPY_PHASE_STRIP = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PRECOMPILE_PREFIX_HEADER = NO;
-				GCC_PREFIX_HEADER = "";
-				INSTALL_PATH = /usr/local/bin;
-				PRODUCT_NAME = AppletDump;
-			};
-			name = Debug;
-		};
-		35FBBEF1C1503749C2209597 /* DebugModern */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				COPY_PHASE_STRIP = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PRECOMPILE_PREFIX_HEADER = NO;
-				GCC_PREFIX_HEADER = "";
-				INSTALL_PATH = /usr/local/bin;
-				PRODUCT_NAME = AppletDump;
-			};
-			name = DebugModern;
-		};
-		4D96308C0F1D15A90018CDAA /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				STRIP_STYLE = all;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				DEPLOYMENT_POSTPROCESSING = YES;
-				STRIP_INSTALLED_PRODUCT = YES;
-				DEAD_CODE_STRIPPING = YES;
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_PRECOMPILE_PREFIX_HEADER = NO;
-				GCC_PREFIX_HEADER = "";
-				INSTALL_PATH = /usr/local/bin;
-				PRODUCT_NAME = AppletDump;
-			};
-			name = Release;
-		};
-		E864A82D283967F5B8F36856 /* ReleaseModern */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				STRIP_STYLE = all;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				DEPLOYMENT_POSTPROCESSING = YES;
-				STRIP_INSTALLED_PRODUCT = YES;
-				DEAD_CODE_STRIPPING = YES;
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_PRECOMPILE_PREFIX_HEADER = NO;
-				GCC_PREFIX_HEADER = "";
-				INSTALL_PATH = /usr/local/bin;
-				PRODUCT_NAME = AppletDump;
-			};
-			name = ReleaseModern;
-		};
-		A95EFA660F17C94B00E1BDA9 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PRECOMPILE_PREFIX_HEADER = NO;
-				GCC_PREFIX_HEADER = "";
-				INFOPLIST_FILE = "AlphaSyncLauncher-Info.plist";
-				INSTALL_PATH = "$(HOME)/Applications";
-				SKIP_INSTALL = YES;
-				OTHER_LDFLAGS = (
-					"-framework",
-					Foundation,
+		"26E3CCBE7B62D739D6F0FFE3" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "267BACB7F0C9773C7BA6B0D1";
+			"settings" = {
+				"ATTRIBUTES" = (
+					"CodeSignOnCopy",
 				);
-				PRODUCT_NAME = AlphaSyncLauncher;
-                PRODUCT_BUNDLE_IDENTIFIER = com.tsoniq.AlphaSyncLauncher;
-				WRAPPER_EXTENSION = app;
 			};
-			name = Debug;
 		};
-		B10B72ADBA960429622B8528 /* DebugModern */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PRECOMPILE_PREFIX_HEADER = NO;
-				GCC_PREFIX_HEADER = "";
-				INFOPLIST_FILE = "AlphaSyncLauncher-Info.plist";
-				INSTALL_PATH = "$(HOME)/Applications";
-				SKIP_INSTALL = YES;
-				OTHER_LDFLAGS = (
-					"-framework",
-					Foundation,
+		"F1515EE1D193AD95AF666D29" = {
+			"isa" = "PBXCopyFilesBuildPhase";
+			"buildActionMask" = 2147483647;
+			"files" = (
+				"26E3CCBE7B62D739D6F0FFE3",
+			);
+			"runOnlyForDeploymentPostprocessing" = 0;
+			"name" = "Embed login helper";
+			"dstPath" = "Contents/Library/LoginItems";
+			"dstSubfolderSpec" = 1;
+		};
+		"64CA9C996208C1316A792BAD" = {
+			"isa" = "PBXContainerItemProxy";
+			"containerPortal" = "E043985085AFF51B46076447";
+			"proxyType" = 1;
+			"remoteGlobalIDString" = "E8B239F2F50847286987A6CA";
+			"remoteInfo" = "AlphaSyncUniversalLauncher";
+		};
+		"DDBC44DAEBC90E772496F30C" = {
+			"isa" = "PBXTargetDependency";
+			"target" = "E8B239F2F50847286987A6CA";
+			"targetProxy" = "64CA9C996208C1316A792BAD";
+		};
+		"4721595D349FAE9514DA6BB7" = {
+			"isa" = "XCBuildConfiguration";
+			"name" = "Debug";
+			"buildSettings" = {
+				"PRODUCT_NAME" = "AlphaSync";
+				"PRODUCT_BUNDLE_IDENTIFIER" = "com.tsoniq.AlphaSync";
+				"GENERATE_INFOPLIST_FILE" = "NO";
+				"INFOPLIST_FILE" = "Info.plist";
+				"CONFIGURATION_BUILD_DIR" = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/$(AS_BUILD_PROFILE)";
+				"SKIP_INSTALL" = "NO";
+				"COMBINE_HIDPI_IMAGES" = "YES";
+				"LD_RUNPATH_SEARCH_PATHS" = "$(inherited) @executable_path/../Frameworks";
+			};
+			"baseConfigurationReference" = "77342188C6E85BBD7921C307";
+		};
+		"5BB9B7E5730E73BF5B488ABC" = {
+			"isa" = "XCBuildConfiguration";
+			"name" = "Release";
+			"buildSettings" = {
+				"PRODUCT_NAME" = "AlphaSync";
+				"PRODUCT_BUNDLE_IDENTIFIER" = "com.tsoniq.AlphaSync";
+				"GENERATE_INFOPLIST_FILE" = "NO";
+				"INFOPLIST_FILE" = "Info.plist";
+				"CONFIGURATION_BUILD_DIR" = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/$(AS_BUILD_PROFILE)";
+				"SKIP_INSTALL" = "NO";
+				"COMBINE_HIDPI_IMAGES" = "YES";
+				"LD_RUNPATH_SEARCH_PATHS" = "$(inherited) @executable_path/../Frameworks";
+			};
+			"baseConfigurationReference" = "77342188C6E85BBD7921C307";
+		};
+		"8C147C9C84E7C26FA582DBF6" = {
+			"isa" = "XCConfigurationList";
+			"buildConfigurations" = (
+				"4721595D349FAE9514DA6BB7",
+				"5BB9B7E5730E73BF5B488ABC",
+			);
+			"defaultConfigurationIsVisible" = 0;
+			"defaultConfigurationName" = "Release";
+		};
+		"C49CA47F7D7E6B7DF22353FF" = {
+			"isa" = "PBXNativeTarget";
+			"name" = "AlphaSyncUniversal";
+			"productName" = "AlphaSync";
+			"productReference" = "064CF45A2345987DF9B39194";
+			"productType" = "com.apple.product-type.application";
+			"buildConfigurationList" = "8C147C9C84E7C26FA582DBF6";
+			"buildPhases" = (
+				"905969D1CED5BCD5FB85D066",
+				"215BE9785FC2CDEF55B43C1C",
+				"9B6069B8C2AE1A783F717082",
+				"AD5D24B91688A1FA206665BD",
+				"26138C7EC98FA5F1B48F4E1D",
+				"F1515EE1D193AD95AF666D29",
+			);
+			"buildRules" = (
+			);
+			"dependencies" = (
+				"DDBC44DAEBC90E772496F30C",
+			);
+			"packageProductDependencies" = (
+				"493F3F324DB43D21BD110F72",
+			);
+		};
+		"7EC16B594FCF40E39D972ED2" = {
+			"isa" = "PBXFileReference";
+			"path" = "Build/AppleSilicon.xcconfig";
+			"lastKnownFileType" = "text.xcconfig";
+			"sourceTree" = "<group>";
+		};
+		"7483D6206D16BF612AF4DA47" = {
+			"isa" = "PBXFileReference";
+			"explicitFileType" = "wrapper.application";
+			"path" = "AlphaSync.app";
+			"sourceTree" = "BUILT_PRODUCTS_DIR";
+		};
+		"C81628141A4B25B4CF66B6F8" = {
+			"isa" = "PBXFileReference";
+			"explicitFileType" = "wrapper.application";
+			"path" = "AlphaSyncLauncher.app";
+			"sourceTree" = "BUILT_PRODUCTS_DIR";
+		};
+		"6675EB63CF60D45D3F80BF19" = {
+			"isa" = "XCSwiftPackageProductDependency";
+			"package" = "D354C7E8230FE6AD5A9D443A";
+			"productName" = "AlphaSyncHardware";
+		};
+		"8C374A9340F928C171F0B66E" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "9B291E50F1C419CD61C90B07";
+		};
+		"DAAECE35933BBBCF2952C186" = {
+			"isa" = "PBXSourcesBuildPhase";
+			"buildActionMask" = 2147483647;
+			"files" = (
+				"8C374A9340F928C171F0B66E",
+			);
+			"runOnlyForDeploymentPostprocessing" = 0;
+		};
+		"7E04EBB43E72C341D9A38032" = {
+			"isa" = "PBXBuildFile";
+			"productRef" = "6675EB63CF60D45D3F80BF19";
+		};
+		"DE91BF76A87DEFE5BD42E2B6" = {
+			"isa" = "PBXFrameworksBuildPhase";
+			"buildActionMask" = 2147483647;
+			"files" = (
+				"7E04EBB43E72C341D9A38032",
+			);
+			"runOnlyForDeploymentPostprocessing" = 0;
+		};
+		"F41F573B1AF6BD7B29E74E6F" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "13B5637121AD624888447927";
+		};
+		"E8A99654E8D48EB543150536" = {
+			"isa" = "PBXResourcesBuildPhase";
+			"buildActionMask" = 2147483647;
+			"files" = (
+				"F41F573B1AF6BD7B29E74E6F",
+			);
+			"runOnlyForDeploymentPostprocessing" = 0;
+		};
+		"F8BDCDB2D58CA76973A9C7F8" = {
+			"isa" = "XCBuildConfiguration";
+			"name" = "Debug";
+			"buildSettings" = {
+				"PRODUCT_NAME" = "AlphaSyncLauncher";
+				"PRODUCT_BUNDLE_IDENTIFIER" = "com.tsoniq.AlphaSyncLauncher";
+				"GENERATE_INFOPLIST_FILE" = "NO";
+				"INFOPLIST_FILE" = "AlphaSyncLauncher-Info.plist";
+				"CONFIGURATION_BUILD_DIR" = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/$(AS_BUILD_PROFILE)";
+				"SKIP_INSTALL" = "YES";
+				"COMBINE_HIDPI_IMAGES" = "YES";
+			};
+			"baseConfigurationReference" = "7EC16B594FCF40E39D972ED2";
+		};
+		"3D46CE36012888F88D0718A8" = {
+			"isa" = "XCBuildConfiguration";
+			"name" = "Release";
+			"buildSettings" = {
+				"PRODUCT_NAME" = "AlphaSyncLauncher";
+				"PRODUCT_BUNDLE_IDENTIFIER" = "com.tsoniq.AlphaSyncLauncher";
+				"GENERATE_INFOPLIST_FILE" = "NO";
+				"INFOPLIST_FILE" = "AlphaSyncLauncher-Info.plist";
+				"CONFIGURATION_BUILD_DIR" = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/$(AS_BUILD_PROFILE)";
+				"SKIP_INSTALL" = "YES";
+				"COMBINE_HIDPI_IMAGES" = "YES";
+			};
+			"baseConfigurationReference" = "7EC16B594FCF40E39D972ED2";
+		};
+		"6F5FD928A5ABD1E398D501D7" = {
+			"isa" = "XCConfigurationList";
+			"buildConfigurations" = (
+				"F8BDCDB2D58CA76973A9C7F8",
+				"3D46CE36012888F88D0718A8",
+			);
+			"defaultConfigurationIsVisible" = 0;
+			"defaultConfigurationName" = "Release";
+		};
+		"B4FD74D83B429BD2DF4665BE" = {
+			"isa" = "PBXNativeTarget";
+			"name" = "AlphaSyncAppleSiliconLauncher";
+			"productName" = "AlphaSyncLauncher";
+			"productReference" = "C81628141A4B25B4CF66B6F8";
+			"productType" = "com.apple.product-type.application";
+			"buildConfigurationList" = "6F5FD928A5ABD1E398D501D7";
+			"buildPhases" = (
+				"DAAECE35933BBBCF2952C186",
+				"DE91BF76A87DEFE5BD42E2B6",
+				"E8A99654E8D48EB543150536",
+			);
+			"buildRules" = (
+			);
+			"dependencies" = (
+			);
+			"packageProductDependencies" = (
+				"6675EB63CF60D45D3F80BF19",
+			);
+		};
+		"F6BC8DFC25033C9EED4BE886" = {
+			"isa" = "XCSwiftPackageProductDependency";
+			"package" = "D354C7E8230FE6AD5A9D443A";
+			"productName" = "AlphaSyncUI";
+		};
+		"58A57933A6EB27F10DD2E599" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "C0AD73F7F475418886CB42A0";
+		};
+		"58BCAA21E82F78AEDE8AE32A" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "725B98672F241AD1E888B241";
+		};
+		"CF0606400EF934D580458400" = {
+			"isa" = "PBXSourcesBuildPhase";
+			"buildActionMask" = 2147483647;
+			"files" = (
+				"58A57933A6EB27F10DD2E599",
+				"58BCAA21E82F78AEDE8AE32A",
+			);
+			"runOnlyForDeploymentPostprocessing" = 0;
+		};
+		"6BBA81CDB9501E65E3798ACF" = {
+			"isa" = "PBXBuildFile";
+			"productRef" = "F6BC8DFC25033C9EED4BE886";
+		};
+		"DF073345FF89000ACB8EDB82" = {
+			"isa" = "PBXFrameworksBuildPhase";
+			"buildActionMask" = 2147483647;
+			"files" = (
+				"6BBA81CDB9501E65E3798ACF",
+			);
+			"runOnlyForDeploymentPostprocessing" = 0;
+		};
+		"2287ED443ED2F331909DA16D" = {
+			"isa" = "PBXShellScriptBuildPhase";
+			"buildActionMask" = 2147483647;
+			"files" = (
+			);
+			"runOnlyForDeploymentPostprocessing" = 0;
+			"name" = "Build app icon";
+			"shellPath" = "/bin/bash";
+			"shellScript" = "bash \"$SRCROOT/../scripts/build-app-icon.sh\"\n";
+			"inputPaths" = (
+				"$(SRCROOT)/../scripts/build-app-icon.sh",
+				"$(SRCROOT)/application.iconset",
+				"$(SRCROOT)/Graphics/application-modern.png",
+			);
+			"outputPaths" = (
+				"$(DERIVED_FILE_DIR)/AppIconBuild",
+				"$(DERIVED_FILE_DIR)/$(AS_APP_ICON_NAME).icns",
+			);
+		};
+		"B8CA0883D6657F5E0A299C1D" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "18FF38AFD06F0F1A4BEF911C";
+		};
+		"EF3BE9A1140FD9C0585FAA5C" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "773809ADDEEDE8F1D440BF3E";
+		};
+		"B21483A369D8603C9F75E6C6" = {
+			"isa" = "PBXResourcesBuildPhase";
+			"buildActionMask" = 2147483647;
+			"files" = (
+				"B8CA0883D6657F5E0A299C1D",
+				"EF3BE9A1140FD9C0585FAA5C",
+			);
+			"runOnlyForDeploymentPostprocessing" = 0;
+		};
+		"C3CEF6CE634CFE7309457429" = {
+			"isa" = "PBXShellScriptBuildPhase";
+			"buildActionMask" = 2147483647;
+			"files" = (
+			);
+			"runOnlyForDeploymentPostprocessing" = 0;
+			"name" = "Build offline Help";
+			"alwaysOutOfDate" = 1;
+			"shellPath" = "/bin/bash";
+			"shellScript" = "bash \"$SRCROOT/../scripts/build-help.sh\"\n";
+			"inputPaths" = (
+				"$(SRCROOT)/../scripts/build-help.sh",
+				"$(SRCROOT)/../LICENSE",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/AlphaSync Help/alphasync-help.html",
+			);
+			"outputPaths" = (
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/AlphaSync Help/licence.html",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/AlphaSync Help/AlphaSync Help.helpindex",
+			);
+		};
+		"C76A23A96C8DBDF815BBA7D2" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "C81628141A4B25B4CF66B6F8";
+			"settings" = {
+				"ATTRIBUTES" = (
+					"CodeSignOnCopy",
 				);
-				PRODUCT_NAME = AlphaSyncLauncher;
-                PRODUCT_BUNDLE_IDENTIFIER = com.tsoniq.AlphaSyncLauncher;
-				WRAPPER_EXTENSION = app;
 			};
-			name = DebugModern;
 		};
-		A95EFA670F17C94B00E1BDA9 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				STRIP_STYLE = all;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEPLOYMENT_POSTPROCESSING = YES;
-				STRIP_INSTALLED_PRODUCT = YES;
-				DEAD_CODE_STRIPPING = YES;
-				COPY_PHASE_STRIP = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_PRECOMPILE_PREFIX_HEADER = NO;
-				GCC_PREFIX_HEADER = "";
-				INFOPLIST_FILE = "AlphaSyncLauncher-Info.plist";
-				INSTALL_PATH = "$(HOME)/Applications";
-				SKIP_INSTALL = YES;
-				OTHER_LDFLAGS = (
-					"-framework",
-					Foundation,
-				);
-				PRODUCT_NAME = AlphaSyncLauncher;
-                PRODUCT_BUNDLE_IDENTIFIER = com.tsoniq.AlphaSyncLauncher;
-				WRAPPER_EXTENSION = app;
-			};
-			name = Release;
-		};
-		CFC69FB6F95A37EDCE82DC4C /* ReleaseModern */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				STRIP_STYLE = all;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEPLOYMENT_POSTPROCESSING = YES;
-				STRIP_INSTALLED_PRODUCT = YES;
-				DEAD_CODE_STRIPPING = YES;
-				COPY_PHASE_STRIP = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_PRECOMPILE_PREFIX_HEADER = NO;
-				GCC_PREFIX_HEADER = "";
-				INFOPLIST_FILE = "AlphaSyncLauncher-Info.plist";
-				INSTALL_PATH = "$(HOME)/Applications";
-				SKIP_INSTALL = YES;
-				OTHER_LDFLAGS = (
-					"-framework",
-					Foundation,
-				);
-				PRODUCT_NAME = AlphaSyncLauncher;
-                PRODUCT_BUNDLE_IDENTIFIER = com.tsoniq.AlphaSyncLauncher;
-				WRAPPER_EXTENSION = app;
-			};
-			name = ReleaseModern;
-		};
-		C01FCF4B08A954540054247B /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				INFOPLIST_FILE = Info.plist;
-				INSTALL_PATH = /Applications;
-				PRODUCT_NAME = AlphaSync;
-                PRODUCT_BUNDLE_IDENTIFIER = com.tsoniq.AlphaSync;
-				WRAPPER_EXTENSION = app;
-			};
-			name = Debug;
-		};
-		598116EA568D317BFB6F255F /* DebugModern */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				INFOPLIST_FILE = Info.plist;
-				INSTALL_PATH = /Applications;
-				PRODUCT_NAME = AlphaSync;
-                PRODUCT_BUNDLE_IDENTIFIER = com.tsoniq.AlphaSync;
-				WRAPPER_EXTENSION = app;
-			};
-			name = DebugModern;
-		};
-		C01FCF4C08A954540054247B /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				STRIP_STYLE = all;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEPLOYMENT_POSTPROCESSING = YES;
-				STRIP_INSTALLED_PRODUCT = YES;
-				DEAD_CODE_STRIPPING = YES;
-				COPY_PHASE_STRIP = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				INFOPLIST_FILE = Info.plist;
-				INSTALL_PATH = /Applications;
-				PRODUCT_NAME = AlphaSync;
-                PRODUCT_BUNDLE_IDENTIFIER = com.tsoniq.AlphaSync;
-				WRAPPER_EXTENSION = app;
-			};
-			name = Release;
-		};
-		7DDC292532B0C41B09752808 /* ReleaseModern */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				STRIP_STYLE = all;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEPLOYMENT_POSTPROCESSING = YES;
-				STRIP_INSTALLED_PRODUCT = YES;
-				DEAD_CODE_STRIPPING = YES;
-				COPY_PHASE_STRIP = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				INFOPLIST_FILE = Info.plist;
-				INSTALL_PATH = /Applications;
-				PRODUCT_NAME = AlphaSync;
-                PRODUCT_BUNDLE_IDENTIFIER = com.tsoniq.AlphaSync;
-				WRAPPER_EXTENSION = app;
-			};
-			name = ReleaseModern;
-		};
-		C01FCF4F08A954540054247B /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = E7E3978206CD4AB3E5F1B4CD /* Universal.xcconfig */;
-			buildSettings = {
-				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = YES;
-                CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-                GCC_TREAT_WARNINGS_AS_ERRORS = YES;
-				ALWAYS_SEARCH_USER_PATHS = NO;
-                CLANG_CXX_LANGUAGE_STANDARD = "c++17";
-				CLANG_CXX_LIBRARY = "libc++";
-				CODE_SIGN_IDENTITY = "-";
-				CODE_SIGN_STYLE = Manual;
-				ENABLE_HARDENED_RUNTIME = YES;
-				HEADER_SEARCH_PATHS = ("$(SRCROOT)/Application", "$(SRCROOT)/Driver", "$(SRCROOT)/Library", "$(SRCROOT)/Launcher");
-				ONLY_ACTIVE_ARCH = NO;
-				SDKROOT = macosx;
-				COPY_PHASE_STRIP = NO;
-				DEAD_CODE_STRIPPING = NO;
-				GCC_C_LANGUAGE_STANDARD = c99;
-				GCC_ENABLE_CPP_EXCEPTIONS = YES;
-				GCC_ENABLE_CPP_RTTI = YES;
-				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
-				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
-				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = YES;
-				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = YES;
-				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
-				GCC_WARN_MISSING_PARENTHESES = YES;
-				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
-				GCC_WARN_SHADOW = YES;
-				GCC_WARN_SIGN_COMPARE = YES;
-				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_LABEL = YES;
-				GCC_WARN_UNUSED_PARAMETER = YES;
-				GCC_WARN_UNUSED_VALUE = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				STRIP_INSTALLED_PRODUCT = NO;
-			};
-			name = Debug;
-		};
-		69ABDEB41C6F25F95AAB5C43 /* DebugModern */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = D7B4C96AC8AF0BF3C8619F8B /* Modern.xcconfig */;
-			buildSettings = {
-				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = YES;
-                CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-                GCC_TREAT_WARNINGS_AS_ERRORS = YES;
-				ALWAYS_SEARCH_USER_PATHS = NO;
-                CLANG_CXX_LANGUAGE_STANDARD = "c++17";
-				CLANG_CXX_LIBRARY = "libc++";
-				CODE_SIGN_IDENTITY = "-";
-				CODE_SIGN_STYLE = Manual;
-				ENABLE_HARDENED_RUNTIME = YES;
-				HEADER_SEARCH_PATHS = ("$(SRCROOT)/Application", "$(SRCROOT)/Driver", "$(SRCROOT)/Library", "$(SRCROOT)/Launcher");
-				ONLY_ACTIVE_ARCH = NO;
-				SDKROOT = macosx;
-				COPY_PHASE_STRIP = NO;
-				DEAD_CODE_STRIPPING = NO;
-				GCC_C_LANGUAGE_STANDARD = c99;
-				GCC_ENABLE_CPP_EXCEPTIONS = YES;
-				GCC_ENABLE_CPP_RTTI = YES;
-				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
-				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
-				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = YES;
-				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = YES;
-				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
-				GCC_WARN_MISSING_PARENTHESES = YES;
-				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
-				GCC_WARN_SHADOW = YES;
-				GCC_WARN_SIGN_COMPARE = YES;
-				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_LABEL = YES;
-				GCC_WARN_UNUSED_PARAMETER = YES;
-				GCC_WARN_UNUSED_VALUE = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				STRIP_INSTALLED_PRODUCT = NO;
-			};
-			name = DebugModern;
-		};
-		C01FCF5008A954540054247B /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = E7E3978206CD4AB3E5F1B4CD /* Universal.xcconfig */;
-			buildSettings = {
-				STRIP_STYLE = all;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEPLOYMENT_POSTPROCESSING = YES;
-				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = YES;
-                CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-                GCC_TREAT_WARNINGS_AS_ERRORS = YES;
-				ALWAYS_SEARCH_USER_PATHS = NO;
-                CLANG_CXX_LANGUAGE_STANDARD = "c++17";
-				CLANG_CXX_LIBRARY = "libc++";
-				CODE_SIGN_IDENTITY = "-";
-				CODE_SIGN_STYLE = Manual;
-				ENABLE_HARDENED_RUNTIME = YES;
-				HEADER_SEARCH_PATHS = ("$(SRCROOT)/Application", "$(SRCROOT)/Driver", "$(SRCROOT)/Library", "$(SRCROOT)/Launcher");
-				ONLY_ACTIVE_ARCH = NO;
-				SDKROOT = macosx;
-				COPY_PHASE_STRIP = YES;
-				DEAD_CODE_STRIPPING = YES;
-				GCC_C_LANGUAGE_STANDARD = c99;
-				GCC_ENABLE_CPP_EXCEPTIONS = YES;
-				GCC_ENABLE_CPP_RTTI = YES;
-				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
-				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
-				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = YES;
-				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = YES;
-				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
-				GCC_WARN_MISSING_PARENTHESES = YES;
-				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
-				GCC_WARN_SHADOW = YES;
-				GCC_WARN_SIGN_COMPARE = YES;
-				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_LABEL = YES;
-				GCC_WARN_UNUSED_PARAMETER = YES;
-				GCC_WARN_UNUSED_VALUE = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				STRIP_INSTALLED_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		2F3D6C59DF1B2C486366EDA9 /* ReleaseModern */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = D7B4C96AC8AF0BF3C8619F8B /* Modern.xcconfig */;
-			buildSettings = {
-				STRIP_STYLE = all;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEPLOYMENT_POSTPROCESSING = YES;
-				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = YES;
-                CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-                GCC_TREAT_WARNINGS_AS_ERRORS = YES;
-				ALWAYS_SEARCH_USER_PATHS = NO;
-                CLANG_CXX_LANGUAGE_STANDARD = "c++17";
-				CLANG_CXX_LIBRARY = "libc++";
-				CODE_SIGN_IDENTITY = "-";
-				CODE_SIGN_STYLE = Manual;
-				ENABLE_HARDENED_RUNTIME = YES;
-				HEADER_SEARCH_PATHS = ("$(SRCROOT)/Application", "$(SRCROOT)/Driver", "$(SRCROOT)/Library", "$(SRCROOT)/Launcher");
-				ONLY_ACTIVE_ARCH = NO;
-				SDKROOT = macosx;
-				COPY_PHASE_STRIP = YES;
-				DEAD_CODE_STRIPPING = YES;
-				GCC_C_LANGUAGE_STANDARD = c99;
-				GCC_ENABLE_CPP_EXCEPTIONS = YES;
-				GCC_ENABLE_CPP_RTTI = YES;
-				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
-				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
-				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = YES;
-				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = YES;
-				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
-				GCC_WARN_MISSING_PARENTHESES = YES;
-				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
-				GCC_WARN_SHADOW = YES;
-				GCC_WARN_SIGN_COMPARE = YES;
-				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_LABEL = YES;
-				GCC_WARN_UNUSED_PARAMETER = YES;
-				GCC_WARN_UNUSED_VALUE = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				STRIP_INSTALLED_PRODUCT = YES;
-			};
-			name = ReleaseModern;
-		};
-/* End XCBuildConfiguration section */
-
-/* Begin XCConfigurationList section */
-		4D96308E0F1D15B50018CDAA /* Build configuration list for PBXNativeTarget "AppletDump" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				4D96308B0F1D15A90018CDAA /* Debug */,
-				35FBBEF1C1503749C2209597 /* DebugModern */,
-				4D96308C0F1D15A90018CDAA /* Release */,
-				E864A82D283967F5B8F36856 /* ReleaseModern */,
+		"3D044FDFCB9A1B705D45D570" = {
+			"isa" = "PBXCopyFilesBuildPhase";
+			"buildActionMask" = 2147483647;
+			"files" = (
+				"C76A23A96C8DBDF815BBA7D2",
 			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			"runOnlyForDeploymentPostprocessing" = 0;
+			"name" = "Embed login helper";
+			"dstPath" = "Contents/Library/LoginItems";
+			"dstSubfolderSpec" = 1;
 		};
-		A95EFA650F17C94B00E1BDA9 /* Build configuration list for PBXNativeTarget "AlphaSyncLauncher" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				A95EFA660F17C94B00E1BDA9 /* Debug */,
-				B10B72ADBA960429622B8528 /* DebugModern */,
-				A95EFA670F17C94B00E1BDA9 /* Release */,
-				CFC69FB6F95A37EDCE82DC4C /* ReleaseModern */,
+		"59F26248DF99A4431F171546" = {
+			"isa" = "PBXContainerItemProxy";
+			"containerPortal" = "E043985085AFF51B46076447";
+			"proxyType" = 1;
+			"remoteGlobalIDString" = "B4FD74D83B429BD2DF4665BE";
+			"remoteInfo" = "AlphaSyncAppleSiliconLauncher";
+		};
+		"E8DC6D80FE32527C84EC0204" = {
+			"isa" = "PBXTargetDependency";
+			"target" = "B4FD74D83B429BD2DF4665BE";
+			"targetProxy" = "59F26248DF99A4431F171546";
+		};
+		"B4BF5B3AD0BA5DA18A69A55C" = {
+			"isa" = "XCBuildConfiguration";
+			"name" = "Debug";
+			"buildSettings" = {
+				"PRODUCT_NAME" = "AlphaSync";
+				"PRODUCT_BUNDLE_IDENTIFIER" = "com.tsoniq.AlphaSync";
+				"GENERATE_INFOPLIST_FILE" = "NO";
+				"INFOPLIST_FILE" = "Info.plist";
+				"CONFIGURATION_BUILD_DIR" = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/$(AS_BUILD_PROFILE)";
+				"SKIP_INSTALL" = "NO";
+				"COMBINE_HIDPI_IMAGES" = "YES";
+				"LD_RUNPATH_SEARCH_PATHS" = "$(inherited) @executable_path/../Frameworks";
+			};
+			"baseConfigurationReference" = "7EC16B594FCF40E39D972ED2";
+		};
+		"A307CDC856BB0F64E735E6F1" = {
+			"isa" = "XCBuildConfiguration";
+			"name" = "Release";
+			"buildSettings" = {
+				"PRODUCT_NAME" = "AlphaSync";
+				"PRODUCT_BUNDLE_IDENTIFIER" = "com.tsoniq.AlphaSync";
+				"GENERATE_INFOPLIST_FILE" = "NO";
+				"INFOPLIST_FILE" = "Info.plist";
+				"CONFIGURATION_BUILD_DIR" = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/$(AS_BUILD_PROFILE)";
+				"SKIP_INSTALL" = "NO";
+				"COMBINE_HIDPI_IMAGES" = "YES";
+				"LD_RUNPATH_SEARCH_PATHS" = "$(inherited) @executable_path/../Frameworks";
+			};
+			"baseConfigurationReference" = "7EC16B594FCF40E39D972ED2";
+		};
+		"020F92F45803BB8634E5BC88" = {
+			"isa" = "XCConfigurationList";
+			"buildConfigurations" = (
+				"B4BF5B3AD0BA5DA18A69A55C",
+				"A307CDC856BB0F64E735E6F1",
 			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			"defaultConfigurationIsVisible" = 0;
+			"defaultConfigurationName" = "Release";
 		};
-		C01FCF4A08A954540054247B /* Build configuration list for PBXNativeTarget "AlphaSync" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				C01FCF4B08A954540054247B /* Debug */,
-				598116EA568D317BFB6F255F /* DebugModern */,
-				C01FCF4C08A954540054247B /* Release */,
-				7DDC292532B0C41B09752808 /* ReleaseModern */,
+		"603E53865CE0C46FC058378D" = {
+			"isa" = "PBXNativeTarget";
+			"name" = "AlphaSyncAppleSilicon";
+			"productName" = "AlphaSync";
+			"productReference" = "7483D6206D16BF612AF4DA47";
+			"productType" = "com.apple.product-type.application";
+			"buildConfigurationList" = "020F92F45803BB8634E5BC88";
+			"buildPhases" = (
+				"CF0606400EF934D580458400",
+				"DF073345FF89000ACB8EDB82",
+				"2287ED443ED2F331909DA16D",
+				"B21483A369D8603C9F75E6C6",
+				"C3CEF6CE634CFE7309457429",
+				"3D044FDFCB9A1B705D45D570",
 			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		C01FCF4E08A954540054247B /* Build configuration list for PBXProject "AlphaSync" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				C01FCF4F08A954540054247B /* Debug */,
-				69ABDEB41C6F25F95AAB5C43 /* DebugModern */,
-				C01FCF5008A954540054247B /* Release */,
-				2F3D6C59DF1B2C486366EDA9 /* ReleaseModern */,
+			"buildRules" = (
 			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			"dependencies" = (
+				"E8DC6D80FE32527C84EC0204",
+			);
+			"packageProductDependencies" = (
+				"F6BC8DFC25033C9EED4BE886",
+			);
 		};
-/* End XCConfigurationList section */
+		"2BD9807CAAD133047923A898" = {
+			"isa" = "PBXGroup";
+			"name" = "Products";
+			"children" = (
+				"064CF45A2345987DF9B39194",
+				"267BACB7F0C9773C7BA6B0D1",
+				"7483D6206D16BF612AF4DA47",
+				"C81628141A4B25B4CF66B6F8",
+			);
+			"sourceTree" = "<group>";
+		};
+		"6B8530BF5270DF7DC538FC1F" = {
+			"isa" = "PBXGroup";
+			"children" = (
+				"C0AD73F7F475418886CB42A0",
+				"9B291E50F1C419CD61C90B07",
+				"725B98672F241AD1E888B241",
+				"5FACDCABF0A98F429D0C246C",
+				"18FF38AFD06F0F1A4BEF911C",
+				"773809ADDEEDE8F1D440BF3E",
+				"13B5637121AD624888447927",
+				"9A35A91C61B0408CE0E0B09B",
+				"77342188C6E85BBD7921C307",
+				"7EC16B594FCF40E39D972ED2",
+				"2BD9807CAAD133047923A898",
+			);
+			"sourceTree" = "<group>";
+		};
+		"99BE0FEFD14A0EF025AE5DA5" = {
+			"isa" = "XCBuildConfiguration";
+			"name" = "Debug";
+			"buildSettings" = {
+				"SWIFT_VERSION" = "6.0";
+				"MACOSX_DEPLOYMENT_TARGET" = "13.0";
+				"SDKROOT" = "macosx";
+				"ONLY_ACTIVE_ARCH" = "NO";
+				"CLANG_ENABLE_MODULES" = "YES";
+				"ENABLE_USER_SCRIPT_SANDBOXING" = "NO";
+				"SWIFT_STRICT_CONCURRENCY" = "complete";
+				"CODE_SIGN_STYLE" = "Manual";
+				"CODE_SIGN_IDENTITY" = "-";
+				"CODE_SIGN_INJECT_BASE_ENTITLEMENTS" = "NO";
+				"ENABLE_HARDENED_RUNTIME" = "YES";
+				"DEBUG_INFORMATION_FORMAT" = "dwarf-with-dsym";
+				"SWIFT_OPTIMIZATION_LEVEL" = "-Onone";
+				"SWIFT_COMPILATION_MODE" = "singlefile";
+				"SWIFT_ACTIVE_COMPILATION_CONDITIONS" = "$(inherited) DEBUG";
+			};
+		};
+		"2FB199BD01D8FBFECDAA4A35" = {
+			"isa" = "XCBuildConfiguration";
+			"name" = "Release";
+			"buildSettings" = {
+				"SWIFT_VERSION" = "6.0";
+				"MACOSX_DEPLOYMENT_TARGET" = "13.0";
+				"SDKROOT" = "macosx";
+				"ONLY_ACTIVE_ARCH" = "NO";
+				"CLANG_ENABLE_MODULES" = "YES";
+				"ENABLE_USER_SCRIPT_SANDBOXING" = "NO";
+				"SWIFT_STRICT_CONCURRENCY" = "complete";
+				"CODE_SIGN_STYLE" = "Manual";
+				"CODE_SIGN_IDENTITY" = "-";
+				"CODE_SIGN_INJECT_BASE_ENTITLEMENTS" = "NO";
+				"ENABLE_HARDENED_RUNTIME" = "YES";
+				"DEBUG_INFORMATION_FORMAT" = "dwarf-with-dsym";
+				"SWIFT_OPTIMIZATION_LEVEL" = "-O";
+				"SWIFT_COMPILATION_MODE" = "wholemodule";
+			};
+		};
+		"AC21F582B81D5CB9EB1CDB04" = {
+			"isa" = "XCConfigurationList";
+			"buildConfigurations" = (
+				"99BE0FEFD14A0EF025AE5DA5",
+				"2FB199BD01D8FBFECDAA4A35",
+			);
+			"defaultConfigurationIsVisible" = 0;
+			"defaultConfigurationName" = "Release";
+		};
+		"E043985085AFF51B46076447" = {
+			"isa" = "PBXProject";
+			"attributes" = {
+				"LastUpgradeCheck" = "1660";
+				"BuildIndependentTargetsInParallel" = "YES";
+			};
+			"buildConfigurationList" = "AC21F582B81D5CB9EB1CDB04";
+			"compatibilityVersion" = "Xcode 14.0";
+			"developmentRegion" = "en";
+			"hasScannedForEncodings" = 0;
+			"knownRegions" = (
+				"en",
+				"Base",
+			);
+			"mainGroup" = "6B8530BF5270DF7DC538FC1F";
+			"productRefGroup" = "2BD9807CAAD133047923A898";
+			"projectDirPath" = "";
+			"projectRoot" = "";
+			"targets" = (
+				"E8B239F2F50847286987A6CA",
+				"C49CA47F7D7E6B7DF22353FF",
+				"B4FD74D83B429BD2DF4665BE",
+				"603E53865CE0C46FC058378D",
+			);
+			"packageReferences" = (
+				"D354C7E8230FE6AD5A9D443A",
+			);
+		};
 	};
-	rootObject = 29B97313FDCFA39411CA2CEA /* Project object */;
+	"rootObject" = "E043985085AFF51B46076447";
 }

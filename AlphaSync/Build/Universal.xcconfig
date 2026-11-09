@@ -1,7 +1,8 @@
 #include "Version.xcconfig"
 
-// One app for Intel and Apple Silicon on macOS 11 and 12.
+// Standard app for Intel and Apple Silicon, using the same Swift source.
 ARCHS = x86_64 arm64
-MACOSX_DEPLOYMENT_TARGET = 11.0
-AS_COMPATIBILITY_DESCRIPTION = For macOS 11 and macOS 12
+MACOSX_DEPLOYMENT_TARGET = 13.0
+AS_BUILD_PROFILE = universal
+AS_COMPATIBILITY_DESCRIPTION = For macOS 13 and later
 AS_APP_ICON_NAME = application
