@@ -133,11 +133,11 @@ public struct InspectorView: View {
                 }
             }.formStyle(.grouped).textSelection(.enabled)
         }.frame(width: 400).frame(minHeight: 430, idealHeight: 560, maxHeight: 700)
-            .task(id: file?.id) {
+            .task(id: store.inspectorPreviewID) {
                 preview = nil; previewError = nil
-                guard let id = file?.id else { return }
+                guard let request = store.inspectorPreviewID else { return }
                 do {
-                    let text = try await store.readText(id)
+                    let text = try await store.readText(request.file)
                     if !Task.isCancelled { preview = String(text.prefix(2048)) }
                 } catch { if !Task.isCancelled { previewError = error.localizedDescription } }
             }

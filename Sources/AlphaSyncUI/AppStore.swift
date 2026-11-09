@@ -31,6 +31,11 @@ struct ImportTarget: Equatable, Sendable {
     let file: NeoFileID?
 }
 
+struct InspectorPreviewID: Hashable, Sendable {
+    let file: NeoFileID
+    let revision: UUID
+}
+
 @MainActor
 public final class AppStore: ObservableObject {
     @Published public var devices: [NeoSnapshot] = []
@@ -45,6 +50,7 @@ public final class AppStore: ObservableObject {
     @Published public var showImporter = false
     @Published public var showExportFolder = false
     @Published public private(set) var shuttingDown = false
+    @Published private var contentRevision = UUID()
     @Published private var activities = 0
     public let preferences: Preferences
     public let service: DeviceService
@@ -63,6 +69,10 @@ public final class AppStore: ObservableObject {
         }
     }
     public var selectedFiles: [NeoFile] { files.filter { selection.contains($0.id) } }
+    var inspectorPreviewID: InspectorPreviewID? {
+        guard selection.count == 1, let file = selectedFiles.first else { return nil }
+        return InspectorPreviewID(file: file.id, revision: contentRevision)
+    }
     public var clearTitle: String {
         if selection.count == 1 { return "Clear File…" }
         return selection.isEmpty ? "Clear All Files…" : "Clear Selected Files…"
@@ -129,6 +139,7 @@ public final class AppStore: ObservableObject {
     }
     private func replace(_ snapshot: NeoSnapshot) {
         if let index = devices.firstIndex(where: { $0.connection == snapshot.connection }) { devices[index] = snapshot }
+        contentRevision = UUID()
         reconcileSelection()
     }
     private func run(_ title: String, _ action: @MainActor () async throws -> Void) async {
@@ -151,6 +162,7 @@ public final class AppStore: ObservableObject {
             notice = AppNotice("The operation could not be completed", error.localizedDescription)
             if let result = try? await service.refresh() {
                 devices = result.devices
+                contentRevision = UUID()
                 connectionIssue = result.issue
                 reconcileSelection()
             }
@@ -159,7 +171,9 @@ public final class AppStore: ObservableObject {
     public func refresh() async {
         await run("Refreshing files…") {
             let result = try await service.refresh()
-            devices = result.devices; connectionIssue = result.issue; reconcileSelection()
+            devices = result.devices; connectionIssue = result.issue
+            contentRevision = UUID()
+            reconcileSelection()
         }
     }
     public func readText(_ id: NeoFileID) async throws -> String {

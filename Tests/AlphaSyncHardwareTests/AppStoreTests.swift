@@ -137,4 +137,52 @@ final class AppStoreTests: XCTestCase {
         XCTAssertEqual(store.pendingChange?.items.first?.file.id, original)
         await store.shutdown()
     }
+
+    func testReplacementInvalidatesPreviewWithTheSameFileIdentityAndSize() async throws {
+        let store = makeStore()
+        await store.refresh()
+        let file = store.files[0]
+        store.selection = [file.id]
+        let previous = try XCTUnwrap(store.inspectorPreviewID)
+        store.beginImport()
+        await store.finishImport(.success([try sourceFile()]))?.value
+        let change = try XCTUnwrap(store.pendingChange)
+        await store.confirm(change, saveRecovery: false)
+        let current = try XCTUnwrap(store.inspectorPreviewID)
+        XCTAssertEqual(current.file, previous.file)
+        XCTAssertEqual(store.selectedFiles.first?.size, file.size)
+        XCTAssertNotEqual(current, previous)
+        let text = try await store.readText(current.file)
+        XCTAssertEqual(text, "Replacement text")
+        await store.shutdown()
+    }
+
+    func testClearInvalidatesTheSelectedFilePreview() async throws {
+        let store = makeStore()
+        await store.refresh()
+        store.selection = [store.files[0].id]
+        let previous = try XCTUnwrap(store.inspectorPreviewID)
+        await store.requestClear()
+        let change = try XCTUnwrap(store.pendingChange)
+        await store.confirm(change, saveRecovery: false)
+        let current = try XCTUnwrap(store.inspectorPreviewID)
+        XCTAssertEqual(current.file, previous.file)
+        XCTAssertNotEqual(current, previous)
+        let text = try await store.readText(current.file)
+        XCTAssertEqual(text, "")
+        await store.shutdown()
+    }
+
+    func testExplicitRefreshInvalidatesPreviewWithoutChangingSelection() async throws {
+        let store = makeStore()
+        await store.refresh()
+        store.selection = [store.files[0].id]
+        let previous = try XCTUnwrap(store.inspectorPreviewID)
+        store.reconcileSelection()
+        XCTAssertEqual(store.inspectorPreviewID, previous)
+        await store.refresh()
+        XCTAssertEqual(store.inspectorPreviewID?.file, previous.file)
+        XCTAssertNotEqual(store.inspectorPreviewID, previous)
+        await store.shutdown()
+    }
 }
