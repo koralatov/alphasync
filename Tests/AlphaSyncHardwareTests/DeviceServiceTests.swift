@@ -151,4 +151,55 @@ final class DeviceServiceTests: XCTestCase {
         XCTAssertTrue(FileManager.default.fileExists(atPath: folder.appendingPathComponent("AlphaWord/File 1.txt").path))
         await service.shutdown()
     }
+
+    func testPartialExportRetainsSavedURLsAndTheUnderlyingFailure() async throws {
+        let service = makeService(SimulatedConfiguration(failingRead: 2), observations: SimulatedObservations())
+        let snapshot = try await device(service)
+        let files = try XCTUnwrap(snapshot.applets.first?.files)
+        let folder = try temporaryFolder()
+        defer { try? FileManager.default.removeItem(at: folder) }
+        do {
+            _ = try await service.export(files.map(\.id), to: folder)
+            XCTFail("The simulated export failure unexpectedly succeeded")
+        } catch {
+            let failure = try XCTUnwrap(error as? ExportFailure)
+            XCTAssertEqual(failure.completedFiles, 1)
+            XCTAssertEqual(failure.expectedFiles, 2)
+            XCTAssertEqual(failure.destination, folder)
+            XCTAssertEqual(failure.underlying as? NeoError, .device("Simulated read failure"))
+            let saved = try XCTUnwrap(failure.savedFiles.first)
+            XCTAssertEqual(try String(contentsOf: saved, encoding: .utf8), "Original 1")
+        }
+        await service.shutdown()
+    }
+
+    func testCancellationAfterAnExportKeepsItsCompletedFile() async throws {
+        let reachedSecond = expectation(description: "Second file read started")
+        let gate = DispatchSemaphore(value: 0)
+        defer { gate.signal() }
+        let configuration = SimulatedConfiguration(beforeRead: { index in
+            if index == 2 { reachedSecond.fulfill(); gate.wait() }
+        })
+        let service = makeService(configuration, observations: SimulatedObservations())
+        let snapshot = try await device(service)
+        let files = try XCTUnwrap(snapshot.applets.first?.files)
+        let folder = try temporaryFolder()
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let task = Task { try await service.export(files.map(\.id), to: folder) }
+        await fulfillment(of: [reachedSecond], timeout: 3)
+        task.cancel()
+        gate.signal()
+        do {
+            _ = try await task.value
+            XCTFail("The cancelled export unexpectedly succeeded")
+        } catch {
+            let failure = try XCTUnwrap(error as? ExportFailure)
+            XCTAssertTrue(failure.underlying is CancellationError)
+            XCTAssertEqual(failure.completedFiles, 1)
+            let saved = try XCTUnwrap(failure.savedFiles.first)
+            XCTAssertEqual(try String(contentsOf: saved, encoding: .utf8), "Original 1")
+            XCTAssertFalse(FileManager.default.fileExists(atPath: folder.appendingPathComponent("File 2.txt").path))
+        }
+        await service.shutdown()
+    }
 }

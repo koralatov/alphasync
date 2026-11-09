@@ -44,6 +44,7 @@ public final class AppStore: ObservableObject {
     @Published public var notice: AppNotice?
     @Published public var pendingChange: PreparedChange?
     @Published public var backupResult: BackupResult?
+    @Published public private(set) var lastExportedFiles: [URL] = []
     @Published public var operationText = ""
     @Published public var progress: Double?
     @Published public var connectionIssue: String?
@@ -302,13 +303,19 @@ public final class AppStore: ObservableObject {
     }
     private func exportFiles(_ ids: [NeoFileID], to folder: URL) async {
         await run("Saving files to your Mac…") {
+            lastExportedFiles = []
             guard ids.allSatisfy({ id in applet(for: id)?.files.contains { $0.id == id } == true }) else {
                 throw NeoError.disconnected
             }
             let scoped = folder.startAccessingSecurityScopedResource()
             defer { if scoped { folder.stopAccessingSecurityScopedResource() } }
-            let outputs = try await service.export(ids, to: folder)
-            notice = AppNotice("Files saved", "AlphaSync saved \(outputs.count.formatted()) files to:\n\(folder.path)\n\nThe original files on your Neo have not been changed.")
+            do {
+                lastExportedFiles = try await service.export(ids, to: folder)
+                notice = AppNotice("Files saved", "AlphaSync saved \(lastExportedFiles.count.formatted()) files to:\n\(folder.path)\n\nThe original files on your Neo have not been changed.")
+            } catch let failure as ExportFailure {
+                lastExportedFiles = failure.savedFiles
+                throw failure
+            }
         }
     }
     public func backup() async {

@@ -7,6 +7,7 @@ struct SimulatedConfiguration: Sendable {
     var failingRead: UInt8?
     var failingWriteNumber: Int?
     var failRefreshAfterWriting = false
+    var beforeRead: (@Sendable (UInt8) -> Void)?
 }
 
 /// Only observations cross executors.  Device data remains inside the simulated connection.
@@ -135,6 +136,8 @@ private final class SimulatedConnection: DeviceConnection {
     }
 
     func readFile(applet: UInt16, index: UInt8, checkingCancellation: () throws -> Void) throws -> Data {
+        try checkingCancellation()
+        configuration.beforeRead?(index)
         try checkingCancellation()
         if configuration.failingRead == index { throw NeoError.device("Simulated read failure") }
         guard let bytes = contents[index] else { throw NeoError.disconnected }

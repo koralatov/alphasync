@@ -185,4 +185,20 @@ final class AppStoreTests: XCTestCase {
         XCTAssertNotEqual(store.inspectorPreviewID, previous)
         await store.shutdown()
     }
+
+    func testPartialExportReportsAndRetainsTheSavedFiles() async throws {
+        let store = makeStore(SimulatedConfiguration(failingRead: 2))
+        await store.refresh()
+        store.beginExport()
+        let folder = try temporaryFolder()
+        await store.finishExport(.success(folder))?.value
+        XCTAssertEqual(store.lastExportedFiles.count, 1)
+        let saved = try XCTUnwrap(store.lastExportedFiles.first)
+        XCTAssertEqual(try String(contentsOf: saved, encoding: .utf8), "Original 1")
+        let message = try XCTUnwrap(store.notice?.message)
+        XCTAssertTrue(message.contains("1 of 2 files"))
+        XCTAssertTrue(message.contains(folder.path))
+        XCTAssertTrue(message.contains("The saved files have been kept."))
+        await store.shutdown()
+    }
 }
