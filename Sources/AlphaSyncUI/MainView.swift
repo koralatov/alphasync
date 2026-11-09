@@ -111,11 +111,13 @@ public struct MainView: View {
             }
             .contextMenu(forSelectionType: NeoFileID.self) { ids in
                 Button("Open Read-only") { openReaders(ids) }.disabled(ids.isEmpty)
-                Button("Save to Mac…") { store.showExportFolder = true }.disabled(ids.isEmpty || store.busy)
+                Button("Save to Mac…") { store.selection = ids; store.showExportFolder = true }.disabled(ids.isEmpty || store.busy)
                 Button("Rename…") { renaming = store.files.first { ids.contains($0.id) } }
                     .disabled(ids.count != 1 || store.busy || !ids.allSatisfy { store.applet(for: $0)?.canWrite == true })
                 Divider()
-                Button(store.clearTitle, role: .destructive) { Task { await store.requestClear() } }.disabled(!store.canClear)
+                Button(ids.count == 1 ? "Clear File…" : "Clear Selected Files…", role: .destructive) {
+                    store.selection = ids; Task { await store.requestClear() }
+                }.disabled(store.busy || ids.isEmpty || Set(ids.map(\.applet)).count != 1 || !ids.allSatisfy { store.applet(for: $0)?.canWrite == true })
             } primaryAction: { ids in openReaders(ids) }
             .dropDestination(for: URL.self) { urls, _ in
                 guard store.canImport, !urls.isEmpty else { return false }
@@ -152,7 +154,7 @@ public enum FileSize {
         formatter.allowsNonnumericFormatting = false
         return formatter.string(fromByteCount: Int64(value))
     }
-    public static func exact(_ value: Int) -> String { "\(value.formatted()) bytes" }
+    public static func exact(_ value: Int) -> String { "\(value.formatted()) " + (value == 1 ? "byte" : "bytes") }
 }
 
 private struct FileDrag: Transferable, Sendable {

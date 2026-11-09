@@ -122,14 +122,16 @@ extension DeviceService {
             let limits = try engine.fileLimits(applet: appletID)
             let converted = try FileCodec.converted(TextFiles.read(source), applet: appletID, limits: limits)
             _ = try engine.createFile(converted, name: source.deletingPathExtension().lastPathComponent, applet: appletID)
-            return try access.update(connection)
+            do { return try access.update(connection) }
+            catch { throw NeoError.device("The file was added and verified, but the updated file list could not be read. Reconnect your Neo to check it. \(error.localizedDescription)") }
         }
     }
 
     public func rename(_ file: NeoFileID, to name: String) async throws -> NeoSnapshot {
         try await perform { access in
             try access.engine(for: file.connection).rename(applet: file.applet, index: file.index, to: name)
-            return try access.update(file.connection)
+            do { return try access.update(file.connection) }
+            catch { throw NeoError.device("The file was renamed and verified, but the updated file list could not be read. Reconnect your Neo to check it. \(error.localizedDescription)") }
         }
     }
 

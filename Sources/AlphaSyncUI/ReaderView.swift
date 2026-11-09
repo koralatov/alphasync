@@ -77,6 +77,9 @@ public struct ReadOnlyText: NSViewRepresentable {
         view.isEditable = false; view.isSelectable = true; view.isRichText = false
         view.usesFindBar = true; view.isIncrementalSearchingEnabled = true
         view.isHorizontallyResizable = false; view.isVerticallyResizable = true
+        view.minSize = .zero
+        view.maxSize = NSSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
+        view.textContainer?.containerSize = NSSize(width: 0, height: CGFloat.greatestFiniteMagnitude)
         view.autoresizingMask = [.width]
         view.textContainer?.widthTracksTextView = true
         view.textContainerInset = NSSize(width: 12, height: 12)
@@ -90,7 +93,8 @@ public struct ReadOnlyText: NSViewRepresentable {
         let ranges = view.selectedRanges, origin = scroll.contentView.bounds.origin
         if view.string != text { view.string = text }
         view.font = monospaced ? .monospacedSystemFont(ofSize: NSFont.systemFontSize, weight: .regular) : .systemFont(ofSize: NSFont.systemFontSize)
-        view.selectedRanges = ranges.filter { NSMaxRange($0.rangeValue) <= (text as NSString).length }
+        let valid = ranges.filter { NSMaxRange($0.rangeValue) <= (text as NSString).length }
+        view.selectedRanges = valid.isEmpty ? [NSValue(range: NSRange(location: 0, length: 0))] : valid
         scroll.contentView.scroll(to: origin)
         scroll.reflectScrolledClipView(scroll.contentView)
     }

@@ -56,7 +56,14 @@ struct InterfaceChecks {
         }
         return NeoSnapshot(connection: id, registryID: 1, systemVersion: "3.6", availableRAM: 378_880, availableROM: 1_048_576, applets: [applet])
     }
-    static func main() throws {
+    static func main() {
+        do { try run() }
+        catch {
+            FileHandle.standardError.write(Data("Interface check failed: \(error)\n".utf8))
+            exit(EXIT_FAILURE)
+        }
+    }
+    static func run() throws {
         let app = NSApplication.shared
         app.setActivationPolicy(.regular); app.finishLaunching(); app.activate(ignoringOtherApps: true)
         let output = URL(fileURLWithPath: CommandLine.arguments.dropFirst().first ?? "build/interface-checks", isDirectory: true)
@@ -67,6 +74,12 @@ struct InterfaceChecks {
         let preferences = Preferences(defaults: defaults)
         let store = AppStore(preferences: preferences, monitoringEnabled: false)
         let snapshot = try sample()
+        store.devices = [snapshot]; store.sidebar = .device(snapshot.connection)
+        store.selection = [snapshot.applets[0].files[0].id]
+        try require(store.canImport && store.importApplet?.id == NeoApplet.alphaWord, "A selected file must retain its applet as an import destination")
+        store.sidebar = .applet(snapshot.connection, 0x9999); store.reconcileSelection()
+        try require(store.chosenApplet?.id == NeoApplet.alphaWord, "An absent applet must not leave a stale selection")
+        try require(FileSize.exact(1) == "1 byte", "A single byte must have singular wording")
         for (label, appearance) in [("light", NSAppearance.Name.aqua), ("dark", .darkAqua)] {
             app.appearance = NSAppearance(named: appearance)
             store.devices = []; store.sidebar = nil; store.selection = []

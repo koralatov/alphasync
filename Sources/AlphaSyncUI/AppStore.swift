@@ -44,7 +44,7 @@ public final class AppStore: ObservableObject {
     public let preferences: Preferences
     public let service: DeviceService
     public let temporaryExports = FileManager.default.temporaryDirectory.appendingPathComponent("AlphaSync-Exports-" + UUID().uuidString, isDirectory: true)
-    public var busy: Bool { activities > 0 || shuttingDown }
+    public var busy: Bool { activities > 0 || shuttingDown || pendingChange != nil }
     public var connected: Bool { !devices.isEmpty }
     public var chosenDevice: NeoSnapshot? { devices.first { $0.connection == sidebar?.connection } ?? devices.first }
     public var chosenApplet: NeoApplet? {
@@ -66,7 +66,11 @@ public final class AppStore: ObservableObject {
         !busy && (selection.isEmpty ? (chosenApplet?.canWrite == true && !(chosenApplet?.files.isEmpty ?? true)) :
                   selectedFiles.count == selection.count && selectedFiles.allSatisfy { applet(for: $0.id)?.canWrite == true })
     }
-    public var canImport: Bool { !busy && chosenApplet?.canWrite == true }
+    public var importApplet: NeoApplet? {
+        if selection.count == 1, let file = selectedFiles.first { return applet(for: file.id) }
+        return selection.isEmpty ? chosenApplet : nil
+    }
+    public var canImport: Bool { !busy && importApplet?.canWrite == true }
     public var stopRequest: StopRequest?
     private var monitor: Task<Void, Never>?
     private var epoch = 0
@@ -99,7 +103,14 @@ public final class AppStore: ObservableObject {
         }
     }
     public func reconcileSelection() {
-        if let sidebar, !devices.contains(where: { $0.connection == sidebar.connection }) { self.sidebar = nil }
+        if let sidebar {
+            if let device = devices.first(where: { $0.connection == sidebar.connection }) {
+                if case .applet(_, let id) = sidebar,
+                   !device.applets.contains(where: { $0.id == id && (preferences.filter.appletIDs?.contains(id) ?? true) }) {
+                    self.sidebar = nil
+                }
+            } else { self.sidebar = nil }
+        }
         if sidebar == nil, let device = devices.first {
             if let applet = device.applets.first(where: { preferences.filter.appletIDs?.contains($0.id) ?? true }) {
                 sidebar = .applet(device.connection, applet.id)
@@ -136,22 +147,33 @@ public final class AppStore: ObservableObject {
         return try FileCodec.text(bytes, applet: applet)
     }
     public func importFiles(_ urls: [URL]) async {
-        guard let applet = chosenApplet, applet.canWrite, let device = chosenDevice else { return }
+        guard let applet = importApplet, applet.canWrite, let device = chosenDevice else {
+            notice = AppNotice("Choose an applet", "Choose AlphaWord or the user dictionary to add a text file, or select one of its files to replace it.")
+            return
+        }
+        // Keep the destination fixed while an async import is running, even if the selection changes.
+        let target = selectedFiles.first
+        let replacing = !selection.isEmpty
         await run("Reading the text file…") {
-            guard urls.count == 1 || selection.isEmpty else {
+            guard !replacing || urls.count == 1 else {
                 throw NeoError.device("Choose one text file when replacing a selected Neo file.")
             }
-            for url in urls {
-                let scoped = url.startAccessingSecurityScopedResource()
-                defer { if scoped { url.stopAccessingSecurityScopedResource() } }
-                if selection.count == 1, let file = selectedFiles.first {
-                    pendingChange = try await service.prepareReplacement(file: file.id, from: url)
-                } else if selection.count > 1 {
-                    throw NeoError.device("Select one file to replace, or clear the selection to add a new file.")
-                } else {
-                    let value = try await service.create(connection: device.connection, appletID: applet.id, from: url)
-                    replace(value)
+            var created = 0
+            do {
+                for url in urls {
+                    let scoped = url.startAccessingSecurityScopedResource()
+                    defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+                    if let target {
+                        pendingChange = try await service.prepareReplacement(file: target.id, from: url)
+                    } else {
+                        let value = try await service.create(connection: device.connection, appletID: applet.id, from: url)
+                        created += 1; replace(value)
+                    }
                 }
+            } catch {
+                guard created > 0 else { throw error }
+                let reason = error.localizedDescription.replacingOccurrences(of: " No device files were changed.", with: "")
+                throw NeoError.device("\(created.formatted()) files were added before the import stopped. \(reason)")
             }
         }
     }

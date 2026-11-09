@@ -22,8 +22,10 @@ public struct DestructiveConfirmation: View {
             Label(title, systemImage: "exclamationmark.triangle").font(.headline)
             Text(explanation).fixedSize(horizontal: false, vertical: true)
             if names.count > 1 {
-                Text(names.joined(separator: ", ")).foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
+                ScrollView {
+                    Text(names.joined(separator: ", ")).foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }.frame(maxHeight: 140)
             }
             Toggle("Save a recovery copy first", isOn: $saveRecovery)
             HStack {
