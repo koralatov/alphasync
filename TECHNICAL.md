@@ -2,35 +2,23 @@
 
 Build, test, and implementation details for developers and advanced users. For installation and everyday use, see the [README](README.md).
 
-## Supported builds
+## Legacy release
 
-Each release provides two downloads built from the same source and version:
+**AlphaSync 1.5.1, build 147** is the final supported release for **macOS 11 and 12**, on Intel and Apple Silicon. It produces one Universal app and its matching bundled launcher. There is no macOS 13–26 or macOS 27 app download in this release.
 
-| Download | Supported macOS | Processors |
-|---|---|---|
-| Universal | 11 through 26 | Intel and Apple Silicon |
-| Modern | 27 and later | Apple Silicon |
+The public [v1.5.1 release](https://github.com/koralatov/alphasync/releases/tag/v1.5.1) retains the app ZIP, its SHA-256 checksum and build report, and a separate matching crash-symbol ZIP with its own checksum and report. These are release assets, rather than expiring Actions artifacts. GitHub also provides source archives for the tag.
 
-Both include the matching bundled launcher and use Apple’s public frameworks and the standard C++ library. There are no third-party runtime libraries, package managers, or separately installed USB drivers. Deployment targets set the minimum system; the download labels describe the supported range.
+The exact release commit is preserved as `v1.5.1` and `legacy-macos-11-12`. Freeze finalisation locks the branch against updates, deletion, and force pushes, including administrators; an active ruleset blocks updates and deletion of this tag without bypass actors. GitHub release immutability is enabled before publishing the draft, protecting its assets and tag. Repository owners can still change repository policies or remove the repository; these controls do not constitute an independent archival service. Keep an independent copy when long-term retention matters.
 
-## Development downloads
+Development continues on **master** for 1.6. Do not merge later changes into the frozen branch, move the tag, or replace its downloads. Do not raise this legacy build’s deployment target or introduce a macOS 13 dependency.
 
-GitHub Actions provides development downloads. To get one:
+The deployment target is **11.0** in both executable slices and both bundles. Apple’s deployment target specifies a minimum, not an upper runtime limit; the supported range and download label are 11 and 12. The app is not deliberately disabled on newer systems. No separate newer-system app is built or released for 1.5.1.
 
-1. Sign in to GitHub and open the repository’s [Actions page](https://github.com/koralatov/alphasync/actions).
-2. Choose a successful **Build and test** run for the branch or commit you want.
-3. In **Artifacts**, download `AlphaSync-release-<source commit>`. It contains both app downloads, their checksums, and build information.
-4. Double-click the downloaded archive to extract it, then double-click the **Universal** or **Modern** app ZIP for your Mac.
+The app uses Apple’s public frameworks and the standard C++ library. There are no third-party runtime libraries, package managers, or separately installed USB drivers.
 
-See GitHub’s [artifact download instructions](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/download-workflow-artifacts) if you need help finding the download.
+## Build the preserved source
 
-## Build
-
-The universal build uses the Xcode version in [.xcode-version](.xcode-version), currently **26.6**. The modern build uses [.xcode-version-modern](.xcode-version-modern), currently **27.1**. CI also checks the universal app with **Xcode 16.4**.
-
-Install Xcode and its command-line tools, open `AlphaSync/AlphaSync.xcodeproj`, and select the shared **AlphaSync** or **AlphaSync-Modern** scheme. The schemes share their sources and version settings. The modern scheme uses `DebugModern` and `ReleaseModern`, and builds only `arm64` in both the app and launcher.
-
-From the repository root:
+Check out `v1.5.1` or `legacy-macos-11-12`. Use the pinned Xcode version in [.xcode-version](.xcode-version), **26.6**, and the shared **AlphaSync** scheme. CI also compiles and tests with **Xcode 16.4** on an Intel host. These newer build hosts are separate from the app’s supported runtime systems.
 
 ```sh
 xcodebuild -project AlphaSync/AlphaSync.xcodeproj \
@@ -39,26 +27,15 @@ xcodebuild -project AlphaSync/AlphaSync.xcodeproj \
   -derivedDataPath build/DerivedData build
 ```
 
-The universal result is `build/DerivedData/Build/Products/Release/AlphaSync.app`.
+The result is `build/DerivedData/Build/Products/Release/AlphaSync.app`. Keep the bundle intact, including `Contents/Library/LoginItems/AlphaSyncLauncher.app`. The legacy packaging scripts accept only the `universal` profile. The dormant Modern project configurations and icon source are retained for development history; they are not built by the 1.5.1 workflow.
 
-For the modern app:
+### Older-system verification
 
-```sh
-xcodebuild -project AlphaSync/AlphaSync.xcodeproj \
-  -scheme AlphaSync-Modern -configuration ReleaseModern \
-  -destination 'generic/platform=macOS' \
-  -derivedDataPath build/ModernData build
-```
+Mike reports that the earlier build works on **macOS 12**. The exact build, architecture, and individual checks were not recorded, so this is not a completed manual test of the final 1.5.1 ZIP. macOS 11 runtime testing remains unverified. Both systems use the existing `SMLoginItemSetEnabled` implementation. Record final-download and physical Neo results in the [manual checklist](tests/manual-checks.md).
 
-The modern result is `build/ModernData/Build/Products/ReleaseModern/AlphaSync.app`. Launch it on macOS 27 or later. Keep either app bundle intact, including `Contents/Library/LoginItems/AlphaSyncLauncher.app`.
+## Development artifacts
 
-Newer Xcode releases can raise their minimum supported deployment target. Check [Apple’s Xcode requirements](https://developer.apple.com/xcode/system-requirements) before changing the toolchain, and keep the macOS 11 checks passing.
-
-### Testing on macOS 12.7.5
-
-macOS 12.7.5 is within the app’s intended runtime range. Use a universal development build from a successful workflow run to test it without installing the release compiler. Apple’s [Xcode 14.2 requirements](https://developer.apple.com/documentation/xcode-release-notes/xcode-14_2-release-notes) allow that version to run on Monterey 12.5 and later, although it is not part of this project’s CI matrix. Xcode 26.6 needs a newer release Mac.
-
-Testing on 12.7.5 exercises the older login-item implementation shared with macOS 11. Runtime behaviour on macOS 11 still needs a separate check. The approval flow on macOS 13 and later also needs its own test. Record these results with the [manual test checklist](tests/manual-checks.md).
+The [Actions page](https://github.com/koralatov/alphasync/actions) provides temporary artifacts for successful build runs. `AlphaSync-release-<source commit>` contains the legacy app, symbols, checksums, and build reports. Use the public v1.5.1 release for the preserved download. Actions artifact retention is not permanent.
 
 ## Check a build
 
@@ -78,12 +55,6 @@ On a Mac, verify the built app with:
 
 ```sh
 scripts/verify-app.sh
-```
-
-For the modern build, run on macOS 27 or later:
-
-```sh
-scripts/verify-app.sh build/ModernData/Build/Products/ReleaseModern/AlphaSync.app modern
 ```
 
 This checks the exact architectures, executable deployment targets, system-only dependencies, matching app and helper versions, nested signatures, and every interface window. It first starts the shipping executable with `--version`, then builds a separate native interface-check host from the real application classes and the exact bundle resources being verified. Hardware detection and login-item changes are disabled at compile time in that host. Its code is cached within the build job, but its resources are refreshed for each app or archive. The harness in `tests/interface-checks.m` is never compiled into the shipping app.
@@ -114,8 +85,6 @@ Without a Neo, the main window shows a compact connection view built with native
 
 Interface validation logs each startup and window-check stage. Smoke checks have a three-minute deadline, and app appearance captures have five minutes. If a check stalls on macOS, the runner records a process sample before stopping it and failing the check. These deadlines retain the normal validation requirements and leave useful diagnostics instead of waiting for the whole CI job to be cancelled.
 
-The macOS 26 Intel CI job uses the workaround for [runner image issue 14751](https://github.com/actions/runner-images/issues/14751): it unloads the crashing per-user icon agent so AppKit can use generic native icons. This is confined to that disposable build machine. All window, control, and appearance checks still run; the other Mac jobs use the normal icon service.
-
 The backup sheet uses native AppKit controls and Auto Layout at a width of 520 points. Its height fits the result message and selectable, wrapping folder paths. Completion shows the number of files saved and each dated backup folder; the Finder button opens those folders rather than the general backup destination. Failed, cancelled, and empty backups have separate wording. Interface checks cover these results, singular wording, default buttons, unclipped text, and multiple long paths. Appearance captures include successful and incomplete backups, plus two Neo locations, in each mode. Opening the folders in Finder remains a manual check.
 
 Backup logs are opt-in through **Save a backup log** in Preferences. `SaveBackupLogs` defaults to false, including for existing installations, and is captured when a backup starts. When enabled, each Neo’s dated destination contains `AlphaSync Backup Log.plist`, an XML property list covering only that Neo’s files. Initial publication is atomic and exclusive; subsequent updates are atomic. Each device’s log is finished when its files have been processed, so a later cancellation does not change an earlier Neo’s completed log. In-progress logs retain pending files after an interruption. Empty backups create no log. Existing logs are left in place. Native checks exercise logging off and on, option changes during a backup, separate Neos, cancellation, failed exports, empty backups, and filename collisions.
@@ -126,13 +95,11 @@ About uses native AppKit controls, the bundled app icon, and the shared version 
 
 The main toolbar uses matching standard fixed spacers between its commands and a leading flexible spacer. The previous default arrangement is migrated through native toolbar item insertion and removal; deliberate custom layouts are preserved. A native `NSStackView` lays out the existing status controls, with progress beside the connection message, a flexible gap, and a right-aligned available-memory label at the trailing edge. Appearance captures include the normal and wider main windows and the progress state in each mode.
 
-GitHub Actions builds the universal app on Intel and Apple Silicon runners with macOS 15 and 26. A required macOS 27 Apple Silicon job builds and launches the modern app. Both profiles receive Debug, Release, archive, dependency, signature, and window checks. These checks run on the runners’ macOS versions, so they do not establish that every feature works on macOS 11.
+GitHub Actions compiles the legacy Universal app on an Intel macOS 15 host with Xcode 16.4 and an Apple Silicon macOS 26 host with pinned Xcode 26.6. Both receive core and native regression tests, bounded sanitizer checks, Debug and Release builds, dependencies, signatures, and native window and appearance checks. The pinned host also checks the archive layout. No Modern or macOS 27 build runs for 1.5.1. These host checks do not establish runtime or USB behaviour on macOS 11 or 12.
 
-A final job collects the two canonical development downloads into the `AlphaSync-release-<source commit>` artifact, with checksums, build reports, and shared release notes. It rejects missing packages and mismatched versions, build numbers, source commits, profiles, and signing states. The collector uses Python 3’s standard library; Python is not required to run AlphaSync.
+`scripts/verify-symbols.sh` checks that the separate dSYM UUIDs match each executable. `scripts/package-symbols.sh` retains the app and helper symbols outside the installable ZIP. The collector validates all six release assets, including hashes, the legacy profile, version, build, source commit, and matching symbol metadata. Unexpected assets are rejected. It uses Python’s standard library; Python is not needed to run AlphaSync.
 
-A separate advisory job checks the modern app with the runner’s default Xcode. It uploads no app. This reveals changes needed for newer SDKs while release builds retain their pinned compilers.
-
-Release configurations remove unused code and strip executable symbols after generating matching dSYM bundles. `scripts/verify-symbols.sh` compares the executable and dSYM UUIDs. CI keeps these symbols as separate `AlphaSync-symbols-<runner>-<source commit>` artifacts, outside the public app ZIPs. Debug settings remain unchanged. Obsolete toolbar and status PDFs, Backup nibs, and the Inspector nib have been removed; current views use native components and system symbols.
+Release configurations strip executable symbols after producing the dSYMs. Debug settings remain unchanged. Unused toolbar and status PDFs and obsolete window nibs stay out of the app.
 
 A small Linux job checks build scope before starting the Mac matrix. Only changes confined to `README.md`, `TECHNICAL.md`, `AGENTS.md`, `tests/manual-checks.md`, and `releases/*.md` skip Mac builds. It compares actual Git paths, including deleted sides of renames. Unknown comparisons, new branches, bundled Help, licences, scripts, resources, source, and build settings require builds. A `Release AlphaSync <version>` request always builds, even if it changes only release notes.
 
@@ -147,7 +114,7 @@ AlphaSync no longer copies a launcher into Application Support. If an older inst
 
 Preferences shows the actual launcher state separately from the automatic-launch setting. It reports registration errors and approval requests, and provides a Login Items settings button on macOS 13 and later. The older API cannot query the saved registration state, so macOS 11 and 12 report an unknown state when the helper is not running.
 
-The Universal build keeps the original icon in `application.iconset`. The modern build uses the preferred macOS 27 mockup in `Graphics/application-modern.png` as a flattened icon. Each profile sets `AS_APP_ICON_NAME`; Xcode uses macOS’s `sips` and `iconutil` tools to create the selected `.icns` file at standard and Retina sizes in its derived files directory. Only that icon is copied into the main app. Verification checks the selected name, the absence of the other variant, and every icon size. The bundled launch helper retains its own icon.
+The legacy Universal build keeps the original icon in `application.iconset`. The unused Modern icon source is retained for later work. Each profile sets `AS_APP_ICON_NAME`; Xcode uses macOS’s `sips` and `iconutil` tools to create the selected `.icns` file at standard and Retina sizes in its derived files directory. Only that icon is copied into the main app. Verification checks the selected name, the absence of the other variant, and every icon size. The bundled launch helper retains its own icon.
 
 ## Imports and backups
 
@@ -173,6 +140,8 @@ File creation, replacement, and single-file clearing read the bytes back and com
 
 Recovery folders start with an incomplete suffix and are published with an exclusive rename only after their files and identification metadata are saved. Retention moves only recognised version 1 recovery folders older than the selected period to the Mac’s Trash when a new copy is made. It skips incomplete folders and directory symlinks, and never permanently deletes files. A retention failure also blocks the pending destructive task. Recovery is a manual restore by importing the saved text, not an atomic USB rollback or an Edit → Undo action.
 
+Before Quick Backup starts, cached applet enumeration must be complete, and each included applet must have a successful resource query whose file count matches its listed files. This status is copied into the display tree without main-thread USB reads. A partial applet list, missing files, or unreadable count blocks the backup with a reconnect explanation, including when logs are off.
+
 Exports are written and synchronised in a hidden temporary file before their final name appears. Existing files are preserved. Each dated backup folder starts with ` (Incomplete)` and loses that suffix through an exclusive rename only after that Neo’s files finish successfully. Failed, stopped, or interrupted sessions retain the marker even with logs off. Optional **AlphaSync Backup Log.plist** files use format version 2 with paths relative to that folder, so completing the folder does not invalidate its entries. Hidden temporary files left by an interrupted write can be removed after checking the saved files and any log.
 
 ## Help and support
@@ -181,13 +150,23 @@ The Help menu uses native `NSMenu` and `NSMenuItem` objects and is assigned to `
 
 Release Notes uses the running bundle’s `CFBundleShortVersionString` to link to that exact GitHub release. Report Issue opens GitHub’s new-issue form, and Contact Us opens `mailto:mike@koralatov.com` through the user’s default mail app. Their editable forms include app version, build, edition, macOS version, and process architecture. No file contents, paths, device identifiers, or attachments are included. Choosing either command opens a form; submission remains with the user. A native alert offers to copy the link if macOS cannot open its handler.
 
-The Build Help phase generates an offline licence page directly from the original `LICENSE`, then uses macOS’s `hiutil` to rebuild the Help index, including anchors. It runs after copying the Help resources and before signing, for both variants and archives. The obsolete prebuilt index is no longer kept in source control. The Licence command opens the generated `alphasync-licence` anchor in Help Viewer. Interface checks validate menu wiring and destinations without launching browsers or mail, and the WebKit checks compare the displayed licence text with the original notice in each appearance mode. Native Help-popup screenshots are collected when the runner permits screen capture; interactive Help search and external handlers remain in the manual checklist.
+The Build Help phase generates an offline licence page directly from the original `LICENSE`, then uses macOS’s `hiutil` to rebuild the Help index, including anchors. It runs after copying the Help resources and before signing, for the app and archives. The obsolete prebuilt index is no longer kept in source control. The Licence command opens the generated `alphasync-licence` anchor in Help Viewer. Interface checks validate menu wiring and destinations without launching browsers or mail, and the WebKit checks compare the displayed licence text with the original notice in each appearance mode. Native Help-popup screenshots are collected when the runner permits screen capture; interactive Help search and external handlers remain in the manual checklist.
 
-## Versioning
+## Release and freeze procedure
 
-Both downloads and their helpers share the version and build in [Version.xcconfig](AlphaSync/Build/Version.xcconfig). Versions can have two or three numeric components, such as `1.5` or `1.5.1`. Increase the build number for each distributed revision, independently of the release version, and set the version before creating its release tag. The separate build reports record the full source commit for both downloads.
+The app and helper share `MARKETING_VERSION = 1.5.1` and `CURRENT_PROJECT_VERSION = 147` in [Version.xcconfig](AlphaSync/Build/Version.xcconfig). The full source commit is recorded separately in both build reports.
 
-To publish a testing release, commit its notes as `releases/<version>.md`, then push a version update with the exact commit subject `Release AlphaSync <version>`. The version must match `Version.xcconfig`. The **Build and test** workflow builds both downloads, completes the required checks, and verifies the version, source commit, and checksums before creating a fresh tag. It uploads both ZIPs, their checksums, and build reports to one draft, verifies all six uploaded files, then publishes it as a prerelease. Existing tags and releases are not overwritten. Only the publication job has release-writing permission. Other pushes and pull requests produce build artifacts as before.
+The exact subject `Release AlphaSync 1.5.1` triggers a complete build. Only after both Mac jobs pass does the publication job validate the six assets against that commit and version, create a fresh `v1.5.1` tag, upload a stable release draft, verify its asset names and sizes, and create `legacy-macos-11-12` at the same commit. It never replaces an existing tag or branch. Creating a draft allows every asset to be checked before immutability takes effect.
+
+The owner then runs:
+
+```sh
+scripts/freeze-legacy.sh <verified-release-commit>
+```
+
+This requires GitHub CLI authentication with repository administration access, which the Actions `GITHUB_TOKEN` does not provide. The script downloads and verifies all assets again, locks the exact legacy branch with administrator enforcement, protects only the release tag, enables immutable releases, and publishes the draft as a stable release. It verifies the resulting controls, exact source pointers, and immutable release state. It does not lock master or the whole repository. A failed administrative step leaves the prepared draft unpublished rather than claiming the source has been frozen.
+
+For manual finalisation, apply those same controls in GitHub Settings before publishing the draft, then verify them through GitHub’s API. Do not publish first and enable immutability afterwards: immutability applies to future publications only. See [GitHub’s immutable-release guidance](https://docs.github.com/en/code-security/concepts/supply-chain-security/immutable-releases).
 
 ## Hardware checks before a release
 

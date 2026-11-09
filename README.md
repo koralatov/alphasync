@@ -4,16 +4,13 @@ AlphaSync copies text files between your Mac and an AlphaSmart Neo. It can also 
 
 ## Download
 
-Open the [Releases page](https://github.com/koralatov/alphasync/releases) and choose the download for your Mac:
+[Download AlphaSync 1.5.1 for macOS 11 and 12](https://github.com/koralatov/alphasync/releases/download/v1.5.1/AlphaSync-1.5.1-147-macOS-11-12-universal.zip).
 
-| Download | macOS version | Mac |
-|---|---|---|
-| Universal | 11 through 26 | Intel or Apple Silicon |
-| Modern | 27 and later | Apple Silicon |
+This is the final version for macOS 11 Big Sur and macOS 12 Monterey. The same download works on Intel and Apple Silicon Macs. No version for newer macOS systems is included in this release.
 
-You can find your macOS version and your Mac’s chip or processor in **Apple menu → About This Mac**.
+You can find your macOS version in **Apple menu → About This Mac**. Keep using 1.5.1 on macOS 11 or 12; version 1.6 and later will require a newer system.
 
-If the download you need is not available yet, see [development downloads](TECHNICAL.md#development-downloads).
+The [1.5.1 release page](https://github.com/koralatov/alphasync/releases/tag/v1.5.1) keeps the download and release notes available. Its [legacy source branch](https://github.com/koralatov/alphasync/tree/legacy-macos-11-12) is preserved separately from ongoing development.
 
 ## Install
 
@@ -24,12 +21,7 @@ If the download you need is not available yet, see [development downloads](TECHN
 
 ## If your Mac blocks AlphaSync
 
-Your Mac may say that it cannot verify AlphaSync. Dismiss the warning, then open the settings for your macOS version:
-
-| macOS | Where to go |
-|---|---|
-| 11 and 12 | **System Preferences → Security & Privacy → General** |
-| 13 and later | **System Settings → Privacy & Security**, then scroll to **Security** |
+Your Mac may say that it cannot verify AlphaSync. Dismiss the warning, then open **System Preferences → Security & Privacy → General**.
 
 Find the message about AlphaSync and click **Open Anyway**. If you see an **Open** button first, click it to reach **Open Anyway**. Follow the prompts, using your Mac login password or Touch ID if asked.
 
@@ -55,6 +47,8 @@ If a text file is too large for your Neo, AlphaSync explains the limit and leave
 
 Backup logs are off by default. If you want a record of copied files and any errors, enable **Save a backup log** in **Preferences**. The log is saved inside each dated backup folder.
 
+If AlphaSync cannot read the complete file list, it stops the backup and asks you to reconnect your Neo. It will not label a partial list as a complete backup.
+
 A backup folder ends in **(Incomplete)** until that Neo’s backup finishes successfully. If you stop a backup or a file cannot be copied, the folder keeps this label. The result shows the location and offers a button to open it in Finder.
 
 To have AlphaSync open whenever you connect your Neo, turn on automatic opening in **Preferences**. Keep the app in Applications, and follow any approval prompts shown in Preferences.
@@ -69,7 +63,7 @@ Choose **Contact Us…** to open an email addressed to **mike@koralatov.com** in
 
 ## Advanced users
 
-For development downloads, build instructions, tests, supported text formats, and implementation notes, see the [technical guide](TECHNICAL.md).
+For the preserved source, build instructions, tests, supported text formats, and implementation notes, see the [technical guide](TECHNICAL.md).
 
 ## Licence
 

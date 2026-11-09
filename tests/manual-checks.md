@@ -8,10 +8,7 @@ Record the exact app version, build number, source commit, macOS version, archit
 |---|---|---|
 | macOS 11, Intel | Minimum runtime and older login-item API | Not run |
 | macOS 11, Apple Silicon | Minimum runtime and older login-item API | Not run |
-| macOS 12.7.5 | Available older Mac and older login-item API | Not run |
-| macOS 13 or later | Launcher registration, approval, and settings changes | Not run |
-| macOS 26, Intel and Apple Silicon | Universal app, real USB transfers on both architectures | Not run |
-| macOS 27 or later, Apple Silicon | Modern app, real USB transfers, and launcher approval | Not run |
+| macOS 12, Intel or Apple Silicon | Final ZIP, physical USB, and older login-item API | Earlier build reported working by Mike. Exact build and coverage unspecified. Final 1.5.1 not run. |
 
 macOS 12.7.5 provides a useful older-system check. Passing there does not establish a result for macOS 11. The automated macOS 15 and 26 builds also do not fill either macOS 11 row.
 
@@ -19,7 +16,7 @@ Record the host with `sw_vers` and `uname -m`. If Xcode tools are installed, run
 
 With the app running, change macOS Appearance between Light, Dark, and Auto in System Settings (System Preferences on macOS 11 and 12). Check the main list, selected and unselected rows, toolbar, Inspector previews and details, Preferences, backup sheet, alerts, file panels, and Apple Help Viewer. Check Increase Contrast and a different accent colour too. The app should update without restarting. Confirm that file renaming still accepts Return, cancels with Escape, and is unavailable during a transfer. `scripts/check-appearance.sh /Applications/AlphaSync.app build/appearance` provides automated appearance checks and screenshots without using a Neo; the system-setting and hardware checks still need a person.
 
-For the modern app, run `scripts/verify-app.sh /Applications/AlphaSync.app modern` on macOS 27 or later. This requires exactly `arm64` in both the app and launcher, with a macOS 27 minimum. Verify that the release contains both downloads with matching versions and source commits, and install only the app appropriate for the test Mac.
+This checklist applies to the final 1.5.1 Universal download for macOS 11 and 12. Newer CI systems are build hosts, not additional supported downloads.
 
 ## Help menu
 
@@ -63,7 +60,7 @@ Keep known-good backups before testing writes to the Neo.
 - Open empty and long files, disconnect during a read, and close a loading window. Empty files should be identified, failed reads should explain the problem, and a closed window should stay closed when its read finishes. After a successful read, disconnect the Neo and check that the opened text can still be read and copied.
 - Scroll through a long file preview and copy text from it. The preview should wrap and stay read-only. Change to an applet or Neo and check its icon preview. Clear the selection and select several items; previous details and preview text should disappear. Confirm that changing the selected item keeps the top of the Inspector in place and that closing and reopening it works.
 - Open the Clear warning for a file and an applet, and the Replace warning by dropping a file. Each should be a native sheet attached to the main window. Cancel should be the default and have the initial keyboard focus, with no focus ring on Replace, Clear File, or Clear All Files. Immediately pressing Space, Return, keypad Enter, or Escape should dismiss it without changing the Neo. Repeat with keyboard navigation enabled, then check that Tab can still deliberately reach the other controls. With disposable files and known-good backups, confirm that deliberately choosing Replace, Clear File, or Clear All Files changes only the named contents.
-- Select a file and check the **Clear File…** label, then select AlphaWord and check **Clear All Files…**. Each tooltip should name its target. Check that Backup, Clear, and Info all fit the default 560-point window without toolbar overflow in Light and Dark Mode, including macOS 26 and 27. Confirm that clearing remains disabled during transfers and for unsupported selections.
+- Select a file and check the **Clear File…** label, then select AlphaWord and check **Clear All Files…**. Each tooltip should name its target. Check that Backup, Clear, and Info all fit the default 560-point window without toolbar overflow in Light and Dark Mode, on macOS 11 and 12. Confirm that clearing remains disabled during transfers and for unsupported selections.
 - Copy files in both directions, including pound signs, accented letters, and curly quotes.
 - Import matching MacASCII, UTF-8, and UTF-16 files, including both UTF-16 byte orders with byte-order marks. Confirm that exported copies and backups use UTF-8 and preserve the text.
 - Import the same paragraphs with LF, CRLF, and CR endings. Check for the same paragraph breaks.
@@ -88,6 +85,8 @@ Keep known-good backups before testing writes to the Neo.
 
 ## Backups
 
+- Interrupt file-list discovery, or use a test device with a reported count larger than its listed files. Backup must stop before copying and ask for reconnection. An unreadable count must not be treated as an empty applet.
+
 - Back up named files, numbered file spaces, and empty files with logging off. Confirm that only the copied files and their applet folders appear in each dated destination, with no new logs or separate reports folder.
 - Enable **Save a backup log** and repeat. Each Neo’s dated folder should contain **AlphaSync Backup Log.plist**, listing only its files, saved paths, errors, and final state. Repeat on the same day and confirm that each dated destination keeps its own log. Changing the option during a backup should affect the next backup.
 - Check the completion sheet’s file count and dated folder path. Click **Open Backup Folder** and confirm that Finder opens that exact folder. **Done** should dismiss the sheet, including when Return is pressed.
@@ -103,6 +102,6 @@ Keep known-good backups before testing writes to the Neo.
 
 - Open About, close it, and reopen it after using a link. No link should have keyboard focus on opening. With keyboard navigation enabled, confirm that Tab can still reach Project, Release notes, and Licence, and Space can activate a focused link.
 
-- Check Finder, the Dock, and About for each download. Universal should show the original green icon; the macOS 27 Apple Silicon build should show the preferred glass icon. Check small and large icon sizes in Light and Dark Mode.
+- Check Finder, the Dock, and About for the legacy Universal download. It should show the original green icon, version 1.5.1, build 147, and “For macOS 11 and macOS 12”. Check small and large icon sizes in Light and Dark Mode.
 
 Use the final download ZIP for a clean-install check on a second Mac. Record first-launch behaviour, opening every window, automatic launching, and a real transfer.
