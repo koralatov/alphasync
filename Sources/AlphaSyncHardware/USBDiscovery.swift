@@ -48,6 +48,7 @@ enum USBDiscovery {
         IOHIDManagerSetDeviceMatching(manager, [kIOHIDVendorIDKey: vendor, kIOHIDProductIDKey: keyboardProduct] as CFDictionary)
         let devices = IOHIDManagerCopyDevices(manager) as? Set<IOHIDDevice> ?? []
         var attached = Set<UInt64>()
+        defer { attempted.formIntersection(attached) }
         for device in devices {
             let service = IOHIDDeviceGetService(device)
             guard property(service, "bInterfaceNumber") == 1 else { continue }
@@ -68,6 +69,5 @@ enum USBDiscovery {
                 }
             }
         }
-        attempted.formIntersection(attached)
     }
 }

@@ -124,6 +124,7 @@ public struct NeoFileLimits: Hashable, Sendable {
         self.minimum = minimum; self.maximum = maximum
     }
     public func validate(_ size: Int, allocation: Int, available: Int) throws {
+        guard size >= minimum else { throw NeoError.device("The converted file is below the Neo’s minimum allocation. No device files were changed.") }
         guard size <= maximum else { throw NeoError.tooLarge(required: size, maximum: maximum) }
         let growth = max(0, size - allocation)
         let usable = max(0, available - 1024)

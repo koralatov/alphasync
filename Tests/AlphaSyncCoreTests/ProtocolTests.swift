@@ -75,7 +75,7 @@ private final class SimulatedNeo: NeoTransport {
             writes += 1; pending = Data(); writingAttributes = false
             try reply(0x50)
         case 0x02:
-            blockRemaining = Int(try frame.argument(at: 1, width: 4)); pending = Data()
+            blockRemaining = Int(try frame.argument(at: 1, width: 4))
             try reply(0x42)
         case 0x15:
             if !writingAttributes { payload = pending }
@@ -107,7 +107,7 @@ final class ProtocolTests: XCTestCase {
     }
     func testReplacementIsReadBack() throws {
         let device = SimulatedNeo()
-        let old = device.payload, new = Data(repeating: 66, count: 512)
+        let old = device.payload, new = Data((0..<2304).map { UInt8(truncatingIfNeeded: $0) })
         try NeoProtocol(transport: device).writeFile(new, applet: 0xa000, index: 1, expectedOriginal: old)
         XCTAssertEqual(device.payload, new)
         XCTAssertEqual(device.writes, 1)

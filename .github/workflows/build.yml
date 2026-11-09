@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   swift-core:
-    name: Swift core milestone
+    name: Swift USB service milestone
     runs-on: macos-26
     timeout-minutes: 15
     steps:
@@ -22,8 +22,6 @@ jobs:
           selected_developer="/Applications/Xcode_$version.app/Contents/Developer"
           test -d "$selected_developer"
           printf 'DEVELOPER_DIR=%s\n' "$selected_developer" >> "$GITHUB_ENV"
-      - name: Compile and test the Swift core
-        run: swift test --parallel
       - name: Retain the public USB SDK interface for the transport migration
         run: |
           mkdir -p build/usb-sdk
@@ -31,7 +29,15 @@ jobs:
           cp "$sdk"/System/Library/Frameworks/IOUSBHost.framework/Headers/*.h build/usb-sdk/
           xcrun swift-symbolgraph-extract -module-name IOUSBHost -target arm64-apple-macos13.0 \
             -sdk "$sdk" -output-dir build/usb-sdk
+          for path in "$sdk"/System/Library/Frameworks/IOUSBHost.framework/Modules/*/*.swiftinterface "$DEVELOPER_DIR"/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/IOUSBHost.swiftmodule/*.swiftinterface; do
+            if [[ -f "$path" ]]; then cp "$path" build/usb-sdk/; fi
+          done
+      - name: Compile the Swift transport and run protocol regressions
+        run: |
+          swift build --target AlphaSyncHardware
+          swift test --parallel
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
         with:
           name: AlphaSync-USB-SDK-${{ github.sha }}
           path: build/usb-sdk/*
