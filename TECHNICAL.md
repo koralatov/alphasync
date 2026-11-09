@@ -62,7 +62,7 @@ scripts/verify-app.sh build/DerivedData/Build/Products/Release/universal/AlphaSy
 scripts/verify-symbols.sh build/DerivedData/Build/Products/Release/universal
 ```
 
-Repeat with `apple-silicon` for that edition. Verification checks exact architectures in both executables, macOS deployment commands, bundle versions, identifiers, selected icons, Help, native dependencies, signatures, and executable `--version` output on a matching host. Separate crash-symbol UUIDs must match each executable. These checks do not establish runtime or hardware compatibility on macOS 13.
+Repeat with `apple-silicon` for that edition. Verification checks exact architectures in both executables, macOS deployment commands, bundle versions, identifiers, selected icons, Help, native dependencies, signatures, and executable `--version` output on a matching host. Separate crash-symbol UUIDs must match each executable. `scripts/collect-builds.py` checks both editions, all twelve assets, checksums, signing state, and exact version, build, and source before collecting a download directory. It does not publish anything. These checks do not establish runtime or hardware compatibility on macOS 13.
 
 Successful CI runs retain development app ZIPs, separate symbol ZIPs, SHA-256 checksums, build reports with the source commit, and interface screenshots on the [Actions page](https://github.com/koralatov/alphasync/actions). Artifacts expire. There is no automatic 1.6 release publication.
 

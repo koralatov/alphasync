@@ -15,4 +15,4 @@ if [[ "$actual" != "$expected" ]]; then
 fi
 xcodebuild -version
 xcrun --sdk macosx --show-sdk-version
-xcrun clang --version
+xcrun swiftc --version

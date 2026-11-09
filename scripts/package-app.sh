@@ -43,7 +43,7 @@ digest=$(awk '{ print $1 }' "$output/$filename.sha256")
     printf 'Signing: %s\nArchive: %s\nSHA-256: %s\n\n' "$signing" "$filename" "$digest"
     xcodebuild -version
     xcrun --sdk macosx --show-sdk-version
-    xcrun clang --version
+    xcrun swiftc --version
     sw_vers
     uname -m
 } > "$output/$filename.build-information.txt"
