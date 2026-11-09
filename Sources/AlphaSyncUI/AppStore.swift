@@ -25,6 +25,12 @@ public enum SidebarSelection: Hashable {
     }
 }
 
+struct ImportTarget: Equatable, Sendable {
+    let connection: UUID
+    let applet: UInt16
+    let file: NeoFileID?
+}
+
 @MainActor
 public final class AppStore: ObservableObject {
     @Published public var devices: [NeoSnapshot] = []
@@ -74,6 +80,8 @@ public final class AppStore: ObservableObject {
     private var monitor: Task<Void, Never>?
     private var epoch = 0
     private let monitoringEnabled: Bool
+    private var importRequest: ImportTarget?
+    private var exportRequest: [NeoFileID]?
 
     public init(service: DeviceService = DeviceService(), preferences: Preferences? = nil, monitoringEnabled: Bool = true) {
         self.service = service; self.preferences = preferences ?? Preferences(); self.monitoringEnabled = monitoringEnabled
@@ -165,15 +173,50 @@ public final class AppStore: ObservableObject {
         try Task.checkCancellation()
         return try FileCodec.text(bytes, applet: applet)
     }
-    public func importFiles(_ urls: [URL]) async {
-        guard let applet = importApplet, applet.canWrite, let device = chosenDevice else {
-            notice = AppNotice("Choose an applet", "Choose AlphaWord or the user dictionary to add a text file, or select one of its files to replace it.")
-            return
+    private func importTarget(replacing file: NeoFileID? = nil) -> ImportTarget? {
+        guard !busy else { return nil }
+        if let file {
+            guard let applet = applet(for: file), applet.canWrite,
+                  applet.files.contains(where: { $0.id == file }) else { return nil }
+            return ImportTarget(connection: file.connection, applet: file.applet, file: file)
         }
-        // Keep the destination fixed while an async import is running, even if the selection changes.
-        let target = selectedFiles.first
-        let replacing = !selection.isEmpty
+        guard canImport, let applet = importApplet, let device = chosenDevice,
+              selection.isEmpty || selectedFiles.count == 1 else { return nil }
+        return ImportTarget(connection: device.connection, applet: applet.id, file: selectedFiles.first?.id)
+    }
+    public func beginImport() {
+        guard !showImporter, !showExportFolder, let target = importTarget() else { return }
+        importRequest = target
+        showImporter = true
+    }
+    @discardableResult
+    public func finishImport(_ result: Result<[URL], Error>) -> Task<Void, Never>? {
+        let target = importRequest
+        importRequest = nil
+        showImporter = false
+        guard let target else { return nil }
+        switch result {
+        case .success(let urls): return Task { await importFiles(urls, to: target) }
+        case .failure(let error):
+            if (error as NSError).code != NSUserCancelledError {
+                notice = AppNotice("The file could not be opened", error.localizedDescription)
+            }
+            return nil
+        }
+    }
+    @discardableResult
+    func importDroppedFiles(_ urls: [URL], replacing file: NeoFileID? = nil) -> Task<Void, Never>? {
+        guard !urls.isEmpty, let target = importTarget(replacing: file) else { return nil }
+        if let file { selection = [file] }
+        return Task { await importFiles(urls, to: target) }
+    }
+    private func importFiles(_ urls: [URL], to target: ImportTarget) async {
+        let replacing = target.file != nil
         await run("Reading the text file…") {
+            guard let applet = devices.first(where: { $0.connection == target.connection })?.applets.first(where: { $0.id == target.applet }),
+                  applet.canWrite, target.file.map({ id in applet.files.contains { $0.id == id } }) ?? true else {
+                throw NeoError.disconnected
+            }
             guard !replacing || urls.count == 1 else {
                 throw NeoError.device("Choose one text file when replacing a selected Neo file.")
             }
@@ -183,10 +226,10 @@ public final class AppStore: ObservableObject {
                     try Task.checkCancellation()
                     let scoped = url.startAccessingSecurityScopedResource()
                     defer { if scoped { url.stopAccessingSecurityScopedResource() } }
-                    if let target {
-                        pendingChange = try await service.prepareReplacement(file: target.id, from: url)
+                    if let file = target.file {
+                        pendingChange = try await service.prepareReplacement(file: file, from: url)
                     } else {
-                        let value = try await service.create(connection: device.connection, appletID: applet.id, from: url)
+                        let value = try await service.create(connection: target.connection, appletID: target.applet, from: url)
                         created += 1; replace(value)
                     }
                 }
@@ -221,10 +264,33 @@ public final class AppStore: ObservableObject {
     public func rename(_ file: NeoFileID, to name: String) async {
         await run("Renaming the file…") { replace(try await service.rename(file, to: name)) }
     }
-    public func exportFiles(to folder: URL) async {
+    public func beginExport() {
+        guard !busy, !showImporter, !showExportFolder else { return }
         let ids = selection.isEmpty ? files.map(\.id) : selectedFiles.map(\.id)
-        guard !ids.isEmpty else { return }
+        guard !ids.isEmpty, selection.isEmpty || ids.count == selection.count else { return }
+        exportRequest = ids
+        showExportFolder = true
+    }
+    @discardableResult
+    public func finishExport(_ result: Result<URL, Error>) -> Task<Void, Never>? {
+        let ids = exportRequest
+        exportRequest = nil
+        showExportFolder = false
+        guard let ids else { return nil }
+        switch result {
+        case .success(let folder): return Task { await exportFiles(ids, to: folder) }
+        case .failure(let error):
+            if (error as NSError).code != NSUserCancelledError {
+                notice = AppNotice("The folder could not be opened", error.localizedDescription)
+            }
+            return nil
+        }
+    }
+    private func exportFiles(_ ids: [NeoFileID], to folder: URL) async {
         await run("Saving files to your Mac…") {
+            guard ids.allSatisfy({ id in applet(for: id)?.files.contains { $0.id == id } == true }) else {
+                throw NeoError.disconnected
+            }
             let scoped = folder.startAccessingSecurityScopedResource()
             defer { if scoped { folder.stopAccessingSecurityScopedResource() } }
             let outputs = try await service.export(ids, to: folder)

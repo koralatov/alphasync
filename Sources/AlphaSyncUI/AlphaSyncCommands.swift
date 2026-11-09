@@ -13,9 +13,9 @@ public struct AlphaSyncCommands: Commands {
             Button("Open Read-only") {
                 for file in store.selectedFiles { openWindow(value: ReaderRequest(file: file)) }
             }.keyboardShortcut("o").disabled(store.selection.isEmpty)
-            Button("Import Text Files to Neo…") { store.showImporter = true }
+            Button("Import Text Files to Neo…") { store.beginImport() }
                 .keyboardShortcut("i", modifiers: [.command, .shift]).disabled(!store.canImport)
-            Button("Save to Mac…") { store.showExportFolder = true }
+            Button("Save to Mac…") { store.beginExport() }
                 .keyboardShortcut("s", modifiers: [.command, .shift]).disabled(store.files.isEmpty || store.busy)
             Divider()
             Button("Back Up Neo Files") { Task { await store.backup() } }.disabled(!store.connected || store.busy)

@@ -38,16 +38,10 @@ public struct MainView: View {
             }
         }
         .fileImporter(isPresented: $store.showImporter, allowedContentTypes: [.plainText], allowsMultipleSelection: true) { result in
-            switch result {
-            case .success(let urls): Task { await store.importFiles(urls) }
-            case .failure(let error): store.notice = AppNotice("The file could not be opened", error.localizedDescription)
-            }
+            store.finishImport(result)
         }
         .fileImporter(isPresented: $store.showExportFolder, allowedContentTypes: [.folder]) { result in
-            switch result {
-            case .success(let url): Task { await store.exportFiles(to: url) }
-            case .failure(let error): store.notice = AppNotice("The folder could not be opened", error.localizedDescription)
-            }
+            store.finishExport(result)
         }
         .sheet(item: $store.pendingChange) { change in
             DestructiveConfirmation(title: change.title, action: change.action, explanation: change.explanation,
@@ -99,10 +93,7 @@ public struct MainView: View {
                     Label(file.displayName, systemImage: "doc.text")
                         .draggable(FileDrag(file: file.id, service: store.service, folder: store.temporaryExports))
                         .dropDestination(for: URL.self) { urls, _ in
-                            guard !store.busy, !urls.isEmpty, store.applet(for: file.id)?.canWrite == true else { return false }
-                            store.selection = [file.id]
-                            Task { await store.importFiles(urls) }
-                            return true
+                            store.importDroppedFiles(urls, replacing: file.id) != nil
                         }
                 }.width(min: 200, ideal: 360)
                 TableColumn("Size") { file in
@@ -111,7 +102,7 @@ public struct MainView: View {
             }
             .contextMenu(forSelectionType: NeoFileID.self) { ids in
                 Button("Open Read-only") { openReaders(ids) }.disabled(ids.isEmpty)
-                Button("Save to Mac…") { store.selection = ids; store.showExportFolder = true }.disabled(ids.isEmpty || store.busy)
+                Button("Save to Mac…") { store.selection = ids; store.beginExport() }.disabled(ids.isEmpty || store.busy)
                 Button("Rename…") { renaming = store.files.first { ids.contains($0.id) } }
                     .disabled(ids.count != 1 || store.busy || !ids.allSatisfy { store.applet(for: $0)?.canWrite == true })
                 Divider()
@@ -120,9 +111,7 @@ public struct MainView: View {
                 }.disabled(store.busy || ids.isEmpty || Set(ids.map(\.applet)).count != 1 || !ids.allSatisfy { store.applet(for: $0)?.canWrite == true })
             } primaryAction: { ids in openReaders(ids) }
             .dropDestination(for: URL.self) { urls, _ in
-                guard store.canImport, !urls.isEmpty else { return false }
-                Task { await store.importFiles(urls) }
-                return true
+                store.importDroppedFiles(urls) != nil
             }
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
