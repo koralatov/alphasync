@@ -18,22 +18,21 @@ public enum NeoError: Error, LocalizedError, Equatable, Sendable {
         case .disconnected: return "The Neo is no longer connected. Reconnect it and try again."
         case .cancelled: return "The operation was cancelled."
         case .unsupportedCharacter(let character):
-            return "The Neo cannot represent \(character). Remove or replace this character in your text file, then try again. No device files were changed."
+            return "The Neo cannot represent \(character).  Remove or replace this character in your text file, then try again."
         case .tooLarge(let required, let maximum):
-            return "The converted file needs \(required.formatted()) bytes. The Neo’s maximum is \(maximum.formatted()) bytes. Shorten the text or split it into smaller files. No device files were changed."
+            return "The converted file needs \(required.formatted()) bytes.  The Neo’s maximum is \(maximum.formatted()) bytes.  Shorten the text or split it into smaller files."
         case .insufficientMemory(let required, let available):
-            return "The converted file needs \(required.formatted()) bytes, but only \(available.formatted()) bytes are available. No device files were changed."
-        case .limitsUnavailable: return "AlphaSync could not read the Neo’s file limits. Reconnect your Neo and try again. No device files were changed."
-        case .verificationFailed: return "AlphaSync could not verify the changed file. Its contents may already have changed. Check the Neo and your recovery copy before trying again."
+            return "The converted file needs \(required.formatted()) bytes, but only \(available.formatted()) bytes are available."
+        case .limitsUnavailable: return "AlphaSync could not read the Neo’s file limits.  Reconnect your Neo and try again."
+        case .verificationFailed: return "AlphaSync could not verify the changed file."
         }
     }
 }
 
 public struct NeoWriteError: Error, LocalizedError, Sendable {
-    public let reason: String
-    public init(reason: String) { self.reason = reason }
+    public let underlying: any Error
+    public init(underlying: any Error) { self.underlying = underlying }
     public var errorDescription: String? {
-        if reason.contains("may already have changed") { return reason }
-        return "The Neo could not confirm the change. Device contents may already have changed. " + reason
+        "The Neo could not confirm the change.  Device contents may already have changed.  " + underlying.localizedDescription
     }
 }

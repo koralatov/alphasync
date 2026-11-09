@@ -90,48 +90,57 @@ extension DeviceService {
 
     public func apply(_ change: PreparedChange, recovery: RecoveryOptions) async throws -> ChangeResult {
         try await perform { access in
-            let engine = try access.engine(for: change.connection)
-            let latest = try access.update(change.connection)
-            guard let applet = latest.applets.first(where: { $0.id == change.applet.id }) else { throw NeoError.disconnected }
-            guard change.items.allSatisfy({ item in applet.files.contains(where: { $0.id == item.file.id }) }) else { throw NeoError.disconnected }
-            // Recheck every original before saving any recovery set or beginning a multi-file clear.
-            for item in change.items {
-                guard try engine.readFile(applet: applet.id, index: item.file.id.index) == item.original else {
-                    throw NeoError.device("A file changed after the warning opened. Review the current files and try again. No device files were changed.")
-                }
-            }
-            let folder = recovery.enabled ? try Self.saveRecovery(change, options: recovery) : nil
             var completed = 0
+            var folder: URL?
             do {
+                let engine = try access.engine(for: change.connection)
+                let latest = try access.update(change.connection)
+                guard let applet = latest.applets.first(where: { $0.id == change.applet.id }) else { throw NeoError.disconnected }
+                guard change.items.allSatisfy({ item in applet.files.contains(where: { $0.id == item.file.id }) }) else { throw NeoError.disconnected }
+                // Recheck every original before saving recovery or beginning a multi-file clear.
+                for item in change.items {
+                    guard try engine.readFile(applet: applet.id, index: item.file.id.index) == item.original else {
+                        throw NeoError.device("A file changed after the warning opened.  Review the current files and try again.")
+                    }
+                }
+                folder = recovery.enabled ? try Self.saveRecovery(change, options: recovery) : nil
                 for item in change.items {
                     try engine.writeFile(item.replacement, applet: applet.id, index: item.file.id.index, expectedOriginal: item.original)
                     completed += 1
                 }
                 return ChangeResult(snapshot: try access.update(change.connection), recoveryFolder: folder)
             } catch {
-                let location = folder.map { "\n\nRecovery copy: \($0.path)" } ?? ""
-                let message = completed > 0 ? error.localizedDescription.replacingOccurrences(of: " No device files were changed.", with: "") + " \(completed.formatted()) files were changed before this operation stopped." : error.localizedDescription
-                throw NeoError.device("\(message)\(location)")
+                throw OperationFailure(error, action: .change, completedFiles: completed, recoveryFolder: folder)
             }
         }
     }
 
     public func create(connection: UUID, appletID: UInt16, from source: URL) async throws -> NeoSnapshot {
         try await perform { access in
-            let engine = try access.engine(for: connection)
-            let limits = try engine.fileLimits(applet: appletID)
-            let converted = try FileCodec.converted(TextFiles.read(source), applet: appletID, limits: limits)
-            _ = try engine.createFile(converted, name: source.deletingPathExtension().lastPathComponent, applet: appletID)
-            do { return try access.update(connection) }
-            catch { throw NeoError.device("The file was added and verified, but the updated file list could not be read. Reconnect your Neo to check it. \(error.localizedDescription)") }
+            var completed = 0
+            do {
+                let engine = try access.engine(for: connection)
+                let limits = try engine.fileLimits(applet: appletID)
+                let converted = try FileCodec.converted(TextFiles.read(source), applet: appletID, limits: limits)
+                _ = try engine.createFile(converted, name: source.deletingPathExtension().lastPathComponent, applet: appletID)
+                completed = 1
+                return try access.update(connection)
+            } catch {
+                throw OperationFailure(error, action: .add, completedFiles: completed)
+            }
         }
     }
 
     public func rename(_ file: NeoFileID, to name: String) async throws -> NeoSnapshot {
         try await perform { access in
-            try access.engine(for: file.connection).rename(applet: file.applet, index: file.index, to: name)
-            do { return try access.update(file.connection) }
-            catch { throw NeoError.device("The file was renamed and verified, but the updated file list could not be read. Reconnect your Neo to check it. \(error.localizedDescription)") }
+            var completed = 0
+            do {
+                try access.engine(for: file.connection).rename(applet: file.applet, index: file.index, to: name)
+                completed = 1
+                return try access.update(file.connection)
+            } catch {
+                throw OperationFailure(error, action: .rename, completedFiles: completed)
+            }
         }
     }
 
@@ -169,7 +178,10 @@ extension DeviceService {
         try AtomicFileStore.write(metadata, name: ".recovery-information", extension: "plist", to: pending)
         let complete = try AtomicFileStore.completeFolder(pending)
         do { try AtomicFileStore.expireRecoveryCopies(in: root, olderThan: options.retentionDays, now: now) }
-        catch { throw NeoError.device("A recovery copy was saved at \(complete.path), but older copies could not be moved to Trash. No device files were changed. \(error.localizedDescription)") }
+        catch {
+            let reason = NeoError.device("Older recovery copies could not be moved to Trash.  \(error.localizedDescription)")
+            throw OperationFailure(reason, action: .change, recoveryFolder: complete)
+        }
         return complete
     }
 }

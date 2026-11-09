@@ -171,9 +171,7 @@ public final class AppStore: ObservableObject {
                     }
                 }
             } catch {
-                guard created > 0 else { throw error }
-                let reason = error.localizedDescription.replacingOccurrences(of: " No device files were changed.", with: "")
-                throw NeoError.device("\(created.formatted()) files were added before the import stopped. \(reason)")
+                throw OperationFailure(error, action: replacing ? .change : .add, completedFiles: created)
             }
         }
     }

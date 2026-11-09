@@ -20,12 +20,12 @@ public enum TextFiles {
         var attributes = stat()
         guard fstat(handle.fileDescriptor, &attributes) == 0 else { throw NSError(domain: NSPOSIXErrorDomain, code: Int(errno)) }
         guard attributes.st_mode & mode_t(S_IFMT) == mode_t(S_IFREG) else {
-            throw NeoError.device("Choose a regular text file. Folders, devices, and named pipes cannot be imported. No device files were changed.")
+            throw NeoError.device("Choose a regular text file.  Folders, devices, and named pipes cannot be imported.")
         }
         #endif
         let data = try handle.read(upToCount: maximumImportBytes + 1) ?? Data()
         guard data.count <= maximumImportBytes else {
-            throw NeoError.device("This text file is larger than AlphaSync’s \(maximumImportBytes.formatted())-byte import limit. Shorten it or split it into smaller files. No device files were changed.")
+            throw NeoError.device("This text file is larger than AlphaSync’s \(maximumImportBytes.formatted())-byte import limit.  Shorten it or split it into smaller files.")
         }
         return try decode(data)
     }
@@ -34,13 +34,13 @@ public enum TextFiles {
         guard data.count <= maximumImportBytes else { throw NeoError.invalidData("The import is too large.") }
         if data.starts(with: [0xff, 0xfe]) || data.starts(with: [0xfe, 0xff]) {
             guard data.count % 2 == 0, let text = String(data: data, encoding: .utf16) else {
-                throw NeoError.device("The UTF-16 text file is damaged or incomplete. No device files were changed.")
+                throw NeoError.device("The UTF-16 text file is damaged or incomplete.")
             }
             return text
         }
         if data.starts(with: [0xef, 0xbb, 0xbf]) {
             guard let text = String(data: data.dropFirst(3), encoding: .utf8) else {
-                throw NeoError.device("The UTF-8 text file is damaged or incomplete.  No device files were changed.")
+                throw NeoError.device("The UTF-8 text file is damaged or incomplete.")
             }
             return text
         }

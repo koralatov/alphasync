@@ -221,7 +221,7 @@ public final class NeoProtocol {
     /// Validation happens again immediately before the transaction that can change device contents.
     private func changing<T>(_ operation: () throws -> T) throws -> T {
         do { return try operation() }
-        catch { throw NeoWriteError(reason: error.localizedDescription) }
+        catch { throw NeoWriteError(underlying: error) }
     }
 
     public func writeFile(_ data: Data, applet: UInt16, index: UInt8, expectedOriginal: Data) throws {
@@ -230,7 +230,7 @@ public final class NeoProtocol {
         let memory = try availableMemory()
         try limits.validate(data.count, allocation: info.allocation, available: memory.ram)
         guard try readFile(applet: applet, index: index) == expectedOriginal else {
-            throw NeoError.device("The file changed after the warning opened. Review the current file and try again. No device files were changed.")
+            throw NeoError.device("The file changed after the warning opened.  Review the current file and try again.")
         }
         try transaction { try changing { try rawWrite(data, applet: applet, index: index) } }
     }
