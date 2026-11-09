@@ -1,3 +1,3 @@
 // Both downloads belong to one release and use the same version numbers.
-MARKETING_VERSION = 1.4.5
-CURRENT_PROJECT_VERSION = 145
+MARKETING_VERSION = 1.5
+CURRENT_PROJECT_VERSION = 146
