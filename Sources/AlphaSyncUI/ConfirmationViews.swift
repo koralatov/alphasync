@@ -3,6 +3,29 @@ import AppKit
 import AlphaSyncCore
 import AlphaSyncHardware
 
+struct DictionaryImportConfirmation: View {
+    let request: DictionaryImportRequest
+    let cancel: () -> Void
+    let confirm: () -> Void
+    @FocusState private var cancelFocused: Bool
+    var body: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            Label("Some dictionary words cannot be imported", systemImage: "exclamationmark.triangle").font(.headline)
+            Text(request.sources.first?.lastPathComponent ?? "Dictionary import").textSelection(.enabled)
+            Text(request.report.explanation).fixedSize(horizontal: false, vertical: true)
+            Text("Continue with only the valid words? Replacing an existing file still requires the usual Replace confirmation.")
+                .fixedSize(horizontal: false, vertical: true)
+            if request.completedFiles > 0 { Text("\(request.completedFiles.formatted()) files were already added and verified.").foregroundStyle(.secondary) }
+            HStack {
+                Spacer()
+                Button("Continue", action: confirm)
+                Button("Cancel", role: .cancel, action: cancel).keyboardShortcut(.defaultAction).focused($cancelFocused)
+            }
+        }.padding(24).frame(width: 450)
+            .defaultFocus($cancelFocused, true).onAppear { cancelFocused = true }
+    }
+}
+
 public struct DestructiveConfirmation: View {
     let title: String
     let action: String

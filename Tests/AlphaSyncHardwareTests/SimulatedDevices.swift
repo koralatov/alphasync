@@ -132,7 +132,8 @@ private final class SimulatedConnection: DeviceConnection {
     init(_ configuration: SimulatedConfiguration, _ observations: SimulatedObservations) throws {
         self.configuration = configuration
         self.observations = observations
-        limits = try NeoFileLimits(minimum: 512, maximum: 51_200)
+        limits = try NeoFileLimits(minimum: configuration.appletID == NeoApplet.dictionary ? 0 : 512,
+                                   maximum: configuration.appletID == NeoApplet.dictionary ? DictionaryCodec.maximum : 51_200)
         guard (0...255).contains(configuration.fileCount) else { throw NeoError.invalidData("Invalid simulated file count") }
         for number in 0..<configuration.fileCount {
             let index = UInt8(number + 1)

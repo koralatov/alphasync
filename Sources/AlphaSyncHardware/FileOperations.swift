@@ -42,14 +42,14 @@ public struct BackupResult: Sendable {
 }
 
 extension DeviceService {
-    public func prepareReplacement(file: NeoFileID, from source: URL) async throws -> PreparedChange {
+    public func prepareReplacement(file: NeoFileID, from source: URL, dictionaryConsent: String? = nil) async throws -> PreparedChange {
         try await perform { access in
             let snapshot = try access.snapshot(for: file.connection)
             guard let applet = snapshot.applets.first(where: { $0.id == file.applet }),
                   let node = applet.files.first(where: { $0.id == file }) else { throw NeoError.disconnected }
             let engine = try access.engine(for: file.connection)
             let limits = try engine.fileLimits(applet: file.applet)
-            let replacement = try FileCodec.converted(TextFiles.read(source), applet: file.applet, limits: limits)
+            let replacement = try FileCodec.converted(TextFiles.read(source), applet: file.applet, limits: limits, dictionaryConsent: dictionaryConsent)
             let memory = try engine.availableMemory()
             let attributes = try engine.attributes(applet: file.applet, index: file.index)
             try limits.validate(replacement.count, allocation: attributes.allocation, available: memory.ram)
@@ -110,16 +110,18 @@ extension DeviceService {
         }
     }
 
-    public func create(connection: UUID, appletID: UInt16, from source: URL) async throws -> NeoSnapshot {
+    public func create(connection: UUID, appletID: UInt16, from source: URL, dictionaryConsent: String? = nil) async throws -> NeoSnapshot {
         try await perform { access in
             var completed = 0
             do {
                 let engine = try access.engine(for: connection)
                 let limits = try engine.fileLimits(applet: appletID)
-                let converted = try FileCodec.converted(TextFiles.read(source), applet: appletID, limits: limits)
+                let converted = try FileCodec.converted(TextFiles.read(source), applet: appletID, limits: limits, dictionaryConsent: dictionaryConsent)
                 _ = try engine.createFile(converted, name: source.deletingPathExtension().lastPathComponent, applet: appletID)
                 completed = 1
                 return try access.update(connection)
+            } catch let warning as DictionaryImportWarning {
+                throw warning
             } catch {
                 throw OperationFailure(error, action: .add, completedFiles: completed)
             }

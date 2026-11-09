@@ -213,4 +213,93 @@ final class AppStoreTests: XCTestCase {
         XCTAssertEqual(observations.modeSwitchRetries, [true, false, true])
         await store.shutdown()
     }
+
+    private func dictionarySource(_ text: String) throws -> URL {
+        let url = try temporaryFolder().appendingPathComponent("Dictionary.txt")
+        try Data(text.utf8).write(to: url)
+        return url
+    }
+
+    func testDictionaryOmissionsNeedReviewBeforeTheReplaceConfirmation() async throws {
+        let observations = SimulatedObservations()
+        let store = makeStore(SimulatedConfiguration(appletID: NeoApplet.dictionary), observations: observations)
+        await store.refresh()
+        let file = store.files[0].id
+        store.selection = [file]
+        store.beginImport()
+        await store.finishImport(.success([try dictionarySource("cats a")]))?.value
+        let warning = try XCTUnwrap(store.pendingDictionaryImport)
+        XCTAssertEqual(warning.report.omittedWords, 1)
+        XCTAssertNil(store.pendingChange)
+        XCTAssertEqual(observations.writeCount, 0)
+        await store.confirmDictionaryImport(warning)
+        let replacement = try XCTUnwrap(store.pendingChange)
+        XCTAssertEqual(observations.writeCount, 0)
+        await store.confirm(replacement, saveRecovery: false)
+        XCTAssertEqual(observations.writeCount, 1)
+        let text = try await store.readText(file)
+        XCTAssertEqual(text, "cats")
+        await store.shutdown()
+    }
+
+    func testChangedDictionarySourceNeedsANewOmissionReview() async throws {
+        let observations = SimulatedObservations()
+        let store = makeStore(SimulatedConfiguration(appletID: NeoApplet.dictionary), observations: observations)
+        await store.refresh()
+        store.selection = [store.files[0].id]
+        let source = try dictionarySource("cats a")
+        store.beginImport()
+        await store.finishImport(.success([source]))?.value
+        let warning = try XCTUnwrap(store.pendingDictionaryImport)
+        try Data("dogs a".utf8).write(to: source)
+        await store.confirmDictionaryImport(warning)
+        XCTAssertEqual(store.pendingDictionaryImport?.sourceText, "dogs a")
+        XCTAssertNil(store.pendingChange)
+        XCTAssertEqual(observations.writeCount, 0)
+        await store.shutdown()
+    }
+
+    func testDictionaryWithoutUsableWordsIsRejectedBeforeWriting() async throws {
+        let observations = SimulatedObservations()
+        let store = makeStore(SimulatedConfiguration(appletID: NeoApplet.dictionary), observations: observations)
+        await store.refresh()
+        store.selection = [store.files[0].id]
+        store.beginImport()
+        await store.finishImport(.success([try dictionarySource("a extraordinarilylongword")]))?.value
+        XCTAssertEqual(observations.writeCount, 0)
+        XCTAssertNil(store.pendingDictionaryImport)
+        XCTAssertNil(store.pendingChange)
+        XCTAssertNotNil(store.notice)
+        await store.shutdown()
+    }
+
+    func testCancellingADictionaryWarningRetainsEarlierAddedFiles() async throws {
+        let observations = SimulatedObservations()
+        let store = makeStore(SimulatedConfiguration(appletID: NeoApplet.dictionary), observations: observations)
+        await store.refresh()
+        store.beginImport()
+        await store.finishImport(.success([try dictionarySource("cats"), try dictionarySource("dogs a")]))?.value
+        let warning = try XCTUnwrap(store.pendingDictionaryImport)
+        XCTAssertEqual(warning.completedFiles, 1)
+        store.cancelDictionaryImport(warning)
+        XCTAssertEqual(observations.writeCount, 1)
+        XCTAssertEqual(store.files.count, 3)
+        XCTAssertNil(store.pendingDictionaryImport)
+        XCTAssertTrue(try XCTUnwrap(store.notice?.message).contains("already added and verified"))
+        await store.shutdown()
+    }
+
+    func testDictionaryBatchResumesWithoutAddingEarlierFilesAgain() async throws {
+        let observations = SimulatedObservations()
+        let store = makeStore(SimulatedConfiguration(appletID: NeoApplet.dictionary), observations: observations)
+        await store.refresh()
+        store.beginImport()
+        await store.finishImport(.success([try dictionarySource("cats"), try dictionarySource("dogs a"), try dictionarySource("birds")]))?.value
+        let warning = try XCTUnwrap(store.pendingDictionaryImport)
+        await store.confirmDictionaryImport(warning)
+        XCTAssertEqual(observations.writeCount, 3)
+        XCTAssertEqual(store.files.count, 5)
+        XCTAssertNil(store.pendingDictionaryImport)
+        await store.shutdown()
+    }
 }

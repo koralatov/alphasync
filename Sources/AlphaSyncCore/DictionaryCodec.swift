@@ -1,17 +1,51 @@
 // Dictionary layout derived from tSoniq’s BSD-licensed ASUserDictionaryFile. See LICENSE.
 import Foundation
 
+public struct DictionaryImportReport: Sendable {
+    public let acceptedWords: Int
+    public let omittedWords: Int
+    public let examples: [String]
+    public var explanation: String {
+        let words = omittedWords == 1 ? "word cannot" : "words cannot"
+        var text = "\(omittedWords.formatted()) \(words) be stored. The Neo accepts dictionary words of 2 to 20 characters. \(acceptedWords.formatted()) distinct valid words remain."
+        if !examples.isEmpty { text += "\n\nExamples: " + examples.map { "‘\($0)’" }.joined(separator: ", ") }
+        return text
+    }
+}
+
+public struct DictionaryConversion: Sendable {
+    public let data: Data
+    public let report: DictionaryImportReport
+}
+
+public struct DictionaryImportWarning: Error, LocalizedError, Sendable {
+    public let sourceText: String
+    public let report: DictionaryImportReport
+    public var errorDescription: String? { report.explanation }
+}
+
 public enum DictionaryCodec {
     public static let maximum = 65536
-    public static func encode(_ text: String) throws -> Data {
+    public static func encode(_ text: String) throws -> Data { try convert(text).data }
+
+    public static func convert(_ text: String) throws -> DictionaryConversion {
         guard text.utf8.count <= 4 * 1024 * 1024 else { throw NeoError.tooLarge(required: text.utf8.count, maximum: maximum) }
         var words = Set<[UInt8]>(), current: [UInt8] = []
+        var omitted = 0, examples: [String] = []
         func isSeparator(_ byte: UInt8) -> Bool {
             byte == 32 || (9...13).contains(byte) || (33...47).contains(byte) ||
             (58...64).contains(byte) || (91...96).contains(byte) || (123...126).contains(byte)
         }
         func finish() {
             if (2...20).contains(current.count) { words.insert(current) }
+            else if !current.isEmpty {
+                omitted += 1
+                if examples.count < 3 {
+                    var example = String(String.UnicodeScalarView(current.prefix(32).map(NeoCharacters.decode)))
+                    if current.count > 32 { example += "…" }
+                    examples.append(example)
+                }
+            }
             current.removeAll(keepingCapacity: true)
         }
         for scalar in text.unicodeScalars {
@@ -32,7 +66,7 @@ public enum DictionaryCodec {
                 body.append(contentsOf: word)
             }
         }
-        return header + body
+        return DictionaryConversion(data: header + body, report: DictionaryImportReport(acceptedWords: words.count, omittedWords: omitted, examples: examples))
     }
 
     public static func decode(_ data: Data) throws -> String {

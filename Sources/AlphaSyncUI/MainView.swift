@@ -42,11 +42,17 @@ public struct MainView: View {
         .fileImporter(isPresented: $store.showExportFolder, allowedContentTypes: [.folder]) { result in
             store.finishExport(result)
         }
-        .sheet(item: $store.pendingChange) { change in
-            DestructiveConfirmation(title: change.title, action: change.action, explanation: change.explanation,
+        .sheet(item: $store.fileConfirmation) { confirmation in
+            switch confirmation {
+            case .change(let change):
+                DestructiveConfirmation(title: change.title, action: change.action, explanation: change.explanation,
                                     names: change.items.map { $0.file.displayName }, saveRecovery: preferences.saveRecoveryCopies,
                                cancel: { store.pendingChange = nil },
                                confirm: { choice in Task { await store.confirm(change, saveRecovery: choice) } })
+            case .dictionary(let request):
+                DictionaryImportConfirmation(request: request, cancel: { store.cancelDictionaryImport(request) },
+                                             confirm: { Task { await store.confirmDictionaryImport(request) } })
+            }
         }
         .sheet(isPresented: Binding(get: { store.backupResult != nil }, set: { if !$0 { store.backupResult = nil } })) {
             if let result = store.backupResult { BackupCompletion(result: result, close: { store.backupResult = nil }) }

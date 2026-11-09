@@ -36,13 +36,38 @@ struct InspectorPreviewID: Hashable, Sendable {
     let revision: UUID
 }
 
+struct DictionaryImportRequest: Identifiable {
+    let id = UUID()
+    let sources: [URL]
+    let target: ImportTarget
+    let sourceText: String
+    let report: DictionaryImportReport
+    let completedFiles: Int
+}
+
+enum FileConfirmation: Identifiable {
+    case change(PreparedChange)
+    case dictionary(DictionaryImportRequest)
+    var id: UUID {
+        switch self { case .change(let value): return value.id; case .dictionary(let value): return value.id }
+    }
+}
+
 @MainActor
 public final class AppStore: ObservableObject {
     @Published public var devices: [NeoSnapshot] = []
     @Published public var sidebar: SidebarSelection?
     @Published public var selection = Set<NeoFileID>()
     @Published public var notice: AppNotice?
-    @Published public var pendingChange: PreparedChange?
+    @Published var fileConfirmation: FileConfirmation?
+    public var pendingChange: PreparedChange? {
+        get { if case .change(let change) = fileConfirmation { return change }; return nil }
+        set { fileConfirmation = newValue.map(FileConfirmation.change) }
+    }
+    var pendingDictionaryImport: DictionaryImportRequest? {
+        if case .dictionary(let request) = fileConfirmation { return request }
+        return nil
+    }
     @Published public var backupResult: BackupResult?
     @Published public private(set) var lastExportedFiles: [URL] = []
     @Published public var operationText = ""
@@ -56,7 +81,7 @@ public final class AppStore: ObservableObject {
     public let preferences: Preferences
     public let service: DeviceService
     public let temporaryExports = TemporaryExports()
-    public var busy: Bool { activities > 0 || shuttingDown || pendingChange != nil }
+    public var busy: Bool { activities > 0 || shuttingDown || fileConfirmation != nil }
     public var connected: Bool { !devices.isEmpty }
     public var chosenDevice: NeoSnapshot? { devices.first { $0.connection == sidebar?.connection } ?? devices.first }
     public var chosenApplet: NeoApplet? {
@@ -225,32 +250,49 @@ public final class AppStore: ObservableObject {
         if let file { selection = [file] }
         return Task { await importFiles(urls, to: target) }
     }
-    private func importFiles(_ urls: [URL], to target: ImportTarget) async {
+    private func importFiles(_ urls: [URL], to target: ImportTarget, dictionaryConsent: String? = nil, previouslyCreated: Int = 0) async {
         let replacing = target.file != nil
         await run("Reading the text file…") {
-            guard let applet = devices.first(where: { $0.connection == target.connection })?.applets.first(where: { $0.id == target.applet }),
-                  applet.canWrite, target.file.map({ id in applet.files.contains { $0.id == id } }) ?? true else {
-                throw NeoError.disconnected
-            }
-            guard !replacing || urls.count == 1 else {
-                throw NeoError.device("Choose one text file when replacing a selected Neo file.")
-            }
-            var created = 0
+            var created = previouslyCreated
             do {
-                for url in urls {
+                guard let applet = devices.first(where: { $0.connection == target.connection })?.applets.first(where: { $0.id == target.applet }),
+                      applet.canWrite, target.file.map({ id in applet.files.contains { $0.id == id } }) ?? true else {
+                    throw NeoError.disconnected
+                }
+                guard !replacing || urls.count == 1 else {
+                    throw NeoError.device("Choose one text file when replacing a selected Neo file.")
+                }
+                for (offset, url) in urls.enumerated() {
                     try Task.checkCancellation()
                     let scoped = url.startAccessingSecurityScopedResource()
                     defer { if scoped { url.stopAccessingSecurityScopedResource() } }
-                    if let file = target.file {
-                        pendingChange = try await service.prepareReplacement(file: file, from: url)
-                    } else {
-                        let value = try await service.create(connection: target.connection, appletID: target.applet, from: url)
-                        created += 1; replace(value)
+                    do {
+                        let consent = offset == 0 ? dictionaryConsent : nil
+                        if let file = target.file {
+                            pendingChange = try await service.prepareReplacement(file: file, from: url, dictionaryConsent: consent)
+                        } else {
+                            let value = try await service.create(connection: target.connection, appletID: target.applet, from: url, dictionaryConsent: consent)
+                            created += 1; replace(value)
+                        }
+                    } catch let warning as DictionaryImportWarning {
+                        fileConfirmation = .dictionary(DictionaryImportRequest(sources: Array(urls.dropFirst(offset)), target: target,
+                            sourceText: warning.sourceText, report: warning.report, completedFiles: created))
+                        return
                     }
                 }
             } catch {
                 throw OperationFailure(error, action: replacing ? .change : .add, completedFiles: created)
             }
+        }
+    }
+    func confirmDictionaryImport(_ request: DictionaryImportRequest) async {
+        fileConfirmation = nil
+        await importFiles(request.sources, to: request.target, dictionaryConsent: request.sourceText, previouslyCreated: request.completedFiles)
+    }
+    func cancelDictionaryImport(_ request: DictionaryImportRequest) {
+        fileConfirmation = nil
+        if request.completedFiles > 0 {
+            notice = AppNotice("Import stopped", "\(request.completedFiles.formatted()) files were already added and verified. Those files have been kept on your Neo.")
         }
     }
     public func requestClear() async {

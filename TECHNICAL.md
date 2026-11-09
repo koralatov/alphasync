@@ -88,6 +88,8 @@ File-operation failures retain the underlying error, completed and verified file
 
 Exports and backups are **UTF-8 without a byte-order mark**, with LF line endings. Imports accept strict UTF-8, UTF-16 with a byte-order mark in either byte order, and MacASCII (Mac Roman). Unsupported Neo characters are rejected rather than silently replaced. This includes the unsupported `≡` character discussed during 1.5 development.
 
+Dictionary imports report omitted words and require consent for the exact source text before continuing. Non-empty sources without valid words are rejected. Resumed batches retain earlier verified additions and never import those files twice.
+
 Local imports must be regular files and are bounded to 4 MiB plus one detection byte. A non-blocking open prevents named pipes from holding up device work. File-name conversion is strict, with a 15-byte device limit. No silent truncation is used.
 
 Converted device bytes are validated against fresh applet limits and available memory before a writing command. Replacements can reuse their current allocation; growth keeps 1,024 bytes in reserve. Missing or invalid limits stop the import. Changed contents are read back and compared. Errors after writing begins say that the device may already have changed.
