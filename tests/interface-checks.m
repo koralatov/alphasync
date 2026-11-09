@@ -6,6 +6,10 @@
 #include <math.h>
 #include <stdio.h>
 
+@interface ASFileViewWindowController (ASCopyChecks)
+- (BOOL)copyTextToPasteboard:(NSPasteboard*)pasteboard;
+@end
+
 // Used only by --smoke-test.  These cached sample rows never access a Neo.
 @interface ASInterfaceRows : NSObject <NSOutlineViewDataSource>
 @property (retain) NSArray* roots;
@@ -748,7 +752,7 @@ static void checkFileViewLayout(ASFileViewWindowController* viewer)
     NSString* expectedMode = [[[viewer window] effectiveAppearance] bestMatchFromAppearancesWithNames:modes];
     requireInterface([[viewer window] isMemberOfClass:[NSWindow class]] && [[viewer window] appearance] == nil,
                      @"The file viewer is not a standard window inheriting the system appearance.");
-    for (NSView* view in @[content, text, scroll, [viewer valueForKey:@"fontStyle"], [viewer valueForKey:@"statusLabel"], [viewer valueForKey:@"progress"], [viewer valueForKey:@"readOnlyIcon"]])
+    for (NSView* view in @[content, text, scroll, [viewer valueForKey:@"fontStyle"], [viewer valueForKey:@"statusLabel"], [viewer valueForKey:@"progress"], [viewer valueForKey:@"readOnlyIcon"], [viewer valueForKey:@"copyButton"]])
     {
         requireInterface([view appearance] == nil && ![NSStringFromClass([view class]) hasPrefix:@"AS"],
                          [NSString stringWithFormat:@"The file viewer control %@ overrides its appearance or uses a custom view.", NSStringFromClass([view class])]);
@@ -759,7 +763,7 @@ static void checkFileViewLayout(ASFileViewWindowController* viewer)
                      @"The file viewer permits editing or prevents text selection.");
     requireInterface(NSWidth([text frame]) <= NSWidth([[scroll contentView] bounds]) + 1 && ![scroll hasHorizontalScroller],
                      @"The file viewer does not wrap its text to the visible width.");
-    for (NSString* key in @[@"fontStyle", @"statusLabel", @"readOnlyIcon"])
+    for (NSString* key in @[@"fontStyle", @"statusLabel", @"readOnlyIcon", @"copyButton"])
     {
         NSView* view = [viewer valueForKey:key];
         if ([view isHiddenOrHasHiddenAncestor]) continue;
@@ -802,6 +806,10 @@ static void checkFileViews(id controller)
         ASFileViewWindowController* first = [[[controller valueForKey:@"fileViewWindows"] lastObject] retain];
         [first autorelease];
         requireInterface(first && [[first window] isVisible], @"Opening a file did not show a new window.");
+        NSButton* copyButton = [first valueForKey:@"copyButton"];
+        requireInterface([copyButton isMemberOfClass:[NSButton class]] && ![copyButton isEnabled] &&
+                         [copyButton target] == first && [copyButton action] == @selector(copyToClipboard:),
+                         @"The native Copy to Clipboard button is missing or enabled before loading.");
         NSSize size = [[[first window] contentView] bounds].size;
         requireInterface(fabs(size.width - 640) < 1 && fabs(size.height - 480) < 1 &&
                          ([[first window] styleMask] & NSWindowStyleMaskResizable), @"The file viewer has the wrong initial size or cannot resize.");
@@ -821,6 +829,10 @@ static void checkFileViews(id controller)
         requireInterface(copied && [copiedText isEqualToString:@"Notes"],
             [NSString stringWithFormat:@"Read-only copy failed: wrote=%d, selection=%@, types=%@, copied=%@.",
              copied, NSStringFromRange([text selectedRange]), copyTypes, copiedText]);
+        requireInterface([copyButton isEnabled] && [first copyTextToPasteboard:copyBoard] &&
+                         [[copyBoard stringForType:NSPasteboardTypeString] isEqualToString:[worker text]] &&
+                         NSEqualRanges([text selectedRange], NSMakeRange(0, 5)),
+                         @"Copy to Clipboard copied a selection or changed it instead of copying the complete loaded file.");
         [copyBoard releaseGlobally];
         NSSegmentedControl* style = [first valueForKey:@"fontStyle"];
         NSFont* regular = [NSFont systemFontOfSize:0];
@@ -832,6 +844,8 @@ static void checkFileViews(id controller)
         requireInterface([[[text font] fontName] isEqualToString:[mono fontName]] && fabs([[text font] pointSize] - [mono pointSize]) < 0.01 &&
                          [[text string] isEqualToString:[worker text]] && NSEqualRanges([text selectedRange], NSMakeRange(0, 5)),
                          @"Changing the font changed the text, selection, or system font size.");
+        checkFileViewLayout(first);
+        [[first window] setContentSize:NSMakeSize(400, 300)];
         checkFileViewLayout(first);
         [controller performSelector:NSSelectorFromString(@"openFile:") withObject:file];
         ASFileViewWindowController* second = [[controller valueForKey:@"fileViewWindows"] lastObject];
@@ -853,12 +867,14 @@ static void checkFileViews(id controller)
         requireInterface([[[failed valueForKey:@"textView"] string] length] == 0 &&
                          [[[failed valueForKey:@"statusLabel"] stringValue] containsString:@"couldn’t read"] &&
                          [[failed valueForKey:@"readOnlyIcon"] isHidden], @"A failed read displayed stale text or no explanation.");
+        requireInterface(![[failed valueForKey:@"copyButton"] isEnabled], @"A failed read enabled Copy to Clipboard.");
         [worker setFailRead:NO];
         [worker setText:@""];
         [controller performSelector:NSSelectorFromString(@"openFile:") withObject:file];
         ASFileViewWindowController* empty = [[controller valueForKey:@"fileViewWindows"] lastObject];
         waitForRead(queue, 4);
         requireInterface([[[empty valueForKey:@"statusLabel"] stringValue] containsString:@"empty"], @"An empty file was treated as a read failure.");
+        requireInterface(![[empty valueForKey:@"copyButton"] isEnabled], @"An empty file enabled Copy to Clipboard.");
         [queue setHoldRead:YES];
         [controller performSelector:NSSelectorFromString(@"openFile:") withObject:file];
         ASFileViewWindowController* closed = [[[[controller valueForKey:@"fileViewWindows"] lastObject] retain] autorelease];

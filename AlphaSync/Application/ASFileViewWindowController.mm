@@ -7,6 +7,7 @@ static NSString* const ASFileViewMonospacedKey = @"FileViewerMonospaced";
 @interface ASFileViewWindowController ()
 - (void)applyFont;
 - (void)showText:(NSString*)text error:(NSString*)error;
+- (BOOL)copyTextToPasteboard:(NSPasteboard*)pasteboard;
 @end
 
 @implementation ASFileViewWindowController
@@ -87,7 +88,13 @@ static NSString* const ASFileViewMonospacedKey = @"FileViewerMonospaced";
         [statusLabel setTextColor:[NSColor secondaryLabelColor]];
         [statusLabel setContentCompressionResistancePriority:NSLayoutPriorityDefaultLow forOrientation:NSLayoutConstraintOrientationHorizontal];
         [statusLabel setContentCompressionResistancePriority:NSLayoutPriorityRequired forOrientation:NSLayoutConstraintOrientationVertical];
-        NSStackView* statusBar = [NSStackView stackViewWithViews:@[progress, readOnlyIcon, statusLabel]];
+        copyButton = [NSButton buttonWithTitle:@"Copy to Clipboard" target:self action:@selector(copyToClipboard:)];
+        [copyButton setToolTip:@"Copy all text in this window to the clipboard"];
+        [copyButton setEnabled:NO];
+        [copyButton setContentHuggingPriority:NSLayoutPriorityRequired forOrientation:NSLayoutConstraintOrientationHorizontal];
+        [copyButton setContentCompressionResistancePriority:NSLayoutPriorityRequired forOrientation:NSLayoutConstraintOrientationHorizontal];
+        NSView* spacer = [[[NSView alloc] initWithFrame:NSZeroRect] autorelease];
+        NSStackView* statusBar = [NSStackView stackViewWithViews:@[progress, readOnlyIcon, statusLabel, spacer, copyButton]];
         [statusBar setOrientation:NSUserInterfaceLayoutOrientationHorizontal];
         [statusBar setAlignment:NSLayoutAttributeCenterY];
         [statusBar setSpacing:8];
@@ -141,6 +148,9 @@ static NSString* const ASFileViewMonospacedKey = @"FileViewerMonospaced";
 
 - (void)loadFile:(ASFileNode*)file controller:(ASDeviceController*)controller
 {
+    [copyButton setEnabled:NO];
+    [copyButton setHidden:NO];
+    [readOnlyIcon setHidden:YES];
     [progress startAnimation:self];
     [controller performTaskForNode:file refresh:NO task:^id(ASNode* working) {
         NSString* text = [(ASFileNode*)working fileData];
@@ -159,6 +169,8 @@ static NSString* const ASFileViewMonospacedKey = @"FileViewerMonospaced";
     [progress stopAnimation:self];
     [progress setHidden:YES];
     [readOnlyIcon setHidden:error != nil];
+    [copyButton setEnabled:!error && [text length] > 0];
+    [copyButton setHidden:error != nil];
     [textView setString:error ? @"" : (text ?: @"")];
     [self applyFont];
     [textView scrollRangeToVisible:NSMakeRange(0, 0)];
@@ -166,10 +178,24 @@ static NSString* const ASFileViewMonospacedKey = @"FileViewerMonospaced";
     [statusLabel setTextColor:error ? [NSColor labelColor] : [NSColor secondaryLabelColor]];
 }
 
+- (BOOL)copyTextToPasteboard:(NSPasteboard*)pasteboard
+{
+    if (closed || ![copyButton isEnabled] || ![[textView string] length]) return NO;
+    [pasteboard clearContents];
+    return [pasteboard setString:[textView string] forType:NSPasteboardTypeString];
+}
+
+- (IBAction)copyToClipboard:(id)sender
+{
+    (void)sender;
+    if (![self copyTextToPasteboard:[NSPasteboard generalPasteboard]]) NSBeep();
+}
+
 - (void)windowWillClose:(NSNotification*)notification
 {
     (void)notification;
     closed = YES;
+    [copyButton setEnabled:NO];
 }
 
 @end

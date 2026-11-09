@@ -10,11 +10,13 @@
     NSTextField* statusLabel;
     NSProgressIndicator* progress;
     NSImageView* readOnlyIcon;
+    NSButton* copyButton;
     BOOL closed;
 }
 
 - (id)initWithFileName:(NSString*)name;
 - (void)loadFile:(ASFileNode*)file controller:(ASDeviceController*)controller;
 - (IBAction)changeFontStyle:(id)sender;
+- (IBAction)copyToClipboard:(id)sender;
 
 @end

@@ -84,6 +84,7 @@ Keep known-good backups before testing writes to the Neo.
 - On real hardware, create, replace, and clear disposable files and confirm the final text on the Neo. Disconnect during a write or verification. Any failure after writing must say contents may have changed and include the recovery location when one was saved. Check that a failed rename is reported and the file list refreshes to the actual name.
 - Check natural ordering of names such as File 1, File 2, and File 10. Connect a Neo containing several longer files and confirm that ordinary list refreshes no longer read every complete file. Opening a reader or a visible Inspector preview must still load the complete text.
 - In a read-only file window, test Copy, Select All, Find, Find Next, Find Previous, and Use Selection for Find through both menus and shortcuts. Search and copying must leave the original text unchanged.
+- Check the native symbol beside Read-only. Copy to Clipboard should copy the complete loaded file, including text beyond the visible preview, while preserving the selection and scroll position. Paste into TextEdit and compare it. Repeat after disconnecting the Neo. Loading, empty, and failed reads must not enable copying unavailable text. Check both font choices, the minimum window size, Light and Dark Mode, and VoiceOver.
 
 ## Backups
 

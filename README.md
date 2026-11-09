@@ -39,7 +39,7 @@ Your Mac remembers that you allowed this copy of AlphaSync. You can then open it
 
 Open AlphaSync and connect your Neo with a USB cable. Your Neo’s files appear in the window.
 
-- **Read a file:** double-click it to open a read-only window. Use **Font** to choose **Regular** or **Monospaced**. Use **Edit → Copy**, **Select All**, or **Find → Find…** to work with the text.
+- **Read a file:** double-click it to open a read-only window. Use **Font** to choose **Regular** or **Monospaced**. Click **Copy to Clipboard** to copy the complete text. Use **Edit → Copy** for a selection or **Find → Find…** to search.
 - **Copy files to your Mac:** drag them from AlphaSync into a Finder folder.
 - **Copy text files to your Neo:** drag them from Finder into AlphaSync.
 - **Back up your files:** click **Backup**. You can choose where backups are saved in **Preferences**.
