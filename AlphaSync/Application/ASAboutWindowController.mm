@@ -107,6 +107,13 @@ static NSStackView* ASAboutColumn(NSArray<NSView*>* views, CGFloat spacing)
     return self;
 }
 
+- (void)showWindow:(id)sender
+{
+    [super showWindow:sender];
+    // Start with neutral focus each time, while keeping the links in the key-view loop.
+    [[self window] makeFirstResponder:nil];
+}
+
 - (void)openLink:(NSButton*)sender
 {
     NSArray* urls = @[@"https://github.com/koralatov/alphasync",

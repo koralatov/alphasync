@@ -430,6 +430,32 @@ static void checkPreferenceLayout(id preferences)
                      [NSString stringWithFormat:@"The folder button is stretched (alignment %.1f, intrinsic %.1f).", width, [choose intrinsicContentSize].width]);
 }
 
+static void checkAboutFocus(NSWindowController* about)
+{
+    NSWindow* window = [about window];
+    for (NSUInteger pass = 0; pass < 2; ++pass)
+    {
+        [about showWindow:nil];
+        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
+        requireInterface(![[window firstResponder] isKindOfClass:[NSButton class]], @"An About link has keyboard focus on opening.");
+        NSMutableArray* views = [NSMutableArray arrayWithObject:[window contentView]];
+        NSUInteger links = 0;
+        while ([views count])
+        {
+            NSView* view = [[[views lastObject] retain] autorelease];
+            [views removeLastObject];
+            [views addObjectsFromArray:[view subviews]];
+            if (![view isKindOfClass:[NSButton class]]) continue;
+            NSButton* link = (NSButton*)view;
+            requireInterface([link isEnabled] && ![link refusesFirstResponder], @"An About link lost keyboard access.");
+            ++links;
+        }
+        requireInterface(links == 3, @"The About links are missing.");
+        [about close];
+    }
+    [about showWindow:nil];
+}
+
 static void checkPreferences(id controller)
 {
     id preferences = [controller valueForKey:@"preferenceController"];
@@ -1233,6 +1259,7 @@ static int checkInterface(void)
                 if ([item action] == NSSelectorFromString(@"actionShowAbout:"))
                     openedAbout = [NSApp sendAction:[item action] to:[item target] from:item];
         requireInterface(openedAbout, @"The About menu did not open the native About window.");
+        checkAboutFocus([controller valueForKey:@"aboutController"]);
         for (NSString* key in @[@"preferenceController", @"inspectorController", @"aboutController"])
         {
             NSWindowController* windowController = [controller valueForKey:key];

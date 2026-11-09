@@ -100,6 +100,8 @@ Keep known-good backups before testing writes to the Neo.
 
 ## Distribution
 
+- Open About, close it, and reopen it after using a link. No link should have keyboard focus on opening. With keyboard navigation enabled, confirm that Tab can still reach Project, Release notes, and Licence, and Space can activate a focused link.
+
 - Check Finder, the Dock, and About for each download. Universal should show the original green icon; the macOS 27 Apple Silicon build should show the preferred glass icon. Check small and large icon sizes in Light and Dark Mode.
 
 Use the final download ZIP for a clean-install check on a second Mac. Record first-launch behaviour, opening every window, automatic launching, and a real transfer.
