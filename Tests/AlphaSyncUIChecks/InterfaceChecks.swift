@@ -30,7 +30,22 @@ struct InterfaceChecks {
         view.layoutSubtreeIfNeeded(); view.displayIfNeeded()
         guard let bitmap = view.bitmapImageRepForCachingDisplay(in: view.bounds) else { throw CheckFailure(description: "Cannot capture \(name)") }
         view.cacheDisplay(in: view.bounds, to: bitmap)
-        guard let bytes = bitmap.representation(using: .png, properties: [:]) else { throw CheckFailure(description: "Cannot encode \(name)") }
+        // NSHostingView is transparent. Include the native window colour so standalone PNGs remain readable.
+        guard let opaque = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: bitmap.pixelsWide, pixelsHigh: bitmap.pixelsHigh,
+                    bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB,
+                    bytesPerRow: 0, bitsPerPixel: 0), let context = NSGraphicsContext(bitmapImageRep: opaque) else {
+            throw CheckFailure(description: "Cannot create the capture background")
+        }
+        opaque.size = bitmap.size
+        NSGraphicsContext.saveGraphicsState()
+        NSGraphicsContext.current = context
+        window.effectiveAppearance.performAsCurrentDrawingAppearance {
+            NSColor.windowBackgroundColor.setFill()
+            let bounds = NSRect(origin: .zero, size: bitmap.size)
+            bounds.fill(); bitmap.draw(in: bounds)
+        }
+        NSGraphicsContext.restoreGraphicsState()
+        guard let bytes = opaque.representation(using: .png, properties: [:]) else { throw CheckFailure(description: "Cannot encode \(name)") }
         try bytes.write(to: output.appendingPathComponent(name + ".png"), options: .atomic)
     }
     static func key(_ character: String, code: UInt16, in window: NSWindow) throws {

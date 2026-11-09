@@ -48,7 +48,9 @@ jobs:
         run: |
           swift build --product AlphaSyncUIChecks
           swift test --parallel
+          python3 Tests/Packaging/check-packages.py
       - name: Build both native app targets
+        id: apps
         if: always() && steps.shared.outcome == 'success'
         env:
           PACKAGE_EDITIONS: ${{ matrix.package }}
@@ -72,6 +74,14 @@ jobs:
               scripts/package-symbols.sh "$products" "$profile" "build/downloads/$profile"
             fi
           done
+      - name: Collect matching development editions
+        if: matrix.package && steps.apps.outcome == 'success'
+        run: |
+          version=$(sed -n 's/^MARKETING_VERSION *= *//p' AlphaSync/Build/Version.xcconfig)
+          build_number=$(sed -n 's/^CURRENT_PROJECT_VERSION *= *//p' AlphaSync/Build/Version.xcconfig)
+          python3 scripts/collect-builds.py --universal build/downloads/universal \
+            --apple-silicon build/downloads/apple-silicon --output build/validated-downloads \
+            --version "$version" --build "$build_number" --source-commit "$GITHUB_SHA"
       - name: Check native interface behaviour and capture both appearances
         if: always() && steps.shared.outcome == 'success'
         run: swift run --skip-build AlphaSyncUIChecks build/interface-checks
@@ -87,5 +97,5 @@ jobs:
         if: success() && matrix.package
         with:
           name: AlphaSync-1.6-development-${{ github.sha }}
-          path: build/downloads/*/*
+          path: build/validated-downloads/*
           if-no-files-found: error

@@ -12,8 +12,8 @@ helper="$app/Contents/Library/LoginItems/AlphaSyncLauncher.app"
 help_book="$app/Contents/Resources/AlphaSync Help"
 test -s "$help_book/AlphaSync Help.helpindex"
 test -s "$help_book/licence.html"
-rg -q 'alphasync-home' "$help_book/alphasync-help.html"
-if find "$app/Contents/Resources" -name '*.nib' -print | rg -q .; then
+/usr/bin/grep -q 'alphasync-home' "$help_book/alphasync-help.html"
+if find "$app/Contents/Resources" -name '*.nib' -print | /usr/bin/grep -q .; then
     printf 'The SwiftUI app must not contain legacy nibs.\n' >&2; exit 1
 fi
 version=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$app/Contents/Info.plist")

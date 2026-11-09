@@ -55,7 +55,7 @@ swift run --skip-build AlphaSyncUIChecks build/interface-checks
 
 Core regressions cover wire frames, truncated replies, character conversion, UTF-16 byte orders, dictionary bounds, unsupported text, file limits, low memory, exclusive exports, and incomplete folders. Simulated transfer checks include multi-block writes, read-back mismatches, changed originals, and a 2 MB import rejected before file-writing commands.
 
-The separate interface executable uses disposable sample snapshots and private preferences. It never opens a Neo or registers a login item. It checks native read-only text, fonts, and Return and Space handling for Clear and Replace, and captures the interface in Light and Dark appearances. This code is excluded from shipping app targets. Physical keyboard, accessibility, window-transition, and USB checks remain in the [manual checklist](tests/manual-checks.md).
+The separate interface executable uses disposable sample snapshots and private preferences. It never opens a Neo or registers a login item. It checks native read-only text, fonts, and Return and Space handling for Clear and Replace, and captures the interface in Light and Dark appearances. This code is excluded from shipping app targets. Cached view images do not capture every system-composited toolbar or sidebar effect. Physical keyboard, accessibility, window-transition, and USB checks remain in the [manual checklist](tests/manual-checks.md).
 
 ```sh
 scripts/verify-app.sh build/DerivedData/Build/Products/Release/universal/AlphaSync.app universal
