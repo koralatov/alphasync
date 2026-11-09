@@ -261,7 +261,7 @@ static NSInteger sortFunctionDisplayName(id node1, id node2, void* context)
     ASNode* n2 = (ASNode*)node2;
 
     NSString* name1 = [n1 displayName];
-    NSString* name2 = [n1 displayName];
+    NSString* name2 = [n2 displayName];
     int fileSpace1 = [n1 fileSpace];
     int fileSpace2 = [n2 fileSpace];
     int space1 = (fileSpace1 == 0) ? INT_MAX : fileSpace1;
@@ -269,7 +269,7 @@ static NSInteger sortFunctionDisplayName(id node1, id node2, void* context)
 
     if (space1 < space2) result = NSOrderedAscending;
     else if (space1 > space2) result = NSOrderedDescending;
-    else result = [name1 caseInsensitiveCompare:name2];
+    else result = [name1 localizedStandardCompare:name2];
 
     return result;
 }

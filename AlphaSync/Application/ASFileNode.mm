@@ -416,17 +416,24 @@ static NSImage* iconFileBin = nil;              /**< Icon to use for binary file
  */
 - (NSString*)setFileName:(NSString*)newName
 {
+    [self setOperationError:nil];
     const char* newCName = [newName cStringUsingEncoding:NSWindowsCP1252StringEncoding];
-    if (newCName && strlen(newCName) > 0)
+    NSData* encoded = [newName dataUsingEncoding:NSWindowsCP1252StringEncoding allowLossyConversion:NO];
+    if (!newCName || ![encoded length] || [encoded length] > kASFileAttributesFileNameMaxSize ||
+        strlen(newCName) != [encoded length] || [newName rangeOfCharacterFromSet:[NSCharacterSet controlCharacterSet]].location != NSNotFound)
     {
-        fileAttributes->setFileName(newCName);
-        device->setFileAttributes(applet, fileIndex, fileAttributes);   // Set the values
-        device->getFileAttributes(fileAttributes, applet, fileIndex);   // Re-read them in case the device changes something
+        [self setOperationError:[NSString stringWithFormat:@"Choose a name of 1 to %u characters that the Neo can store. Control characters and unsupported characters, such as emoji, cannot be used.", kASFileAttributesFileNameMaxSize]];
+        return nil;
     }
-
+    ASFileAttributes changed(*fileAttributes);
+    changed.setFileName(newCName);
+    BOOL written = device->setFileAttributes(applet, fileIndex, &changed);
+    ASFileAttributes confirmed;
+    BOOL verified = written && device->getFileAttributes(&confirmed, applet, fileIndex) &&
+        strcmp(confirmed.fileName(), newCName) == 0;
+    if (!verified) [self setOperationError:@"The Neo could not confirm the new name. Check the connection and try again."];
     [self refresh];
-
-    return [self displayName];
+    return verified ? [self displayName] : nil;
 }
 
 

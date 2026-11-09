@@ -46,6 +46,15 @@ int main()
     @autoreleasepool
     {
         TestDevice device;
+        ASNode* sorted = [[[ASNode alloc] init] autorelease];
+        for (NSString* name in @[@"File 10", @"File 2", @"File 1"])
+        {
+            ASNode* child = [[[ASNode alloc] init] autorelease];
+            [child setDisplayName:name];
+            [sorted addChild:child];
+        }
+        [sorted sortChildren];
+        CHECK([[[sorted children] valueForKey:@"displayName"] isEqual:@[@"File 1", @"File 2", @"File 10"]]);
         ts::ASDevice* testDevice = &device;
         ASDeviceController* controller = [[ASDeviceController alloc] init];
         dispatch_queue_t queue = (dispatch_queue_t)[controller valueForKey:@"deviceQueue"];
