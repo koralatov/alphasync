@@ -141,7 +141,7 @@ final class DeviceServiceTests: XCTestCase {
         let stop = StopRequest()
         let result = try await service.backup(connections: [snapshot.connection], includedApplets: nil,
                                               destination: root, saveLog: false, stop: stop) { value in
-            if !value.fileName.isEmpty { stop.stop() }
+            if value.saved == 1 && !value.fileName.isEmpty { stop.stop() }
         }
         XCTAssertEqual(result.saved, 1)
         XCTAssertTrue(result.stopped)
