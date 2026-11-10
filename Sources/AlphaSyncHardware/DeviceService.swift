@@ -64,10 +64,10 @@ public final class DeviceService: @unchecked Sendable {
     public func refresh(retryConnections: Bool = false) async throws -> DiscoveryResult {
         try await perform { access in try access.scan(refresh: true, retryConnections: retryConnections) }
     }
-    public func read(_ file: NeoFileID) async throws -> Data {
+    public func read(_ file: NeoFileID, stop: StopRequest? = nil) async throws -> Data {
         try await perform { access in
             try access.engine(for: file.connection).readFile(applet: file.applet, index: file.index) {
-                try access.checkCancellation()
+                try access.checkCancellation(stop)
             }
         }
     }
@@ -96,8 +96,8 @@ public final class DeviceService: @unchecked Sendable {
             dispatchPrecondition(condition: .onQueue(service.queue))
             return cancellation.isRequested
         }
-        func checkCancellation() throws {
-            if isCancellationRequested { throw CancellationError() }
+        func checkCancellation(_ stop: StopRequest? = nil) throws {
+            if isCancellationRequested || stop?.isRequested == true { throw CancellationError() }
         }
         func engine(for generation: UUID) throws -> any DeviceConnection {
             dispatchPrecondition(condition: .onQueue(service.queue))

@@ -78,6 +78,8 @@ public final class AppStore: ObservableObject {
     @Published public private(set) var shuttingDown = false
     @Published private var contentRevision = UUID()
     @Published private var activities = 0
+    private var activityStops: [UUID: StopRequest] = [:]
+    private var idleWaiters: [CheckedContinuation<Void, Never>] = []
     public let preferences: Preferences
     public let service: DeviceService
     public let temporaryExports = TemporaryExports()
@@ -206,24 +208,40 @@ public final class AppStore: ObservableObject {
         contentRevision = UUID()
         reconcileSelection()
     }
-    private func run(_ title: String, _ action: @MainActor () async throws -> Void) async {
+    private func beginActivity() -> (id: UUID, stop: StopRequest) {
+        let id = UUID(), stop = StopRequest()
+        activityStops[id] = stop
+        activities = activityStops.count
+        epoch += 1
+        return (id, stop)
+    }
+    private func finishActivity(_ id: UUID) {
+        guard activityStops.removeValue(forKey: id) != nil else { return }
+        activities = activityStops.count
+        if activities == 0 {
+            let waiters = idleWaiters
+            idleWaiters.removeAll()
+            for waiter in waiters { waiter.resume() }
+        }
+        resumeAttachmentScan()
+    }
+    private func run(_ title: String, _ action: @MainActor (StopRequest) async throws -> Void) async {
+        guard !shuttingDown else { return }
         guard !busy else {
             notice = AppNotice("Please wait", "Wait for the current transfer to finish, then try again.")
             return
         }
-        activities += 1
-        epoch += 1
+        let activity = beginActivity()
         operationText = title
         defer {
-            activities -= 1
             operationText = ""
             progress = nil
             stopRequest = nil
-            resumeAttachmentScan()
+            finishActivity(activity.id)
         }
-        do { try await action() }
+        do { try await action(activity.stop) }
         catch {
-            if error is CancellationError { return }
+            if shuttingDown || error is CancellationError { return }
             notice = AppNotice("The operation could not be completed", error.localizedDescription)
             if let result = try? await service.refresh() {
                 devices = result.devices
@@ -235,7 +253,7 @@ public final class AppStore: ObservableObject {
         }
     }
     public func refresh() async {
-        await run("Refreshing files…") {
+        await run("Refreshing files…") { _ in
             let result = try await service.refresh(retryConnections: true)
             devices = result.devices; discoveryIssue = result.issue
             updateConnectionIssue()
@@ -248,11 +266,11 @@ public final class AppStore: ObservableObject {
         try Task.checkCancellation()
         guard !shuttingDown else { throw NeoError.cancelled }
         guard let applet = applet(for: id) else { throw NeoError.disconnected }
-        activities += 1
-        epoch += 1
-        defer { activities -= 1; resumeAttachmentScan() }
-        let bytes = try await service.read(id)
+        let activity = beginActivity()
+        defer { finishActivity(activity.id) }
+        let bytes = try await service.read(id, stop: activity.stop)
         try Task.checkCancellation()
+        if activity.stop.isRequested { throw CancellationError() }
         return try FileCodec.text(bytes, applet: applet)
     }
     private func importTarget(replacing file: NeoFileID? = nil) -> ImportTarget? {
@@ -294,7 +312,7 @@ public final class AppStore: ObservableObject {
     }
     private func importFiles(_ urls: [URL], to target: ImportTarget, dictionaryConsent: String? = nil, previouslyCreated: Int = 0) async {
         let replacing = target.file != nil
-        await run("Reading the text file…") {
+        await run("Reading the text file…") { stop in
             var created = previouslyCreated
             do {
                 guard let applet = devices.first(where: { $0.connection == target.connection })?.applets.first(where: { $0.id == target.applet }),
@@ -306,14 +324,15 @@ public final class AppStore: ObservableObject {
                 }
                 for (offset, url) in urls.enumerated() {
                     try Task.checkCancellation()
+                    if stop.isRequested { throw CancellationError() }
                     let scoped = url.startAccessingSecurityScopedResource()
                     defer { if scoped { url.stopAccessingSecurityScopedResource() } }
                     do {
                         let consent = offset == 0 ? dictionaryConsent : nil
                         if let file = target.file {
-                            pendingChange = try await service.prepareReplacement(file: file, from: url, dictionaryConsent: consent)
+                            pendingChange = try await service.prepareReplacement(file: file, from: url, dictionaryConsent: consent, stop: stop)
                         } else {
-                            let value = try await service.create(connection: target.connection, appletID: target.applet, from: url, dictionaryConsent: consent)
+                            let value = try await service.create(connection: target.connection, appletID: target.applet, from: url, dictionaryConsent: consent, stop: stop)
                             created += 1; replace(value)
                         }
                     } catch let warning as DictionaryImportWarning {
@@ -347,24 +366,24 @@ public final class AppStore: ObservableObject {
             appletID = ids.count == 1 ? ids.first : nil
         }
         guard let appletID else { notice = AppNotice("Choose files from one applet", "Clear one applet’s files at a time."); return }
-        await run("Reading the original files…") {
+        await run("Reading the original files…") { stop in
             pendingChange = try await service.prepareClear(connection: device.connection, appletID: appletID,
-                                                           files: selected.isEmpty ? nil : selected)
+                                                           files: selected.isEmpty ? nil : selected, stop: stop)
         }
     }
     public func confirm(_ change: PreparedChange, saveRecovery: Bool) async {
         pendingChange = nil
-        await run("Saving recovery copies and changing files…") {
+        await run("Saving recovery copies and changing files…") { stop in
             let folder = saveRecovery ? try preferences.prepareBackupFolder() : preferences.backupFolder
             let scoped = saveRecovery && folder.startAccessingSecurityScopedResource()
             defer { if scoped { folder.stopAccessingSecurityScopedResource() } }
             let options = RecoveryOptions(enabled: saveRecovery, folder: folder, retentionDays: preferences.retentionDays)
-            let result = try await service.apply(change, recovery: options)
+            let result = try await service.apply(change, recovery: options, stop: stop)
             replace(result.snapshot)
         }
     }
     public func rename(_ file: NeoFileID, to name: String) async {
-        await run("Renaming the file…") { replace(try await service.rename(file, to: name)) }
+        await run("Renaming the file…") { stop in replace(try await service.rename(file, to: name, stop: stop)) }
     }
     public func beginExport() {
         guard !busy, !showImporter, !showExportFolder else { return }
@@ -389,7 +408,7 @@ public final class AppStore: ObservableObject {
         }
     }
     private func exportFiles(_ ids: [NeoFileID], to folder: URL) async {
-        await run("Saving files to your Mac…") {
+        await run("Saving files to your Mac…") { stop in
             lastExportedFiles = []
             guard ids.allSatisfy({ id in applet(for: id)?.files.contains { $0.id == id } == true }) else {
                 throw NeoError.disconnected
@@ -397,7 +416,7 @@ public final class AppStore: ObservableObject {
             let scoped = folder.startAccessingSecurityScopedResource()
             defer { if scoped { folder.stopAccessingSecurityScopedResource() } }
             do {
-                lastExportedFiles = try await service.export(ids, to: folder)
+                lastExportedFiles = try await service.export(ids, to: folder, stop: stop)
                 notice = AppNotice("Files saved", "AlphaSync saved \(lastExportedFiles.count.formatted()) files to:\n\(folder.path)\n\nThe original files on your Neo have not been changed.")
             } catch let failure as ExportFailure {
                 lastExportedFiles = failure.savedFiles
@@ -409,11 +428,11 @@ public final class AppStore: ObservableObject {
         let identities = devices.map(\.connection)
         let included = preferences.filter.appletIDs, logs = preferences.saveBackupLogs
         guard !identities.isEmpty else { return }
-        await run("Starting the backup…") {
+        await run("Starting the backup…") { request in
             let folder = try preferences.prepareBackupFolder()
             let scoped = folder.startAccessingSecurityScopedResource()
             defer { if scoped { folder.stopAccessingSecurityScopedResource() } }
-            let request = StopRequest(); stopRequest = request
+            stopRequest = request
             backupResult = try await service.backup(connections: identities, includedApplets: included, destination: folder,
                                                      saveLog: logs, stop: request) { [weak self] value in
                 Task { @MainActor in
@@ -430,9 +449,10 @@ public final class AppStore: ObservableObject {
         monitor = nil
         scanTask?.cancel()
         scanPending = false
-        stopRequest?.stop()
-        while activities > 0 {
-            try? await Task.sleep(for: .milliseconds(50))
+        for stop in activityStops.values { stop.stop() }
+        if activities > 0 {
+            // Cancellation of the waiter must not abandon a committed write or spin the main actor.
+            await withCheckedContinuation { idleWaiters.append($0) }
         }
         await service.shutdown()
     }

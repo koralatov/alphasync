@@ -8,6 +8,7 @@ struct SimulatedConfiguration: Sendable {
     var failingWriteNumber: Int?
     var failRefreshAfterWriting = false
     var beforeRead: (@Sendable (UInt8) -> Void)?
+    var beforeWrite: (@Sendable (Int) -> Void)?
     var failOpen = false
     var appletID = NeoApplet.alphaWord
 }
@@ -197,10 +198,13 @@ private final class SimulatedConnection: DeviceConnection {
         return bytes
     }
 
-    func writeFile(_ data: Data, applet: UInt16, index: UInt8, expectedOriginal: Data) throws {
+    func writeFile(_ data: Data, applet: UInt16, index: UInt8, expectedOriginal: Data,
+                   checkingCancellationBeforeWrite: () throws -> Void) throws {
+        try checkingCancellationBeforeWrite()
         guard contents[index] == expectedOriginal else { throw NeoError.device("The original changed") }
         writes += 1
         observations.didWrite()
+        configuration.beforeWrite?(writes)
         contents[index] = data
         if configuration.failingWriteNumber == writes { throw NeoWriteError(underlying: NeoError.verificationFailed) }
     }

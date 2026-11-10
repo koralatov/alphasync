@@ -231,14 +231,17 @@ public final class NeoProtocol {
         catch { throw NeoWriteError(underlying: error) }
     }
 
-    public func writeFile(_ data: Data, applet: UInt16, index: UInt8, expectedOriginal: Data) throws {
+    public func writeFile(_ data: Data, applet: UInt16, index: UInt8, expectedOriginal: Data,
+                          checkingCancellationBeforeWrite: () throws -> Void = {}) throws {
+        try checkingCancellationBeforeWrite()
         let limits = try fileLimits(applet: applet)
         let info = try attributes(applet: applet, index: index)
         let memory = try availableMemory()
         try limits.validate(data.count, allocation: info.allocation, available: memory.ram)
-        guard try readFile(applet: applet, index: index) == expectedOriginal else {
+        guard try readFile(applet: applet, index: index, checkingCancellation: checkingCancellationBeforeWrite) == expectedOriginal else {
             throw NeoError.device("The file changed after the warning opened.  Review the current file and try again.")
         }
+        try checkingCancellationBeforeWrite()
         try transaction { try changing { try rawWrite(data, applet: applet, index: index) } }
     }
     public func createFile(_ data: Data, name: String, applet: UInt16) throws -> UInt8 {

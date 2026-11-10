@@ -90,9 +90,11 @@ public enum AtomicFileStore {
         return complete
     }
 
-    public static func expireRecoveryCopies(in root: URL, olderThan days: Int, now: Date = Date()) throws {
+    public static func expireRecoveryCopies(in root: URL, olderThan days: Int, now: Date = Date(),
+                                            checkingCancellation: () throws -> Void = {}) throws {
         guard [7, 30, 90].contains(days) else { return }
         for url in try FileManager.default.contentsOfDirectory(at: root, includingPropertiesForKeys: nil) {
+            try checkingCancellation()
             if url.lastPathComponent.hasSuffix(incompleteSuffix) { continue }
             let attributes = try FileManager.default.attributesOfItem(atPath: url.path)
             guard attributes[.type] as? FileAttributeType == .typeDirectory else { continue }

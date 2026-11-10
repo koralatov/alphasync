@@ -42,8 +42,10 @@ public struct BackupResult: Sendable {
 }
 
 extension DeviceService {
-    public func prepareReplacement(file: NeoFileID, from source: URL, dictionaryConsent: String? = nil) async throws -> PreparedChange {
+    public func prepareReplacement(file: NeoFileID, from source: URL, dictionaryConsent: String? = nil,
+                                   stop: StopRequest? = nil) async throws -> PreparedChange {
         try await perform { access in
+            try access.checkCancellation(stop)
             let snapshot = try access.snapshot(for: file.connection)
             guard let applet = snapshot.applets.first(where: { $0.id == file.applet }),
                   let node = applet.files.first(where: { $0.id == file }) else { throw NeoError.disconnected }
@@ -53,7 +55,8 @@ extension DeviceService {
             let memory = try engine.availableMemory()
             let attributes = try engine.attributes(applet: file.applet, index: file.index)
             try limits.validate(replacement.count, allocation: attributes.allocation, available: memory.ram)
-            let original = try engine.readFile(applet: file.applet, index: file.index)
+            let original = try engine.readFile(applet: file.applet, index: file.index) { try access.checkCancellation(stop) }
+            try access.checkCancellation(stop)
             return PreparedChange(connection: file.connection, applet: applet,
                                   items: [.init(file: node, original: original, replacement: replacement)],
                                   title: "Replace ‘\(node.displayName)’?", action: "Replace",
@@ -61,8 +64,10 @@ extension DeviceService {
         }
     }
 
-    public func prepareClear(connection: UUID, appletID: UInt16, files selected: Set<NeoFileID>?) async throws -> PreparedChange {
+    public func prepareClear(connection: UUID, appletID: UInt16, files selected: Set<NeoFileID>?,
+                             stop: StopRequest? = nil) async throws -> PreparedChange {
         try await perform { access in
+            try access.checkCancellation(stop)
             let snapshot = try access.update(connection)
             guard let applet = snapshot.applets.first(where: { $0.id == appletID }), applet.canWrite else {
                 throw NeoError.device("This applet’s files cannot be cleared by AlphaSync.")
@@ -73,8 +78,11 @@ extension DeviceService {
             let limits = try engine.fileLimits(applet: appletID)
             let empty = try FileCodec.converted("", applet: appletID, limits: limits)
             let items = try files.map { file in
-                PreparedChange.Item(file: file, original: try engine.readFile(applet: appletID, index: file.id.index), replacement: empty)
+                PreparedChange.Item(file: file, original: try engine.readFile(applet: appletID, index: file.id.index) {
+                    try access.checkCancellation(stop)
+                }, replacement: empty)
             }
+            try access.checkCancellation(stop)
             let all = selected == nil
             let title = all ? "Clear all files in ‘\(applet.name)’?" : (files.count == 1 ? "Clear ‘\(files[0].displayName)’?" : "Clear \(files.count.formatted()) selected files?")
             return PreparedChange(connection: connection, applet: applet, items: items,
@@ -83,24 +91,33 @@ extension DeviceService {
         }
     }
 
-    public func apply(_ change: PreparedChange, recovery: RecoveryOptions) async throws -> ChangeResult {
+    public func apply(_ change: PreparedChange, recovery: RecoveryOptions, stop: StopRequest? = nil) async throws -> ChangeResult {
         try await perform { access in
             var completed = 0
             var folder: URL?
             do {
+                try access.checkCancellation(stop)
                 let engine = try access.engine(for: change.connection)
                 let latest = try access.update(change.connection)
                 guard let applet = latest.applets.first(where: { $0.id == change.applet.id }) else { throw NeoError.disconnected }
                 guard change.items.allSatisfy({ item in applet.files.contains(where: { $0.id == item.file.id }) }) else { throw NeoError.disconnected }
                 // Recheck every original before saving recovery or beginning a multi-file clear.
                 for item in change.items {
-                    guard try engine.readFile(applet: applet.id, index: item.file.id.index) == item.original else {
+                    guard try engine.readFile(applet: applet.id, index: item.file.id.index, checkingCancellation: {
+                        try access.checkCancellation(stop)
+                    }) == item.original else {
                         throw NeoError.device("A file changed after the warning opened.  Review the current files and try again.")
                     }
                 }
-                folder = recovery.enabled ? try Self.saveRecovery(change, options: recovery) : nil
+                folder = recovery.enabled ? try Self.saveRecovery(change, options: recovery,
+                    checkingCancellation: { try access.checkCancellation(stop) }) : nil
+                // Cancellation is honoured up to the first device write. The committed change then finishes and verifies.
+                try access.checkCancellation(stop)
                 for item in change.items {
-                    try engine.writeFile(item.replacement, applet: applet.id, index: item.file.id.index, expectedOriginal: item.original)
+                    try engine.writeFile(item.replacement, applet: applet.id, index: item.file.id.index, expectedOriginal: item.original,
+                                         checkingCancellationBeforeWrite: {
+                        if completed == 0 { try access.checkCancellation(stop) }
+                    })
                     completed += 1
                 }
                 return ChangeResult(snapshot: try access.update(change.connection), recoveryFolder: folder)
@@ -110,13 +127,16 @@ extension DeviceService {
         }
     }
 
-    public func create(connection: UUID, appletID: UInt16, from source: URL, dictionaryConsent: String? = nil) async throws -> NeoSnapshot {
+    public func create(connection: UUID, appletID: UInt16, from source: URL, dictionaryConsent: String? = nil,
+                       stop: StopRequest? = nil) async throws -> NeoSnapshot {
         try await perform { access in
             var completed = 0
             do {
+                try access.checkCancellation(stop)
                 let engine = try access.engine(for: connection)
                 let limits = try engine.fileLimits(applet: appletID)
                 let converted = try FileCodec.converted(TextFiles.read(source), applet: appletID, limits: limits, dictionaryConsent: dictionaryConsent)
+                try access.checkCancellation(stop)
                 _ = try engine.createFile(converted, name: source.deletingPathExtension().lastPathComponent, applet: appletID)
                 completed = 1
                 return try access.update(connection)
@@ -128,10 +148,11 @@ extension DeviceService {
         }
     }
 
-    public func rename(_ file: NeoFileID, to name: String) async throws -> NeoSnapshot {
+    public func rename(_ file: NeoFileID, to name: String, stop: StopRequest? = nil) async throws -> NeoSnapshot {
         try await perform { access in
             var completed = 0
             do {
+                try access.checkCancellation(stop)
                 try access.engine(for: file.connection).rename(applet: file.applet, index: file.index, to: name)
                 completed = 1
                 return try access.update(file.connection)
@@ -141,18 +162,19 @@ extension DeviceService {
         }
     }
 
-    public func export(_ files: [NeoFileID], to destination: URL) async throws -> [URL] {
+    public func export(_ files: [NeoFileID], to destination: URL, stop: StopRequest? = nil) async throws -> [URL] {
         try await perform { access in
             var outputs: [URL] = []
             do {
                 for id in files {
-                    try access.checkCancellation()
+                    try access.checkCancellation(stop)
                     let snapshot = try access.snapshot(for: id.connection)
                     guard let applet = snapshot.applets.first(where: { $0.id == id.applet }),
                           let file = applet.files.first(where: { $0.id == id }) else { throw NeoError.disconnected }
                     let raw = try access.engine(for: id.connection).readFile(applet: id.applet, index: id.index) {
-                        try access.checkCancellation()
+                        try access.checkCancellation(stop)
                     }
+                    try access.checkCancellation(stop)
                     let text = try FileCodec.text(raw, applet: applet)
                     let output = try AtomicFileStore.write(TextFiles.utf8(text), name: file.displayName,
                                                           extension: FileCodec.fileExtension(applet: id.applet), to: destination)
@@ -165,7 +187,9 @@ extension DeviceService {
         }
     }
 
-    private static func saveRecovery(_ change: PreparedChange, options: RecoveryOptions) throws -> URL {
+    private static func saveRecovery(_ change: PreparedChange, options: RecoveryOptions,
+                                     checkingCancellation: () throws -> Void) throws -> URL {
+        try checkingCancellation()
         let root = options.folder.appendingPathComponent("Recovery Copies", isDirectory: true)
         let now = Date()
         let formatter = DateFormatter()
@@ -175,6 +199,7 @@ extension DeviceService {
         let pending = try AtomicFileStore.createFolder(in: root, name: formatter.string(from: now) + " " + String(UUID().uuidString.prefix(8)), incomplete: true)
         var records: [[String: Any]] = []
         for item in change.items {
+            try checkingCancellation()
             let text = try FileCodec.text(item.original, applet: change.applet)
             let readable = try AtomicFileStore.write(TextFiles.utf8(text), name: item.file.displayName,
                                                     extension: FileCodec.fileExtension(applet: change.applet.id), to: pending)
@@ -183,10 +208,13 @@ extension DeviceService {
                             "text": readable.lastPathComponent, "raw": raw.lastPathComponent])
         }
         let record: [String: Any] = ["kind": "AlphaSyncRecoveryCopy", "formatVersion": 2, "createdAt": now, "files": records]
+        try checkingCancellation()
         let metadata = try PropertyListSerialization.data(fromPropertyList: record, format: .xml, options: 0)
         try AtomicFileStore.write(metadata, name: ".recovery-information", extension: "plist", to: pending)
         let complete = try AtomicFileStore.completeFolder(pending)
-        do { try AtomicFileStore.expireRecoveryCopies(in: root, olderThan: options.retentionDays, now: now) }
+        do { try AtomicFileStore.expireRecoveryCopies(in: root, olderThan: options.retentionDays, now: now,
+                                                     checkingCancellation: checkingCancellation) }
+        catch is CancellationError { throw CancellationError() }
         catch {
             let reason = NeoError.device("Older recovery copies could not be moved to Trash.  \(error.localizedDescription)")
             throw OperationFailure(reason, action: .change, recoveryFolder: complete)

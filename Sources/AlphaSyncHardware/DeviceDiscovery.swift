@@ -20,7 +20,8 @@ protocol DeviceConnection: AnyObject {
     func availableMemory() throws -> (ram: Int, rom: Int)
     func attributes(applet: UInt16, index: UInt8) throws -> NeoFileAttributes
     func readFile(applet: UInt16, index: UInt8, checkingCancellation: () throws -> Void) throws -> Data
-    func writeFile(_ data: Data, applet: UInt16, index: UInt8, expectedOriginal: Data) throws
+    func writeFile(_ data: Data, applet: UInt16, index: UInt8, expectedOriginal: Data,
+                   checkingCancellationBeforeWrite: () throws -> Void) throws
     func createFile(_ data: Data, name: String, applet: UInt16) throws -> UInt8
     func rename(applet: UInt16, index: UInt8, to name: String) throws
 }
