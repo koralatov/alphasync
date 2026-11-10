@@ -1,0 +1,179 @@
+{
+  "version": "2.0.3",
+  "legacy_source": "6cb821c9ab8073ff950414952bf2480eb4638c5d",
+  "legacy": {
+    "id": 439077510,
+    "tag_name": "v1.5.1",
+    "target_commitish": "master",
+    "assets": {
+      "AlphaSync-1.5.1-147-macOS-11-12-universal-symbols.zip": {
+        "size": 781096,
+        "digest": "sha256:3d7e153b7efab033047a66cd100951f827d872c85a3ddf4c2fd074d747ac854c",
+        "state": "uploaded"
+      },
+      "AlphaSync-1.5.1-147-macOS-11-12-universal-symbols.zip.build-information.txt": {
+        "size": 838,
+        "digest": "sha256:be4f34fff92d083f5e0601463ba1786528320e204ee88f90f79dd51afe2c9ee9",
+        "state": "uploaded"
+      },
+      "AlphaSync-1.5.1-147-macOS-11-12-universal-symbols.zip.sha256": {
+        "size": 120,
+        "digest": "sha256:b046de391bb06119db0fdc7597685e62e30c8d3c46c38f0897384d9ab7bcffc1",
+        "state": "uploaded"
+      },
+      "AlphaSync-1.5.1-147-macOS-11-12-universal.zip": {
+        "size": 2131393,
+        "digest": "sha256:4a13834a66047fce672f40eb956dea90146ff386ae08265597421ee3536b3f74",
+        "state": "uploaded"
+      },
+      "AlphaSync-1.5.1-147-macOS-11-12-universal.zip.build-information.txt": {
+        "size": 643,
+        "digest": "sha256:1633bfd672c536615f60c4fc42c4d32707dc16979dbce1bba5d037b0857a19ac",
+        "state": "uploaded"
+      },
+      "AlphaSync-1.5.1-147-macOS-11-12-universal.zip.sha256": {
+        "size": 112,
+        "digest": "sha256:c03b9f70a708d58799c416ab8efdc3a6022939cae6a1af60baaf3e322a889d78",
+        "state": "uploaded"
+      }
+    }
+  },
+  "retire": [
+    {
+      "id": 440248391,
+      "tag_name": "v2.0.2",
+      "target_commitish": "807b4bedf1bb1cd655e934e1495723bb5c203c93",
+      "assets": {
+        "AlphaSync-2.0.2-151-macOS-13-apple-silicon-symbols.zip": {
+          "size": 4728236,
+          "digest": "sha256:ce803121d8a757d376f4e11ca2ad6077efac19b2b97c5f0d048bbeafb0259195",
+          "state": "uploaded"
+        },
+        "AlphaSync-2.0.2-151-macOS-13-apple-silicon-symbols.zip.build-information.txt": {
+          "size": 557,
+          "digest": "sha256:0d3ceace3994bbf28b56a62100b5b919e4bcb099cc1a102f5d408b28225e96c9",
+          "state": "uploaded"
+        },
+        "AlphaSync-2.0.2-151-macOS-13-apple-silicon-symbols.zip.sha256": {
+          "size": 121,
+          "digest": "sha256:4aaebd2401056d6d28d20d736dc9440a6dbedf605aa31fef4b1cad6c79abc741",
+          "state": "uploaded"
+        },
+        "AlphaSync-2.0.2-151-macOS-13-apple-silicon.zip": {
+          "size": 2844046,
+          "digest": "sha256:84553d2982d1b7e898eea6dbd38cb40bdd5b463e068d8091103e2ffa8690692b",
+          "state": "uploaded"
+        },
+        "AlphaSync-2.0.2-151-macOS-13-apple-silicon.zip.build-information.txt": {
+          "size": 530,
+          "digest": "sha256:fde747d4c64a84f9614784fda8c5cb8ec4304c3159c3a9790e0d863010a81ae9",
+          "state": "uploaded"
+        },
+        "AlphaSync-2.0.2-151-macOS-13-apple-silicon.zip.sha256": {
+          "size": 113,
+          "digest": "sha256:c15bbc42cf6e811f05439ea92b87a7669bc75fb3ad53dab0d32580813922c9f3",
+          "state": "uploaded"
+        },
+        "AlphaSync-2.0.2-151-macOS-13-universal-symbols.zip": {
+          "size": 9523300,
+          "digest": "sha256:2755e9c74911444ef58193c382459f8e35c006b842ad84844fd87b7f88104d44",
+          "state": "uploaded"
+        },
+        "AlphaSync-2.0.2-151-macOS-13-universal-symbols.zip.build-information.txt": {
+          "size": 875,
+          "digest": "sha256:fbce8113b25f3bfdb924ef7a151663f9225296be600690e297dbdf5324fe6a37",
+          "state": "uploaded"
+        },
+        "AlphaSync-2.0.2-151-macOS-13-universal-symbols.zip.sha256": {
+          "size": 117,
+          "digest": "sha256:5fd58be0ba8f03bbaa112bbfcc26b6dc5e942b22561ac0fa320d636a91a69285",
+          "state": "uploaded"
+        },
+        "AlphaSync-2.0.2-151-macOS-13-universal.zip": {
+          "size": 3340953,
+          "digest": "sha256:5103f7c77803257d2402dad499b40032a5af08b97f6eef95b527194bfdef134f",
+          "state": "uploaded"
+        },
+        "AlphaSync-2.0.2-151-macOS-13-universal.zip.build-information.txt": {
+          "size": 529,
+          "digest": "sha256:17ff3f4f5bc08fd3ede0c69a92c2db393e0de640159a3efe52a6cdcc01ccf94a",
+          "state": "uploaded"
+        },
+        "AlphaSync-2.0.2-151-macOS-13-universal.zip.sha256": {
+          "size": 109,
+          "digest": "sha256:c3f043444f16e3a28ab1404c2acf59636e1302ba419063fb6b1fd6027b0f1f22",
+          "state": "uploaded"
+        }
+      }
+    },
+    {
+      "id": 440343890,
+      "tag_name": "v2.0.2-build.152",
+      "target_commitish": "fbcc566207d550ee313245e3eff39a55d3c986fb",
+      "assets": {
+        "AlphaSync-2.0.2-152-macOS-13-apple-silicon-symbols.zip": {
+          "size": 4728489,
+          "digest": "sha256:bf6d273cef7f2a7761fedb58d44e1f862861eb83c02159caf089fde22c45260b",
+          "state": "uploaded"
+        },
+        "AlphaSync-2.0.2-152-macOS-13-apple-silicon-symbols.zip.build-information.txt": {
+          "size": 557,
+          "digest": "sha256:6545cd64850c8a551b1ce91eadea0848d7d790f527f5ad1b273d132e3dda67a9",
+          "state": "uploaded"
+        },
+        "AlphaSync-2.0.2-152-macOS-13-apple-silicon-symbols.zip.sha256": {
+          "size": 121,
+          "digest": "sha256:d5320828ce312cf1dacbaa10c55693d2d9c1b77a107dd3a6d4ec53537968d92d",
+          "state": "uploaded"
+        },
+        "AlphaSync-2.0.2-152-macOS-13-apple-silicon.zip": {
+          "size": 2844324,
+          "digest": "sha256:64ffdb7ee80bd9309d24b24a5ea8a01c01a9bd697ef90ec025f76a2780f89a89",
+          "state": "uploaded"
+        },
+        "AlphaSync-2.0.2-152-macOS-13-apple-silicon.zip.build-information.txt": {
+          "size": 530,
+          "digest": "sha256:2ce7bbd4f5c1f7b86bf6a7971dcdb165149578f241b2d7b5bb0e26f208c814c0",
+          "state": "uploaded"
+        },
+        "AlphaSync-2.0.2-152-macOS-13-apple-silicon.zip.sha256": {
+          "size": 113,
+          "digest": "sha256:f7f5f6f5a6f0fda3f9504dbe4bbd901ff744dea31218ebcdf19a0812f9a3920a",
+          "state": "uploaded"
+        },
+        "AlphaSync-2.0.2-152-macOS-13-universal-symbols.zip": {
+          "size": 9523684,
+          "digest": "sha256:6a047f03919027adbaf943d784fb17fa45a8ca7ee2457e7c575e57853d8303ba",
+          "state": "uploaded"
+        },
+        "AlphaSync-2.0.2-152-macOS-13-universal-symbols.zip.build-information.txt": {
+          "size": 875,
+          "digest": "sha256:cc376dad404117daec74963de5bce94dc76c55041fa9a1956b4de5f43172afe1",
+          "state": "uploaded"
+        },
+        "AlphaSync-2.0.2-152-macOS-13-universal-symbols.zip.sha256": {
+          "size": 117,
+          "digest": "sha256:5a374c1026ebb633fdc17fbf0eb9b29226f010ad2e416a7dd370326e953b7d62",
+          "state": "uploaded"
+        },
+        "AlphaSync-2.0.2-152-macOS-13-universal.zip": {
+          "size": 3341426,
+          "digest": "sha256:fb861f4e39a989f7f2966accdcef635a2a043f5d527b29d7023d6cf00de03b1b",
+          "state": "uploaded"
+        },
+        "AlphaSync-2.0.2-152-macOS-13-universal.zip.build-information.txt": {
+          "size": 529,
+          "digest": "sha256:4573cfd85f2b77069b82b2f7f6ddf52d6006549b4d28a9c565e9384310f3b8b3",
+          "state": "uploaded"
+        },
+        "AlphaSync-2.0.2-152-macOS-13-universal.zip.sha256": {
+          "size": 109,
+          "digest": "sha256:feb5a3c4b4e15514750a7fdd5c198fbbedd6529ffb33abc42cfdd54a3ccd0b25",
+          "state": "uploaded"
+        }
+      }
+    }
+  ],
+  "build": "153",
+  "release_tag": "v2.0.3"
+}

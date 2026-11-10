@@ -2,6 +2,8 @@
 
 Record the app version, build, source commit, edition, exact macOS version, architecture, Neo model, result, and any failure. Hosted builds and simulated transfers do not establish physical USB or macOS 13 runtime compatibility.
 
+Version 2.0.3, build 153 passed [release run 42819807561](https://github.com/koralatov/alphasync/actions/runs/42819807561) on 10 November 2026 for source `db3ff4c23253c024726dd812868e6ac745a7b831`. Both hosts passed 109 Swift regressions, 42 release fixtures, native interface checks, and app and helper verification. The twelve public assets match the downloaded packages. The [permanent record](../releases/verification/2.0.3-153/verification.json) retains those results. Physical checks below remain unverified.
+
 The [frozen 1.5.1 checklist](https://github.com/koralatov/alphasync/blob/v1.5.1/tests/manual-checks.md) retains the macOS 11 and 12 checks and Mike’s earlier macOS 12 report. Do not apply Swift rewrite changes to that release.
 
 The original build 151 [2.0.2 release run](https://github.com/koralatov/alphasync/actions/runs/42802943901) passed on 10 November 2026 for source `807b4bedf1bb1cd655e934e1495723bb5c203c93`. Both hosts passed 109 Swift regressions, 35 packaging, publication, and retirement fixtures, and the native interface checks. App, helper, architecture, deployment, signature, and symbol verification passed. The published twelve assets match the downloaded packages. These automated results do not change the unverified physical checks below.
