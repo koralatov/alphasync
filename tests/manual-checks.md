@@ -10,7 +10,7 @@ The 2.0.1 development pass also needs these physical checks:
 
 - Enable automatic opening with a Neo already connected, including Login Items approval. Quit and reconnect. Check that a failed opening can retry, disabling the option stops the helper, and logout and login preserve the requested setting.
 - Stop a backup and quit during a long file read. Previously saved files must remain, the result must say it stopped, and the unfinished folder must retain its marker.
-- Connect a second Neo that cannot be opened. Keep the first connected and confirm the warning and Try Again remain visible.
+- Connect a second Neo that cannot be opened. Keep the first connected and confirm the warning and Try Again remain visible. The table headings and file rows must stay clear of the warning and status bar. Resize the window and repeat in both appearances.
 - Import a dictionary with valid, one-character, and overlong words. Cancel must write nothing for the warned file. Continuing must show the usual Replace confirmation when replacing. A non-empty file with no valid words must leave the dictionary intact. Edit the source after the warning and check that a new review appears.
 - Rename or move the selected backup folder, then restart. Backups and recovery copies must use the moved folder. Disconnect its drive or remove the folder; neither operation may recreate the old path. Choose an existing legacy destination once to migrate it.
 - Connect, disconnect, and reconnect in keyboard and transfer modes, including during a transfer and a confirmation. Check the app and helper after sleep and wake. No periodic idle discovery should be needed. Repeat with two Neos.
