@@ -2,12 +2,18 @@ import SwiftUI
 import AppKit
 import AlphaSyncCore
 
+private struct ReaderLoad: Hashable {
+    let request: UUID
+    let retry: UInt64
+}
+
 public struct ReaderView: View {
     @ObservedObject private var store: AppStore
     private let request: ReaderRequest
     @State private var text: String?
     @State private var failure: String?
     @State private var copyFailure = false
+    @State private var retry: UInt64 = 0
     @State private var monospaced = UserDefaults.standard.bool(forKey: "FileViewerMonospaced")
     public init(request: ReaderRequest, store: AppStore) { self.request = request; self.store = store }
     public var body: some View {
@@ -26,7 +32,7 @@ public struct ReaderView: View {
                 VStack(spacing: 14) {
                     Label("The file could not be read", systemImage: "exclamationmark.triangle").font(.headline)
                     Text(failure).multilineTextAlignment(.center)
-                    Button("Try Again") { Task { await load() } }
+                    Button("Try Again") { retry &+= 1 }
                 }.padding(24).frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 ProgressView("Reading from Neo…").frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -48,10 +54,11 @@ public struct ReaderView: View {
         .alert("The text could not be copied", isPresented: $copyFailure) {
             Button("OK", role: .cancel) {}
         } message: { Text("Try copying the text again.") }
-        .task(id: request.id) { await load() }
+        .task(id: ReaderLoad(request: request.id, retry: retry)) { await load() }
         .onChange(of: monospaced) { UserDefaults.standard.set($0, forKey: "FileViewerMonospaced") }
     }
     private func load() async {
+        text = nil
         failure = nil
         do {
             let result = try await store.readText(request.file)
