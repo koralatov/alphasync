@@ -75,24 +75,31 @@ def publish(source, repository, version, assets, manifest, notes, command=gh):
     tag = 'v' + version
     check_tag(command, repository, tag, source)
 
-    def find_draft():
+    def find_release():
         releases = api_list(command, f'repos/{repository}/releases?per_page=100')
         matches = [item for item in releases if item['tag_name'] == tag]
         if len(matches) > 1:
             raise ValueError('More than one release uses this tag.')
         if matches:
-            check_draft(matches[0], tag, source)
             return matches[0]
         return None
 
-    release = find_draft()
+    release = find_release()
+    if release is not None and not release['draft']:
+        if release['prerelease'] or release['target_commitish'] != source:
+            raise ValueError('Public releases are never changed. The existing release differs from the tested source.')
+        check_tag(command, repository, tag, source, required=True)
+        existing = api_list(command, f'repos/{repository}/releases/{release["id"]}/assets?per_page=100')
+        check_uploaded(existing, manifest, complete=True)
+        return release['html_url']
     if release is None:
         command('release', 'create', tag, '--draft', '--target', source, '--title', 'AlphaSync ' + version,
                 '--notes-file', str(notes))
-        release = find_draft()
+        release = find_release()
         if release is None:
             raise ValueError('The newly created draft could not be found.')
     release_id = release['id']
+    check_draft(release, tag, source)
 
     def current_draft():
         current = json.loads(command('api', f'repos/{repository}/releases/{release_id}'))

@@ -144,9 +144,23 @@ class PublicationTests(unittest.TestCase):
         self.publish()
         self.assertEqual(self.github.uploads, [])
 
-    def test_public_release_is_never_changed(self):
+    def test_incomplete_public_release_is_never_changed(self):
         self.github.draft()
         self.github.release['draft'] = False
+        self.github.refs = [{'ref': 'refs/tags/' + TAG, 'object': {'type': 'commit', 'sha': SOURCE}}]
+        self.rejected_before_mutation('asset list')
+
+    def test_matching_published_release_is_recognised_without_mutation(self):
+        self.github.draft()
+        self.github.release.update(draft=False, immutable=True)
+        self.github.assets = [self.github.asset(name) for name in self.manifest]
+        self.github.refs = [{'ref': 'refs/tags/' + TAG, 'object': {'type': 'commit', 'sha': SOURCE}}]
+        self.assertTrue(self.publish().endswith('/' + TAG))
+        self.assertEqual(self.github.mutations, [])
+
+    def test_public_release_from_another_source_is_never_changed(self):
+        self.github.draft()
+        self.github.release.update(draft=False, target_commitish='b' * 40)
         self.rejected_before_mutation('Public releases are never changed')
 
     def test_immutable_draft_is_never_changed(self):
