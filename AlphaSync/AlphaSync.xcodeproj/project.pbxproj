@@ -256,6 +256,7 @@
 			"shellScript" = "bash \"$SRCROOT/../scripts/build-help.sh\"\n";
 			"inputPaths" = (
 				"$(SRCROOT)/../scripts/build-help.sh",
+				"$(SRCROOT)/../scripts/check-help.py",
 				"$(SRCROOT)/../LICENSE",
 				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/AlphaSync Help/alphasync-help.html",
 			);
@@ -569,6 +570,7 @@
 			"shellScript" = "bash \"$SRCROOT/../scripts/build-help.sh\"\n";
 			"inputPaths" = (
 				"$(SRCROOT)/../scripts/build-help.sh",
+				"$(SRCROOT)/../scripts/check-help.py",
 				"$(SRCROOT)/../LICENSE",
 				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/AlphaSync Help/alphasync-help.html",
 			);

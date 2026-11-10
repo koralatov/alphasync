@@ -64,6 +64,7 @@ jobs:
           python3 Tests/Packaging/check-packages.py
           python3 Tests/Packaging/check-publication.py
           python3 Tests/Packaging/check-retirement.py
+          python3 Tests/Packaging/check-help.py
       - name: Build both native app targets
         id: apps
         if: always() && steps.shared.outcome == 'success'

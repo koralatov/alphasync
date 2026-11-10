@@ -67,12 +67,13 @@ jobs:
         run: |
           set -o pipefail
           swift test --parallel 2>&1 | tee build/regression-checks/tests.log
-      - name: Check package validation with disposable fixtures
+      - name: Check Help and package validation with disposable fixtures
         run: |
           set -o pipefail
           python3 Tests/Packaging/check-packages.py 2>&1 | tee build/regression-checks/packages.log
           python3 Tests/Packaging/check-publication.py 2>&1 | tee build/regression-checks/publication.log
           python3 Tests/Packaging/check-retirement.py 2>&1 | tee build/regression-checks/retirement.log
+          python3 Tests/Packaging/check-help.py 2>&1 | tee build/regression-checks/help.log
       - name: Check native interface behaviour
         run: |
           set -o pipefail

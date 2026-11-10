@@ -106,7 +106,7 @@ for edition, scheme, config_file in [('universal', 'AlphaSyncUniversal', 'Univer
         if not helper:
             phases.append(phase(key + '-build-help', 'PBXShellScriptBuildPhase', name='Build offline Help', alwaysOutOfDate=1,
                 shellPath='/bin/bash', shellScript='bash "$SRCROOT/../scripts/build-help.sh"\n',
-                inputPaths=['$(SRCROOT)/../scripts/build-help.sh', '$(SRCROOT)/../LICENSE',
+                inputPaths=['$(SRCROOT)/../scripts/build-help.sh', '$(SRCROOT)/../scripts/check-help.py', '$(SRCROOT)/../LICENSE',
                     '$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/AlphaSync Help/alphasync-help.html'],
                 outputPaths=['$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/AlphaSync Help/licence.html',
                     '$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/AlphaSync Help/AlphaSync Help.helpindex']))
