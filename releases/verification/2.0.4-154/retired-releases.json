@@ -1,5 +1,5 @@
 {
-  "state": "planned",
+  "state": "completed",
   "source": "7b71c9fa7f8de748c91e26990050decfb2a98472",
   "keep": [
     "v1.5.1",
@@ -489,5 +489,17 @@
       "url": "https://api.github.com/repos/koralatov/alphasync/git/commits/db3ff4c23253c024726dd812868e6ac745a7b831"
     }
   },
-  "note": "Archive created before deletion. The 2.0.3 listing is still public until this record is marked completed."
+  "note": "The user-requested 2.0.3 release listing was deleted. Its notes and asset metadata are preserved here; all source tags remain unchanged.",
+  "completedAt": "2026-11-10T22:02:09.170Z",
+  "result": {
+    "deletedReleaseID": 440367984,
+    "publishedReleases": [
+      "v1.5.1",
+      "v2.0.4"
+    ],
+    "latestRelease": "v2.0.4",
+    "retainedReleaseNotesAndAssets": "unchanged",
+    "sourceTags": "all twelve preserved",
+    "legacyBranch": "unchanged"
+  }
 }

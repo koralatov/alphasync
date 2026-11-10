@@ -265,6 +265,14 @@
     "workflow-notes.md": {
       "size": 11823,
       "sha256": "a6c20f7377c0f56c97b5f032d1a31387eae242d67552574a51101f9b278c4173"
+    },
+    "retirement-plan.json": {
+      "size": 10471,
+      "sha256": "23ba10d24e59aec417d5d29dd7547a5b7cdfba5e4d6684121b332e0dd6121b6a"
+    },
+    "retired-releases.json": {
+      "size": 43981,
+      "sha256": "49a186e1a903fb3228c2b14b6259a8bc93d72b80fca787dd894dfcf0fbaf5913"
     }
   },
   "documentationLinks": {
@@ -278,5 +286,23 @@
     "releaseSourceTagAndAssets": "unchanged",
     "publicApiBodySHA256": "1d8b31ee7175abf0addeb04a3ac46f123bfe5839a424e71d93d7ad336ee7eb68",
     "committedNotesLineEndings": "LF normalised from API CRLF"
+  },
+  "retirement": {
+    "state": "completed",
+    "requestedAfterPublication": true,
+    "completedAt": "2026-11-10T22:02:09.170Z",
+    "deletedReleaseID": 440367984,
+    "retiredTag": "v2.0.3",
+    "preservedSource": "db3ff4c23253c024726dd812868e6ac745a7b831",
+    "publicReleases": [
+      "v1.5.1",
+      "v2.0.4"
+    ],
+    "latestRelease": "v2.0.4",
+    "retainedReleaseNotesAndAssets": "unchanged",
+    "allTwelveSourceTags": "preserved",
+    "legacyBranch": "unchanged",
+    "plan": "retirement-plan.json",
+    "archive": "retired-releases.json"
   }
 }
