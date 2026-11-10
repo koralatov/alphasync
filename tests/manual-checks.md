@@ -1,4 +1,4 @@
-# Manual checks for AlphaSync 2.0
+# Manual checks for AlphaSync 2.0.2
 
 Record the app version, build, source commit, edition, exact macOS version, architecture, Neo model, result, and any failure. Hosted builds and simulated transfers do not establish physical USB or macOS 13 runtime compatibility.
 
@@ -6,14 +6,18 @@ The [frozen 1.5.1 checklist](https://github.com/koralatov/alphasync/blob/v1.5.1/
 
 ## Runtime coverage
 
-The 2.0.1 development pass also needs these physical checks:
+Version 2.0.2, build 151 includes the unpublished 2.0.1 work. These physical checks remain outstanding:
 
 - Enable automatic opening with a Neo already connected, including Login Items approval. Quit and reconnect. Check that a failed opening can retry, disabling the option stops the helper, and logout and login preserve the requested setting.
 - Stop a backup and quit during a long file read. Previously saved files must remain, the result must say it stopped, and the unfinished folder must retain its marker.
 - Connect a second Neo that cannot be opened. Keep the first connected and confirm the warning and Try Again remain visible. The table headings and file rows must stay clear of the warning and status bar. Resize the window and repeat in both appearances.
 - Import a dictionary with valid, one-character, and overlong words. Cancel must write nothing for the warned file. Continuing must show the usual Replace confirmation when replacing. A non-empty file with no valid words must leave the dictionary intact. Edit the source after the warning and check that a new review appears.
 - Rename or move the selected backup folder, then restart. Backups and recovery copies must use the moved folder. Disconnect its drive or remove the folder; neither operation may recreate the old path. Choose an existing legacy destination once to migrate it.
+- With disposable fresh preferences, open the app and Settings without starting a backup. The default folder must not be created. Make the first backup or recovery copy, move its default destination immediately, and restart. Both operations must follow the moved folder. Remove it and confirm neither recreates the old path.
 - Connect, disconnect, and reconnect in keyboard and transfer modes, including during a transfer and a confirmation. Check the app and helper after sleep and wake. No periodic idle discovery should be needed. Repeat with two Neos.
+- Quit while Replace or Clear is still reading its originals, including the final check after confirmation. No writing may start. Quit after writing starts; all writes and verification in that change must finish before USB closes, with the interface still responsive.
+- Cause a reader failure, choose Try Again, then close its window while it is loading. The read must stop between blocks, the window must stay closed, and another operation must become available.
+- Check recovery after a temporary observer error and after sleep and wake, with the app running and with only the helper running. The app’s warning must clear after monitoring recovers. Repeated setup failures must use the documented cooldown rather than stop monitoring permanently.
 
 | System and edition | Required check | Result |
 | --- | --- | --- |
@@ -34,7 +38,7 @@ Use known-good independent backups and disposable Neo files for writing checks. 
 - Resize the connected window. Confirm that table columns, status, and available memory fit, with memory aligned at the trailing edge. Check long applet names and connection errors.
 - Change system appearance between Light, Dark, and Auto without restarting. Check the list, selection, toolbar, Settings, Inspector, About, sheets, file panels, and Help Viewer. Repeat with Increase Contrast, Reduce Motion, a different accent colour, and scroll bars always visible.
 - Use keyboard navigation and VoiceOver throughout. Confirm that control labels, disabled states, sidebar groups, file sizes, progress, and read-only text are understandable. Check all controls on a small screen.
-- Open About, close it after activating a link, and reopen it. No link should start with keyboard focus. Tab must still reach every link. Check version 2.0, build 149, the correct edition description, and the selected icon in About, Finder, and the Dock.
+- Open About, close it after activating a link, and reopen it. No link should start with keyboard focus. Tab must still reach every link. Check version 2.0.2, build 151, the correct edition description, and the selected icon in About, Finder, and the Dock.
 - Inspect a file, applet, and Neo. More Information and Preview must stay open, details must be selectable, and previous file text must clear when the selection changes. Check long metadata and unknown limits.
 - Compare bytes and decimal KB with Finder, including 0, 1, 999, 1,000, 1,024, and 12,000 bytes. Exact values such as 51,200 bytes must use regional grouping and fit their fields.
 
@@ -89,7 +93,7 @@ Use known-good independent backups and disposable Neo files for writing checks. 
 - Check saved filters, backup destination, log option, recovery settings, and regular or monospaced preference after upgrading from 1.5.1 and after restarting. Cancelling a folder chooser must preserve its prior value.
 - In Applications, enable automatic opening. Check registration errors, approval required, granting and revoking Login Items approval, logout and login, USB reconnection, and disabling it. Confirm the helper does not capture keyboard input or open another edition unexpectedly.
 - Open Help with no Neo and during a transfer. Check the system search field, last menu position, AlphaSync Help as the first app item, ⌘?, command search, and topic search.
-- Open Licence offline and compare it with LICENSE. Stable release notes must open the 2.0 release, and the licence must point to the same tag. GitHub and issue commands must open the intended pages.
+- Open Licence offline and compare it with LICENSE. Stable release notes must open the 2.0.2 release, and the licence must point to the same tag. GitHub and issue commands must open the intended pages.
 - Contact Us must open an unsent message to mike@koralatov.com. Issue and contact forms may include only version, build, edition, system version, and process architecture. Leave reports and messages unsubmitted. Check the Copy Link fallback with an unavailable handler.
 
-Use the final 2.0 ZIP for a clean-install check on another Mac. Physical Neo and macOS 13 checks remain unverified until results are recorded here. The public release notes must retain that limit.
+Use the final 2.0.2 ZIP for a clean-install check on another Mac. Physical Neo, real Login Items approval, and macOS 13 checks remain unverified until results are recorded here. The public release notes must retain that limit.

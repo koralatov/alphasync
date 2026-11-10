@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="description" content="Backing up files in AlphaSync 2.0.">
+    <meta name="description" content="Backing up files in AlphaSync 2.0.2.">
     <link rel="stylesheet" href="css/alphasync.css">
     <title>Backing up files – AlphaSync Help</title>
 </head>
@@ -12,8 +12,9 @@
 <p>Click Backup to save the files included by the file filter in Settings. Each Neo has its own dated destination inside the selected backup folder.</p>
 <p>Backups use UTF-8 text for AlphaWord and dictionary files. Other applet files are saved as lossless XML.</p>
 <p>The destination starts with (Incomplete) in its name. This is removed only when that Neo’s files finish successfully. Existing backups are preserved. If the complete file list cannot be read, AlphaSync stops before treating a partial list as a complete backup.</p>
-<p>Stop finishes the current file before stopping. If a file fails, the result explains what was saved and lists any folders that were created. Open Backup Folder shows the saved files in Finder. Done dismisses the result.</p>
+<p>Stop and Quit can interrupt a backup between blocks of the file being read. Files already saved remain in the unfinished folder. If a file fails, the result explains what was saved and lists any folders that were created. Open Backup Folder shows the saved files in Finder. Done dismisses the result.</p>
 <p>Backup logs are off by default. Enable Save a backup log in Settings if you need one. AlphaSync Backup Log.plist stays inside the dated folder and records relative paths, errors, and the final state.</p>
+<p>The default backup folder is created and remembered when first used. Selected and default destinations follow moves and renames. If a saved destination is missing, reconnect its drive or choose it again in Settings. AlphaSync does not recreate its old path.</p>
 <hr>
 <p>Original application © 2009–2013 tSoniq.</p>
 </body>

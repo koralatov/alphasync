@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="description" content="Clearing files in AlphaSync 2.0.">
+    <meta name="description" content="Clearing files in AlphaSync 2.0.2.">
     <link rel="stylesheet" href="css/alphasync.css">
     <title>Clearing files – AlphaSync Help</title>
 </head>
@@ -14,6 +14,7 @@
 <p>Cancel is the default and has initial keyboard focus. Return or Space should cancel when the warning first opens. Tab can deliberately move focus to other controls.</p>
 <p>Save a recovery copy first is on by default. Each original is saved as readable text and raw Neo data before clearing starts. If the requested copy cannot be completed, no clearing starts. Use Open Recovery Copies in Settings to find the originals.</p>
 <p>Clearing is available for AlphaWord and user dictionary files. It is unavailable for other formats and during another operation. Changed files are read back to verify them. A failure after clearing starts can leave some files changed; the error includes the recovery location when a copy was saved.</p>
+<p>Quit stops the read-only preparation for clearing, including the final check of the originals. Once clearing starts writing, all writes and read-back verification in that change finish before AlphaSync closes.</p>
 <hr>
 <p>Original application © 2009–2013 tSoniq.</p>
 </body>

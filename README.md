@@ -2,24 +2,24 @@
 
 AlphaSync copies text files between your Mac and an AlphaSmart Neo. It can also back up your Neo and open automatically when you connect it.
 
-## Version 2.0
+## Version 2.0.2
 
-Version 2.0 is the first release of the Swift rewrite and requires **macOS 13 or later**. The version number marks the change from the earlier Objective-C and Objective-C++ application.
+Version 2.0.2 improves the Swift rewrite first released as 2.0 and requires **macOS 13 or later**. It includes all changes prepared under the unpublished 2.0.1 development version.
 
-Choose one download from the [2.0 release](https://github.com/koralatov/alphasync/releases/tag/v2.0):
+Choose one download from the [2.0.2 release](https://github.com/koralatov/alphasync/releases/tag/v2.0.2):
 
-- [**Universal**](https://github.com/koralatov/alphasync/releases/download/v2.0/AlphaSync-2.0-149-macOS-13-universal.zip): for Intel and Apple Silicon Macs.
-- [**Apple Silicon**](https://github.com/koralatov/alphasync/releases/download/v2.0/AlphaSync-2.0-149-macOS-13-apple-silicon.zip): for Macs with an M-series chip.
+- [**Universal**](https://github.com/koralatov/alphasync/releases/download/v2.0.2/AlphaSync-2.0.2-151-macOS-13-universal.zip): for Intel and Apple Silicon Macs.
+- [**Apple Silicon**](https://github.com/koralatov/alphasync/releases/download/v2.0.2/AlphaSync-2.0.2-151-macOS-13-apple-silicon.zip): for Macs with an M-series chip.
 
 Both offer the same file-transfer features. Install one edition. You can find your macOS version and chip in **Apple menu → About This Mac**.
 
-Version 2.0.1 is being developed on master. The links above remain the published 2.0 downloads.
+Automatic opening recovers after temporary monitoring errors and sleep. Backup folders follow moves and renames, dictionary imports explain omitted words, and Quit stops read-only preparation while letting a committed change finish safely. See the [changes since 2.0](releases/2.0.2.md).
 
 ## macOS 11 and 12
 
 [Download AlphaSync 1.5.1 for macOS 11 and 12](https://github.com/koralatov/alphasync/releases/download/v1.5.1/AlphaSync-1.5.1-147-macOS-11-12-universal.zip).
 
-This is the final version for these systems, on Intel and Apple Silicon. Its [release page](https://github.com/koralatov/alphasync/releases/tag/v1.5.1), downloads, and [legacy source](https://github.com/koralatov/alphasync/tree/legacy-macos-11-12) are preserved. They remain separate from version 2.0.
+This is the final version for these systems, on Intel and Apple Silicon. Its [release page](https://github.com/koralatov/alphasync/releases/tag/v1.5.1), downloads, and [legacy source](https://github.com/koralatov/alphasync/tree/legacy-macos-11-12) are preserved. They remain separate from version 2.0.2.
 
 ## Install
 
@@ -30,7 +30,7 @@ This is the final version for these systems, on Intel and Apple Silicon. Its [re
 
 If macOS blocks the app, follow [Apple’s instructions for opening a downloaded app](https://support.apple.com/en-gb/102445). On macOS 11 and 12, the approval is in **System Preferences → Security & Privacy → General**. On newer systems, look in **System Settings → Privacy & Security**.
 
-## Use version 2.0
+## Use version 2.0.2
 
 Connect your Neo with a USB cable. AlphaSync expands from its connection message to show your files. Choose an applet in the sidebar.
 
@@ -49,13 +49,15 @@ Recovery copies are kept for 30 days by default. Settings offers 7, 30, or 90 da
 
 If text is too large, or contains a character your Neo cannot store, AlphaSync explains the problem and stops before changing the file. Shorten the text or replace the character, then try again.
 
+Dictionary words must contain 2 to 20 characters. If some words fall outside that range, AlphaSync shows their count and examples before you choose whether to continue. A non-empty dictionary import with no usable words is rejected. Continuing a replacement still requires the normal Replace confirmation.
+
 Backup logs are off unless you enable them in Settings. Each log stays inside its dated backup folder. An unfinished backup keeps **(Incomplete)** in its folder name. The result shows what was saved, its location, and a button to open the folder.
 
 To open AlphaSync whenever you connect your Neo, enable automatic opening in Settings. Keep the app in Applications and follow any Login Items approval prompt.
 
 AlphaSync follows your Mac’s Light or Dark appearance.
 
-The downloads have ad hoc signatures and are not Apple-notarised. The [release notes](releases/2.0.md) describe the build checks and the remaining physical Neo and macOS 13 testing.
+The downloads have ad hoc signatures and are not Apple-notarised. The [release notes](releases/2.0.2.md) describe the build checks and the remaining physical Neo, Login Items approval, and macOS 13 testing.
 
 ## Help and support
 

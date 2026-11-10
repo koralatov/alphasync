@@ -1,4 +1,4 @@
-// Shared development version for both apps and their launch helpers.
-MARKETING_VERSION = 2.0.1
-CURRENT_PROJECT_VERSION = 150
-AS_RELEASE_CHANNEL = development
+// Shared release version for both apps and their launch helpers.
+MARKETING_VERSION = 2.0.2
+CURRENT_PROJECT_VERSION = 151
+AS_RELEASE_CHANNEL = stable
