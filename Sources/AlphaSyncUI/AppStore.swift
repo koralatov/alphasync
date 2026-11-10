@@ -355,7 +355,7 @@ public final class AppStore: ObservableObject {
     public func confirm(_ change: PreparedChange, saveRecovery: Bool) async {
         pendingChange = nil
         await run("Saving recovery copies and changing files…") {
-            let folder = saveRecovery ? try preferences.resolvedBackupFolder() : preferences.backupFolder
+            let folder = saveRecovery ? try preferences.prepareBackupFolder() : preferences.backupFolder
             let scoped = saveRecovery && folder.startAccessingSecurityScopedResource()
             defer { if scoped { folder.stopAccessingSecurityScopedResource() } }
             let options = RecoveryOptions(enabled: saveRecovery, folder: folder, retentionDays: preferences.retentionDays)
@@ -410,7 +410,7 @@ public final class AppStore: ObservableObject {
         let included = preferences.filter.appletIDs, logs = preferences.saveBackupLogs
         guard !identities.isEmpty else { return }
         await run("Starting the backup…") {
-            let folder = try preferences.resolvedBackupFolder()
+            let folder = try preferences.prepareBackupFolder()
             let scoped = folder.startAccessingSecurityScopedResource()
             defer { if scoped { folder.stopAccessingSecurityScopedResource() } }
             let request = StopRequest(); stopRequest = request

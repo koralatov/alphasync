@@ -1,5 +1,6 @@
 import Foundation
 import XCTest
+import ServiceManagement
 @testable import AlphaSyncUI
 
 @MainActor
@@ -14,6 +15,36 @@ final class BackupLocationTests: XCTestCase {
         try FileManager.default.createDirectory(at: url, withIntermediateDirectories: false)
         addTeardownBlock { try? FileManager.default.removeItem(at: url) }
         return url
+    }
+
+    private func preferences(defaults: UserDefaults, initial: URL) -> Preferences {
+        Preferences(defaults: defaults, loginItem: SMAppService.loginItem(identifier: "com.tsoniq.AlphaSyncLauncher"),
+                    initialBackupFolder: initial)
+    }
+
+    func testDefaultDestinationIsBookmarkedBeforeItsFirstUseAndFollowsAMove() throws {
+        let root = try root(), defaults = defaults()
+        let original = root.appendingPathComponent("First backups", isDirectory: true)
+        let preferences = preferences(defaults: defaults, initial: original)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: original.path))
+        _ = try preferences.resolvedBackupFolder()
+        XCTAssertFalse(FileManager.default.fileExists(atPath: original.path))
+        _ = try preferences.prepareBackupFolder()
+        XCTAssertNotNil(defaults.data(forKey: "BackupFolderBookmark"))
+        let moved = root.appendingPathComponent("Moved first backups", isDirectory: true)
+        try FileManager.default.moveItem(at: original, to: moved)
+        let relaunched = self.preferences(defaults: defaults, initial: original)
+        XCTAssertEqual(try relaunched.prepareBackupFolder(), moved.resolvingSymlinksInPath())
+        XCTAssertFalse(FileManager.default.fileExists(atPath: original.path))
+    }
+
+    func testRemovingTheFirstDefaultDestinationDoesNotRecreateIt() throws {
+        let initial = try root().appendingPathComponent("First backups", isDirectory: true)
+        let preferences = preferences(defaults: defaults(), initial: initial)
+        _ = try preferences.prepareBackupFolder()
+        try FileManager.default.removeItem(at: initial)
+        XCTAssertThrowsError(try preferences.prepareBackupFolder())
+        XCTAssertFalse(FileManager.default.fileExists(atPath: initial.path))
     }
 
     func testChosenBackupFolderFollowsMovesAndSurvivesRelaunch() throws {

@@ -42,18 +42,21 @@ public final class Preferences: ObservableObject {
     @Published public private(set) var loginStatus = ""
     private let defaults: UserDefaults
     private let loginItem: any LoginItemManaging
+    private let initialBackupFolder: URL
 
     public convenience init(defaults: UserDefaults = .standard) {
         self.init(defaults: defaults, loginItem: SMAppService.loginItem(identifier: "com.tsoniq.AlphaSyncLauncher"))
     }
 
-    init(defaults: UserDefaults, loginItem: any LoginItemManaging) {
+    init(defaults: UserDefaults, loginItem: any LoginItemManaging, initialBackupFolder: URL? = nil) {
         self.defaults = defaults
         self.loginItem = loginItem
-        defaults.register(defaults: ["FilterMode": 1, "BackupFolder": ("~/Documents/AlphaSync" as NSString).expandingTildeInPath,
+        let initial = initialBackupFolder ?? URL(fileURLWithPath: ("~/Documents/AlphaSync" as NSString).expandingTildeInPath, isDirectory: true)
+        self.initialBackupFolder = initial
+        defaults.register(defaults: ["FilterMode": 1, "BackupFolder": initial.path,
                                      "SaveBackupLogs": false, "SaveRecoveryCopies": true, "RecoveryRetentionDays": 30, "AutoRun": false])
         filter = FileFilter(rawValue: defaults.integer(forKey: "FilterMode")) ?? .textApplets
-        let path = defaults.string(forKey: "BackupFolder") ?? ("~/Documents/AlphaSync" as NSString).expandingTildeInPath
+        let path = defaults.string(forKey: "BackupFolder") ?? initial.path
         backupFolder = URL(fileURLWithPath: (path as NSString).expandingTildeInPath, isDirectory: true)
         saveBackupLogs = defaults.bool(forKey: "SaveBackupLogs"); saveRecoveryCopies = defaults.bool(forKey: "SaveRecoveryCopies")
         let days = defaults.integer(forKey: "RecoveryRetentionDays")
@@ -92,8 +95,7 @@ public final class Preferences: ObservableObject {
                     guard directory.boolValue else { throw CocoaError(.fileNoSuchFile) }
                     try selectBackupFolder(backupFolder)
                 } else {
-                    let initial = URL(fileURLWithPath: ("~/Documents/AlphaSync" as NSString).expandingTildeInPath, isDirectory: true)
-                    guard backupFolder.standardizedFileURL == initial.standardizedFileURL else { throw CocoaError(.fileNoSuchFile) }
+                    guard backupFolder.standardizedFileURL == initialBackupFolder.standardizedFileURL else { throw CocoaError(.fileNoSuchFile) }
                 }
             }
             backupLocationIssue = nil
@@ -104,6 +106,16 @@ public final class Preferences: ObservableObject {
             throw NSError(domain: NSCocoaErrorDomain, code: NSFileReadNoSuchFileError,
                           userInfo: [NSLocalizedDescriptionKey: message, NSUnderlyingErrorKey: error])
         }
+    }
+    /// Only an operation requested by the user may create the first default destination.
+    public func prepareBackupFolder() throws -> URL {
+        let folder = try resolvedBackupFolder()
+        if defaults.data(forKey: "BackupFolderBookmark") == nil {
+            try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true,
+                                                    attributes: [.posixPermissions: 0o700])
+            try selectBackupFolder(folder)
+        }
+        return backupFolder
     }
     public func refreshLoginStatus() {
         switch loginItem.status {
