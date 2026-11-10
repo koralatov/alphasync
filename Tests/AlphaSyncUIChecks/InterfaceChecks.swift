@@ -14,6 +14,12 @@ struct InterfaceChecks {
     }
     static func settle() { RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.35)) }
     static func descendants(_ root: NSView) -> [NSView] { [root] + root.subviews.flatMap(descendants) }
+    static func fileTableFrame(in window: NSWindow) throws -> NSRect {
+        guard let content = window.contentView,
+              let table = descendants(content).compactMap({ $0 as? NSTableView }).first(where: { $0.tableColumns.count == 2 }),
+              let scroll = table.enclosingScrollView else { throw CheckFailure(description: "Missing native file table") }
+        return scroll.convert(scroll.bounds, to: nil)
+    }
     static func window<V: View>(_ view: V, size: NSSize, title: String) -> NSWindow {
         let result = NSWindow(contentRect: NSRect(origin: .zero, size: size),
                               styleMask: [.titled, .closable, .resizable], backing: .buffered, defer: false)
@@ -110,10 +116,14 @@ struct InterfaceChecks {
             let connected = window(MainView(store: store), size: NSSize(width: 820, height: 560), title: "AlphaSync")
             try require(connected.contentView!.bounds.width >= 760, "Connected window is too narrow")
             let withoutWarning = try capture(connected, "files-" + label, to: output)
+            let initialTable = try fileTableFrame(in: connected)
             store.connectionIssue = "A second Neo could not be opened. Close other Neo software and choose Try Again."
             settle()
             let withWarning = try capture(connected, "connection-warning-" + label, to: output)
             try require(withWarning != withoutWarning, "A connected Neo must visibly show its connection warning")
+            let warnedTable = try fileTableFrame(in: connected)
+            try require(warnedTable.maxY < initialTable.maxY - 12, "A connection warning must reserve space above the native file table")
+            try require(warnedTable.minY >= 20, "The native file table must leave room for the status row")
             connected.close()
             store.connectionIssue = nil
             let about = window(AboutView(), size: NSSize(width: 420, height: 570), title: "About AlphaSync")

@@ -80,6 +80,13 @@ public struct MainView: View {
         }.padding(24)
     }
     private var fileManager: some View {
+        VStack(spacing: 0) {
+            if let issue = store.connectionIssue { connectionWarning(issue) }
+            fileBrowser.frame(maxWidth: .infinity, maxHeight: .infinity)
+            connectionStatus
+        }
+    }
+    private var fileBrowser: some View {
         NavigationSplitView {
             List(selection: $store.sidebar) {
                 ForEach(store.devices, id: \.connection) { device in
@@ -119,35 +126,33 @@ public struct MainView: View {
                 store.importDroppedFiles(urls) != nil
             }
         }
-        .safeAreaInset(edge: .top, spacing: 0) {
-            if let issue = store.connectionIssue {
-                VStack(spacing: 0) {
-                    HStack(alignment: .top, spacing: 12) {
-                        Label(issue, systemImage: "exclamationmark.triangle")
-                            .textSelection(.enabled).fixedSize(horizontal: false, vertical: true)
-                        Spacer(minLength: 8)
-                        Button("Try Again") { Task { await store.refresh() } }.disabled(store.busy)
-                    }.padding(12)
-                    Divider()
-                }.background(.bar)
-            }
-        }
-        .safeAreaInset(edge: .bottom, spacing: 0) {
-            VStack(spacing: 0) {
-                Divider()
-                HStack(spacing: 10) {
-                    Label("Connected", systemImage: "circle.fill").labelStyle(.titleAndIcon).foregroundStyle(.secondary)
-                    if store.busy {
-                        ProgressView().controlSize(.small)
-                        Text(store.operationText).lineLimit(1)
-                        if let value = store.progress { ProgressView(value: value).frame(width: 90) }
-                        if let stop = store.stopRequest { Button("Stop") { stop.stop() }.keyboardShortcut(.cancelAction) }
-                    }
-                    Spacer()
-                    if let memory = store.chosenDevice?.availableRAM { Text("\(FileSize.compact(memory)) available").foregroundStyle(.secondary) }
-                }.font(.callout).padding(.horizontal, 12).padding(.vertical, 7)
-            }.background(.bar)
-        }
+    }
+    private func connectionWarning(_ issue: String) -> some View {
+        VStack(spacing: 0) {
+            HStack(alignment: .top, spacing: 12) {
+                Label(issue, systemImage: "exclamationmark.triangle")
+                    .textSelection(.enabled).fixedSize(horizontal: false, vertical: true)
+                Spacer(minLength: 8)
+                Button("Try Again") { Task { await store.refresh() } }.disabled(store.busy)
+            }.padding(12)
+            Divider()
+        }.background(.bar)
+    }
+    private var connectionStatus: some View {
+        VStack(spacing: 0) {
+            Divider()
+            HStack(spacing: 10) {
+                Label("Connected", systemImage: "circle.fill").labelStyle(.titleAndIcon).foregroundStyle(.secondary)
+                if store.busy {
+                    ProgressView().controlSize(.small)
+                    Text(store.operationText).lineLimit(1)
+                    if let value = store.progress { ProgressView(value: value).frame(width: 90) }
+                    if let stop = store.stopRequest { Button("Stop") { stop.stop() }.keyboardShortcut(.cancelAction) }
+                }
+                Spacer()
+                if let memory = store.chosenDevice?.availableRAM { Text("\(FileSize.compact(memory)) available").foregroundStyle(.secondary) }
+            }.font(.callout).padding(.horizontal, 12).padding(.vertical, 7)
+        }.background(.bar)
     }
     private func openReaders(_ ids: Set<NeoFileID>) {
         for file in store.files where ids.contains(file.id) { openWindow(value: ReaderRequest(file: file)) }
