@@ -146,6 +146,29 @@ final class ProtocolTests: XCTestCase {
         XCTAssertEqual(device.payload, new)
         XCTAssertEqual(device.writes, 1)
     }
+    func testCancellingTheFinalOriginalReadSendsNoWritingCommand() {
+        let device = SimulatedNeo()
+        device.payload = Data(repeating: 65, count: 4096)
+        let original = device.payload
+        XCTAssertThrowsError(try NeoProtocol(transport: device).writeFile(Data(repeating: 66, count: 512),
+            applet: 0xa000, index: 1, expectedOriginal: original, checkingCancellationBeforeWrite: {
+                if device.readBlocks > 0 { throw CancellationError() }
+            })) { XCTAssertTrue($0 is CancellationError) }
+        XCTAssertEqual(device.payload, original)
+        XCTAssertEqual(device.readBlocks, 1)
+        XCTAssertEqual(device.writes, 0)
+        XCTAssertFalse(device.commands.contains(0x1f))
+    }
+    func testCancellationAfterWritingBeginsDoesNotInterruptVerification() throws {
+        let device = SimulatedNeo(), replacement = Data(repeating: 66, count: 2048)
+        let original = device.payload
+        try NeoProtocol(transport: device).writeFile(replacement, applet: 0xa000, index: 1, expectedOriginal: original,
+            checkingCancellationBeforeWrite: {
+                if device.writes > 0 { throw CancellationError() }
+            })
+        XCTAssertEqual(device.payload, replacement)
+        XCTAssertEqual(device.writes, 1)
+    }
     func testVerificationFailureDoesNotClaimTheOriginalWasPreserved() {
         let device = SimulatedNeo(); device.corruptVerification = true
         let engine = NeoProtocol(transport: device), original = device.payload
