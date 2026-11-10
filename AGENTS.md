@@ -46,3 +46,5 @@
 - The final native interface checker uses private preferences, an isolated Login Items fixture, direct execution, unbuffered progress, and a failing 120-second deadline with process sampling. All native assertions passed in the published build. Keep the bounded checker and all publication gates for future releases.
 
 - The Intel About stall was diagnosed from the process sample in run `42904497735`. The published source uses the public `doc.text` symbol when bundled artwork is unavailable, avoiding the synchronous application-icon service lookup. Both native interface jobs passed with this correction.
+
+- The user now explicitly requests retirement of the 2.0.3 release listing, leaving only 1.5.1 and 2.0.4 published. Preserve `v2.0.3`, all other source tags, the frozen legacy branch, and the notes and assets of both retained releases. The reviewed plan and pre-deletion archive are in `releases/verification/2.0.4-154`. Verify the exact final release list and protected references, then mark retirement completed without rebuilding or replacing either app.

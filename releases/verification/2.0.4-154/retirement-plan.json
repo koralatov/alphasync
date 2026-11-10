@@ -1,0 +1,243 @@
+{
+  "version": "2.0.4",
+  "build": "154",
+  "release_tag": "v2.0.4",
+  "published_source": "7b71c9fa7f8de748c91e26990050decfb2a98472",
+  "legacy_source": "6cb821c9ab8073ff950414952bf2480eb4638c5d",
+  "legacy": {
+    "id": 439077510,
+    "tag_name": "v1.5.1",
+    "target_commitish": "master",
+    "assets": {
+      "AlphaSync-1.5.1-147-macOS-11-12-universal-symbols.zip": {
+        "size": 781096,
+        "digest": "sha256:3d7e153b7efab033047a66cd100951f827d872c85a3ddf4c2fd074d747ac854c",
+        "state": "uploaded"
+      },
+      "AlphaSync-1.5.1-147-macOS-11-12-universal-symbols.zip.build-information.txt": {
+        "size": 838,
+        "digest": "sha256:be4f34fff92d083f5e0601463ba1786528320e204ee88f90f79dd51afe2c9ee9",
+        "state": "uploaded"
+      },
+      "AlphaSync-1.5.1-147-macOS-11-12-universal-symbols.zip.sha256": {
+        "size": 120,
+        "digest": "sha256:b046de391bb06119db0fdc7597685e62e30c8d3c46c38f0897384d9ab7bcffc1",
+        "state": "uploaded"
+      },
+      "AlphaSync-1.5.1-147-macOS-11-12-universal.zip": {
+        "size": 2131393,
+        "digest": "sha256:4a13834a66047fce672f40eb956dea90146ff386ae08265597421ee3536b3f74",
+        "state": "uploaded"
+      },
+      "AlphaSync-1.5.1-147-macOS-11-12-universal.zip.build-information.txt": {
+        "size": 643,
+        "digest": "sha256:1633bfd672c536615f60c4fc42c4d32707dc16979dbce1bba5d037b0857a19ac",
+        "state": "uploaded"
+      },
+      "AlphaSync-1.5.1-147-macOS-11-12-universal.zip.sha256": {
+        "size": 112,
+        "digest": "sha256:c03b9f70a708d58799c416ab8efdc3a6022939cae6a1af60baaf3e322a889d78",
+        "state": "uploaded"
+      }
+    }
+  },
+  "modern": {
+    "id": 440948367,
+    "tag_name": "v2.0.4",
+    "target_commitish": "7b71c9fa7f8de748c91e26990050decfb2a98472",
+    "assets": {
+      "AlphaSync-2.0.4-154-macOS-13-apple-silicon-symbols.zip": {
+        "size": 4729006,
+        "digest": "sha256:dc7b34a45c62cd0228c5c6b50895ceb0ef400957656b920d45a1d8c1ef7de64e",
+        "state": "uploaded"
+      },
+      "AlphaSync-2.0.4-154-macOS-13-apple-silicon-symbols.zip.build-information.txt": {
+        "size": 557,
+        "digest": "sha256:bdc88cb5e76ddca479d5fac46068d3e2dd8b4b2e10604250094c5923a266044e",
+        "state": "uploaded"
+      },
+      "AlphaSync-2.0.4-154-macOS-13-apple-silicon-symbols.zip.sha256": {
+        "size": 121,
+        "digest": "sha256:44726f6858a06286512aed0984b21e38f760b8efdee91b6605be6347f79dde46",
+        "state": "uploaded"
+      },
+      "AlphaSync-2.0.4-154-macOS-13-apple-silicon.zip": {
+        "size": 2870816,
+        "digest": "sha256:f2660477d1d88c9c5041a1100f13711eb55be3e239f7ab1bf28632f8c75c3821",
+        "state": "uploaded"
+      },
+      "AlphaSync-2.0.4-154-macOS-13-apple-silicon.zip.build-information.txt": {
+        "size": 531,
+        "digest": "sha256:24338147f563acc04675d0bd250106ca1d9b52fc0dac9c1a5ba8d870b99b2696",
+        "state": "uploaded"
+      },
+      "AlphaSync-2.0.4-154-macOS-13-apple-silicon.zip.sha256": {
+        "size": 113,
+        "digest": "sha256:8c6228fa310c3abafd4c6716eee004f6b78b9857c983d86cd0d3ff9d18743de7",
+        "state": "uploaded"
+      },
+      "AlphaSync-2.0.4-154-macOS-13-universal-symbols.zip": {
+        "size": 9525061,
+        "digest": "sha256:6ddbf66092b94d8a56be552f935225e8ef422734d404898a8631254ea6803f35",
+        "state": "uploaded"
+      },
+      "AlphaSync-2.0.4-154-macOS-13-universal-symbols.zip.build-information.txt": {
+        "size": 875,
+        "digest": "sha256:651e1b69a40f3e9355f013a9c74a741de77c428f6a437be5eae5a534709edcce",
+        "state": "uploaded"
+      },
+      "AlphaSync-2.0.4-154-macOS-13-universal-symbols.zip.sha256": {
+        "size": 117,
+        "digest": "sha256:9c281ffdb22e37f66b04b7eeca4261aaa69d1e3bcac789f996dc187504f0ee49",
+        "state": "uploaded"
+      },
+      "AlphaSync-2.0.4-154-macOS-13-universal.zip": {
+        "size": 3367883,
+        "digest": "sha256:f0092aca638d5fb7e4c47695173d8111ebe4a6a57a5b5e1809a94bce226f67ac",
+        "state": "uploaded"
+      },
+      "AlphaSync-2.0.4-154-macOS-13-universal.zip.build-information.txt": {
+        "size": 530,
+        "digest": "sha256:43fe4d38040fb6946f752a6bef708807e91f1195ab686d30e632d0b13bfb5b7d",
+        "state": "uploaded"
+      },
+      "AlphaSync-2.0.4-154-macOS-13-universal.zip.sha256": {
+        "size": 109,
+        "digest": "sha256:15bb997ace157ead3fd3fc0031e36b33594d2f408879e857d7ceec58d4f999e2",
+        "state": "uploaded"
+      }
+    }
+  },
+  "retire": [
+    {
+      "id": 440367984,
+      "tag_name": "v2.0.3",
+      "target_commitish": "db3ff4c23253c024726dd812868e6ac745a7b831",
+      "assets": {
+        "AlphaSync-2.0.3-153-macOS-13-apple-silicon-symbols.zip": {
+          "size": 4728490,
+          "digest": "sha256:2ed3c67d729fabc878924fa9ff0542a26d26dde0e483ab9cd8866568ec4cd4c8",
+          "state": "uploaded"
+        },
+        "AlphaSync-2.0.3-153-macOS-13-apple-silicon-symbols.zip.build-information.txt": {
+          "size": 557,
+          "digest": "sha256:029df71be66e3720b50eb6137d37690dd23109bd9229709a2ffb0ba0dfac9be8",
+          "state": "uploaded"
+        },
+        "AlphaSync-2.0.3-153-macOS-13-apple-silicon-symbols.zip.sha256": {
+          "size": 121,
+          "digest": "sha256:40a320754e132eab3cf5168bf35f2b5146dc00b6cc03b2b2a73f5d7e3686e09e",
+          "state": "uploaded"
+        },
+        "AlphaSync-2.0.3-153-macOS-13-apple-silicon.zip": {
+          "size": 2844334,
+          "digest": "sha256:f2695b180dbbc93d0dd3c164ce8c91b0173d8be2e8ce04f5b82f87163f272be8",
+          "state": "uploaded"
+        },
+        "AlphaSync-2.0.3-153-macOS-13-apple-silicon.zip.build-information.txt": {
+          "size": 530,
+          "digest": "sha256:4b8100f6a14d06dc180e31e3fdc1b23de9f51df4d8711cacc2d30aa75846d7d9",
+          "state": "uploaded"
+        },
+        "AlphaSync-2.0.3-153-macOS-13-apple-silicon.zip.sha256": {
+          "size": 113,
+          "digest": "sha256:492b8000f12c29a3d39147c3a297bfecb0a689d8fdb11c02dfb0b995dfa79b80",
+          "state": "uploaded"
+        },
+        "AlphaSync-2.0.3-153-macOS-13-universal-symbols.zip": {
+          "size": 9523684,
+          "digest": "sha256:95f24e308aca88884c192d94d5423c9f32f1290ed6dadee6c7baf31f61efe157",
+          "state": "uploaded"
+        },
+        "AlphaSync-2.0.3-153-macOS-13-universal-symbols.zip.build-information.txt": {
+          "size": 875,
+          "digest": "sha256:5f1934a6e9dfed303146b925e1371342baf16514888ff7a5385994e63c0d8c9a",
+          "state": "uploaded"
+        },
+        "AlphaSync-2.0.3-153-macOS-13-universal-symbols.zip.sha256": {
+          "size": 117,
+          "digest": "sha256:f3a6ca8a34196f311c51131515029f5d011b7581e13aebf0d20001e39459082b",
+          "state": "uploaded"
+        },
+        "AlphaSync-2.0.3-153-macOS-13-universal.zip": {
+          "size": 3341367,
+          "digest": "sha256:8ce7f3441a17c6a8912372e229be6b135621e44583efed68bc7b2b9dd3391625",
+          "state": "uploaded"
+        },
+        "AlphaSync-2.0.3-153-macOS-13-universal.zip.build-information.txt": {
+          "size": 529,
+          "digest": "sha256:25df28bbf85ea184ea5f7785f1f7358502f444275c86efc00f57ebd443d08b41",
+          "state": "uploaded"
+        },
+        "AlphaSync-2.0.3-153-macOS-13-universal.zip.sha256": {
+          "size": 109,
+          "digest": "sha256:d3259e874e77ad6dd8f446f3c2a7785544837e5c0aea80aad0d498fd433adea4",
+          "state": "uploaded"
+        }
+      }
+    }
+  ],
+  "preserved_tag_objects": {
+    "refs/tags/v1.4.1": {
+      "sha": "a7a98ca2097fc2ac2b409fd1d35e8afbd41f9199",
+      "type": "commit",
+      "url": "https://api.github.com/repos/koralatov/alphasync/git/commits/a7a98ca2097fc2ac2b409fd1d35e8afbd41f9199"
+    },
+    "refs/tags/v1.4.2": {
+      "sha": "f614f61dda822be6f7afd14938cbe4d2bacc26a3",
+      "type": "commit",
+      "url": "https://api.github.com/repos/koralatov/alphasync/git/commits/f614f61dda822be6f7afd14938cbe4d2bacc26a3"
+    },
+    "refs/tags/v1.4.3": {
+      "sha": "d5a2a54b99a1e3a0fdb0ea87788d72812f6a0e46",
+      "type": "commit",
+      "url": "https://api.github.com/repos/koralatov/alphasync/git/commits/d5a2a54b99a1e3a0fdb0ea87788d72812f6a0e46"
+    },
+    "refs/tags/v1.4.4": {
+      "sha": "077b4acdcde7a709269078885b6f98eacf8cd771",
+      "type": "commit",
+      "url": "https://api.github.com/repos/koralatov/alphasync/git/commits/077b4acdcde7a709269078885b6f98eacf8cd771"
+    },
+    "refs/tags/v1.4.5": {
+      "sha": "4e3756f952b32b056b8dcf7b1a77c1aace6e28f7",
+      "type": "commit",
+      "url": "https://api.github.com/repos/koralatov/alphasync/git/commits/4e3756f952b32b056b8dcf7b1a77c1aace6e28f7"
+    },
+    "refs/tags/v1.5": {
+      "sha": "3ba2abfd32b7f4cbae833079f2e81296761e6b22",
+      "type": "commit",
+      "url": "https://api.github.com/repos/koralatov/alphasync/git/commits/3ba2abfd32b7f4cbae833079f2e81296761e6b22"
+    },
+    "refs/tags/v1.5.1": {
+      "sha": "6cb821c9ab8073ff950414952bf2480eb4638c5d",
+      "type": "commit",
+      "url": "https://api.github.com/repos/koralatov/alphasync/git/commits/6cb821c9ab8073ff950414952bf2480eb4638c5d"
+    },
+    "refs/tags/v2.0": {
+      "sha": "a508da036db4516d65d98b0a33e1d031e96f8b88",
+      "type": "commit",
+      "url": "https://api.github.com/repos/koralatov/alphasync/git/commits/a508da036db4516d65d98b0a33e1d031e96f8b88"
+    },
+    "refs/tags/v2.0.2": {
+      "sha": "807b4bedf1bb1cd655e934e1495723bb5c203c93",
+      "type": "commit",
+      "url": "https://api.github.com/repos/koralatov/alphasync/git/commits/807b4bedf1bb1cd655e934e1495723bb5c203c93"
+    },
+    "refs/tags/v2.0.2-build.152": {
+      "sha": "fbcc566207d550ee313245e3eff39a55d3c986fb",
+      "type": "commit",
+      "url": "https://api.github.com/repos/koralatov/alphasync/git/commits/fbcc566207d550ee313245e3eff39a55d3c986fb"
+    },
+    "refs/tags/v2.0.3": {
+      "sha": "db3ff4c23253c024726dd812868e6ac745a7b831",
+      "type": "commit",
+      "url": "https://api.github.com/repos/koralatov/alphasync/git/commits/db3ff4c23253c024726dd812868e6ac745a7b831"
+    },
+    "refs/tags/v2.0.4": {
+      "sha": "7b71c9fa7f8de748c91e26990050decfb2a98472",
+      "type": "commit",
+      "url": "https://api.github.com/repos/koralatov/alphasync/git/commits/7b71c9fa7f8de748c91e26990050decfb2a98472"
+    }
+  },
+  "scope": "The user explicitly requested removal of the 2.0.3 release listing so that only 1.5.1 and 2.0.4 are published. Preserve all source tags, the legacy branch, both protected releases, and their notes and assets."
+}
