@@ -115,10 +115,9 @@ public final class AppStore: ObservableObject {
     }
     public var canImport: Bool { !busy && importApplet?.canWrite == true }
     public var stopRequest: StopRequest?
-    private var monitor: Task<Void, Never>?
+    private var attachmentWatcher: AttachmentWatcher?
     private var scanTask: Task<Void, Never>?
     private var scanPending = false
-    private var monitorGeneration = UUID()
     private var monitoringIssue: String?
     private var discoveryIssue: String?
     private var epoch = 0
@@ -129,35 +128,33 @@ public final class AppStore: ObservableObject {
     public init(service: DeviceService = DeviceService(), preferences: Preferences? = nil, monitoringEnabled: Bool = true) {
         self.service = service; self.preferences = preferences ?? Preferences(); self.monitoringEnabled = monitoringEnabled
     }
-    deinit { monitor?.cancel(); scanTask?.cancel() }
+    deinit { scanTask?.cancel() }
     public func applet(for id: NeoFileID) -> NeoApplet? {
         devices.first { $0.connection == id.connection }?.applets.first { $0.id == id.applet }
     }
     public func start() {
-        guard monitoringEnabled, monitor == nil, !shuttingDown else { return }
-        let observer = service.attachmentMonitor()
-        let generation = UUID()
-        monitorGeneration = generation
-        monitoringIssue = nil
-        updateConnectionIssue()
-        monitor = Task { [weak self] in
-            defer {
-                observer.cancel()
-                if self?.monitorGeneration == generation { self?.monitor = nil }
-            }
-            do {
-                for try await _ in observer.events {
-                    guard !Task.isCancelled, let self else { return }
-                    self.scanPending = true
-                    self.resumeAttachmentScan()
-                }
-            } catch {
-                if !Task.isCancelled {
-                    self?.monitoringIssue = error.localizedDescription
-                    self?.updateConnectionIssue()
-                }
-            }
+        guard monitoringEnabled, !shuttingDown else { return }
+        if attachmentWatcher == nil {
+            let service = service
+            attachmentWatcher = AttachmentWatcher(factory: { service.attachmentMonitor() }, onEvent: { [weak self] in
+                self?.scanPending = true
+                self?.resumeAttachmentScan()
+            }, onFailure: { [weak self] error in
+                self?.monitoringIssue = error.localizedDescription
+                self?.updateConnectionIssue()
+            }, onRecovery: { [weak self] in
+                self?.monitoringIssue = nil
+                self?.updateConnectionIssue()
+            })
         }
+        attachmentWatcher?.start()
+    }
+    public func resumeAfterWake() {
+        guard monitoringEnabled, !shuttingDown else { return }
+        start()
+        attachmentWatcher?.restart()
+        scanPending = true
+        resumeAttachmentScan()
     }
     private func resumeAttachmentScan() {
         guard monitoringEnabled, scanPending, scanTask == nil, !busy, !shuttingDown else { return }
@@ -260,7 +257,7 @@ public final class AppStore: ObservableObject {
             contentRevision = UUID()
             reconcileSelection()
         }
-        start()
+        resumeAfterWake()
     }
     public func readText(_ id: NeoFileID) async throws -> String {
         try Task.checkCancellation()
@@ -445,8 +442,7 @@ public final class AppStore: ObservableObject {
     }
     public func shutdown() async {
         shuttingDown = true
-        monitor?.cancel()
-        monitor = nil
+        attachmentWatcher?.stop()
         scanTask?.cancel()
         scanPending = false
         for stop in activityStops.values { stop.stop() }

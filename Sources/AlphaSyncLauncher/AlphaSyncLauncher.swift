@@ -15,35 +15,22 @@ enum AlphaSyncLauncher {
 
 @MainActor
 private final class LaunchDelegate: NSObject, NSApplicationDelegate {
-    private var monitor: Task<Void, Never>?
+    private var watcher: AttachmentWatcher?
     private var launchTask: Task<Void, Never>?
     private var retryTask: Task<Void, Never>?
     private var launchState = NeoLaunchState()
     func applicationDidFinishLaunching(_ notification: Notification) {
-        monitor = Task {
-            var failures = 0
-            while !Task.isCancelled && failures < 3 {
-                do {
-                    let observer = NeoPresence.monitorAttachments()
-                    defer { observer.cancel() }
-                    for try await _ in observer.events {
-                        guard !Task.isCancelled else { return }
-                        // Only registry metadata is read here. USB ownership remains in the main app.
-                        launchState.observe(try NeoPresence.attachedIDs())
-                        attemptLaunch()
-                    }
-                    return
-                } catch {
-                    if Task.isCancelled { return }
-                    NSLog("Neo attachment monitoring failed: %@", error.localizedDescription)
-                    failures += 1
-                    if failures < 3 {
-                        do { try await Task.sleep(for: .seconds(failures)) } catch { return }
-                    }
-                }
-            }
-        }
+        watcher = AttachmentWatcher(onEvent: { [weak self] in
+            guard let self else { return }
+            // Only registry metadata is read here. USB ownership remains in the main app.
+            self.launchState.observe(try NeoPresence.attachedIDs())
+            self.attemptLaunch()
+        }, onFailure: { error in NSLog("Neo attachment monitoring failed: %@", error.localizedDescription) })
+        watcher?.start()
+        NSWorkspace.shared.notificationCenter.addObserver(self, selector: #selector(didWake),
+                                                          name: NSWorkspace.didWakeNotification, object: nil)
     }
+    @objc private func didWake(_ notification: Notification) { watcher?.restart() }
     private func attemptLaunch() {
         retryTask?.cancel(); retryTask = nil
         let running = !NSRunningApplication.runningApplications(withBundleIdentifier: "com.tsoniq.AlphaSync").isEmpty
@@ -73,6 +60,7 @@ private final class LaunchDelegate: NSObject, NSApplicationDelegate {
         }
     }
     func applicationWillTerminate(_ notification: Notification) {
-        monitor?.cancel(); retryTask?.cancel(); launchTask?.cancel()
+        NSWorkspace.shared.notificationCenter.removeObserver(self)
+        watcher?.stop(); retryTask?.cancel(); launchTask?.cancel()
     }
 }

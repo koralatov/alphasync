@@ -1,5 +1,6 @@
 import SwiftUI
 import UniformTypeIdentifiers
+import AppKit
 import AlphaSyncCore
 import AlphaSyncHardware
 
@@ -66,6 +67,9 @@ public struct MainView: View {
         .onChange(of: store.sidebar) { _ in store.selection = [] }
         .onChange(of: preferences.filter) { _ in store.reconcileSelection() }
         .task { store.start(); store.reconcileSelection() }
+        .onReceive(NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didWakeNotification)) { _ in
+            store.resumeAfterWake()
+        }
     }
 
     private var waiting: some View {

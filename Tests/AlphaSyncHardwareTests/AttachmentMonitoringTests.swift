@@ -104,7 +104,7 @@ final class AttachmentMonitoringTests: XCTestCase {
         await store.shutdown()
     }
 
-    func testMonitorFailureRemainsVisibleUntilExplicitRestart() async throws {
+    func testMonitorFailureRemainsVisibleUntilAutomaticRecoverySucceeds() async throws {
         let observations = SimulatedObservations(), first = EventFeed(), second = EventFeed()
         let feeds = EventFeeds([first, second])
         let store = store(observations, events: { feeds.next() })
@@ -113,12 +113,65 @@ final class AttachmentMonitoringTests: XCTestCase {
         try await eventually { store.devices.count == 1 }
         first.continuation.finish(throwing: NeoError.device("Simulated attachment monitor failure"))
         try await eventually { store.connectionIssue?.contains("monitor failure") == true }
-        await store.refresh()
         observations.setAttached([])
         second.continuation.yield(())
         try await eventually { store.devices.isEmpty }
         XCTAssertNil(store.connectionIssue)
         await store.shutdown()
+        try await eventually { second.terminated.isRequested }
+    }
+}
+
+final class MonitorRetryPolicyTests: XCTestCase {
+    func testFailuresUseShortBurstsSeparatedByACooldown() {
+        var policy = MonitorRetryPolicy()
+        let delays = (0..<6).map { _ in policy.nextDelay(healthyFor: .zero) }
+        XCTAssertEqual(delays, [.seconds(1), .seconds(2), .seconds(30), .seconds(1), .seconds(2), .seconds(30)])
+    }
+    func testAHealthyObserverStartsAFreshBurstAfterALaterFailure() {
+        var policy = MonitorRetryPolicy()
+        _ = policy.nextDelay(healthyFor: .zero)
+        _ = policy.nextDelay(healthyFor: .zero)
+        XCTAssertEqual(policy.nextDelay(healthyFor: .seconds(60)), .seconds(1))
+    }
+}
+
+@MainActor
+final class WatcherLifetimeTests: XCTestCase {
+    private func eventually(_ condition: () -> Bool) async throws {
+        let deadline = ContinuousClock.now.advanced(by: .seconds(3))
+        while !condition() && ContinuousClock.now < deadline { try await Task.sleep(for: .milliseconds(10)) }
+        XCTAssertTrue(condition())
+    }
+
+    func testWakeStyleRestartCancelsThePreviousObserverAndKeepsTheNewOne() async throws {
+        let first = EventFeed(), second = EventFeed()
+        let sequence = EventFeeds([first, second])
+        var events = 0
+        let watcher = AttachmentWatcher(factory: { sequence.next() }, onEvent: { events += 1 },
+                                         onFailure: { XCTFail($0.localizedDescription) })
+        watcher.start()
+        first.continuation.yield(())
+        try await eventually { events == 1 }
+        watcher.restart()
+        second.continuation.yield(())
+        try await eventually { events == 2 && first.terminated.isRequested }
+        watcher.stop()
+        try await eventually { second.terminated.isRequested }
+    }
+
+    func testAnUnexpectedEndReportsFailureAndArmsAnotherObserver() async throws {
+        let first = EventFeed(), second = EventFeed()
+        let feeds = EventFeeds([first, second])
+        var failure: String?
+        var events = 0
+        let watcher = AttachmentWatcher(factory: { feeds.next() }, sleep: { _ in }, onEvent: { events += 1 },
+                                         onFailure: { failure = $0.localizedDescription })
+        watcher.start()
+        first.continuation.finish()
+        second.continuation.yield(())
+        try await eventually { failure != nil && events == 1 }
+        watcher.stop()
         try await eventually { second.terminated.isRequested }
     }
 }
