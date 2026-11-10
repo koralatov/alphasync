@@ -1,6 +1,8 @@
 # Technical guide
 
-Version **2.0.4** is the current release of the Swift rewrite, developed on **master**. It includes the unpublished 2.0.1 maintenance work. Both app targets require **macOS 13 or later**. For installation and everyday use, see the [README](README.md).
+Version **2.0.3** is the current verified release of the Swift rewrite, developed on **master**. It includes the unpublished 2.0.1 maintenance work. Both app targets require **macOS 13 or later**. For installation and everyday use, see the [README](README.md).
+
+Version 2.0.4, build 154 is prepared but unpublished. [Run 42860366107](https://github.com/koralatov/alphasync/actions/runs/42860366107) passed its Intel checks, including 109 Swift regressions and all 55 Help and release fixtures. Both attempts to allocate an Apple Silicon runner failed before execution; publication was skipped. The [pending verification record](releases/verification/2.0.4-154/verification.json) identifies the exact prepared source and the remaining work. Re-run only failed jobs after GitHub recovers, with publication enabled and retirement disabled.
 
 Version 2.0.3, build 153 passed [release run 42819807561](https://github.com/koralatov/alphasync/actions/runs/42819807561) on 10 November 2026 for exact source `db3ff4c23253c024726dd812868e6ac745a7b831`. Both host jobs passed 109 Swift regressions, 42 release fixtures, native interface checks, and app and helper package verification. All twelve public assets match the independently downloaded packages. At its publication, the latest immutable release was `v2.0.3`; both 2.0.2 listings are retired, with all ten earlier tags and the exact 1.5.1 release preserved. See the [permanent verification record](releases/verification/2.0.3-153/verification.json). Physical Neo, actual Login Items approval, and macOS 13 runtime checks remain unverified.
 

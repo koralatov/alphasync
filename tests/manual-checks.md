@@ -2,6 +2,8 @@
 
 Record the app version, build, source commit, edition, exact macOS version, architecture, Neo model, result, and any failure. Hosted builds and simulated transfers do not establish physical USB or macOS 13 runtime compatibility.
 
+Version 2.0.4, build 154 is prepared but unpublished. Its [pending build record](../releases/verification/2.0.4-154/verification.json) records the passed Intel checks and two failed Apple Silicon runner allocations. No Apple Silicon test or final publication result is claimed. The native Help Viewer checks below also remain unverified.
+
 Version 2.0.3, build 153 passed [release run 42819807561](https://github.com/koralatov/alphasync/actions/runs/42819807561) on 10 November 2026 for source `db3ff4c23253c024726dd812868e6ac745a7b831`. Both hosts passed 109 Swift regressions, 42 release fixtures, native interface checks, and app and helper verification. The twelve public assets match the downloaded packages. The [permanent record](../releases/verification/2.0.3-153/verification.json) retains those results. Physical checks below remain unverified.
 
 The [frozen 1.5.1 checklist](https://github.com/koralatov/alphasync/blob/v1.5.1/tests/manual-checks.md) retains the macOS 11 and 12 checks and Mike’s earlier macOS 12 report. Do not apply Swift rewrite changes to that release.
