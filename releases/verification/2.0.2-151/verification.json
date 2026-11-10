@@ -1,0 +1,71 @@
+{
+  "formatVersion": 1,
+  "version": "2.0.2",
+  "build": "151",
+  "releaseTag": "v2.0.2",
+  "sourceCommit": "807b4bedf1bb1cd655e934e1495723bb5c203c93",
+  "workflow": {
+    "runID": 42802943901,
+    "attempt": 2,
+    "url": "https://github.com/koralatov/alphasync/actions/runs/42802943901",
+    "conclusion": "success"
+  },
+  "hosts": [
+    {
+      "architecture": "x86_64",
+      "xcode": "16.4",
+      "swiftRegressions": 109,
+      "packagingFixtures": 9,
+      "publicationFixtures": 18,
+      "retirementFixtures": 8,
+      "nativeInterface": "passed",
+      "builtEditions": [
+        "universal"
+      ]
+    },
+    {
+      "architecture": "arm64",
+      "xcode": "26.6",
+      "swiftRegressions": 109,
+      "packagingFixtures": 9,
+      "publicationFixtures": 18,
+      "retirementFixtures": 8,
+      "nativeInterface": "passed",
+      "builtEditions": [
+        "universal",
+        "apple-silicon"
+      ]
+    }
+  ],
+  "verification": {
+    "appAndHelper": "passed",
+    "architectures": "passed",
+    "minimumDeployment": "13.0",
+    "signing": "ad-hoc",
+    "hardenedRuntime": "passed",
+    "crashSymbols": "passed",
+    "publicAssetHashes": "matched all twelve downloaded assets",
+    "legacyRelease": "unchanged",
+    "priorTags": "all eight preserved"
+  },
+  "unverified": [
+    "Physical Neo transfers",
+    "Real Login Items approval",
+    "macOS 13 runtime"
+  ],
+  "publicationNote": "The failed publication job was resumed after the newly created draft was briefly absent from the release list. Successful builds and their exact artifacts were reused.",
+  "files": {
+    "assets.json": {
+      "size": 2043,
+      "sha256": "86693cd7c6e23b236797310307f1b2884c535c83f4cdcf13550956172e15edd1"
+    },
+    "notes.md": {
+      "size": 13358,
+      "sha256": "566b3d2f4b5a649861482c23d465ca4dc2c3cc98608ce25f6b39a944c84a3ed7"
+    },
+    "retired-releases.json": {
+      "size": 153485,
+      "sha256": "8d8c62fc4d78a993dea99f51ca38009a4c1364df1e7a04273e9fe8ad19fdaa75"
+    }
+  }
+}
