@@ -1,57 +1,37 @@
-/* alphasync.css */
-
 :root {
-	color-scheme: light dark;
+    color-scheme: light dark;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 100%;
 }
-
-BODY {
-	font-size: 9pt;
-	font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-	font-weight: normal;
+body {
+    color: CanvasText;
+    background: Canvas;
+    font-size: 1rem;
+    line-height: 1.55;
+    max-width: 68ch;
+    margin: 0 auto;
+    padding: 1.25rem 1.5rem;
+    overflow-wrap: break-word;
 }
-
-h1 {
-	font-size: 14pt;
-	font-weight: bold;
-	margin-top: 6px;
-	margin-bottom: 0;
-}
-
-h2 {
-	font-size: 12pt;
-	font-weight: bold;
-	margin-top: 4px;
-	margin-bottom: 0;
-}
-
-h3 {
-	font-size: 10pt;
-	font-weight: bold;
-	margin-top: 2px;
-	margin-bottom: 0;
-}
-
-code
-{
-    font-weight: bold;
-}
-
-blockquote
-{
-	font-size: 9pt;
-	font-weight: bold;
-	line-height: 12pt;
-}
-
-.disclaimer
-{
-	font-weight: normal;
-}
-
-.licence {
-	font: inherit;
-	white-space: pre-wrap;
-	overflow-wrap: anywhere;
-}
-
-
+h1, h2 { line-height: 1.25; font-weight: 650; }
+h1 { font-size: 1.75rem; margin: 1rem 0; }
+h2 { font-size: 1.2rem; margin: 1.75rem 0 0.65rem; }
+p, ul, ol { margin: 0.75rem 0; }
+ul, ol { padding-inline-start: 1.5rem; }
+li + li { margin-top: 0.45rem; }
+a { color: LinkText; text-decoration: underline; text-underline-offset: 0.15em; }
+a:visited { color: VisitedText; }
+a:focus-visible { outline: 3px solid Highlight; outline-offset: 3px; border-radius: 2px; }
+nav { margin-bottom: 1rem; }
+footer { margin-top: 2rem; border-top: 1px solid GrayText; padding-top: 0.75rem; }
+footer p { font-size: 0.875rem; }
+header { display: flow-root; }
+.app-icon { float: right; margin: 0.5rem 0 1rem 1rem; }
+.note { border-inline-start: 0.25rem solid GrayText; padding: 0.5rem 0.75rem; }
+code, kbd { font-family: ui-monospace, monospace; font-size: 0.95em; }
+kbd { white-space: nowrap; }
+table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+caption { text-align: start; font-weight: 600; margin-bottom: 0.5rem; }
+th, td { text-align: start; vertical-align: top; border-bottom: 1px solid GrayText; padding: 0.6rem 0.5rem; }
+th { font-weight: 650; }
+.licence { font: inherit; white-space: pre-wrap; overflow-wrap: anywhere; }

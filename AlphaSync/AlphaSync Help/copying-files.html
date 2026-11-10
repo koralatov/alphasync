@@ -2,28 +2,40 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="description" content="Reading and copying files in AlphaSync 2.0.3.">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="KEYWORDS" content="copy, save, export, Finder, drag, text, UTF-8, XML, selected files">
+    <meta name="description" content="Save Neo files to a folder on your Mac or drag them into Finder.">
     <link rel="stylesheet" href="css/alphasync.css">
-    <title>Reading and copying files – AlphaSync Help</title>
+    <title>Copy files to your Mac – AlphaSync Help</title>
 </head>
 <body>
-<p><a href="alphasync-help.html">AlphaSync Help</a></p>
-<h1>Reading and copying files</h1>
-<h2>Read a file</h2>
-<p>Double-click a file to open its own read-only window. Choose Regular or Monospaced to use the system font and size. Use Edit → Find to search, or select text and use Edit → Copy.</p>
-<p>Copy to Clipboard copies all the loaded text without changing its selection. The text stays available after you disconnect the Neo. Close and reopen the window after refreshing to see later changes.</p>
-<p>Try Again retries a failed read. Closing the window cancels its loading or retry between file blocks.</p>
-<h2>Save to your Mac</h2>
-<p>Select files and choose File → Save to Mac…, then choose a folder. You can also drag file names into a Finder folder. Existing files are preserved, with a numbered name used for another copy.</p>
-<h2>Add or replace text</h2>
-<p>Choose AlphaWord or the user dictionary in the sidebar. With no files selected, choose File → Import Text Files to Neo… to add text. Select one file before importing to replace that file, or drop a text file onto its name.</p>
-<p>New AlphaWord files are unbound. Use the Neo’s Open command to find them. Names must fit the Neo’s 15-character limit and use supported characters.</p>
-<p>A replacement requires confirmation. Cancel has the initial keyboard focus and is the default. Save a recovery copy first is on by default. If that copy fails, the replacement stops.</p>
-<p>Use plain text in MacASCII (Mac Roman), UTF-8, or UTF-16 with a byte-order mark. Unsupported characters, unreadable limits, insufficient memory, and text above the converted-size limit stop the change. AlphaSync reads changed contents back to verify them. If writing or verification fails, the file may already have changed; check your recovery copy.</p>
-<p>Dictionary words must contain 2 to 20 characters. If some words cannot be used, AlphaSync shows their count and examples before you choose whether to continue. A non-empty source with no usable words is rejected. Editing the source may require a fresh review. Continuing a replacement still requires its normal confirmation.</p>
-<p>Quit stops read-only preparation before a replacement starts writing. Once writing starts, it and read-back verification finish before AlphaSync closes.</p>
-<p>Other applet formats can be exported and backed up as XML, but cannot be imported or changed in this version.</p>
-<hr>
-<p>Original application © 2009–2013 tSoniq.</p>
+<nav aria-label="Help navigation"><a href="alphasync-help.html">AlphaSync Help</a></nav>
+<main>
+<a id="alphasync-copying-files" name="alphasync-copying-files"></a>
+<h1>Copy files to your Mac</h1>
+<p>Save a copy of your writing on your Mac. The original files stay on your Neo.</p>
+<ol>
+<li>Choose your Neo or an applet in the sidebar.</li>
+<li>Select the files you want to copy. With no files selected, <strong>Save to Mac…</strong> copies every file in the current list.</li>
+<li>Choose <strong>File → Save to Mac…</strong>, choose a destination folder, and confirm the folder choice.</li>
+<li>Read the result to check how many files were saved and where.</li>
+</ol>
+<h2>Drag a file into Finder</h2>
+<p>You can also drag a file’s name from the list into a Finder folder. Keep the Neo connected until the copy finishes.</p>
+<h2>Find the saved copy</h2>
+<p>AlphaWord and dictionary files are saved as UTF-8 <code>.txt</code> files. Other applet files are saved as <code>.xml</code> data, which AlphaSync can preserve but cannot import back in this version.</p>
+<p>If a file with the same name already exists in the destination, AlphaSync gives the new copy a different name. Existing Mac files are preserved.</p>
+<h2>If copying stops</h2>
+<p>A saved file is kept even if a later file fails. Read the message for the saved count and location, then check the destination before trying again.</p>
+<section aria-labelledby="related-topics">
+<h2 id="related-topics">Related topics</h2>
+<ul>
+<li><a href="reading-files.html">Read and find text in a file</a></li>
+<li><a href="backup.html">Back up your Neo files</a></li>
+<li><a href="character-sets.html">Choose a text format your Neo can store</a></li>
+</ul>
+</section>
+</main>
+<footer><p>Original application © 2009–2013 tSoniq.</p></footer>
 </body>
 </html>

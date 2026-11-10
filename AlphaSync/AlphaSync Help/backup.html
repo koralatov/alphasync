@@ -2,20 +2,47 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="description" content="Backing up files in AlphaSync 2.0.3.">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="KEYWORDS" content="backup, back up, destination, folder, Stop, incomplete, log, all Neos, filter">
+    <meta name="description" content="Choose a backup destination, save files from connected Neos, and check the result.">
     <link rel="stylesheet" href="css/alphasync.css">
-    <title>Backing up files – AlphaSync Help</title>
+    <title>Back up your Neo files – AlphaSync Help</title>
 </head>
 <body>
-<p><a href="alphasync-help.html">AlphaSync Help</a></p>
-<h1>Backing up files</h1>
-<p>Click Backup to save the files included by the file filter in Settings. Each Neo has its own dated destination inside the selected backup folder.</p>
-<p>Backups use UTF-8 text for AlphaWord and dictionary files. Other applet files are saved as lossless XML.</p>
-<p>The destination starts with (Incomplete) in its name. This is removed only when that Neo’s files finish successfully. Existing backups are preserved. If the complete file list cannot be read, AlphaSync stops before treating a partial list as a complete backup.</p>
-<p>Stop and Quit can interrupt a backup between blocks of the file being read. Files already saved remain in the unfinished folder. If a file fails, the result explains what was saved and lists any folders that were created. Open Backup Folder shows the saved files in Finder. Done dismisses the result.</p>
-<p>Backup logs are off by default. Enable Save a backup log in Settings if you need one. AlphaSync Backup Log.plist stays inside the dated folder and records relative paths, errors, and the final state.</p>
-<p>The default backup folder is created and remembered when first used. Selected and default destinations follow moves and renames. If a saved destination is missing, reconnect its drive or choose it again in Settings. AlphaSync does not recreate its old path.</p>
-<hr>
-<p>Original application © 2009–2013 tSoniq.</p>
+<nav aria-label="Help navigation"><a href="alphasync-help.html">AlphaSync Help</a></nav>
+<main>
+<a id="alphasync-backup" name="alphasync-backup"></a>
+<h1>Back up your Neo files</h1>
+<p>A backup saves a dated copy of the included files from <strong>every connected Neo</strong>. Selecting one file, applet, or Neo does not limit the backup.</p>
+<h2>Choose what to back up</h2>
+<ol>
+<li>Choose <strong>AlphaSync → Settings…</strong>.</li>
+<li>Under <strong>Files shown and backed up</strong>, use <strong>Show</strong> to choose AlphaWord files, AlphaWord and dictionary files, or all applet files.</li>
+<li>Under <strong>Backups</strong>, use <strong>Choose…</strong> beside <strong>Save to</strong> to choose a destination if needed. The default is the AlphaSync folder in Documents.</li>
+</ol>
+<p>The same filter controls the main file list and backup contents. To save only selected files, use <strong>Save to Mac…</strong> instead.</p>
+<h2>Make a backup</h2>
+<ol>
+<li>Connect the Neos you want to back up.</li>
+<li>Click <strong>Backup</strong>, or choose <strong>File → Back Up Neo Files</strong>.</li>
+<li>Wait for the result. Check the saved and expected file counts and any errors.</li>
+<li>Choose <strong>Open Backup Folder</strong> or <strong>Open Backup Folders</strong> to see the copies in Finder, then choose <strong>Done</strong>.</li>
+</ol>
+<p>Each Neo gets its own dated folder, with files grouped by applet. Repeating a backup preserves earlier copies. AlphaWord and dictionary copies use <code>.txt</code>; other applet data uses <code>.xml</code> and cannot be restored through AlphaSync in this version.</p>
+<h2>Stop or check an unfinished backup</h2>
+<p>Choose <strong>Stop</strong> to end a backup. Files already saved stay on your Mac. A folder keeps <strong>(Incomplete)</strong> in its name until all its included files finish successfully. An unfinished folder is not a complete backup, even if some files are present.</p>
+<p>Read the result before trying again. A fully saved first Neo can remain complete if another Neo fails. If there are no included files, the result says so.</p>
+<h2>Save a backup log</h2>
+<p>Logs are off by default. Enable <strong>Save a backup log</strong> in Settings to include an <code>AlphaSync Backup Log.plist</code> inside each dated folder. It records which files were saved and any errors; your writing remains in the separate files.</p>
+<section aria-labelledby="related-topics">
+<h2 id="related-topics">Related topics</h2>
+<ul>
+<li><a href="preferences.html">Change AlphaSync settings</a></li>
+<li><a href="copying-files.html">Copy files to your Mac</a></li>
+<li><a href="recovery-copies.html">Restore text from a recovery copy</a></li>
+</ul>
+</section>
+</main>
+<footer><p>Original application © 2009–2013 tSoniq.</p></footer>
 </body>
 </html>

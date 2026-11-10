@@ -2,20 +2,42 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="description" content="Clearing files in AlphaSync 2.0.3.">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="KEYWORDS" content="clear, delete, empty, erase, selected, applet, recovery, Cancel">
+    <meta name="description" content="Clear one file, several files, or every file in one editable applet.">
     <link rel="stylesheet" href="css/alphasync.css">
-    <title>Clearing files – AlphaSync Help</title>
+    <title>Clear files on your Neo – AlphaSync Help</title>
 </head>
 <body>
-<p><a href="alphasync-help.html">AlphaSync Help</a></p>
-<h1>Clearing files</h1>
-<p>Clearing removes the selected text on your Neo and cannot be undone.</p>
-<ol><li>Select one file for Clear File…, or several files in the same applet for Clear Selected Files….</li><li>To clear an entire applet, choose it in the sidebar and clear the file selection. The command becomes Clear All Files….</li><li>Read the warning and check the named files before proceeding.</li></ol>
-<p>Cancel is the default and has initial keyboard focus. Return or Space should cancel when the warning first opens. Tab can deliberately move focus to other controls.</p>
-<p>Save a recovery copy first is on by default. Each original is saved as readable text and raw Neo data before clearing starts. If the requested copy cannot be completed, no clearing starts. Use Open Recovery Copies in Settings to find the originals.</p>
-<p>Clearing is available for AlphaWord and user dictionary files. It is unavailable for other formats and during another operation. Changed files are read back to verify them. A failure after clearing starts can leave some files changed; the error includes the recovery location when a copy was saved.</p>
-<p>Quit stops the read-only preparation for clearing, including the final check of the originals. Once clearing starts writing, all writes and read-back verification in that change finish before AlphaSync closes.</p>
-<hr>
-<p>Original application © 2009–2013 tSoniq.</p>
+<nav aria-label="Help navigation"><a href="alphasync-help.html">AlphaSync Help</a></nav>
+<main>
+<a id="alphasync-clearing-files" name="alphasync-clearing-files"></a>
+<h1>Clear files on your Neo</h1>
+<p class="note"><strong>Before clearing:</strong> save a backup of important writing. Clearing removes the selected text on your Neo and cannot be undone with Edit → Undo.</p>
+<h2>Choose what to clear</h2>
+<ul>
+<li>For one file, select it and choose <strong>File → Clear File…</strong>.</li>
+<li>For several files in the same applet, select them and choose <strong>File → Clear Selected Files…</strong>.</li>
+<li>For every file in one applet, choose that applet in the sidebar, clear the file selection, and choose <strong>File → Clear All Files…</strong>.</li>
+</ul>
+<p>The toolbar’s clear button performs the same action. You can also Control-click selected files to use their Clear command. Clear All Files applies to the selected applet, not every applet or every connected Neo.</p>
+<h2>Review the warning</h2>
+<ol>
+<li>Check the named files.</li>
+<li>Keep <strong>Save a recovery copy first</strong> selected to save their originals. If that copy fails, clearing stops.</li>
+<li>Choose the named Clear button to proceed, or <strong>Cancel</strong> to keep the contents.</li>
+</ol>
+<p>Cancel is the default and has the initial keyboard focus. Keep the Neo connected while clearing and verification finish. If a failure occurs after writing starts, some files may already have changed; read the message and check the recovery location.</p>
+<p>Clearing is available for AlphaWord and user dictionary files. If it is unavailable, choose supported files from one applet and wait for any active operation to finish. Selecting All Files without a file selection does not choose an applet to clear.</p>
+<section aria-labelledby="related-topics">
+<h2 id="related-topics">Related topics</h2>
+<ul>
+<li><a href="recovery-copies.html">Restore text from a recovery copy</a></li>
+<li><a href="backup.html">Back up your Neo files</a></li>
+<li><a href="importing-files.html">Add or replace text on your Neo</a></li>
+</ul>
+</section>
+</main>
+<footer><p>Original application © 2009–2013 tSoniq.</p></footer>
 </body>
 </html>

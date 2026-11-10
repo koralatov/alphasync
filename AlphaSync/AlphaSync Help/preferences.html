@@ -2,21 +2,39 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="description" content="Settings in AlphaSync 2.0.3.">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="KEYWORDS" content="settings, preferences, filter, Show, backup folder, bookmark, recovery, log, appearance">
+    <meta name="description" content="Choose file filters, backup folders, recovery retention, and automatic opening.">
     <link rel="stylesheet" href="css/alphasync.css">
-    <title>Settings – AlphaSync Help</title>
+    <title>Change AlphaSync settings – AlphaSync Help</title>
 </head>
 <body>
-<p><a href="alphasync-help.html">AlphaSync Help</a></p>
-<h1>Settings</h1>
-<p>Choose AlphaSync → Settings….</p>
-<h2>Files shown and backed up</h2><p>Choose AlphaWord files, AlphaWord and dictionary files, or all applet files. The same filter controls the main list and backups.</p>
-<h2>Backups</h2><p>Choose where backups and recovery copies are saved. Backup logs are off unless you enable Save a backup log. Exported text always uses UTF-8.</p>
-<h2>Recovery copies</h2><p>Save recovery copies by default is initially on. A Replace or Clear warning can override that choice for its own operation. Keep copies for 7, 30, or 90 days, or until you remove them. The default is 30 days.</p>
-<p>Open Recovery Copies opens the folder inside your backup destination. It is created when you first save a recovery copy. Restore text by importing its saved .txt file onto the matching Neo file. Keep the raw .neo files for recovery or diagnosis.</p>
-<p>Only recognised, complete expired copies move to Trash, when a new copy is made. Incomplete and unrelated folders are left alone.</p>
-<h2>Automatic opening</h2><p>Enable Open AlphaSync when a Neo is connected. The separate status explains whether Login Items approval is required. Use Open Login Items Settings to review the system’s setting.</p>
-<hr>
-<p>Original application © 2009–2013 tSoniq.</p>
+<nav aria-label="Help navigation"><a href="alphasync-help.html">AlphaSync Help</a></nav>
+<main>
+<a id="alphasync-preferences" name="alphasync-preferences"></a>
+<h1>Change AlphaSync settings</h1>
+<p>Choose <strong>AlphaSync → Settings…</strong>. Changes are saved as you make them.</p>
+<h2>Choose files to show and back up</h2>
+<p>Under <strong>Files shown and backed up</strong>, the <strong>Show</strong> menu offers <strong>AlphaWord files</strong>, <strong>AlphaWord and dictionary files</strong>, or <strong>All applet files</strong>. The default includes AlphaWord and dictionary files. The filter changes the main list and backup contents; it does not remove device files.</p>
+<h2>Choose a backup folder</h2>
+<p>Under <strong>Backups</strong>, click <strong>Choose…</strong> beside <strong>Save to</strong> and select a folder. Backups and recovery copies both use this destination. The default is <strong>Documents → AlphaSync</strong>.</p>
+<p>The default folder is created when first used. Remembered destinations follow moves and renames. If a folder is missing, reconnect its drive or choose it again. Backups and requested recovery copies stop until a valid destination is available.</p>
+<p><strong>Save a backup log</strong> is off by default. Enable it to keep a result log inside each dated backup folder.</p>
+<h2>Keep recovery copies</h2>
+<p><strong>Save recovery copies by default</strong> is on initially. A Replace or Clear warning can change that choice for that operation without changing this setting. <strong>Keep copies</strong> defaults to 30 days. Choose <strong>Open Recovery Copies</strong> to find saved originals.</p>
+<h2>Open automatically</h2>
+<p><strong>Open AlphaSync when a Neo is connected</strong> records your choice. Read the status below it to see whether macOS has enabled the helper or still needs Login Items approval. <strong>Open Login Items Settings</strong> opens the relevant system settings.</p>
+<h2>Choose an appearance or reading font</h2>
+<p>AlphaSync follows your Mac’s Light or Dark appearance. The reading font is chosen in each file’s read-only window with <strong>Regular</strong> or <strong>Monospaced</strong>; its last choice is remembered for new reader windows.</p>
+<section aria-labelledby="related-topics">
+<h2 id="related-topics">Related topics</h2>
+<ul>
+<li><a href="backup.html">Back up your Neo files</a></li>
+<li><a href="recovery-copies.html">Restore text from a recovery copy</a></li>
+<li><a href="autorun.html">Open AlphaSync when you connect a Neo</a></li>
+</ul>
+</section>
+</main>
+<footer><p>Original application © 2009–2013 tSoniq.</p></footer>
 </body>
 </html>

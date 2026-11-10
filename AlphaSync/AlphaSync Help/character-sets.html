@@ -2,19 +2,40 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="description" content="Text formats and character sets in AlphaSync 2.0.3.">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="KEYWORDS" content="encoding, character set, UTF-8, UTF-16, MacASCII, Mac Roman, emoji, size, memory, XML, dictionary">
+    <meta name="description" content="Prepare plain text, resolve unsupported characters, and check file-size limits.">
     <link rel="stylesheet" href="css/alphasync.css">
-    <title>Text formats and character sets – AlphaSync Help</title>
+    <title>Choose a text format your Neo can store – AlphaSync Help</title>
 </head>
 <body>
-<p><a href="alphasync-help.html">AlphaSync Help</a></p>
-<h1>Text formats and character sets</h1>
-<p>Files saved to your Mac use UTF-8 without a byte-order mark and ordinary LF line endings. Imports accept UTF-8, UTF-16 with a byte-order mark in either byte order, and MacASCII (Mac Roman).</p>
-<p>The Neo stores a smaller character set than Unicode. AlphaSync converts supported characters back into the Neo’s format. Pound signs, supported accents, and curly quotes can be preserved. Unsupported characters, including many emoji and mathematical symbols, stop the import with an explanation.</p>
-<p>No silent replacement is made. Edit the source text to remove or replace the named character, then import again. Windows, Mac, and Unix paragraph endings are converted consistently.</p>
-<p>The Neo’s size limit applies to converted device bytes. A UTF-8 file’s size on your Mac can differ from its size on the Neo. Shorten or split oversized text.</p>
-<p>The user dictionary accepts words of 2 to 20 characters. AlphaSync reports words outside that range and asks before importing only the valid words. A non-empty source with no usable words is rejected. Use Clear File when you intend to empty the dictionary.</p>
-<hr>
-<p>Original application © 2009–2013 tSoniq.</p>
+<nav aria-label="Help navigation"><a href="alphasync-help.html">AlphaSync Help</a></nav>
+<main>
+<a id="alphasync-character-sets" name="alphasync-character-sets"></a>
+<h1>Choose a text format your Neo can store</h1>
+<p>AlphaSync imports plain text into AlphaWord and the user dictionary. A word-processing document may need to be saved as plain text first.</p>
+<h2>Choose a supported format</h2>
+<p>Imports accept <strong>UTF-8</strong>, <strong>UTF-16 with a byte-order mark</strong> in either byte order, and <strong>MacASCII (Mac Roman)</strong>. A byte-order mark is an encoding marker at the start of a text file. UTF-8 is usually the simplest choice when saving new text on your Mac.</p>
+<p>Copies and backups made by AlphaSync use UTF-8 text, without a byte-order mark, for AlphaWord and dictionary files. Paragraph endings from Windows, older Macs, and Unix are converted consistently.</p>
+<h2>Resolve an unsupported character</h2>
+<p>The Neo stores fewer characters than your Mac. Supported accents, pound signs, and curly quotes can be preserved, but many emoji and mathematical symbols cannot.</p>
+<p>If AlphaSync names an unsupported character, edit the source text to remove or replace it and import again. The app stops rather than silently changing an unsupported character.</p>
+<h2>Make text fit</h2>
+<p>The Neo’s limit applies after conversion, so the size shown in Finder may differ from its size on the Neo. Shorten or split oversized text. If memory is low, save a backup before clearing writing you no longer need.</p>
+<p>An unreadable file limit blocks writing. Reconnect the Neo and refresh before trying again. Names must use 1 to 15 supported characters.</p>
+<h2>Prepare dictionary words</h2>
+<p>Use words of 2 to 20 supported characters, separated by spaces or line breaks. AlphaSync reports unusable words before you choose whether to continue. A non-empty source with no usable words is rejected. Use <strong>Clear File…</strong> when you intend to empty a dictionary.</p>
+<h2>Keep other applet data</h2>
+<p>Other applet files can be exported and backed up as <code>.xml</code> files that preserve the original data. AlphaSync cannot import or change those formats in this version. Raw <code>.neo</code> recovery files are also not text imports.</p>
+<section aria-labelledby="related-topics">
+<h2 id="related-topics">Related topics</h2>
+<ul>
+<li><a href="importing-files.html">Add or replace text on your Neo</a></li>
+<li><a href="renaming-files.html">Rename a file on your Neo</a></li>
+<li><a href="recovery-copies.html">Restore text from a recovery copy</a></li>
+</ul>
+</section>
+</main>
+<footer><p>Original application © 2009–2013 tSoniq.</p></footer>
 </body>
 </html>
