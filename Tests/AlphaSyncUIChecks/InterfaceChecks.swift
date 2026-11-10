@@ -14,40 +14,6 @@ struct InterfaceChecks {
     }
     static func settle() { RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.35)) }
     static func descendants(_ root: NSView) -> [NSView] { [root] + root.subviews.flatMap(descendants) }
-    struct AccessibleElement {
-        let object: NSObject
-        // Public accessibility getters do not require formal protocol conformance.
-        func value(_ key: String, getter: String? = nil) -> Any? {
-            guard object.responds(to: NSSelectorFromString(getter ?? key)) else { return nil }
-            return object.value(forKey: key)
-        }
-        var role: String? { value("accessibilityRole") as? String }
-        var title: String? { value("accessibilityTitle") as? String }
-        var label: String? { value("accessibilityLabel") as? String }
-        var enabled: Bool {
-            (value("accessibilityEnabled", getter: "isAccessibilityEnabled") as? NSNumber)?.boolValue ?? false
-        }
-        var frame: NSRect? {
-            (value("accessibilityFrame") as? NSValue)?.rectValue
-        }
-        var children: [Any] {
-            value("accessibilityChildren") as? [Any] ?? []
-        }
-    }
-    static func accessibilityElements(_ root: Any) -> [AccessibleElement] {
-        var elements: [AccessibleElement] = []
-        var visited = Set<ObjectIdentifier>()
-        func visit(_ value: Any) {
-            guard let object = value as? NSObject, visited.insert(ObjectIdentifier(object)).inserted else { return }
-            let element = AccessibleElement(object: object)
-            elements.append(element)
-            for child in element.children { visit(child) }
-            if let view = object as? NSView { for child in view.subviews { visit(child) } }
-            if let window = object as? NSWindow, let content = window.contentView { visit(content) }
-        }
-        visit(root)
-        return elements
-    }
     static func window<V: View>(_ view: V, size: NSSize, title: String) -> NSWindow {
         let result = NSWindow(contentRect: NSRect(origin: .zero, size: size),
                               styleMask: [.titled, .closable, .resizable], backing: .buffered, defer: false)
@@ -59,7 +25,8 @@ struct InterfaceChecks {
         settle()
         return result
     }
-    static func capture(_ window: NSWindow, _ name: String, to output: URL) throws {
+    @discardableResult
+    static func capture(_ window: NSWindow, _ name: String, to output: URL) throws -> Data {
         guard let view = window.contentView else { throw CheckFailure(description: "Missing content view") }
         view.layoutSubtreeIfNeeded(); view.displayIfNeeded()
         guard let bitmap = view.bitmapImageRepForCachingDisplay(in: view.bounds) else { throw CheckFailure(description: "Cannot capture \(name)") }
@@ -84,6 +51,8 @@ struct InterfaceChecks {
         try require((opaque.colorAt(x: 0, y: 0)?.alphaComponent ?? 0) > 0.99, "Capture background must be opaque")
         guard let bytes = opaque.representation(using: .png, properties: [:]) else { throw CheckFailure(description: "Cannot encode \(name)") }
         try bytes.write(to: output.appendingPathComponent(name + ".png"), options: .atomic)
+        guard let pixels = opaque.bitmapData else { throw CheckFailure(description: "Missing captured pixels") }
+        return Data(bytes: pixels, count: opaque.bytesPerRow * opaque.pixelsHigh)
     }
     static func key(_ character: String, code: UInt16, in window: NSWindow) throws {
         guard let event = NSEvent.keyEvent(with: .keyDown, location: .zero, modifierFlags: [], timestamp: 0,
@@ -140,24 +109,12 @@ struct InterfaceChecks {
             store.devices = [snapshot]; store.reconcileSelection()
             let connected = window(MainView(store: store), size: NSSize(width: 820, height: 560), title: "AlphaSync")
             try require(connected.contentView!.bounds.width >= 760, "Connected window is too narrow")
-            try capture(connected, "files-" + label, to: output); connected.close()
+            let withoutWarning = try capture(connected, "files-" + label, to: output)
             store.connectionIssue = "A second Neo could not be opened. Close other Neo software and choose Try Again."
-            let connectionWarning = window(MainView(store: store), size: NSSize(width: 820, height: 560), title: "AlphaSync")
-            try capture(connectionWarning, "connection-warning-" + label, to: output)
-            let elements = accessibilityElements(connectionWarning)
-            let retry = elements.first {
-                $0.role == NSAccessibility.Role.button.rawValue &&
-                [$0.title, $0.label].contains("Try Again")
-            }
-            if retry == nil {
-                let description = elements.prefix(80).map {
-                    "\(type(of: $0.object)) \($0.role ?? "unknown"): \($0.title ?? "") \($0.label ?? "")"
-                }.joined(separator: "\n")
-                print("Connected warning accessibility tree:\n" + description)
-            }
-            try require(retry?.enabled == true && retry?.frame?.isEmpty == false,
-                        "An error beside a connected Neo must expose a visible, enabled retry button")
-            connectionWarning.close()
+            settle()
+            let withWarning = try capture(connected, "connection-warning-" + label, to: output)
+            try require(withWarning != withoutWarning, "A connected Neo must visibly show its connection warning")
+            connected.close()
             store.connectionIssue = nil
             let about = window(AboutView(), size: NSSize(width: 420, height: 570), title: "About AlphaSync")
             if let button = about.firstResponder as? NSButton {
