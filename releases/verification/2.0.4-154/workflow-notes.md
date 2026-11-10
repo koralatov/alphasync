@@ -1,0 +1,115 @@
+# AlphaSync 2.0.4
+
+AlphaSync is a free Mac app for reading, copying, and backing up files from an **AlphaSmart Neo** writing device. Connect your Neo with a USB cable to read your writing, save it on your Mac, or send text back to the Neo.
+
+**Version 2.0.4, build 154, requires macOS 13 Ventura or later.** For macOS 11 Big Sur or macOS 12 Monterey, use [AlphaSync 1.5.1](https://github.com/koralatov/alphasync/releases/tag/v1.5.1). Both versions support Intel and Apple Silicon Macs on their supported systems.
+
+AlphaSync was originally written by tSoniq. Version 2.0 was the first public release of the Swift rewrite. Version 2.0.4 brings a complete review and rewrite of the built-in Help.
+
+## What it does
+
+- **Read your files.** Open separate, read-only windows, find text, and copy it to the clipboard.
+- **Copy text in either direction.** Save files to your Mac, add text to the Neo, or replace a file after confirmation.
+- **Organise files.** Rename supported files and inspect file, applet, and Neo information.
+- **Protect your writing.** Make dated backups and keep recovery copies before replacing or clearing files.
+- **Open automatically.** Enable automatic opening in Settings and approve the helper if macOS asks.
+
+## What is new in 2.0.4
+
+**The Help starts with your task.** Its home page leads to clear steps for connecting a Neo, reading, copying, importing, renaming, backing up, clearing, changing settings, and solving problems. Choose **Help → AlphaSync Help** or press **⌘?**. The guide works offline.
+
+**Recovery has its own guide.** It explains where saved originals are kept and how to put their text back onto the correct Neo file. It also explains retention, Trash, and the difference between readable text and original Neo data.
+
+**The scope of each action is clearer.** Backup includes the chosen file types from every connected Neo. Save to Mac with nothing selected copies the current list. Clear All Files applies to the selected applet. Each procedure explains its own selection and confirmation steps.
+
+**Problems have practical next steps.** New troubleshooting and support pages cover connection failures, unavailable commands, missing destinations, interrupted copies, failed verification, and what to include in a report.
+
+**The pages are easier to read.** They use the system font, scalable text, underlined links, clearer headings, and colours that follow Light and Dark appearance. Related topics make it easier to move between tasks.
+
+**The About window has a safer fallback.** If its app artwork cannot be loaded, it shows a built-in document symbol without waiting for the system’s application-icon service.
+
+This release carries forward the transfer and maintenance improvements in [2.0.3](https://github.com/koralatov/alphasync/blob/v2.0.3/releases/2.0.3.md), including more reliable automatic opening, remembered backup destinations, dictionary-import review, and safer stopping and quitting.
+
+## How to download it
+
+Check your macOS version and chip in **Apple menu → About This Mac**, then choose one download:
+
+| Download | Which Mac? |
+| --- | --- |
+| [**Universal**](https://github.com/koralatov/alphasync/releases/download/v2.0.4/AlphaSync-2.0.4-154-macOS-13-universal.zip) | Intel or Apple Silicon, running macOS 13 or later. Choose this if you are unsure. |
+| [**Apple Silicon**](https://github.com/koralatov/alphasync/releases/download/v2.0.4/AlphaSync-2.0.4-154-macOS-13-apple-silicon.zip) | An M-series Mac running macOS 13 or later. |
+
+Both editions offer the same features. Universal uses the original icon; Apple Silicon uses the newer icon. Install one edition. Each app includes its matching automatic-launch helper. The separate **symbols** ZIPs are for developers investigating crashes.
+
+## How to install it
+
+1. Double-click the downloaded ZIP file to unpack it.
+2. Quit an older copy of AlphaSync if it is running.
+3. Drag **AlphaSync** into your **Applications** folder. Replace the older copy if Finder asks.
+4. Open **Applications**, then double-click **AlphaSync**.
+
+These downloads have ad hoc signatures and are not Apple-notarised. If macOS blocks the first opening, follow [Apple’s instructions for opening a downloaded app](https://support.apple.com/en-gb/102445). The approval is in **System Settings → Privacy & Security**. Use it only for the copy downloaded from this release.
+
+Check automatic opening in **AlphaSync → Settings…** after upgrading. Keep the app and its bundled helper together, and follow any Login Items approval prompt.
+
+## How to use it
+
+Open AlphaSync and connect your Neo with a USB cable. Choose the intended Neo and applet in the sidebar. An applet is a program on the Neo, such as AlphaWord.
+
+- **Read:** double-click a file. Choose Regular or Monospaced, use **Copy to Clipboard**, or search through **Edit → Find**.
+- **Save to your Mac:** select files and choose **File → Save to Mac…**, or drag a file’s name into Finder. Existing Mac files are preserved.
+- **Add text:** choose AlphaWord or the user dictionary, clear the file selection, and choose **File → Import Text Files to Neo…**. New AlphaWord files are unbound; use the Neo’s Open command to find them.
+- **Replace text:** select one file and import one plain-text file, or drop it onto the file’s name. Check the named target before choosing Replace.
+- **Rename:** Control-click one supported file’s name and choose **Rename…**. Use 1 to 15 supported characters.
+- **Back up:** click **Backup**. Settings controls the included file types, destination, and optional log. Stop keeps files already saved; unfinished folders stay marked **(Incomplete)**.
+- **Clear:** select files for **Clear File…** or **Clear Selected Files…**. With one applet selected and no files selected, **Clear All Files…** clears that applet’s files. Cancel is the default.
+
+**Save a recovery copy first** is on by default. If a requested copy fails, the change stops. Choose **Open Recovery Copies** in Settings to find saved originals. Restore by importing the saved `.txt` file onto the matching Neo file and reviewing the Replace warning. Keep the accompanying `.neo` data; it is not a text import.
+
+Recovery copies are kept for 30 days by default. Settings also offers 7 or 90 days, or no automatic expiry. Recognised complete expired copies move to Trash when a new copy is made. Keep an independent backup of important writing.
+
+AlphaWord and user dictionary files can be imported and changed. Other applet files can be read, exported, and backed up as XML, but cannot be imported back in this version.
+
+Physical Neo transfers, real Login Items approval, macOS 13 runtime checks, and the manual Help Viewer checks described below remain unverified. Build and package checks cover compilation, simulated transfers, native app interfaces, and the packaged Help.
+
+---
+
+## Technical information
+
+### Changes since 2.0.3
+
+The Help book has seventeen authored task and overview pages plus a licence generated from the original `LICENSE`. Seven new pages separate getting started, reading, importing, renaming, recovery, troubleshooting, and support. Existing topics are rewritten against the actual Swift commands and operation paths. The [Help review](https://github.com/koralatov/alphasync/blob/v2.0.4/docs/help-review.md) maps all functions to topics and reviewed sources.
+
+The review applies Apple’s guidance on task-focused help and clear writing. HTML declares its language, uses semantic headings and landmarks, and gives the shortcut table a caption and column headings. CSS uses relative text sizes, system appearance colours, underlined links, and visible focus. Stable `alphasync-home` and `alphasync-licence` entry anchors are preserved.
+
+A standard-library Python validator checks all local targets, fragments, assets, page reachability, titles, heading order, metadata, landmarks, link text, and offline resources. It rejects active content and changes to the original licence. Xcode runs it before `hiutil` builds the search index. Package verification runs it again on the extracted app. Thirteen disposable fixtures exercise failures and the real licence generator. Python is needed for building and verification, not for running AlphaSync. The native interface checker also uses isolated preferences and Login Items state, reports its progress, and fails with diagnostics if it exceeds its time limit.
+
+### Architecture and formats
+
+Both targets and helpers use version 2.0.4, build 154, with a 13.0 deployment target. Universal contains x86_64 and arm64; Apple Silicon contains arm64 only. Shared Swift 6 sources use strict concurrency checking and public SwiftUI, AppKit, ServiceManagement, and IOUSBHost APIs, with no third-party runtime dependencies.
+
+Compared with [tSoniq’s 1.3 release](https://github.com/tSoniq/alphasync/releases/tag/RELEASE_1_3), the Swift rewrite updates the native interface and Mac architecture support while retaining file transfers, text conversion, backups, and automatic opening. The original BSD-style licence and copyright notices remain.
+
+Text exports use UTF-8 without a byte-order mark and LF line endings. Imports accept strict UTF-8, BOM-marked UTF-16 in either byte order, and MacASCII (Mac Roman). Unsupported characters, overlong names, invalid limits, and insufficient memory are rejected before writing. Recovery copies retain readable text and original `.neo` bytes. Recovery metadata is version 2; optional backup logs are version 3.
+
+### Install and build
+
+Install one complete app bundle in Applications. The helper stays in `Contents/Library/LoginItems`. Both editions share the existing bundle identifiers and preferences.
+
+Canonical builds use Xcode 26.6, pinned in `.xcode-version`, on a macOS 26 Intel host. Apple Silicon compatibility checks use Xcode 16.4 on macOS 15. Run `python3 scripts/generate-project.py`, then build the `AlphaSyncUniversal` or `AlphaSyncAppleSilicon` scheme in `AlphaSync/AlphaSync.xcodeproj`. The [technical guide](https://github.com/koralatov/alphasync/blob/v2.0.4/TECHNICAL.md) gives the full commands.
+
+### Verification and publication
+
+Publication requires successful Intel and Apple Silicon jobs, Swift and simulated-device regressions, native interface checks, and disposable Help, packaging, publication, and retirement fixtures. App and helper checks cover architectures, minimum macOS versions, exact release metadata, signatures, hardened runtime, and matching crash symbols.
+
+Both host jobs build both editions and run the full regressions and native interface checks. A separate Apple Silicon job downloads the canonical packages, verifies the extracted bundles, Help, symbols, reports, and hashes, and runs each app’s `--version` command natively. The Intel publication job downloads and verifies the same artifacts again. This build route retains the pinned release compiler while avoiding dependence on the unavailable macOS 26 arm64 runner pool. It uploads twelve assets to a draft and checks every uploaded size and SHA-256 digest before publishing. Published assets and source tags are never replaced. This release preserves the existing 2.0.3 release and the frozen 1.5.1 source and downloads.
+
+Each ZIP has a `.sha256` file and a build-information report with its source commit. For example:
+
+```sh
+shasum -a 256 -c AlphaSync-2.0.4-154-macOS-13-universal.zip.sha256
+```
+
+Essential release evidence is retained in the [permanent verification records](https://github.com/koralatov/alphasync/tree/master/releases/verification). Native Help Viewer navigation, topic search, upgrade-cache behaviour, keyboard focus, and VoiceOver still need manual checks on macOS. Static Help checks do not establish those results.
+
+[Build and verification record](https://github.com/koralatov/alphasync/actions/runs/42906295418).

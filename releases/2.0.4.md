@@ -78,7 +78,7 @@ Physical Neo transfers, real Login Items approval, macOS 13 runtime checks, and 
 
 ### Changes since 2.0.3
 
-The Help book has seventeen authored task and overview pages plus a licence generated from the original `LICENSE`. Seven new pages separate getting started, reading, importing, renaming, recovery, troubleshooting, and support. Existing topics are rewritten against the actual Swift commands and operation paths. The [Help review](https://github.com/koralatov/alphasync/blob/v2.0.4/docs/help-review.md) maps all functions to topics and reviewed sources.
+The Help book has seventeen authored task and overview pages plus a licence generated from the original `LICENSE`. Seven new pages separate getting started, reading, importing, renaming, recovery, troubleshooting, and support. Existing topics are rewritten against the actual Swift commands and operation paths. The [Help review](https://github.com/koralatov/alphasync/blob/3d32aab21484f4ed9df491da0ff8103f21defb53/docs/help-review.md) maps all functions to topics and reviewed sources.
 
 The review applies Apple’s guidance on task-focused help and clear writing. HTML declares its language, uses semantic headings and landmarks, and gives the shortcut table a caption and column headings. CSS uses relative text sizes, system appearance colours, underlined links, and visible focus. Stable `alphasync-home` and `alphasync-licence` entry anchors are preserved.
 
@@ -96,7 +96,7 @@ Text exports use UTF-8 without a byte-order mark and LF line endings. Imports ac
 
 Install one complete app bundle in Applications. The helper stays in `Contents/Library/LoginItems`. Both editions share the existing bundle identifiers and preferences.
 
-Canonical builds use Xcode 26.6, pinned in `.xcode-version`, on a macOS 26 Intel host. Apple Silicon compatibility checks use Xcode 16.4 on macOS 15. Run `python3 scripts/generate-project.py`, then build the `AlphaSyncUniversal` or `AlphaSyncAppleSilicon` scheme in `AlphaSync/AlphaSync.xcodeproj`. The [technical guide](https://github.com/koralatov/alphasync/blob/v2.0.4/TECHNICAL.md) gives the full commands.
+Canonical builds use Xcode 26.6, pinned in `.xcode-version`, on a macOS 26 Intel host. Apple Silicon compatibility checks use Xcode 16.4 on macOS 15. Run `python3 scripts/generate-project.py`, then build the `AlphaSyncUniversal` or `AlphaSyncAppleSilicon` scheme in `AlphaSync/AlphaSync.xcodeproj`. The [technical guide](https://github.com/koralatov/alphasync/blob/3d32aab21484f4ed9df491da0ff8103f21defb53/TECHNICAL.md) gives the full commands.
 
 ### Verification and publication
 

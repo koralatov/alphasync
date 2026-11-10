@@ -70,7 +70,7 @@
       "execution": "both app-version commands ran natively"
     },
     "publicAssetHashes": "matched all twelve independently downloaded assets",
-    "publicNotes": "matched reviewed notes and run link",
+    "publicNotes": "Matched the reviewed source and workflow link at publication. Afterwards, only two documentation links changed to the completed snapshot. The web editor uses CRLF line endings; the committed Markdown normalises these to LF without changing other text.",
     "latestRelease": "verified",
     "immutableRelease": "verified",
     "priorReleaseNotesAndAssets": "unchanged",
@@ -259,8 +259,24 @@
       "sha256": "bf4a706ce74db95232d599cecd20c6302fb7a84f2452eb47bca70390f0523e43"
     },
     "notes.md": {
+      "size": 11891,
+      "sha256": "eb62f8324da647f371c9aa2195402b513dbccd224bc2bef76d511e0a09137eaf"
+    },
+    "workflow-notes.md": {
       "size": 11823,
       "sha256": "a6c20f7377c0f56c97b5f032d1a31387eae242d67552574a51101f9b278c4173"
     }
+  },
+  "documentationLinks": {
+    "snapshotCommit": "3d32aab21484f4ed9df491da0ff8103f21defb53",
+    "changes": {
+      "https://github.com/koralatov/alphasync/blob/v2.0.4/docs/help-review.md": "https://github.com/koralatov/alphasync/blob/3d32aab21484f4ed9df491da0ff8103f21defb53/docs/help-review.md",
+      "https://github.com/koralatov/alphasync/blob/v2.0.4/TECHNICAL.md": "https://github.com/koralatov/alphasync/blob/3d32aab21484f4ed9df491da0ff8103f21defb53/TECHNICAL.md"
+    },
+    "originalWorkflowNotes": "workflow-notes.md",
+    "currentPublicNotes": "notes.md",
+    "releaseSourceTagAndAssets": "unchanged",
+    "publicApiBodySHA256": "1d8b31ee7175abf0addeb04a3ac46f123bfe5839a424e71d93d7ad336ee7eb68",
+    "committedNotesLineEndings": "LF normalised from API CRLF"
   }
 }
