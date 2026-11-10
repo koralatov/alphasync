@@ -1,14 +1,25 @@
 import SwiftUI
 import AppKit
-import AlphaSyncUI
+import ServiceManagement
+@testable import AlphaSyncUI
 import AlphaSyncCore
 
 private struct CheckFailure: Error, CustomStringConvertible { let description: String }
+
+@MainActor
+private final class InterfaceLoginItem: LoginItemManaging {
+    var status: SMAppService.Status { .notRegistered }
+    func register() throws { throw CheckFailure(description: "Interface checks must not register a login item") }
+    func unregister() throws { throw CheckFailure(description: "Interface checks must not unregister a login item") }
+}
 
 /// This executable renders disposable sample data. It never starts USB discovery or registers a login item.
 @main
 @MainActor
 struct InterfaceChecks {
+    static func checkpoint(_ message: String) {
+        FileHandle.standardOutput.write(Data(("Interface check: " + message + "\n").utf8))
+    }
     static func require(_ condition: @autoclosure () -> Bool, _ message: String) throws {
         if !condition() { throw CheckFailure(description: message) }
     }
@@ -21,6 +32,7 @@ struct InterfaceChecks {
         return scroll.convert(scroll.bounds, to: nil)
     }
     static func window<V: View>(_ view: V, size: NSSize, title: String) -> NSWindow {
+        checkpoint("Opening " + title)
         let result = NSWindow(contentRect: NSRect(origin: .zero, size: size),
                               styleMask: [.titled, .closable, .resizable], backing: .buffered, defer: false)
         result.isReleasedWhenClosed = false
@@ -33,6 +45,7 @@ struct InterfaceChecks {
     }
     @discardableResult
     static func capture(_ window: NSWindow, _ name: String, to output: URL) throws -> Data {
+        checkpoint("Capturing " + name)
         guard let view = window.contentView else { throw CheckFailure(description: "Missing content view") }
         view.layoutSubtreeIfNeeded(); view.displayIfNeeded()
         guard let bitmap = view.bitmapImageRepForCachingDisplay(in: view.bounds) else { throw CheckFailure(description: "Cannot capture \(name)") }
@@ -91,14 +104,17 @@ struct InterfaceChecks {
         }
     }
     static func run() throws {
+        checkpoint("Starting AppKit")
         let app = NSApplication.shared
         app.setActivationPolicy(.regular); app.finishLaunching(); app.activate(ignoringOtherApps: true)
+        checkpoint("AppKit ready")
         let output = URL(fileURLWithPath: CommandLine.arguments.dropFirst().first ?? "build/interface-checks", isDirectory: true)
         try FileManager.default.createDirectory(at: output, withIntermediateDirectories: true)
         let domain = "AlphaSync-InterfaceChecks-" + UUID().uuidString
         guard let defaults = UserDefaults(suiteName: domain) else { throw CheckFailure(description: "Missing test preferences") }
         defer { defaults.removePersistentDomain(forName: domain) }
-        let preferences = Preferences(defaults: defaults)
+        let preferences = Preferences(defaults: defaults, loginItem: InterfaceLoginItem())
+        checkpoint("Private preferences ready")
         let store = AppStore(preferences: preferences, monitoringEnabled: false)
         let snapshot = try sample()
         store.devices = [snapshot]; store.sidebar = .device(snapshot.connection)

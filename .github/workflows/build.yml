@@ -20,7 +20,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: swift-apps-${{ github.ref }}-${{ github.event_name }}-${{ inputs.publish_release || false }}
+  group: swift-apps-${{ github.ref }}-${{ github.event_name }}-${{ inputs.publish_release || false }}-${{ inputs.publish_release && github.sha || 'current' }}
   cancel-in-progress: ${{ !inputs.publish_release }}
 
 jobs:
@@ -71,6 +71,7 @@ jobs:
           python3 Tests/Packaging/check-publication.py
           python3 Tests/Packaging/check-retirement.py
           python3 Tests/Packaging/check-help.py
+          printf 'INTERFACE_CHECK_EXECUTABLE=%s/AlphaSyncUIChecks\n' "$(swift build --show-bin-path)" >> "$GITHUB_ENV"
       - name: Build both native app targets
         id: apps
         if: always() && steps.shared.outcome == 'success'
@@ -105,7 +106,7 @@ jobs:
             --version "$version" --build "$build_number" --source-commit "$GITHUB_SHA"
       - name: Check native interface behaviour and capture both appearances
         if: always() && steps.shared.outcome == 'success'
-        run: swift run --skip-build AlphaSyncUIChecks build/interface-checks
+        run: python3 scripts/check-interface.py build/interface-checks
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
