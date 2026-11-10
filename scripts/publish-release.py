@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import re
 import subprocess
+import tempfile
 
 
 def gh(*args):
@@ -93,11 +94,12 @@ def publish(source, repository, version, assets, manifest, notes, command=gh):
         check_uploaded(existing, manifest, complete=True)
         return release['html_url']
     if release is None:
-        command('release', 'create', tag, '--draft', '--target', source, '--title', 'AlphaSync ' + version,
-                '--notes-file', str(notes))
-        release = find_release()
-        if release is None:
-            raise ValueError('The newly created draft could not be found.')
+        # Use the creation response. A release list can briefly omit a newly created draft.
+        with tempfile.TemporaryDirectory() as temporary:
+            request = Path(temporary) / 'release.json'
+            request.write_text(json.dumps({'tag_name': tag, 'target_commitish': source, 'name': 'AlphaSync ' + version,
+                                           'draft': True, 'prerelease': False, 'body': notes.read_text()}))
+            release = json.loads(command('api', '--method', 'POST', f'repos/{repository}/releases', '--input', str(request)))
     release_id = release['id']
     check_draft(release, tag, source)
 

@@ -29,6 +29,8 @@ class FakeGitHub:
         self.interrupt_upload = False
         self.damage_upload = False
         self.move_tag_after_upload = False
+        self.hide_created_draft = False
+        self.wrong_created_source = False
 
     def draft(self):
         self.release = {'id': 42, 'tag_name': TAG, 'draft': True, 'prerelease': False, 'immutable': False,
@@ -46,7 +48,7 @@ class FakeGitHub:
             if endpoint.endswith('/releases?per_page=100'):
                 # Keep the matching draft on a later page to exercise pagination.
                 other = {'tag_name': 'v0.1'}
-                return json.dumps([[other], [self.release] if self.release else []])
+                return json.dumps([[other], [self.release] if self.release and not self.hide_created_draft else []])
             if endpoint.endswith('/assets?per_page=100'):
                 return json.dumps([self.assets[:5], self.assets[5:]])
             raise AssertionError(args)
@@ -55,6 +57,17 @@ class FakeGitHub:
             asset_id = int(args[-1].rsplit('/', 1)[1])
             self.assets = [item for item in self.assets if item['id'] != asset_id]
             return ''
+        if args[:3] == ('api', '--method', 'POST'):
+            self.mutations.append(args)
+            if self.release:
+                raise AssertionError('The existing draft was recreated.')
+            request = json.loads(Path(args[-1]).read_text())
+            assert request == {'tag_name': TAG, 'target_commitish': SOURCE, 'name': 'AlphaSync 2.0.1',
+                               'draft': True, 'prerelease': False, 'body': 'Reviewed release notes.\n'}
+            self.draft()
+            if self.wrong_created_source:
+                self.release['target_commitish'] = 'b' * 40
+            return json.dumps(self.release)
         if args[0] == 'api':
             endpoint = args[1]
             if '/git/tags/' in endpoint:
@@ -66,11 +79,7 @@ class FakeGitHub:
                 return json.dumps(self.release)
             raise AssertionError(args)
         self.mutations.append(args)
-        if args[:2] == ('release', 'create'):
-            if self.release:
-                raise AssertionError('The existing draft was recreated.')
-            self.draft()
-        elif args[:2] == ('release', 'upload'):
+        if args[:2] == ('release', 'upload'):
             for path in args[3:]:
                 name = Path(path).name
                 if any(item['name'] == name for item in self.assets):
@@ -127,6 +136,19 @@ class PublicationTests(unittest.TestCase):
         self.assertEqual(set(self.github.uploads), set(self.manifest))
         self.assertFalse(self.github.release['draft'])
 
+    def test_a_created_draft_can_publish_before_it_appears_in_the_release_list(self):
+        self.github.hide_created_draft = True
+        self.publish()
+        self.assertFalse(self.github.release['draft'])
+        self.assertEqual(set(self.github.uploads), set(self.manifest))
+
+    def test_a_created_draft_with_an_unexpected_source_stops_before_upload(self):
+        self.github.wrong_created_source = True
+        with self.assertRaisesRegex(ValueError, 'tested source'):
+            self.publish()
+        self.assertEqual(self.github.uploads, [])
+        self.assert_not_published()
+
     def test_interrupted_upload_resumes_without_replacing_completed_assets(self):
         self.github.interrupt_upload = True
         with self.assertRaises(subprocess.CalledProcessError):
@@ -136,7 +158,7 @@ class PublicationTests(unittest.TestCase):
         self.publish()
         self.assertEqual(len(self.github.uploads), 12)
         self.assertEqual(len(set(self.github.uploads)), 12)
-        self.assertEqual(sum(args[:2] == ('release', 'create') for args in self.github.mutations), 1)
+        self.assertEqual(sum(args[:3] == ('api', '--method', 'POST') for args in self.github.mutations), 1)
 
     def test_complete_draft_needs_no_more_uploads(self):
         self.github.draft()
