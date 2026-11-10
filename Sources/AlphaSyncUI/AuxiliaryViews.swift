@@ -15,7 +15,9 @@ public struct AboutView: View {
            let image = NSImage(contentsOf: url) {
             return image
         }
-        return NSApp.applicationIconImage
+        // Avoid a synchronous Icon Services lookup when no application bundle is available.
+        return NSImage(systemSymbolName: "doc.text", accessibilityDescription: nil)
+            ?? NSImage(size: NSSize(width: 96, height: 96))
     }
     public var body: some View {
         VStack(spacing: 20) {
