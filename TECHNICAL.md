@@ -78,6 +78,8 @@ The original build 151 [2.0.2 release run](https://github.com/koralatov/alphasyn
 
 Essential release evidence is committed under [releases/verification](releases/verification/README.md): compact host results, exact source and workflow, package hashes, notes, and retirement metadata. Full logs and interface captures remain temporary Actions artifacts.
 
+The [build 152 reissue](https://github.com/koralatov/alphasync/actions/runs/42816587995) passed on 10 November 2026 for source `fbcc566207d550ee313245e3eff39a55d3c986fb`. Both hosts passed 109 Swift regressions, ten packaging fixtures, twenty-two publication fixtures, ten retirement fixtures, and native interface checks. Apps, helpers, architectures, deployment targets, signatures, and matching symbols passed verification. Publication succeeded on its first attempt. All twelve public assets match the independently downloaded packages. The latest immutable release is `v2.0.2-build.152`. Its [permanent verification record](releases/verification/2.0.2-152/verification.json) includes the completed retirement of build 151; all nine earlier tags and the legacy source and assets remain unchanged. Physical checks remain outstanding.
+
 ## USB and concurrency
 
 Use Apple’s public **IOUSBHost** framework for bulk transfers. The Neo appears as USB vendor `081e`, product `bd04` in keyboard mode. Public HID output reports `e0` through `e4`, sent only to interface 1, switch it to the `bd01` file-transfer device. The proprietary file protocol uses bulk endpoints, not keyboard input reports.

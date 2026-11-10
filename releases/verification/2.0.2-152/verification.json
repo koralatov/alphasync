@@ -1,0 +1,164 @@
+{
+  "formatVersion": 1,
+  "version": "2.0.2",
+  "build": "152",
+  "releaseTag": "v2.0.2-build.152",
+  "releaseID": 440343890,
+  "sourceCommit": "fbcc566207d550ee313245e3eff39a55d3c986fb",
+  "workflow": {
+    "runID": 42816587995,
+    "attempt": 1,
+    "url": "https://github.com/koralatov/alphasync/actions/runs/42816587995",
+    "conclusion": "success"
+  },
+  "hosts": [
+    {
+      "architecture": "x86_64",
+      "xcode": "16.4",
+      "jobID": 129831109563,
+      "swiftRegressions": 109,
+      "packagingFixtures": 10,
+      "publicationFixtures": 22,
+      "retirementFixtures": 10,
+      "nativeInterface": "passed",
+      "builtEditions": [
+        "universal"
+      ]
+    },
+    {
+      "architecture": "arm64",
+      "xcode": "26.6",
+      "jobID": 129831110113,
+      "swiftRegressions": 109,
+      "packagingFixtures": 10,
+      "publicationFixtures": 22,
+      "retirementFixtures": 10,
+      "nativeInterface": "passed",
+      "builtEditions": [
+        "universal",
+        "apple-silicon"
+      ]
+    }
+  ],
+  "verification": {
+    "appAndHelper": "passed",
+    "architectures": "passed",
+    "minimumDeployment": "13.0",
+    "signing": "ad-hoc",
+    "hardenedRuntime": "passed",
+    "crashSymbols": "passed",
+    "releaseLinks": "exact build tag in both app bundles",
+    "publicAssetHashes": "matched all twelve independently downloaded assets",
+    "publicNotes": "matched reviewed notes and run link",
+    "latestRelease": "verified",
+    "immutableRelease": "verified",
+    "legacyRelease": "unchanged",
+    "legacyBranchSource": "6cb821c9ab8073ff950414952bf2480eb4638c5d",
+    "priorTags": "all nine preserved",
+    "publicReleases": [
+      "v1.5.1",
+      "v2.0.2-build.152"
+    ]
+  },
+  "preservedTagObjects": {
+    "refs/tags/v1.4.1": {
+      "sha": "a7a98ca2097fc2ac2b409fd1d35e8afbd41f9199",
+      "type": "commit",
+      "url": "https://api.github.com/repos/koralatov/alphasync/git/commits/a7a98ca2097fc2ac2b409fd1d35e8afbd41f9199"
+    },
+    "refs/tags/v1.4.2": {
+      "sha": "f614f61dda822be6f7afd14938cbe4d2bacc26a3",
+      "type": "commit",
+      "url": "https://api.github.com/repos/koralatov/alphasync/git/commits/f614f61dda822be6f7afd14938cbe4d2bacc26a3"
+    },
+    "refs/tags/v1.4.3": {
+      "sha": "d5a2a54b99a1e3a0fdb0ea87788d72812f6a0e46",
+      "type": "commit",
+      "url": "https://api.github.com/repos/koralatov/alphasync/git/commits/d5a2a54b99a1e3a0fdb0ea87788d72812f6a0e46"
+    },
+    "refs/tags/v1.4.4": {
+      "sha": "077b4acdcde7a709269078885b6f98eacf8cd771",
+      "type": "commit",
+      "url": "https://api.github.com/repos/koralatov/alphasync/git/commits/077b4acdcde7a709269078885b6f98eacf8cd771"
+    },
+    "refs/tags/v1.4.5": {
+      "sha": "4e3756f952b32b056b8dcf7b1a77c1aace6e28f7",
+      "type": "commit",
+      "url": "https://api.github.com/repos/koralatov/alphasync/git/commits/4e3756f952b32b056b8dcf7b1a77c1aace6e28f7"
+    },
+    "refs/tags/v1.5": {
+      "sha": "3ba2abfd32b7f4cbae833079f2e81296761e6b22",
+      "type": "commit",
+      "url": "https://api.github.com/repos/koralatov/alphasync/git/commits/3ba2abfd32b7f4cbae833079f2e81296761e6b22"
+    },
+    "refs/tags/v1.5.1": {
+      "sha": "6cb821c9ab8073ff950414952bf2480eb4638c5d",
+      "type": "commit",
+      "url": "https://api.github.com/repos/koralatov/alphasync/git/commits/6cb821c9ab8073ff950414952bf2480eb4638c5d"
+    },
+    "refs/tags/v2.0": {
+      "sha": "a508da036db4516d65d98b0a33e1d031e96f8b88",
+      "type": "commit",
+      "url": "https://api.github.com/repos/koralatov/alphasync/git/commits/a508da036db4516d65d98b0a33e1d031e96f8b88"
+    },
+    "refs/tags/v2.0.2": {
+      "sha": "807b4bedf1bb1cd655e934e1495723bb5c203c93",
+      "type": "commit",
+      "url": "https://api.github.com/repos/koralatov/alphasync/git/commits/807b4bedf1bb1cd655e934e1495723bb5c203c93"
+    }
+  },
+  "unverified": [
+    "Physical Neo transfers",
+    "Real Login Items approval",
+    "macOS 13 runtime"
+  ],
+  "publicationNote": "The maintenance reissue published successfully on its first attempt. The original build 151 listing was retired only after the reissue and its twelve public assets were verified. The original v2.0.2 source tag remains unchanged.",
+  "artifacts": [
+    {
+      "id": 13765946311,
+      "name": "AlphaSync-interface-and-logs-macos-26-fbcc566207d550ee313245e3eff39a55d3c986fb",
+      "size": 551412,
+      "digest": "sha256:a821e38a02173952ab6a8335adbd8fb9f490b828f31a52136d70da5ba8fbdd62",
+      "url": "https://github.com/koralatov/alphasync/actions/runs/42816587995/artifacts/13765946311"
+    },
+    {
+      "id": 13765851564,
+      "name": "AlphaSync-interface-and-logs-macos-15-intel-fbcc566207d550ee313245e3eff39a55d3c986fb",
+      "size": 524073,
+      "digest": "sha256:c6a3d6c6969cf9206a4c3c6273bbb600db25f89348127cc702deda34c468e083",
+      "url": "https://github.com/koralatov/alphasync/actions/runs/42816587995/artifacts/13765851564"
+    },
+    {
+      "id": 13764786958,
+      "name": "AlphaSync-publication-record-fbcc566207d550ee313245e3eff39a55d3c986fb",
+      "size": 14815,
+      "digest": "sha256:6438420a8b9d6d88878eff04513daa8982d87dca5ce64fc8b6659ce77791cb57",
+      "url": "https://github.com/koralatov/alphasync/actions/runs/42816587995/artifacts/13764786958"
+    },
+    {
+      "id": 13764349001,
+      "name": "AlphaSync-packages-fbcc566207d550ee313245e3eff39a55d3c986fb",
+      "size": 20376823,
+      "digest": "sha256:9fbe5d2d1ef897e19f6528050ba76837529ec239e41e695e2dea7ca6bb526465",
+      "url": "https://github.com/koralatov/alphasync/actions/runs/42816587995/artifacts/13764349001"
+    }
+  ],
+  "files": {
+    "assets.json": {
+      "size": 2043,
+      "sha256": "be30b38e8d1780666e3b699c4c6629dcd8fe1a5e647435722563c22015a2cd76"
+    },
+    "notes.md": {
+      "size": 14428,
+      "sha256": "65d93bc5a005af9f9602cb3e6a28f73f041bf28c749b03ab7c555ebd1b57310c"
+    },
+    "retired-releases.json": {
+      "size": 42298,
+      "sha256": "7451a2518211f4294e3a5266ee2296135677a86d138ac330075e92dcd60ccd9c"
+    },
+    "retirement-plan.json": {
+      "size": 4562,
+      "sha256": "dd10fa7c7fbcdf93f03a452189100a6ad24cb8a2991eee8d657351e1b8834186"
+    }
+  }
+}

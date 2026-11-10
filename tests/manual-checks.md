@@ -6,6 +6,8 @@ The [frozen 1.5.1 checklist](https://github.com/koralatov/alphasync/blob/v1.5.1/
 
 The original build 151 [2.0.2 release run](https://github.com/koralatov/alphasync/actions/runs/42802943901) passed on 10 November 2026 for source `807b4bedf1bb1cd655e934e1495723bb5c203c93`. Both hosts passed 109 Swift regressions, 35 packaging, publication, and retirement fixtures, and the native interface checks. App, helper, architecture, deployment, signature, and symbol verification passed. The published twelve assets match the downloaded packages. These automated results do not change the unverified physical checks below.
 
+The [build 152 reissue](https://github.com/koralatov/alphasync/actions/runs/42816587995) passed on 10 November 2026 for source `fbcc566207d550ee313245e3eff39a55d3c986fb`. Both hosts passed 109 Swift regressions, 42 release fixtures, native interface checks, and app and helper package verification. The twelve public assets match the downloaded packages, including the exact build tag for Help and licence links. The [permanent record](../releases/verification/2.0.2-152/verification.json) retains those results. The physical checks below remain unverified.
+
 ## Runtime coverage
 
 Version 2.0.2, build 152 retains the transfer features of build 151 and finalises release maintenance. These physical checks remain outstanding:
