@@ -9,7 +9,7 @@
   "workflow": {
     "runID": 42860366107,
     "url": "https://github.com/koralatov/alphasync/actions/runs/42860366107",
-    "attempt": 2,
+    "attempt": 3,
     "conclusion": "failure",
     "attempts": [
       {
@@ -23,6 +23,12 @@
         "appleSiliconJobID": 129994972688,
         "conclusion": "failure",
         "reason": "GitHub reported an internal server error, failure to acquire a hosted runner after multiple attempts, and macOS arm64 capacity constraints. The Apple Silicon job never started; publication was skipped."
+      },
+      {
+        "number": 3,
+        "appleSiliconJobID": 130112246713,
+        "conclusion": "failure",
+        "reason": "The macOS 26 arm64 job could not acquire a runner and ended before any build or test steps. Publication was skipped."
       }
     ]
   },
@@ -161,7 +167,7 @@
     "Real Login Items approval",
     "macOS 13 runtime"
   ],
-  "resume": "After GitHub runner service recovers, re-run only failed jobs in run 42860366107 for the exact source above. Keep publication enabled and retirement disabled. Verify the public release and all twelve hashes, preserve earlier references and releases, then replace this blocked record with the completed evidence and update the current-download documentation.",
+  "resume": "Use the revised release workflow on master: canonical Xcode 26.6 on macOS 26 Intel, native macOS 15 Apple Silicon compatibility builds and downloaded-package verification. Run the full manual release workflow, keeping publication enabled and retirement disabled. Verify the new tested source and all twelve asset hashes, then replace this historical blocked record with the completed evidence.",
   "checkedAt": "2026-11-10T17:36:44.397893+00:00",
   "files": {
     "reviewed-notes.md": {

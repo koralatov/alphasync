@@ -18,11 +18,13 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - host: Apple Silicon
-            runner: macos-26
+          - host: Intel (canonical)
+            runner: macos-26-intel
+            architecture: x86_64
             xcode: canonical
-          - host: Intel
-            runner: macos-15-intel
+          - host: Apple Silicon (compatibility)
+            runner: macos-15
+            architecture: arm64
             xcode: '16.4'
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 20
@@ -43,6 +45,10 @@ jobs:
           selected_developer="/Applications/Xcode_$XCODE_VERSION.app/Contents/Developer"
           test -d "$selected_developer"
           printf 'DEVELOPER_DIR=%s\n' "$selected_developer" >> "$GITHUB_ENV"
+      - name: Require the intended host architecture
+        env:
+          EXPECTED_ARCHITECTURE: ${{ matrix.architecture }}
+        run: test "$(uname -m)" = "$EXPECTED_ARCHITECTURE"
       - name: Record the source and host
         env:
           SOURCE_COMMIT: ${{ inputs.source_commit }}

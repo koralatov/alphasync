@@ -30,12 +30,14 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - host: Apple Silicon
-            runner: macos-26
+          - host: Intel (canonical)
+            runner: macos-26-intel
+            architecture: x86_64
             xcode: canonical
             package: true
-          - host: Intel
-            runner: macos-15-intel
+          - host: Apple Silicon (compatibility)
+            runner: macos-15
+            architecture: arm64
             xcode: '16.4'
             package: false
     runs-on: ${{ matrix.runner }}
@@ -52,6 +54,10 @@ jobs:
           selected_developer="/Applications/Xcode_$XCODE_VERSION.app/Contents/Developer"
           test -d "$selected_developer"
           printf 'DEVELOPER_DIR=%s\n' "$selected_developer" >> "$GITHUB_ENV"
+      - name: Require the intended host architecture
+        env:
+          EXPECTED_ARCHITECTURE: ${{ matrix.architecture }}
+        run: test "$(uname -m)" = "$EXPECTED_ARCHITECTURE"
       - name: Check generated target definitions
         run: |
           python3 scripts/generate-project.py
@@ -72,8 +78,7 @@ jobs:
           PACKAGE_EDITIONS: ${{ matrix.package }}
         run: |
           mkdir -p build/logs
-          profiles=(universal)
-          if [[ "$PACKAGE_EDITIONS" == true ]]; then profiles+=(apple-silicon); fi
+          profiles=(universal apple-silicon)
           for profile in "${profiles[@]}"; do
             source scripts/build-profile.sh "$profile"
             if ! xcodebuild -project AlphaSync/AlphaSync.xcodeproj -scheme "$profile_scheme" \
@@ -116,11 +121,44 @@ jobs:
           path: build/validated-downloads/*
           if-no-files-found: error
 
+  arm64-downloads:
+    name: Verify downloaded apps on Apple Silicon
+    needs: swift-apps
+    runs-on: macos-15
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Select the compatibility compiler on a native arm64 host
+        run: |
+          test "$(uname -m)" = arm64
+          selected_developer=/Applications/Xcode_16.4.app/Contents/Developer
+          test -d "$selected_developer"
+          printf 'DEVELOPER_DIR=%s\n' "$selected_developer" >> "$GITHUB_ENV"
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: AlphaSync-packages-${{ github.sha }}
+          path: build/release-assets
+      - name: Verify and run both canonical app editions natively
+        run: |
+          set -o pipefail
+          mkdir -p build/native-package-checks
+          scripts/verify-release.sh build/release-assets 2>&1 | tee build/native-package-checks/arm64-packages.log
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: AlphaSync-arm64-package-verification-${{ github.sha }}
+          path: |
+            build/native-package-checks/*
+            build/release-verification/assets.json
+          if-no-files-found: warn
+
   publish:
     name: Verify downloads and publish
     if: github.event_name == 'workflow_dispatch' && inputs.publish_release
-    needs: swift-apps
-    runs-on: macos-26
+    needs: [swift-apps, arm64-downloads]
+    runs-on: macos-26-intel
     timeout-minutes: 15
     concurrency:
       group: alphasync-release-publication
@@ -133,6 +171,7 @@ jobs:
           persist-credentials: false
       - name: Select the pinned compiler
         run: |
+          test "$(uname -m)" = x86_64
           selected_developer="/Applications/Xcode_$(cat .xcode-version).app/Contents/Developer"
           test -d "$selected_developer"
           printf 'DEVELOPER_DIR=%s\n' "$selected_developer" >> "$GITHUB_ENV"

@@ -6,7 +6,7 @@ AlphaSync copies text files between your Mac and an AlphaSmart Neo. It can also 
 
 Version 2.0.4, build 154 is prepared but **has not been published**. Its built-in Help has been reviewed and rewritten to cover every function, with clearer task pages, recovery steps, troubleshooting, and more readable layouts.
 
-The Intel build passed its checks. GitHub could not start the Apple Silicon job because of an internal server error and limited runner capacity; the retry also ended before building. Publication remains blocked until the full release checks pass. Use the verified 2.0.3 downloads below in the meantime.
+The Intel build passed its checks. GitHub could not start the Apple Silicon job because of an internal server error and limited runner capacity; two retries also ended before building. Publication remains blocked until the full release checks pass. Use the verified 2.0.3 downloads below in the meantime.
 
 See the [Help review](docs/help-review.md), [planned 2.0.4 notes](releases/2.0.4.md), and [pending build record](releases/verification/2.0.4-154/verification.json).
 
