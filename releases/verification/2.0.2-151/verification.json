@@ -66,6 +66,10 @@
     "retired-releases.json": {
       "size": 153485,
       "sha256": "8d8c62fc4d78a993dea99f51ca38009a4c1364df1e7a04273e9fe8ad19fdaa75"
+    },
+    "retirement-plan.json": {
+      "size": 13479,
+      "sha256": "2557e36e848edf1050c66dfdaaef0cae182aeaf6498c8e92ced328e6bd081ff9"
     }
   }
 }

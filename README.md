@@ -6,10 +6,12 @@ AlphaSync copies text files between your Mac and an AlphaSmart Neo. It can also 
 
 Version 2.0.2 improves the Swift rewrite first released as 2.0 and requires **macOS 13 or later**. It includes all changes prepared under the unpublished 2.0.1 development version.
 
-Choose one download from the [2.0.2 release](https://github.com/koralatov/alphasync/releases/tag/v2.0.2):
+The current reissue is **build 152**. It finalises release maintenance and preserves verification records. Its file-transfer features match build 151.
 
-- [**Universal**](https://github.com/koralatov/alphasync/releases/download/v2.0.2/AlphaSync-2.0.2-151-macOS-13-universal.zip): for Intel and Apple Silicon Macs.
-- [**Apple Silicon**](https://github.com/koralatov/alphasync/releases/download/v2.0.2/AlphaSync-2.0.2-151-macOS-13-apple-silicon.zip): for Macs with an M-series chip.
+Choose one download from the [2.0.2 release](https://github.com/koralatov/alphasync/releases/tag/v2.0.2-build.152):
+
+- [**Universal**](https://github.com/koralatov/alphasync/releases/download/v2.0.2-build.152/AlphaSync-2.0.2-152-macOS-13-universal.zip): for Intel and Apple Silicon Macs.
+- [**Apple Silicon**](https://github.com/koralatov/alphasync/releases/download/v2.0.2-build.152/AlphaSync-2.0.2-152-macOS-13-apple-silicon.zip): for Macs with an M-series chip.
 
 Both offer the same file-transfer features. Install one edition. You can find your macOS version and chip in **Apple menu → About This Mac**.
 

@@ -95,7 +95,7 @@ class ReleaseAssetTests(unittest.TestCase):
                                              ('AlphaSync.app/Contents/Library/LoginItems/AlphaSyncLauncher.app', 'AlphaSyncLauncher')]:
                             info = {'CFBundleIdentifier': 'com.tsoniq.' + name, 'CFBundleShortVersionString': '2.0',
                                     'CFBundleVersion': '149', 'LSMinimumSystemVersion': '13.0',
-                                    'ASBuildProfile': profile, 'ASReleaseChannel': 'stable'}
+                                    'ASBuildProfile': profile, 'ASReleaseChannel': 'stable', 'ASReleaseTag': 'v2.0'}
                             archive.writestr(prefix + '/Contents/Info.plist', plistlib.dumps(info))
                 fields = {'Version': '2.0', 'Build': '149', 'Source commit': 'a' * 40}
                 if not suffix:
@@ -132,19 +132,27 @@ class ReleaseAssetTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'Unsafe archive path'):
             self.validate()
 
-    def test_wrong_archived_version_rejected_even_with_matching_reports(self):
+    def change_app_metadata(self, key, value):
         path = next(self.assets.glob('*universal.zip'))
         with zipfile.ZipFile(path) as archive:
             entries = {name: archive.read(name) for name in archive.namelist()}
-        key = 'AlphaSync.app/Contents/Info.plist'
-        info = plistlib.loads(entries[key])
-        info['CFBundleVersion'] = '148'
-        entries[key] = plistlib.dumps(info)
+        entry = 'AlphaSync.app/Contents/Info.plist'
+        info = plistlib.loads(entries[entry])
+        info[key] = value
+        entries[entry] = plistlib.dumps(info)
         with zipfile.ZipFile(path, 'w') as archive:
             for name, data in entries.items():
                 archive.writestr(name, data)
         self.write_reports(path, collector.read_report(path.with_name(path.name + '.build-information.txt'), collector.APP_FIELDS))
+
+    def test_wrong_archived_version_rejected_even_with_matching_reports(self):
+        self.change_app_metadata('CFBundleVersion', '148')
         with self.assertRaisesRegex(ValueError, 'unexpected metadata'):
+            self.validate()
+
+    def test_an_archived_app_linking_to_another_release_is_rejected(self):
+        self.change_app_metadata('ASReleaseTag', 'v2.0-build.148')
+        with self.assertRaisesRegex(ValueError, 'another release tag'):
             self.validate()
 
     def test_extra_release_asset_rejected(self):

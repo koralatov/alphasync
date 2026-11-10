@@ -9,12 +9,13 @@ assets=$(cd "$1" && pwd)
 cd "$repository"
 version=$(sed -n 's/^MARKETING_VERSION *= *//p' AlphaSync/Build/Version.xcconfig)
 build_number=$(sed -n 's/^CURRENT_PROJECT_VERSION *= *//p' AlphaSync/Build/Version.xcconfig)
+release_tag=$(sed -n 's/^AS_RELEASE_TAG *= *//p' AlphaSync/Build/Version.xcconfig)
 test "$(sed -n 's/^AS_RELEASE_CHANNEL *= *//p' AlphaSync/Build/Version.xcconfig)" = stable
 test -s "releases/$version.md"
 test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
 mkdir -p build/release-verification
 python3 scripts/check-release.py "$assets" --version "$version" --build "$build_number" \
-    --source "$GITHUB_SHA" --manifest build/release-verification/assets.json
+    --source "$GITHUB_SHA" --tag "$release_tag" --manifest build/release-verification/assets.json
 staging=$(mktemp -d "${TMPDIR:-/tmp}/alphasync-release-check.XXXXXX")
 trap 'rm -rf "$staging"' EXIT
 for profile in universal apple-silicon; do

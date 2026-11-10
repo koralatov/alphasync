@@ -1,4 +1,5 @@
 // Shared release version for both apps and their launch helpers.
 MARKETING_VERSION = 2.0.2
-CURRENT_PROJECT_VERSION = 151
+CURRENT_PROJECT_VERSION = 152
 AS_RELEASE_CHANNEL = stable
+AS_RELEASE_TAG = v2.0.2-build.152

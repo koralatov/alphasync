@@ -6,10 +6,11 @@ public enum AppMetadata {
     public static var compatibility: String { Bundle.main.object(forInfoDictionaryKey: "ASCompatibilityDescription") as? String ?? "For macOS 13 and later" }
     public static let project = URL(string: "https://github.com/koralatov/alphasync")!
     public static var development: Bool { Bundle.main.object(forInfoDictionaryKey: "ASReleaseChannel") as? String != "stable" }
+    public static var releaseTag: String { Bundle.main.object(forInfoDictionaryKey: "ASReleaseTag") as? String ?? "v" + version }
     public static var releaseNotes: URL {
-        development ? project.appendingPathComponent("blob/master/releases/" + version + ".md") : project.appendingPathComponent("releases/tag/v" + version)
+        development ? project.appendingPathComponent("blob/master/releases/" + version + ".md") : project.appendingPathComponent("releases/tag/" + releaseTag)
     }
-    public static var licence: URL { project.appendingPathComponent(development ? "blob/master/LICENSE" : "blob/v" + version + "/LICENSE") }
+    public static var licence: URL { project.appendingPathComponent(development ? "blob/master/LICENSE" : "blob/" + releaseTag + "/LICENSE") }
     public static var issues: URL {
         var components = URLComponents(url: project.appendingPathComponent("issues/new"), resolvingAgainstBaseURL: false)!
         components.queryItems = [URLQueryItem(name: "title", value: "AlphaSync \(version): "), URLQueryItem(name: "body", value: diagnostics + "\n\nWhat happened?\n\nWhat did you expect?\n")]

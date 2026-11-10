@@ -20,6 +20,8 @@ REPOSITORY = 'example/alphasync'
 class FakeGitHub:
     def __init__(self, manifest):
         self.manifest = manifest
+        self.tag = TAG
+        self.other_releases = []
         self.release = None
         self.assets = []
         self.refs = []
@@ -33,8 +35,8 @@ class FakeGitHub:
         self.wrong_created_source = False
 
     def draft(self):
-        self.release = {'id': 42, 'tag_name': TAG, 'draft': True, 'prerelease': False, 'immutable': False,
-                        'target_commitish': SOURCE, 'html_url': 'https://github.com/' + REPOSITORY + '/releases/tag/' + TAG}
+        self.release = {'id': 42, 'tag_name': self.tag, 'draft': True, 'prerelease': False, 'immutable': False,
+                        'target_commitish': SOURCE, 'html_url': 'https://github.com/' + REPOSITORY + '/releases/tag/' + self.tag}
 
     def asset(self, name):
         return {'id': len(self.assets) + 100, 'name': name, 'state': 'uploaded',
@@ -48,7 +50,7 @@ class FakeGitHub:
             if endpoint.endswith('/releases?per_page=100'):
                 # Keep the matching draft on a later page to exercise pagination.
                 other = {'tag_name': 'v0.1'}
-                return json.dumps([[other], [self.release] if self.release and not self.hide_created_draft else []])
+                return json.dumps([[other] + self.other_releases, [self.release] if self.release and not self.hide_created_draft else []])
             if endpoint.endswith('/assets?per_page=100'):
                 return json.dumps([self.assets[:5], self.assets[5:]])
             raise AssertionError(args)
@@ -62,7 +64,7 @@ class FakeGitHub:
             if self.release:
                 raise AssertionError('The existing draft was recreated.')
             request = json.loads(Path(args[-1]).read_text())
-            assert request == {'tag_name': TAG, 'target_commitish': SOURCE, 'name': 'AlphaSync 2.0.1',
+            assert request == {'tag_name': self.tag, 'target_commitish': SOURCE, 'name': 'AlphaSync 2.0.1',
                                'draft': True, 'prerelease': False, 'body': 'Reviewed release notes.\n'}
             self.draft()
             if self.wrong_created_source:
@@ -75,7 +77,7 @@ class FakeGitHub:
             if '/releases/assets/' in endpoint:
                 asset_id = int(endpoint.rsplit('/', 1)[1])
                 return json.dumps(next(item for item in self.assets if item['id'] == asset_id))
-            if endpoint.endswith('/releases/42') or endpoint.endswith('/releases/tags/' + TAG):
+            if endpoint.endswith('/releases/42') or endpoint.endswith('/releases/tags/' + self.tag):
                 return json.dumps(self.release)
             raise AssertionError(args)
         self.mutations.append(args)
@@ -92,11 +94,12 @@ class FakeGitHub:
                     self.interrupt_upload = False
                     raise subprocess.CalledProcessError(1, ['gh', *args])
             if self.move_tag_after_upload:
-                self.refs = [{'ref': 'refs/tags/' + TAG, 'object': {'type': 'commit', 'sha': 'b' * 40}}]
+                self.refs = [{'ref': 'refs/tags/' + self.tag, 'object': {'type': 'commit', 'sha': 'b' * 40}}]
         elif args[:2] == ('release', 'edit'):
             if '--draft=false' in args:
                 self.release.update(draft=False, immutable=True)
-                self.refs = [{'ref': 'refs/tags/' + TAG, 'object': {'type': 'commit', 'sha': SOURCE}}]
+                self.refs = [item for item in self.refs if item['ref'] != 'refs/tags/' + self.tag]
+                self.refs.append({'ref': 'refs/tags/' + self.tag, 'object': {'type': 'commit', 'sha': SOURCE}})
         else:
             raise AssertionError(args)
         return ''
@@ -148,6 +151,26 @@ class PublicationTests(unittest.TestCase):
             self.publish()
         self.assertEqual(self.github.uploads, [])
         self.assert_not_published()
+
+    def test_a_reissue_uses_a_new_build_tag_and_preserves_the_original_tag(self):
+        self.github.draft()
+        self.github.release.update(draft=False, immutable=True, target_commitish='b' * 40)
+        self.github.other_releases.append(self.github.release)
+        self.github.release = None
+        original = {'ref': 'refs/tags/' + TAG, 'object': {'type': 'commit', 'sha': 'b' * 40}}
+        self.github.refs = [original]
+        self.github.tag = TAG + '-build.152'
+        url = publisher.publish(SOURCE, REPOSITORY, '2.0.1', self.assets, self.manifest, self.notes, self.github,
+                                tag=self.github.tag, build='152')
+        self.assertTrue(url.endswith('/' + self.github.tag))
+        self.assertIn(original, self.github.refs)
+        self.assertFalse(self.github.release['draft'])
+
+    def test_a_tag_for_another_build_is_rejected_before_mutation(self):
+        with self.assertRaisesRegex(ValueError, 'version and build'):
+            publisher.publish(SOURCE, REPOSITORY, '2.0.1', self.assets, self.manifest, self.notes, self.github,
+                              tag=TAG + '-build.151', build='152')
+        self.assertEqual(self.github.mutations, [])
 
     def test_interrupted_upload_resumes_without_replacing_completed_assets(self):
         self.github.interrupt_upload = True

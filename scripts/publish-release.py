@@ -62,7 +62,18 @@ def check_uploaded(items, manifest, complete=False):
     return uploaded, starters
 
 
-def publish(source, repository, version, assets, manifest, notes, command=gh):
+def release_tag(version, tag=None, build=None):
+    if not re.fullmatch(r'[0-9]+\.[0-9]+(?:\.[0-9]+)?', version):
+        raise ValueError('The release tag needs a stable version.')
+    standard = 'v' + version
+    if tag is None or tag == standard:
+        return standard
+    if build is not None and re.fullmatch(r'[1-9][0-9]*', build) and tag == standard + '-build.' + build:
+        return tag
+    raise ValueError('The release tag does not match its version and build.')
+
+
+def publish(source, repository, version, assets, manifest, notes, command=gh, *, tag=None, build=None):
     if not re.fullmatch(r'[0-9a-f]{40}', source) or not re.fullmatch(r'[0-9]+\.[0-9]+(?:\.[0-9]+)?', version):
         raise ValueError('Publication needs an exact source commit and stable version.')
     if len(manifest) != 12 or set(manifest) != {path.name for path in assets.iterdir()}:
@@ -73,7 +84,7 @@ def publish(source, repository, version, assets, manifest, notes, command=gh):
             raise ValueError('The verified release asset is not a regular file: ' + name)
         if path.stat().st_size != expected['size'] or hashlib.sha256(path.read_bytes()).hexdigest() != expected['sha256']:
             raise ValueError('The verified release asset has changed: ' + name)
-    tag = 'v' + version
+    tag = release_tag(version, tag, build)
     check_tag(command, repository, tag, source)
 
     def find_release():
@@ -139,7 +150,7 @@ def main():
     source = os.environ['GITHUB_SHA']
     repository = os.environ['GH_REPO']
     run_id = os.environ['GITHUB_RUN_ID']
-    settings = dict(re.findall(r'^(MARKETING_VERSION|AS_RELEASE_CHANNEL) = (.+)$',
+    settings = dict(re.findall(r'^(MARKETING_VERSION|CURRENT_PROJECT_VERSION|AS_RELEASE_CHANNEL|AS_RELEASE_TAG) = (.+)$',
                               Path('AlphaSync/Build/Version.xcconfig').read_text(), re.MULTILINE))
     version = settings['MARKETING_VERSION']
     if settings['AS_RELEASE_CHANNEL'] != 'stable' or not re.fullmatch(r'[0-9]+\.[0-9]+(?:\.[0-9]+)?', version):
@@ -150,7 +161,8 @@ def main():
     body = Path(f'releases/{version}.md').read_text()
     body += f'\n[Build and verification record](https://github.com/{repository}/actions/runs/{run_id}).\n'
     notes.write_text(body)
-    print('Published ' + publish(source, repository, version, assets, manifest, notes))
+    print('Published ' + publish(source, repository, version, assets, manifest, notes,
+                                tag=settings.get('AS_RELEASE_TAG'), build=settings['CURRENT_PROJECT_VERSION']))
 
 
 if __name__ == '__main__':

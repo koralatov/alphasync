@@ -43,7 +43,7 @@ def validate_bundle(archive, prefix, identifier, version, build):
     return fields
 
 
-def validate_assets(directory, version, build, source):
+def validate_assets(directory, version, build, source, tag=None):
     expected = set()
     manifest = {}
     with tempfile.TemporaryDirectory() as temporary:
@@ -68,6 +68,8 @@ def validate_assets(directory, version, build, source):
                                 'com.tsoniq.AlphaSyncLauncher', version, build)
                 if app.get('ASBuildProfile') != profile or app.get('ASReleaseChannel') != 'stable':
                     raise ValueError('The archived app has the wrong edition or release channel.')
+                if app.get('ASReleaseTag') != (tag or 'v' + version):
+                    raise ValueError('The archived app links to another release tag.')
             with zipfile.ZipFile(directory / (stem + '-symbols.zip')) as archive:
                 names_in_archive = archive_entries(archive, {'AlphaSync.app.dSYM', 'AlphaSyncLauncher.app.dSYM'})
                 for name in ['AlphaSync', 'AlphaSyncLauncher']:
@@ -84,10 +86,11 @@ def main():
     parser.add_argument('--version', required=True)
     parser.add_argument('--build', required=True)
     parser.add_argument('--source', required=True)
+    parser.add_argument('--tag')
     parser.add_argument('--manifest', required=True, type=Path)
     args = parser.parse_args()
     try:
-        manifest = validate_assets(args.assets, args.version, args.build, args.source)
+        manifest = validate_assets(args.assets, args.version, args.build, args.source, args.tag)
         args.manifest.write_text(json.dumps(manifest, indent=2) + '\n')
     except (OSError, ValueError, KeyError, zipfile.BadZipFile, plistlib.InvalidFileException) as error:
         parser.exit(1, f'{error}\n')

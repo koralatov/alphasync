@@ -91,6 +91,26 @@ class RetirementTests(unittest.TestCase):
         self.assertEqual(self.retire(), ['v1.5.1', 'v2.0.2'])
         self.assertEqual(self.github.deleted, ['v1.5'])
 
+    def test_a_reissue_retires_the_previous_build_after_verifying_the_new_tag(self):
+        self.github.releases['v2.0.2']['target_commitish'] = 'f' * 40
+        self.github.tags['v2.0.2']['sha'] = 'f' * 40
+        self.plan['retire'].append(retirement.fingerprint(self.github.releases['v2.0.2']))
+        tag = 'v2.0.2-build.152'
+        self.plan.update(release_tag=tag, build='152')
+        self.github.releases[tag] = release(11, tag, SOURCE, 12)
+        self.github.tags[tag] = {'type': 'commit', 'sha': SOURCE}
+        self.github.latest = tag
+        self.manifest = {item['name']: {'size': item['size'], 'sha256': item['digest'][7:]}
+                         for item in self.github.releases[tag]['assets']}
+        tags = copy.deepcopy(self.github.tags)
+        self.assertEqual(self.retire(), ['v1.5.1', tag])
+        self.assertIn('v2.0.2', self.github.deleted)
+        self.assertEqual(self.github.tags, tags)
+
+    def test_a_reissue_tag_for_another_build_prevents_every_deletion(self):
+        self.plan.update(release_tag='v2.0.2-build.151', build='152')
+        self.rejected('version and build')
+
     def test_incomplete_modern_release_prevents_every_deletion(self):
         self.github.releases['v2.0.2']['assets'].pop()
         self.rejected('asset list')

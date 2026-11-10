@@ -34,6 +34,8 @@
 	<string>$(AS_BUILD_PROFILE)</string>
 	<key>ASReleaseChannel</key>
 	<string>$(AS_RELEASE_CHANNEL)</string>
+	<key>ASReleaseTag</key>
+	<string>$(AS_RELEASE_TAG)</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
 	<key>NSHumanReadableCopyright</key>

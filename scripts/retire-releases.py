@@ -21,14 +21,14 @@ def retire(plan, repository, source, manifest, record, command=publisher.gh):
     version = plan['version']
     if not re.fullmatch(r'[0-9]+\.[0-9]+(?:\.[0-9]+)?', version):
         raise ValueError('The retirement plan needs a stable version.')
-    current_tag = 'v' + version
+    current_tag = publisher.release_tag(version, plan.get('release_tag'), plan.get('build'))
     if len(manifest) != 12:
         raise ValueError('All twelve verified modern assets are required before retirement.')
     keep = {current_tag, 'v1.5.1'}
     expected = {item['tag_name']: item for item in plan['retire']}
     if len(expected) != len(plan['retire']) or set(expected) & keep:
         raise ValueError('The retirement plan includes a protected or duplicate release.')
-    if any(not re.fullmatch(r'v[0-9]+\.[0-9]+(?:\.[0-9]+)?', tag) for tag in expected):
+    if any(not re.fullmatch(r'v[0-9]+\.[0-9]+(?:\.[0-9]+)?(?:-build\.[1-9][0-9]*)?', tag) for tag in expected):
         raise ValueError('The retirement plan contains an invalid tag.')
 
     def releases():
@@ -92,7 +92,7 @@ def retire(plan, repository, source, manifest, record, command=publisher.gh):
 
 
 def main():
-    settings = dict(re.findall(r'^(MARKETING_VERSION|AS_RELEASE_CHANNEL) = (.+)$',
+    settings = dict(re.findall(r'^(MARKETING_VERSION|CURRENT_PROJECT_VERSION|AS_RELEASE_CHANNEL|AS_RELEASE_TAG) = (.+)$',
                               Path('AlphaSync/Build/Version.xcconfig').read_text(), re.MULTILINE))
     version = settings['MARKETING_VERSION']
     if settings['AS_RELEASE_CHANNEL'] != 'stable' or not re.fullmatch(r'[0-9]+\.[0-9]+(?:\.[0-9]+)?', version):
@@ -100,6 +100,9 @@ def main():
     plan = json.loads(Path(f'releases/{version}-retirement.json').read_text())
     if plan['version'] != version:
         raise ValueError('The retirement plan is for another release.')
+    expected_tag = publisher.release_tag(version, settings.get('AS_RELEASE_TAG'), settings['CURRENT_PROJECT_VERSION'])
+    if publisher.release_tag(version, plan.get('release_tag'), plan.get('build')) != expected_tag:
+        raise ValueError('The retirement plan is for another release tag.')
     manifest = json.loads(Path('build/release-verification/assets.json').read_text())
     kept = retire(plan, os.environ['GH_REPO'], os.environ['GITHUB_SHA'], manifest,
                   Path('build/release-verification/retired-releases.json'))

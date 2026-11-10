@@ -23,6 +23,7 @@ build_number=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$app/Content
 test "$version" = "$(sed -n 's/^MARKETING_VERSION *= *//p' "$repository/AlphaSync/Build/Version.xcconfig")"
 test "$build_number" = "$(sed -n 's/^CURRENT_PROJECT_VERSION *= *//p' "$repository/AlphaSync/Build/Version.xcconfig")"
 test "$(/usr/libexec/PlistBuddy -c 'Print :ASReleaseChannel' "$app/Contents/Info.plist")" = "$(sed -n 's/^AS_RELEASE_CHANNEL *= *//p' "$repository/AlphaSync/Build/Version.xcconfig")"
+test "$(/usr/libexec/PlistBuddy -c 'Print :ASReleaseTag' "$app/Contents/Info.plist")" = "$(sed -n 's/^AS_RELEASE_TAG *= *//p' "$repository/AlphaSync/Build/Version.xcconfig")"
 test "$(/usr/libexec/PlistBuddy -c 'Print :ASBuildProfile' "$app/Contents/Info.plist")" = "$profile_variant"
 compatibility=$(sed -n 's/^AS_COMPATIBILITY_DESCRIPTION *= *//p' "$profile_configuration")
 test "$(/usr/libexec/PlistBuddy -c 'Print :ASCompatibilityDescription' "$app/Contents/Info.plist")" = "$compatibility"
