@@ -1,7 +1,7 @@
 import Foundation
 
 public enum AppMetadata {
-    public static var version: String { Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "2.0.2" }
+    public static var version: String { Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "2.0.3" }
     public static var build: String { Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "Development" }
     public static var compatibility: String { Bundle.main.object(forInfoDictionaryKey: "ASCompatibilityDescription") as? String ?? "For macOS 13 and later" }
     public static let project = URL(string: "https://github.com/koralatov/alphasync")!

@@ -1,4 +1,4 @@
-# Manual checks for AlphaSync 2.0.2
+# Manual checks for AlphaSync 2.0.3
 
 Record the app version, build, source commit, edition, exact macOS version, architecture, Neo model, result, and any failure. Hosted builds and simulated transfers do not establish physical USB or macOS 13 runtime compatibility.
 
@@ -10,7 +10,7 @@ The [build 152 reissue](https://github.com/koralatov/alphasync/actions/runs/4281
 
 ## Runtime coverage
 
-Version 2.0.2, build 152 retains the transfer features of build 151 and finalises release maintenance. These physical checks remain outstanding:
+Version 2.0.3, build 153 retains the completed transfer and maintenance features of 2.0.2. These physical checks remain outstanding:
 
 - Enable automatic opening with a Neo already connected, including Login Items approval. Quit and reconnect. Check that a failed opening can retry, disabling the option stops the helper, and logout and login preserve the requested setting.
 - Stop a backup and quit during a long file read. Previously saved files must remain, the result must say it stopped, and the unfinished folder must retain its marker.
@@ -42,7 +42,7 @@ Use known-good independent backups and disposable Neo files for writing checks. 
 - Resize the connected window. Confirm that table columns, status, and available memory fit, with memory aligned at the trailing edge. Check long applet names and connection errors.
 - Change system appearance between Light, Dark, and Auto without restarting. Check the list, selection, toolbar, Settings, Inspector, About, sheets, file panels, and Help Viewer. Repeat with Increase Contrast, Reduce Motion, a different accent colour, and scroll bars always visible.
 - Use keyboard navigation and VoiceOver throughout. Confirm that control labels, disabled states, sidebar groups, file sizes, progress, and read-only text are understandable. Check all controls on a small screen.
-- Open About, close it after activating a link, and reopen it. No link should start with keyboard focus. Tab must still reach every link. Check version 2.0.2, build 152, the correct edition description, and the selected icon in About, Finder, and the Dock.
+- Open About, close it after activating a link, and reopen it. No link should start with keyboard focus. Tab must still reach every link. Check version 2.0.3, build 153, the correct edition description, and the selected icon in About, Finder, and the Dock.
 - Inspect a file, applet, and Neo. More Information and Preview must stay open, details must be selectable, and previous file text must clear when the selection changes. Check long metadata and unknown limits.
 - Compare bytes and decimal KB with Finder, including 0, 1, 999, 1,000, 1,024, and 12,000 bytes. Exact values such as 51,200 bytes must use regional grouping and fit their fields.
 
@@ -97,7 +97,7 @@ Use known-good independent backups and disposable Neo files for writing checks. 
 - Check saved filters, backup destination, log option, recovery settings, and regular or monospaced preference after upgrading from 1.5.1 and after restarting. Cancelling a folder chooser must preserve its prior value.
 - In Applications, enable automatic opening. Check registration errors, approval required, granting and revoking Login Items approval, logout and login, USB reconnection, and disabling it. Confirm the helper does not capture keyboard input or open another edition unexpectedly.
 - Open Help with no Neo and during a transfer. Check the system search field, last menu position, AlphaSync Help as the first app item, ⌘?, command search, and topic search.
-- Open Licence offline and compare it with LICENSE. Stable release notes must open the build 152 reissue at `v2.0.2-build.152`, and the licence must point to the same tag. GitHub and issue commands must open the intended pages.
+- Open Licence offline and compare it with LICENSE. Stable release notes must open version 2.0.3 at `v2.0.3`, and the licence must point to the same tag. GitHub and issue commands must open the intended pages.
 - Contact Us must open an unsent message to mike@koralatov.com. Issue and contact forms may include only version, build, edition, system version, and process architecture. Leave reports and messages unsubmitted. Check the Copy Link fallback with an unavailable handler.
 
-Use the final 2.0.2 ZIP for a clean-install check on another Mac. Physical Neo, real Login Items approval, and macOS 13 checks remain unverified until results are recorded here. The public release notes must retain that limit.
+Use the final 2.0.3 ZIP for a clean-install check on another Mac. Physical Neo, real Login Items approval, and macOS 13 checks remain unverified until results are recorded here. The public release notes must retain that limit.
