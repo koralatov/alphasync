@@ -82,7 +82,7 @@ public struct MainView: View {
     private var fileManager: some View {
         VStack(spacing: 0) {
             if let issue = store.connectionIssue { connectionWarning(issue) }
-            fileBrowser.frame(maxWidth: .infinity, maxHeight: .infinity)
+            fileBrowser.frame(maxWidth: .infinity, maxHeight: .infinity).clipped()
             connectionStatus
         }
     }
