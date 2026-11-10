@@ -4,6 +4,8 @@ Record the app version, build, source commit, edition, exact macOS version, arch
 
 The [frozen 1.5.1 checklist](https://github.com/koralatov/alphasync/blob/v1.5.1/tests/manual-checks.md) retains the macOS 11 and 12 checks and Mike’s earlier macOS 12 report. Do not apply Swift rewrite changes to that release.
 
+The [2.0.2 release run](https://github.com/koralatov/alphasync/actions/runs/42802943901) passed on 10 November 2026 for source `807b4bedf1bb1cd655e934e1495723bb5c203c93`. Both hosts passed 109 Swift regressions, 35 packaging, publication, and retirement fixtures, and the native interface checks. App, helper, architecture, deployment, signature, and symbol verification passed. The published twelve assets match the downloaded packages. These automated results do not change the unverified physical checks below.
+
 ## Runtime coverage
 
 Version 2.0.2, build 151 includes the unpublished 2.0.1 work. These physical checks remain outstanding:
