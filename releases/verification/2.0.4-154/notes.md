@@ -26,6 +26,8 @@ AlphaSync was originally written by tSoniq. Version 2.0 was the first public rel
 
 **The pages are easier to read.** They use the system font, scalable text, underlined links, clearer headings, and colours that follow Light and Dark appearance. Related topics make it easier to move between tasks.
 
+**The About window has a safer fallback.** If its app artwork cannot be loaded, it shows a built-in document symbol without waiting for the system’s application-icon service.
+
 This release carries forward the transfer and maintenance improvements in [2.0.3](https://github.com/koralatov/alphasync/blob/v2.0.3/releases/2.0.3.md), including more reliable automatic opening, remembered backup destinations, dictionary-import review, and safer stopping and quitting.
 
 ## How to download it
@@ -80,7 +82,7 @@ The Help book has seventeen authored task and overview pages plus a licence gene
 
 The review applies Apple’s guidance on task-focused help and clear writing. HTML declares its language, uses semantic headings and landmarks, and gives the shortcut table a caption and column headings. CSS uses relative text sizes, system appearance colours, underlined links, and visible focus. Stable `alphasync-home` and `alphasync-licence` entry anchors are preserved.
 
-A standard-library Python validator checks all local targets, fragments, assets, page reachability, titles, heading order, metadata, landmarks, link text, and offline resources. It rejects active content and changes to the original licence. Xcode runs it before `hiutil` builds the search index. Package verification runs it again on the extracted app. Thirteen disposable fixtures exercise failures and the real licence generator. Python is needed for building and verification, not for running AlphaSync.
+A standard-library Python validator checks all local targets, fragments, assets, page reachability, titles, heading order, metadata, landmarks, link text, and offline resources. It rejects active content and changes to the original licence. Xcode runs it before `hiutil` builds the search index. Package verification runs it again on the extracted app. Thirteen disposable fixtures exercise failures and the real licence generator. Python is needed for building and verification, not for running AlphaSync. The native interface checker also uses isolated preferences and Login Items state, reports its progress, and fails with diagnostics if it exceeds its time limit.
 
 ### Architecture and formats
 
@@ -94,13 +96,13 @@ Text exports use UTF-8 without a byte-order mark and LF line endings. Imports ac
 
 Install one complete app bundle in Applications. The helper stays in `Contents/Library/LoginItems`. Both editions share the existing bundle identifiers and preferences.
 
-Canonical builds use Xcode 26.6, pinned in `.xcode-version`. Intel checks use Xcode 16.4. Run `python3 scripts/generate-project.py`, then build the `AlphaSyncUniversal` or `AlphaSyncAppleSilicon` scheme in `AlphaSync/AlphaSync.xcodeproj`. The [technical guide](https://github.com/koralatov/alphasync/blob/v2.0.4/TECHNICAL.md) gives the full commands.
+Canonical builds use Xcode 26.6, pinned in `.xcode-version`, on a macOS 26 Intel host. Apple Silicon compatibility checks use Xcode 16.4 on macOS 15. Run `python3 scripts/generate-project.py`, then build the `AlphaSyncUniversal` or `AlphaSyncAppleSilicon` scheme in `AlphaSync/AlphaSync.xcodeproj`. The [technical guide](https://github.com/koralatov/alphasync/blob/v2.0.4/TECHNICAL.md) gives the full commands.
 
 ### Verification and publication
 
 Publication requires successful Intel and Apple Silicon jobs, Swift and simulated-device regressions, native interface checks, and disposable Help, packaging, publication, and retirement fixtures. App and helper checks cover architectures, minimum macOS versions, exact release metadata, signatures, hardened runtime, and matching crash symbols.
 
-The publication job downloads the exact build artifacts again and verifies the extracted bundles, Help, symbols, reports, and hashes. It uploads twelve assets to a draft and checks every uploaded size and SHA-256 digest before publishing. Published assets and source tags are never replaced. This release preserves the existing 2.0.3 release and the frozen 1.5.1 source and downloads.
+Both host jobs build both editions and run the full regressions and native interface checks. A separate Apple Silicon job downloads the canonical packages, verifies the extracted bundles, Help, symbols, reports, and hashes, and runs each app’s `--version` command natively. The Intel publication job downloads and verifies the same artifacts again. This build route retains the pinned release compiler while avoiding dependence on the unavailable macOS 26 arm64 runner pool. It uploads twelve assets to a draft and checks every uploaded size and SHA-256 digest before publishing. Published assets and source tags are never replaced. This release preserves the existing 2.0.3 release and the frozen 1.5.1 source and downloads.
 
 Each ZIP has a `.sha256` file and a build-information report with its source commit. For example:
 
@@ -109,3 +111,5 @@ shasum -a 256 -c AlphaSync-2.0.4-154-macOS-13-universal.zip.sha256
 ```
 
 Essential release evidence is retained in the [permanent verification records](https://github.com/koralatov/alphasync/tree/master/releases/verification). Native Help Viewer navigation, topic search, upgrade-cache behaviour, keyboard focus, and VoiceOver still need manual checks on macOS. Static Help checks do not establish those results.
+
+[Build and verification record](https://github.com/koralatov/alphasync/actions/runs/42906295418).

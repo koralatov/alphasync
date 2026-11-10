@@ -59,7 +59,7 @@ To open AlphaSync whenever you connect your Neo, enable automatic opening in Set
 
 AlphaSync follows your Mac’s Light or Dark appearance.
 
-The downloads have ad hoc signatures and are not Apple-notarised. The [release notes](releases/2.0.4.md) describe the build checks and the remaining physical Neo, Login Items approval, and macOS 13 testing.
+The downloads have ad hoc signatures and are not Apple-notarised. The [release notes](releases/2.0.4.md) describe the build checks and the remaining physical Neo, Login Items approval, and macOS 13 testing. Native Help Viewer and VoiceOver checks also remain unverified.
 
 ## Help and support
 
