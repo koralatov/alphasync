@@ -37,6 +37,8 @@ Routine edits defer automated tests to this milestone. Run the full non-publishi
 
 The new regressions check the external legacy sequence, non-default configuration values, invalid configurations, descriptor and configuration failures, failure at every report, short or invalid transfer counts, finite timeouts, and connection cleanup. They do not claim that a physical Neo changed mode.
 
+The first native compile, run `43005148138` for source `9b9dd5942ce50a1033bf389f6a82087461974cb4`, found the control-request selector’s modern Swift name. Replace the obsolete imported `__sendDeviceRequest` spelling with `__send` and repeat the full milestone. This was a compiler correction, not a successful hardware test.
+
 Before publication, test the new build on the reported M2 Air with only one AlphaSync edition running. Record the macOS version and the app’s exact message. Confirm that the Neo leaves keyboard mode, files appear, reading and Save to Mac work, and unplugging and reconnecting work. Test writes, read-back verification, and recovery only with disposable Neo files. Also test Intel, a Neo already in transfer mode, multiple Neos, denial of accessory access, and another app holding the device.
 
 Version 2.0.5 remains unpublished. Keep the 1.5.1 and 2.0.4 public releases and every source tag unchanged until a separate release request.

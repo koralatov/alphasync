@@ -38,7 +38,7 @@ final class USBModeSwitchConnection: ModeSwitchConnection {
             }
         }
         var count = 0
-        try device.__sendDeviceRequest(setup, data: buffer, bytesTransferred: &count, completionTimeout: timeout)
+        try device.__send(setup, data: buffer, bytesTransferred: &count, completionTimeout: timeout)
         return count
     }
 
