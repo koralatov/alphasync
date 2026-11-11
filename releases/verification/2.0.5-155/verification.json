@@ -20,16 +20,24 @@
     "neoDisplay": "Attached to MAC, emulating keyboard",
     "affectedVersion": "2.0.4",
     "comparison": "1.5.1 works on the same Mac",
-    "macOSVersion": "not supplied",
-    "candidateHardwareResult": "The user reports that the supplied build quits unexpectedly. Physical mode switching is not confirmed.",
+    "macOSVersion": "macOS 14.7.1 (23H222)",
+    "candidateHardwareResult": "Confirmed runtime crash during the USB mode-switch send path; file-transfer operation remains unconfirmed.",
     "candidateCrash": {
       "date": "2026-11-11",
-      "evidence": "Photograph of the generic macOS AlphaSync quit-unexpectedly dialog",
-      "reportStatus": "full crash report needed",
-      "exceptionType": "not supplied",
-      "terminationReason": "not supplied",
-      "crashedThread": "not supplied",
-      "timing": "not supplied"
+      "evidence": "User-supplied full crash report; app and dSYM UUIDs match the delivered build 155",
+      "reportStatus": "received and analysed",
+      "exceptionType": "EXC_CRASH (SIGABRT)",
+      "terminationReason": "SIGNAL 6, abort() called",
+      "crashedQueue": "com.koralatov.alphasync.usb",
+      "lastExceptionFrames": [
+        "objc_exception_throw",
+        "-[IOBufferMutableData bytes]",
+        "USBModeSwitchConnection.send(_:timeout:)",
+        "NeoModeSwitch.perform(_:)",
+        "USBDiscovery.enterTransferMode(state:retryFailures:)"
+      ],
+      "diagnosis": "The mode-switch adapter treated a fixed kernel-backed IOUSBHost buffer as ordinary mutable data. The same unsafe buffer pattern also existed in bulk reads and writes.",
+      "scope": "Sanitised technical summary only; device identifiers, incident identifiers, and private paths are omitted."
     }
   },
   "hosts": [

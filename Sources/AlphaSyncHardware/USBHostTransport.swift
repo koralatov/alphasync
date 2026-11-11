@@ -45,13 +45,12 @@ final class USBHostTransport: NeoTransport {
     func read(maximum: Int, timeout: TimeInterval) throws -> Data {
         guard !closed else { throw NeoError.disconnected }
         guard (1...8).contains(maximum), timeout.isFinite, timeout > 0 else { throw NeoError.invalidData("Invalid USB read bounds.") }
-        let buffer = try interface.ioData(withCapacity: maximum)
-        buffer.length = maximum
         do {
-            var count = 0
-            try input.__sendIORequest(with: buffer, bytesTransferred: &count, completionTimeout: timeout)
-            guard count >= 0, count <= maximum else { throw NeoError.invalidData("The USB read count is invalid.") }
-            return Data((buffer as Data).prefix(count))
+            return try USBTransferBuffers.read(maximum: maximum) { buffer in
+                var count = 0
+                try input.__sendIORequest(with: buffer, bytesTransferred: &count, completionTimeout: timeout)
+                return count
+            }
         } catch {
             try? input.clearStall()
             throw error
@@ -66,16 +65,13 @@ final class USBHostTransport: NeoTransport {
         while offset < bytes.count {
             let length = min(8, bytes.count - offset)
             let remaining = try deadline.remaining()
-            let buffer = try interface.ioData(withCapacity: length)
-            buffer.length = length
-            let block = Array(bytes[offset..<(offset + length)])
-            block.withUnsafeBytes { raw in
-                if let base = raw.baseAddress { buffer.replaceBytes(in: NSRange(location: 0, length: length), withBytes: base) }
-            }
+            let block = Data(bytes[offset..<(offset + length)])
             do {
-                var count = 0
-                try output.__sendIORequest(with: buffer, bytesTransferred: &count, completionTimeout: remaining)
-                guard count == length else { throw NeoError.device("The Neo accepted only part of a command.") }
+                try USBTransferBuffers.write(block) { buffer in
+                    var count = 0
+                    try output.__sendIORequest(with: buffer, bytesTransferred: &count, completionTimeout: remaining)
+                    return count
+                }
             } catch {
                 try? output.clearStall()
                 throw error

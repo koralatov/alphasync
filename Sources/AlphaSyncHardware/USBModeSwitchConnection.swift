@@ -30,16 +30,12 @@ final class USBModeSwitchConnection: ModeSwitchConnection {
         let setup = IOUSBDeviceRequest(bmRequestType: request.requestType, bRequest: request.request,
                                        wValue: request.value.littleEndian, wIndex: request.index.littleEndian,
                                        wLength: length.littleEndian)
-        let buffer = try device.ioData(withCapacity: request.data.count)
-        buffer.length = request.data.count
-        request.data.withUnsafeBytes { bytes in
-            if let base = bytes.baseAddress {
-                buffer.replaceBytes(in: NSRange(location: 0, length: bytes.count), withBytes: base)
-            }
+        try USBTransferBuffers.write(request.data) { buffer in
+            var count = 0
+            try device.__send(setup, data: buffer, bytesTransferred: &count, completionTimeout: timeout)
+            return count
         }
-        var count = 0
-        try device.__send(setup, data: buffer, bytesTransferred: &count, completionTimeout: timeout)
-        return count
+        return request.data.count
     }
 
     func close() {
