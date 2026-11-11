@@ -41,25 +41,27 @@ private final class USBNotifications: @unchecked Sendable {
             }
             port = created
             IONotificationPortSetDispatchQueue(created, queue)
-            for matched in [true, false] {
-                guard let matching = IOServiceMatching("IOUSBHostInterface") else {
-                    stop()
-                    continuation.finish(throwing: NeoError.device("macOS could not prepare USB attachment matching. Choose Try Again."))
-                    return
+            for serviceClass in ["IOUSBHostDevice", "IOUSBHostInterface"] {
+                for matched in [true, false] {
+                    guard let matching = IOServiceMatching(serviceClass) else {
+                        stop()
+                        continuation.finish(throwing: NeoError.device("macOS could not prepare USB service matching. Choose Try Again."))
+                        return
+                    }
+                    var iterator: io_iterator_t = 0
+                    let callback: IOServiceMatchingCallback
+                    if matched { callback = matchedServices } else { callback = terminatedServices }
+                    let status = IOServiceAddMatchingNotification(created, matched ? kIOMatchedNotification : kIOTerminatedNotification,
+                        matching, callback, Unmanaged.passUnretained(self).toOpaque(), &iterator)
+                    guard status == KERN_SUCCESS else {
+                        if iterator != 0 { IOObjectRelease(iterator) }
+                        stop()
+                        continuation.finish(throwing: NeoError.device("macOS could not monitor USB attachments (\(status)). Choose Try Again."))
+                        return
+                    }
+                    iterators.append(iterator)
+                    drain(iterator, matched: matched)
                 }
-                var iterator: io_iterator_t = 0
-                let callback: IOServiceMatchingCallback
-                if matched { callback = matchedInterfaces } else { callback = terminatedInterfaces }
-                let status = IOServiceAddMatchingNotification(created, matched ? kIOMatchedNotification : kIOTerminatedNotification,
-                    matching, callback, Unmanaged.passUnretained(self).toOpaque(), &iterator)
-                guard status == KERN_SUCCESS else {
-                    if iterator != 0 { IOObjectRelease(iterator) }
-                    stop()
-                    continuation.finish(throwing: NeoError.device("macOS could not monitor USB attachments (\(status)). Choose Try Again."))
-                    return
-                }
-                iterators.append(iterator)
-                drain(iterator, matched: matched)
             }
             // Draining the initial iterators arms notifications and gives every consumer an initial scan.
             continuation.yield(())
@@ -108,12 +110,12 @@ private final class USBNotifications: @unchecked Sendable {
     }
 }
 
-private func matchedInterfaces(_ context: UnsafeMutableRawPointer?, _ iterator: io_iterator_t) {
+private func matchedServices(_ context: UnsafeMutableRawPointer?, _ iterator: io_iterator_t) {
     guard let context else { return }
     Unmanaged<USBNotifications>.fromOpaque(context).takeUnretainedValue().drain(iterator, matched: true)
 }
 
-private func terminatedInterfaces(_ context: UnsafeMutableRawPointer?, _ iterator: io_iterator_t) {
+private func terminatedServices(_ context: UnsafeMutableRawPointer?, _ iterator: io_iterator_t) {
     guard let context else { return }
     Unmanaged<USBNotifications>.fromOpaque(context).takeUnretainedValue().drain(iterator, matched: false)
 }

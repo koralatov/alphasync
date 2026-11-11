@@ -1,6 +1,8 @@
-# Manual checks for AlphaSync 2.0.4
+# Manual checks for AlphaSync 2.0.5
 
 Record the app version, build, source commit, edition, exact macOS version, architecture, Neo model, result, and any failure. Hosted builds and simulated transfers do not establish physical USB or macOS 13 runtime compatibility.
+
+On 11 November 2026, Mike reported that 2.0.4 leaves his Neo in keyboard mode on an M2 MacBook Air, while 1.5.1 works on the same Mac. The photograph does not establish the macOS version or the Mac app’s error. The 2.0.5 candidate must be tested on that setup before this connection issue is marked resolved. The [investigation](../docs/neo-keyboard-mode.md) records the correction and full physical checklist.
 
 Version 2.0.4, build 154 passed [release run 42906295418](https://github.com/koralatov/alphasync/actions/runs/42906295418) on 10 November 2026 for exact source `7b71c9fa7f8de748c91e26990050decfb2a98472`. Intel with Xcode 26.6 and Apple Silicon with Xcode 16.4 each passed 109 Swift regressions, thirteen Help fixtures, forty-two existing release fixtures, native interface checks, and both app and helper builds. A separate Apple Silicon job verified the downloaded canonical packages and executed both app-version commands natively. Intel publication then independently checked the same packages. All twelve public asset sizes and SHA-256 digests match the downloaded build packages. The [permanent verification record](../releases/verification/2.0.4-154/verification.json) preserves the evidence. Native Help Viewer, VoiceOver, physical Neo transfers, real Login Items approval, and macOS 13 runtime checks remain unverified.
 

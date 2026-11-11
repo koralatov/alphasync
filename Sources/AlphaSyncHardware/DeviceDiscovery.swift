@@ -43,7 +43,6 @@ final class SystemDeviceDiscovery: DeviceDiscovery {
 
     func modeSwitchIssue(retryFailures: Bool) -> String? {
         USBDiscovery.enterTransferMode(state: &modeSwitchState, retryFailures: retryFailures)
-        return modeSwitchState.issue
     }
 }
 

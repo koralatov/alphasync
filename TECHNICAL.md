@@ -1,6 +1,8 @@
 # Technical guide
 
-Version **2.0.4** is the current verified release of the Swift rewrite, developed on **master**. It includes the unpublished 2.0.1 maintenance work. Both app targets require **macOS 13 or later**. For installation and everyday use, see the [README](README.md).
+Version **2.0.4** is the current public release of the Swift rewrite, developed on **master**. It includes the unpublished 2.0.1 maintenance work. Both app targets require **macOS 13 or later**. For installation and everyday use, see the [README](README.md).
+
+Version 2.0.5, build 155 is an unpublished connection-correction candidate. A physical report on an M2 MacBook Air shows 2.0.4 remaining in keyboard mode while 1.5.1 works. Its automated build results below do not establish successful hardware operation. The candidate restores the working legacy USB configuration and control sequence and must pass a new non-publishing build milestone and physical verification.
 
 Version 2.0.4, build 154 passed [release run 42906295418](https://github.com/koralatov/alphasync/actions/runs/42906295418) on 10 November 2026 for exact source `7b71c9fa7f8de748c91e26990050decfb2a98472`. Intel with Xcode 26.6 and Apple Silicon with Xcode 16.4 each passed 109 Swift regressions, thirteen Help fixtures, forty-two existing release fixtures, native interface checks, and both app and helper builds. A separate Apple Silicon job verified the downloaded canonical packages and executed both app-version commands natively. Intel publication then independently checked the same packages. All twelve public asset sizes and SHA-256 digests match the downloaded build packages. The [permanent verification record](releases/verification/2.0.4-154/verification.json) preserves the evidence. Native Help Viewer, VoiceOver, physical Neo transfers, real Login Items approval, and macOS 13 runtime checks remain unverified.
 
@@ -90,7 +92,7 @@ The native interface checker uses private preferences and an isolated Login Item
 
 ## USB and concurrency
 
-Use Apple’s public **IOUSBHost** framework for bulk transfers. The Neo appears as USB vendor `081e`, product `bd04` in keyboard mode. Public HID output reports `e0` through `e4`, sent only to interface 1, switch it to the `bd01` file-transfer device. The proprietary file protocol uses bulk endpoints, not keyboard input reports.
+The 2.0.5 candidate uses Apple’s public **IOUSBHost** framework for both mode switching and bulk transfers. Discover the Neo as USB vendor `081e`, product `bd04`, select the first descriptor’s configuration value, and send the legacy output-report controls `e0` through `e4` to interface 1 over endpoint zero. The device reconnects as product `bd01`; its proprietary file protocol uses bulk endpoints. The earlier HID-list handoff omitted configuration selection and could silently find no mode-switch interface. The [hardware investigation](docs/neo-keyboard-mode.md) records the reported 2.0.4 failure, exact request fields, and remaining physical verification.
 
 There is no public `CommunicationUserHIDService` API in the SDK. A HID-only file engine would not match the Neo’s file-transfer interface. A DriverKit extension would require additional entitlements and installation; it is not required for this user-space client. API migration does not bypass Gatekeeper or system-controlled USB approval.
 
