@@ -9,9 +9,9 @@
   "workflow": {
     "runID": 43020148543,
     "url": "https://github.com/koralatov/alphasync/actions/runs/43020148543",
-    "attempt": 2,
+    "attempt": 3,
     "event": "push",
-    "conclusion": "failure",
+    "conclusion": null,
     "publication": "skipped",
     "nativeQueueAttempts": [
       {
@@ -31,9 +31,19 @@
         "conclusion": "cancelled",
         "runnerAllocated": false,
         "executedSteps": 0
+      },
+      {
+        "attempt": 3,
+        "jobID": 130550183136,
+        "startedAt": "2026-11-11T13:24:13Z",
+        "status": "queued",
+        "conclusion": null,
+        "runnerAllocated": false,
+        "executedSteps": 0
       }
     ],
-    "scope": "Both app-build jobs passed. Only the unstarted native download-verification job was retried."
+    "scope": "Both app-build jobs passed. Only the unstarted native download-verification job was retried.",
+    "status": "queued"
   },
   "hardwareReport": {
     "date": "2026-11-11",
@@ -126,20 +136,22 @@
     "nativeAppleSiliconPackageVerification": {
       "jobIDs": [
         130530686102,
-        130538756743
+        130538756743,
+        130550183136
       ],
       "editions": [
         "universal",
         "apple-silicon"
       ],
-      "result": "not run: no macos-15 runner was allocated in either attempt"
+      "result": "not run: the first two attempts received no runner; the third retry is queued"
     },
     "publicReleasePublication": "not requested; skipped",
     "protectedPublicReleases": "Only v1.5.1 and v2.0.4 remain public; their notes, IDs, source targets, and every asset ID, size, and digest are unchanged.",
     "allTwelveSourceTags": "unchanged",
     "legacyBranchSource": "6cb821c9ab8073ff950414952bf2480eb4638c5d",
     "latestPublicRelease": "v2.0.4",
-    "protectedReferencesCheckedAt": "2026-11-11T12:49:01.322Z"
+    "protectedReferencesCheckedAt": "2026-11-11T12:49:01.322Z",
+    "allRequiredChecksPassed": false
   },
   "protectedPublicReleases": [
     "v1.5.1",
@@ -241,7 +253,7 @@
     "macOS 13 runtime",
     "Native Help Viewer, indexed search, cached-book upgrades, keyboard focus, and VoiceOver"
   ],
-  "checkedAt": "2026-11-11T13:20:37.013324+00:00",
+  "checkedAt": "2026-11-11T13:34:21.743396+00:00",
   "files": {
     "assets.json": {
       "size": 2043,
@@ -254,5 +266,11 @@
     "record": "../2.0.5-155/verification.json",
     "result": "crash reported and diagnosed; preserved for comparison"
   },
-  "handover": "Pending the final native package check; no new public release or completion email has been issued."
+  "handover": "A separate private Apple Silicon test ZIP is prepared for physical testing, with the missing native download check clearly stated. This is not a public release or confirmation of Neo operation.",
+  "privateTestZIP": {
+    "filename": "AlphaSync-2.0.5-156-macOS-13-apple-silicon.zip",
+    "size": 2873095,
+    "sha256": "43ee355febbc0e8e527a2e5e3b4b744a1458eeac5ca3c515f4a02daaa5481518",
+    "availability": "private test handover; not a public release asset"
+  }
 }
