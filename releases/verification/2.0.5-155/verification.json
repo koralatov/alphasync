@@ -1,6 +1,6 @@
 {
   "formatVersion": 1,
-  "state": "built-not-published",
+  "state": "crash-reported-not-published",
   "version": "2.0.5",
   "build": "155",
   "releaseTag": null,
@@ -21,7 +21,16 @@
     "affectedVersion": "2.0.4",
     "comparison": "1.5.1 works on the same Mac",
     "macOSVersion": "not supplied",
-    "candidateHardwareResult": "not tested"
+    "candidateHardwareResult": "The user reports that the supplied build quits unexpectedly. Physical mode switching is not confirmed.",
+    "candidateCrash": {
+      "date": "2026-11-11",
+      "evidence": "Photograph of the generic macOS AlphaSync quit-unexpectedly dialog",
+      "reportStatus": "full crash report needed",
+      "exceptionType": "not supplied",
+      "terminationReason": "not supplied",
+      "crashedThread": "not supplied",
+      "timing": "not supplied"
+    }
   },
   "hosts": [
     {

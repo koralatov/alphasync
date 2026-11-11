@@ -48,3 +48,9 @@ Version 2.0.5 remains unpublished. Keep the 1.5.1 and 2.0.4 public releases and 
 On 11 November 2026, [build run 43005406688](https://github.com/koralatov/alphasync/actions/runs/43005406688) passed for exact source `56e1db9936a115bf09494d3e0d51bd2d504ecc8f`. Intel with Xcode 26.6 and Apple Silicon with Xcode 16.4 each passed 115 Swift regressions, including the six new mode-switch checks, all 55 validation fixtures, both app and helper builds, and native interface checks. The canonical packages passed native Apple Silicon verification, including both app-version commands, signatures, architectures, hardened runtime, matching symbols, and Help. The independently downloaded twelve asset hashes matched the native verification manifest; both eighteen-page Help books and eighty-three links matched the tested source and preserved the original licence and index. Publication was skipped. Physical mode switching on Mike’s Neo remains unverified.
 
 The [permanent candidate record](../releases/verification/2.0.5-155/verification.json) retains the source, results, hashes, original compiler correction, and limits. The test build is a candidate for physical verification, not a published release.
+
+## Follow-up: test build crash reported
+
+On 11 November 2026, the user reported that the supplied 2.0.5, build 155 quits unexpectedly. The photograph shows the generic macOS crash dialog. It does not include an exception type, termination reason, crashed thread, macOS version, or whether the crash occurs before or after connection. The connection correction is not confirmed.
+
+Keep the exact tested source and matching build 155 crash symbols for diagnosis. Obtain the full report through Show Details and establish whether the Neo was attached when the app quit. Do not infer the failing call from the dialog or issue another speculative USB correction. A changed test app must use a fresh build number; no public release is authorised.

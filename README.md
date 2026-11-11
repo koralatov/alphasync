@@ -4,7 +4,7 @@ AlphaSync copies text files between your Mac and an AlphaSmart Neo. It can also 
 
 ## Known connection issue
 
-A physical Neo can remain in keyboard mode with 2.0.4. This has been reported on an M2 MacBook Air where 1.5.1 works. An unpublished 2.0.5 test build has passed its [build and package checks](https://github.com/koralatov/alphasync/actions/runs/43005406688); it still needs hardware verification. See the [connection investigation](docs/neo-keyboard-mode.md).
+A physical Neo can remain in keyboard mode with 2.0.4. This has been reported on an M2 MacBook Air where 1.5.1 works. The unpublished 2.0.5 test build passed its [build and package checks](https://github.com/koralatov/alphasync/actions/runs/43005406688), but has now been reported quitting unexpectedly. Its connection correction is not confirmed; diagnosis needs the full crash report. See the [connection investigation](docs/neo-keyboard-mode.md).
 
 ## Version 2.0.4
 
