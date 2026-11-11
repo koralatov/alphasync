@@ -6,6 +6,7 @@ These files are committed to the repository so the essential release evidence su
 
 After a release completes, download its successful publication record and both host logs. Verify the artifact digests, public package hashes, release tag, and protected references. Copy the publication record here, add a compact `verification.json` based on the completed jobs, and commit the records with `[skip ci]`. Record unverified hardware checks separately from passed simulations and builds. Do not rebuild an already verified app to add this documentation.
 
+- [2.0.5, build 155](2.0.5-155/verification.json): unpublished connection-correction candidate; both hosts, 115 Swift tests, 55 fixtures, native interfaces, and exact package checks passed. Physical Neo verification remains outstanding.
 - [2.0.4, build 154](2.0.4-154/verification.json): current release, with the completed Help review, both host builds, native download verification, and the subsequent requested retirement of 2.0.3. Only 1.5.1 and 2.0.4 remain published.
 - [2.0.3, build 153](2.0.3-153/verification.json): retired modern release, with its original verification and the retirement of both 2.0.2 listings preserved. Its own retirement is recorded under 2.0.4.
 - [2.0.2, build 152](2.0.2-152/verification.json): retired maintenance reissue and verified retirement of the build 151 listing.

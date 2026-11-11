@@ -42,3 +42,9 @@ The first native compile, run `43005148138` for source `9b9dd5942ce50a1033bf389f
 Before publication, test the new build on the reported M2 Air with only one AlphaSync edition running. Record the macOS version and the app’s exact message. Confirm that the Neo leaves keyboard mode, files appear, reading and Save to Mac work, and unplugging and reconnecting work. Test writes, read-back verification, and recovery only with disposable Neo files. Also test Intel, a Neo already in transfer mode, multiple Neos, denial of accessory access, and another app holding the device.
 
 Version 2.0.5 remains unpublished. Keep the 1.5.1 and 2.0.4 public releases and every source tag unchanged until a separate release request.
+
+## Hosted build result
+
+On 11 November 2026, [build run 43005406688](https://github.com/koralatov/alphasync/actions/runs/43005406688) passed for exact source `56e1db9936a115bf09494d3e0d51bd2d504ecc8f`. Intel with Xcode 26.6 and Apple Silicon with Xcode 16.4 each passed 115 Swift regressions, including the six new mode-switch checks, all 55 validation fixtures, both app and helper builds, and native interface checks. The canonical packages passed native Apple Silicon verification, including both app-version commands, signatures, architectures, hardened runtime, matching symbols, and Help. The independently downloaded twelve asset hashes matched the native verification manifest; both eighteen-page Help books and eighty-three links matched the tested source and preserved the original licence and index. Publication was skipped. Physical mode switching on Mike’s Neo remains unverified.
+
+The [permanent candidate record](../releases/verification/2.0.5-155/verification.json) retains the source, results, hashes, original compiler correction, and limits. The test build is a candidate for physical verification, not a published release.
