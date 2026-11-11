@@ -1,0 +1,50 @@
+{
+  "AlphaSync-2.0.5-156-macOS-13-universal.zip": {
+    "size": 3371544,
+    "sha256": "94b21177f6051a1f8d9906491e03ccce2381ee11ca208e3d1dcd3ed3ef1a3db6"
+  },
+  "AlphaSync-2.0.5-156-macOS-13-universal.zip.sha256": {
+    "size": 109,
+    "sha256": "2cb423b919985c86b3b19ab24b047743c9e6eea8db35794192f9de4659ce00e0"
+  },
+  "AlphaSync-2.0.5-156-macOS-13-universal.zip.build-information.txt": {
+    "size": 530,
+    "sha256": "9df8c2c7ef32d85880b3bc29e9eb117d511f7af420361eb2bc5bfa7d0b40ded1"
+  },
+  "AlphaSync-2.0.5-156-macOS-13-universal-symbols.zip": {
+    "size": 9560695,
+    "sha256": "2edd2b48b8b1e749415a8eeea12a3bb29a1b4d0e5ddaf1a6e21b8afe7073cb16"
+  },
+  "AlphaSync-2.0.5-156-macOS-13-universal-symbols.zip.sha256": {
+    "size": 117,
+    "sha256": "05a74db11031d7711fa172432b8f7535d9f0c440ded8817291ed86020d366c0d"
+  },
+  "AlphaSync-2.0.5-156-macOS-13-universal-symbols.zip.build-information.txt": {
+    "size": 875,
+    "sha256": "4801b018cc537a5013b124b55fabc3065965fd3c6c7c0e4505311cab62a9b0bf"
+  },
+  "AlphaSync-2.0.5-156-macOS-13-apple-silicon.zip": {
+    "size": 2873095,
+    "sha256": "43ee355febbc0e8e527a2e5e3b4b744a1458eeac5ca3c515f4a02daaa5481518"
+  },
+  "AlphaSync-2.0.5-156-macOS-13-apple-silicon.zip.sha256": {
+    "size": 113,
+    "sha256": "a278ab2a1a2dcd40729b9fffe5e99be04811ed481aa67706890c71f75b91eca8"
+  },
+  "AlphaSync-2.0.5-156-macOS-13-apple-silicon.zip.build-information.txt": {
+    "size": 531,
+    "sha256": "515ad2ca9d52fdc8aab903be9610e7effa0d7338c492823ef973d9670de61662"
+  },
+  "AlphaSync-2.0.5-156-macOS-13-apple-silicon-symbols.zip": {
+    "size": 4743337,
+    "sha256": "a177fe5a9e9ab8d6d4b09bc01432f4555a396cc89b9dddc6b3ddd2f846245000"
+  },
+  "AlphaSync-2.0.5-156-macOS-13-apple-silicon-symbols.zip.sha256": {
+    "size": 121,
+    "sha256": "b21d9ab02a8f242ba95a97659856c788a0f4fdbe0149728ed18d76c4976d621f"
+  },
+  "AlphaSync-2.0.5-156-macOS-13-apple-silicon-symbols.zip.build-information.txt": {
+    "size": 557,
+    "sha256": "0fdd679637d4af747fcf4d3c7daf9e85d0be7b38909cdd2dcd01632ded3b7fa0"
+  }
+}

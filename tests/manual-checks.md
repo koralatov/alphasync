@@ -110,3 +110,7 @@ Use known-good independent backups and disposable Neo files for writing checks. 
 - Contact Us must open an unsent message to mike@koralatov.com. Issue and contact forms may include only version, build, edition, system version, and process architecture. Leave reports and messages unsubmitted. Check the Copy Link fallback with an unavailable handler.
 
 Use the final 2.0.4 ZIP for a clean-install check on another Mac. Physical Neo, real Login Items approval, and macOS 13 checks remain unverified until results are recorded here. The public release notes must retain that limit.
+
+## Build 156 hosted checks
+
+Both hosts passed 123 Swift regressions, including eight new buffer tests, all 55 fixtures, both app and helper builds, and native interface checks in [run 43020148543](https://github.com/koralatov/alphasync/actions/runs/43020148543). Local checks of all twelve downloaded assets, both eighteen-page Help books, and their eighty-three links passed. The final native download check did not run: neither attempt received a Mac runner. Keep that gate and the physical M2 Air test on macOS 14.7.1 open. See the [permanent record](../releases/verification/2.0.5-156/verification.json).
