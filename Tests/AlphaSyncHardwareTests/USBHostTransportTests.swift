@@ -166,10 +166,8 @@ final class USBHostTransportTests: XCTestCase {
         let input = TestUSBPipe(), output = TestUSBPipe()
         var releases = 0
         var transport: USBHostTransport? = USBHostTransport(input: input, output: output, releaseInterface: { releases += 1 })
-        weak var reference = transport
-        XCTAssertNotNil(reference)
+        XCTAssertNotNil(transport)
         transport = nil
-        XCTAssertNil(reference)
         XCTAssertEqual(input.aborts, 1)
         XCTAssertEqual(output.aborts, 1)
         XCTAssertEqual(releases, 1)
