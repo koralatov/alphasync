@@ -42,6 +42,14 @@ Keep 1.5.1 and 2.0.4 public, preserve all twelve tags and the frozen legacy bran
 
 The first audited source, `97d26d838ed6ce02eb7fc9d4a3665eadda54d6fe`, passed all 155 Swift tests, 55 fixtures, both native host builds, exact-package execution, and independent hashes in [run 43646830824](https://github.com/koralatov/alphasync/actions/runs/43646830824). The newer compiler reported one repeated weak-variable warning in the lifetime regression. Remove that redundant reference: the abort and release counters already prove deinitialisation occurred. Repeat the full milestone for the final source before handover; the app’s USB implementation is unchanged by this test correction.
 
+## Final milestone result
+
+On 14 November 2026, [run 43647897685](https://github.com/koralatov/alphasync/actions/runs/43647897685) passed for final source `74be91b1e4d65fcb43bd270cec2fb2ef12c81cc6`. Intel with Xcode 26.6 and Apple Silicon with Xcode 16.4 each passed all 155 Swift regressions, all 55 fixtures, both app and helper builds, and native interface checks without warnings. The separate Apple Silicon job verified and ran both exact canonical packages. Publication was skipped.
+
+All four downloaded artifact digests matched GitHub’s metadata. Independent checks of all twelve assets matched the native package-verification manifest. Both Help books passed eighteen-page and eighty-three-link checks, retained the original licence and nonempty indexes, and matched all twenty authored files from the tested source. The [permanent record](../releases/verification/2.0.5-158/verification.json) includes these results, exact asset hashes, and the first successful audit run. The separate private Apple Silicon ZIP is ready and preserves earlier candidates.
+
+Only 1.5.1 and 2.0.4 remain public, with their notes and all eighteen asset records unchanged. All twelve tags and frozen legacy source are unchanged; no 2.0.5 tag was created. Physical operation remains unconfirmed.
+
 ## Physical checks still required
 
 Use the same Neo, cable, adapter, and M2 Air that work with 1.5.1. Quit each app before opening the other. Preserve files with a verified backup before trying a write.

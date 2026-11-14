@@ -33,3 +33,7 @@ On 14 November 2026, [run 43642608956](https://github.com/koralatov/alphasync/ac
 The four downloaded artifact digests matched GitHub’s records. Independent verification of all twelve assets matched the native Apple Silicon manifest. Both Help books passed eighteen-page and eighty-three-link checks, retained their original licence and nonempty indexes, and matched all twenty authored files from the tested source. The [permanent record](../releases/verification/2.0.5-157/verification.json) retains this evidence. A separate Apple Silicon ZIP is prepared for private handover, preserving builds 155 and 156.
 
 Only 1.5.1 and 2.0.4 remain public. Their notes and asset metadata, all twelve tags, and the frozen legacy branch are unchanged. The next physical check is to open build 157, confirm that version in About, reconnect the Neo, and open an existing file. Do not mark actual Neo operation as passed until that result is reported.
+
+## Later USB audit
+
+Build 158 retains this correction and adds the [full USB comparison with 1.5.1](usb-parity-audit.md). Its final source passed 155 Swift tests, 55 fixtures, both host builds, native interfaces, exact-package execution on Apple Silicon, and independent asset and Help checks without warnings. Use the latest private build 158 for the physical checks above; build 157 and its evidence remain preserved. The [build 158 record](../releases/verification/2.0.5-158/verification.json) retains the result and hardware limits. No public release was published.
