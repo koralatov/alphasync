@@ -25,3 +25,11 @@ Eight new regressions use request layouts and responses independent of the produ
 Tests were deferred while editing. This is the full non-publishing compile and build milestone for version 2.0.5, build 157. Require both host jobs, all 131 Swift tests and 55 fixtures, both app editions and helpers, native interfaces, Help, package hashes, signatures, architectures, matching symbols, and native execution of the exact downloaded packages. Preserve the existing Mac runner gates. Record infrastructure failures separately if a job cannot receive a runner. Do not publish, replace earlier test copies, move tags, or change the frozen legacy source.
 
 Physical confirmation still requires the M2 Air to show the file list and open a real Neo file. The manager recognition and a passing fixture alone do not establish that result.
+
+## Verified private test build
+
+On 14 November 2026, [run 43642608956](https://github.com/koralatov/alphasync/actions/runs/43642608956) passed for exact source `12e9e29d8e1302265dfb5d8e1d03452df35ed44d`. Intel with Xcode 26.6 and Apple Silicon with Xcode 16.4 each passed all 131 Swift regressions, including the eight snapshot wire cases, all 55 fixtures, both app and helper builds, and native interface checks, without compiler warnings. The separate download-verification job ran both canonical app editions natively on Apple Silicon and checked architectures, signatures, hardened runtime, metadata, and matching symbols. Publication was skipped.
+
+The four downloaded artifact digests matched GitHub’s records. Independent verification of all twelve assets matched the native Apple Silicon manifest. Both Help books passed eighteen-page and eighty-three-link checks, retained their original licence and nonempty indexes, and matched all twenty authored files from the tested source. The [permanent record](../releases/verification/2.0.5-157/verification.json) retains this evidence. A separate Apple Silicon ZIP is prepared for private handover, preserving builds 155 and 156.
+
+Only 1.5.1 and 2.0.4 remain public. Their notes and asset metadata, all twelve tags, and the frozen legacy branch are unchanged. The next physical check is to open build 157, confirm that version in About, reconnect the Neo, and open an existing file. Do not mark actual Neo operation as passed until that result is reported.
