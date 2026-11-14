@@ -114,3 +114,7 @@ Use the final 2.0.4 ZIP for a clean-install check on another Mac. Physical Neo, 
 ## Build 156 hosted checks
 
 Both hosts passed 123 Swift regressions, including eight new buffer tests, all 55 fixtures, both app and helper builds, and native interface checks in [run 43020148543](https://github.com/koralatov/alphasync/actions/runs/43020148543). Local checks of all twelve downloaded assets, both eighteen-page Help books, and their eighty-three links passed. The final native download check did not run: neither attempt received a Mac runner. Keep that gate and the physical M2 Air test on macOS 14.7.1 open. See the [permanent record](../releases/verification/2.0.5-156/verification.json).
+
+## Build 157 connection check
+
+The latest report says the Neo recognises AlphaSmart Manager but AlphaSync shows reply 0x90. Build 157 corrects the System applet file-count query and must pass a fresh full build milestone. On the M2 Air, confirm that the file list appears and an existing AlphaWord file opens with its expected text. Check empty read-only applets with Show All Applets, both the dictionary and AlphaWord, Try Again, and unplugging and reconnecting. Record the actual app build and macOS version. Do not mark reading, writing, or backup as passed from manager recognition alone. See the [wire investigation](../docs/neo-parameter-reply.md).

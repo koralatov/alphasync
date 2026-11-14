@@ -66,7 +66,7 @@ public final class NeoProtocol {
         try transport.write(message.data, timeout: timeout)
         let reply = try receive()
         guard reply.command == code else {
-            throw NeoError.device("The Neo could not complete the request (reply \(String(format: "0x%02X", reply.command))). Reconnect it and try again.")
+            throw NeoReplyError(request: message, reply: reply)
         }
         return reply
     }
@@ -276,7 +276,21 @@ public final class NeoProtocol {
         let version = try systemVersion(), memory = try availableMemory()
         for position in applets.indices {
             let id = applets[position].id
-            let before = try resourceUsage(applet: id)
+            // The System applet has no file collection and rejects request 0x1b with 0x90.
+            guard id != 0 else { continue }
+            let before: (count: Int, ram: Int)
+            do {
+                before = try resourceUsage(applet: id)
+            } catch let error as NeoReplyError where error.request == 0x1b && error.reply == 0x90 && !applets[position].canWrite {
+                // Only accept a fileless read-only applet after confirming that index 1 is absent.
+                // Keep real files, other errors, and all writable applets subject to strict checks.
+                do {
+                    _ = try attributes(applet: id, index: 1)
+                } catch let missing as NeoReplyError where missing.request == 0x13 && missing.reply == 0x90 {
+                    continue
+                }
+                throw error
+            }
             var files: [NeoFile] = []
             if before.count > 0 {
                 for index in 1...before.count {

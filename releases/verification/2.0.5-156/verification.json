@@ -1,6 +1,6 @@
 {
   "formatVersion": 1,
-  "state": "built-not-published-native-check-blocked",
+  "state": "parameter-reply-reported-not-published",
   "version": "2.0.5",
   "build": "156",
   "releaseTag": null,
@@ -11,7 +11,7 @@
     "url": "https://github.com/koralatov/alphasync/actions/runs/43020148543",
     "attempt": 3,
     "event": "push",
-    "conclusion": null,
+    "conclusion": "failure",
     "publication": "skipped",
     "nativeQueueAttempts": [
       {
@@ -36,14 +36,15 @@
         "attempt": 3,
         "jobID": 130550183136,
         "startedAt": "2026-11-11T13:24:13Z",
-        "status": "queued",
-        "conclusion": null,
+        "status": "completed",
+        "conclusion": "cancelled",
         "runnerAllocated": false,
-        "executedSteps": 0
+        "executedSteps": 0,
+        "endedAt": "2026-11-11T13:39:14Z"
       }
     ],
     "scope": "Both app-build jobs passed. Only the unstarted native download-verification job was retried.",
-    "status": "queued"
+    "status": "completed"
   },
   "hardwareReport": {
     "date": "2026-11-11",
@@ -52,7 +53,7 @@
     "affectedVersion": "2.0.4",
     "comparison": "1.5.1 works on the same Mac",
     "macOSVersion": "macOS 14.7.1 (23H222)",
-    "candidateHardwareResult": "Build 156 has not yet been physically tested. The supplied build 155 crash identifies the buffer correction; mode switching and file transfers remain unconfirmed.",
+    "candidateHardwareResult": "The user reports manager recognition on the Neo, but AlphaSync cannot open it and shows reply 0x90. The screenshot does not show the app build; file enumeration and transfers remain unconfirmed.",
     "previousCandidateCrash": {
       "date": "2026-11-11",
       "evidence": "User-supplied full crash report; app and dSYM UUIDs match the delivered build 155",
@@ -71,6 +72,13 @@
       "scope": "Sanitised technical summary only; device identifiers, incident identifiers, and private paths are omitted.",
       "version": "2.0.5",
       "build": "155"
+    },
+    "latestConnectionReply": {
+      "date": "2026-11-11",
+      "neoDisplayReported": "Recognises AlphaSmart Manager",
+      "applicationReply": "0x90",
+      "versionVisibleInScreenshot": false,
+      "scope": "Sanitised observation only; the user screenshot is not copied to the public repository."
     }
   },
   "hosts": [
@@ -143,7 +151,7 @@
         "universal",
         "apple-silicon"
       ],
-      "result": "not run: the first two attempts received no runner; the third retry is queued"
+      "result": "not run: all three native-job attempts received no runner and executed no steps"
     },
     "publicReleasePublication": "not requested; skipped",
     "protectedPublicReleases": "Only v1.5.1 and v2.0.4 remain public; their notes, IDs, source targets, and every asset ID, size, and digest are unchanged.",
@@ -253,7 +261,7 @@
     "macOS 13 runtime",
     "Native Help Viewer, indexed search, cached-book upgrades, keyboard focus, and VoiceOver"
   ],
-  "checkedAt": "2026-11-11T13:34:21.743396+00:00",
+  "checkedAt": "2026-11-11T15:10:56.956247+00:00",
   "files": {
     "assets.json": {
       "size": 2043,
