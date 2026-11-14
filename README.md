@@ -6,6 +6,8 @@ AlphaSync copies text files between your Mac and an AlphaSmart Neo. It can also 
 
 A physical Neo can remain in keyboard mode with 2.0.4. On the reported M2 MacBook Air, 1.5.1 works. The unpublished 2.0.5 candidates restored the mode switch and corrected a USB buffer crash. The latest report says that the Neo now recognises AlphaSmart Manager but AlphaSync fails while reading its file list, with reply 0x90. Build 157 corrects a file-count query sent to the System applet. Both hosts passed 131 Swift tests, all 55 validation fixtures, both app builds, and native interfaces, and both exact downloads passed native Apple Silicon verification. The [test-build record](releases/verification/2.0.5-157/verification.json) preserves the results. A private test copy is ready; physical file-list and read confirmation remain required. See the [parameter-reply investigation](docs/neo-parameter-reply.md) and [earlier USB investigation](docs/neo-keyboard-mode.md).
 
+Build 158 is being prepared after a [full USB comparison with 1.5.1](docs/usb-parity-audit.md). It restores ten connection probes, rejects incomplete USB packets without joining later replies, and completes pipe cleanup before releasing an interface. The full non-publishing build milestone and physical Neo checks remain required. It retains build 157’s System applet correction.
+
 ## Version 2.0.4
 
 Version 2.0.4 improves the Swift rewrite first released as 2.0 and requires **macOS 13 or later**. It includes all changes prepared under the unpublished 2.0.1 development version.

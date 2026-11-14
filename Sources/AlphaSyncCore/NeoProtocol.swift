@@ -20,20 +20,27 @@ public final class NeoProtocol {
 
     private func handshake() throws {
         var last: any Error = NeoError.device("The Neo did not enter file-transfer mode. Reconnect it and try again.")
-        for attempt in 0..<3 {
+        for attempt in 0..<10 {
+            let version: Data
             do {
-                try transport.write(Data([1]), timeout: 0.5)
-                let version = try transport.read(maximum: 8, timeout: 0.5)
-                guard version.count == 2, try BinaryReader(version).integer(at: 0, width: 2) >= 0x0230 else {
+                try transport.write(Data([1]), timeout: 0.1)
+                version = try transport.read(maximum: 8, timeout: 0.1)
+                guard version.count == 2 else {
                     throw NeoError.device("The Neo did not enter file-transfer mode. Reconnect it and try again.")
                 }
-                return
-            } catch { last = error }
-            if attempt < 2 {
-                try? transport.write(Self.reset, timeout: 0.5)
-                // Only the serial device executor waits; the main actor remains responsive.
-                Thread.sleep(forTimeInterval: 0.1)
+            } catch {
+                last = error
+                if attempt < 9 {
+                    try? transport.write(Self.reset, timeout: 0.5)
+                    // Only the serial device executor waits; the main actor remains responsive.
+                    Thread.sleep(forTimeInterval: 0.1)
+                }
+                continue
             }
+            guard try BinaryReader(version).integer(at: 0, width: 2) >= 0x0230 else {
+                throw NeoError.device("This Neo’s file-transfer protocol is too old for AlphaSync.")
+            }
+            return
         }
         throw last
     }
@@ -54,8 +61,9 @@ public final class NeoProtocol {
         let deadline = try TransferDeadline(timeout: timeout)
         while result.count < count {
             let remaining = try deadline.remaining()
-            let block = try transport.read(maximum: min(8, count - result.count), timeout: remaining)
-            guard !block.isEmpty, block.count <= count - result.count else { throw NeoError.invalidData("A reply is incomplete.") }
+            let requested = min(8, count - result.count)
+            let block = try transport.read(maximum: requested, timeout: remaining)
+            guard block.count == requested else { throw NeoError.invalidData("A reply is incomplete.") }
             result.append(block)
         }
         return result

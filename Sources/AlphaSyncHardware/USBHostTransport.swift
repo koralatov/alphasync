@@ -3,14 +3,34 @@ import IOKit
 import IOUSBHost
 import AlphaSyncCore
 
+/// A single endpoint request. The native adapter and fault-injection tests use the same packet path.
+protocol USBPipeIO: AnyObject {
+    func transfer(_ buffer: NSMutableData, timeout: TimeInterval) throws -> Int
+    func clearStall() throws
+    func abort() throws
+}
+
+private final class NativeUSBPipe: USBPipeIO {
+    private let pipe: IOUSBHostPipe
+    init(_ pipe: IOUSBHostPipe) { self.pipe = pipe }
+
+    func transfer(_ buffer: NSMutableData, timeout: TimeInterval) throws -> Int {
+        var count = 0
+        try pipe.__sendIORequest(with: buffer, bytesTransferred: &count, completionTimeout: timeout)
+        return count
+    }
+    func clearStall() throws { try pipe.clearStall() }
+    func abort() throws { try pipe.__abort(with: .synchronous) }
+}
+
 /// All access, including close, belongs to DeviceService’s serial executor.
 final class USBHostTransport: NeoTransport {
-    private let interface: IOUSBHostInterface
-    private let input: IOUSBHostPipe
-    private let output: IOUSBHostPipe
+    private let input: any USBPipeIO
+    private let output: any USBPipeIO
+    private let releaseInterface: () -> Void
     private var closed = false
 
-    init(service: io_service_t) throws {
+    convenience init(service: io_service_t) throws {
         // NS_REFINED_FOR_SWIFT imports these public SDK selectors with a double underscore.
         let host = try IOUSBHostInterface(__ioService: service, options: [], queue: nil, interestHandler: nil)
         do {
@@ -33,13 +53,17 @@ final class USBHostTransport: NeoTransport {
             guard let inputAddress, let outputAddress else {
                 throw NeoError.device("The Neo’s file-transfer interface has no bulk input and output pipes.")
             }
-            input = try host.copyPipe(withAddress: inputAddress)
-            output = try host.copyPipe(withAddress: outputAddress)
-            interface = host
+            let input = try NativeUSBPipe(host.copyPipe(withAddress: inputAddress))
+            let output = try NativeUSBPipe(host.copyPipe(withAddress: outputAddress))
+            self.init(input: input, output: output, releaseInterface: { host.destroy() })
         } catch {
             host.destroy()
             throw error
         }
+    }
+
+    init(input: any USBPipeIO, output: any USBPipeIO, releaseInterface: @escaping () -> Void) {
+        self.input = input; self.output = output; self.releaseInterface = releaseInterface
     }
 
     func read(maximum: Int, timeout: TimeInterval) throws -> Data {
@@ -47,9 +71,7 @@ final class USBHostTransport: NeoTransport {
         guard (1...8).contains(maximum), timeout.isFinite, timeout > 0 else { throw NeoError.invalidData("Invalid USB read bounds.") }
         do {
             return try USBTransferBuffers.read(maximum: maximum) { buffer in
-                var count = 0
-                try input.__sendIORequest(with: buffer, bytesTransferred: &count, completionTimeout: timeout)
-                return count
+                try input.transfer(buffer, timeout: timeout)
             }
         } catch {
             try? input.clearStall()
@@ -68,9 +90,7 @@ final class USBHostTransport: NeoTransport {
             let block = Data(bytes[offset..<(offset + length)])
             do {
                 try USBTransferBuffers.write(block) { buffer in
-                    var count = 0
-                    try output.__sendIORequest(with: buffer, bytesTransferred: &count, completionTimeout: remaining)
-                    return count
+                    try output.transfer(buffer, timeout: remaining)
                 }
             } catch {
                 try? output.clearStall()
@@ -83,9 +103,9 @@ final class USBHostTransport: NeoTransport {
     func close() {
         guard !closed else { return }
         closed = true
-        try? input.__abort(with: .synchronous)
-        try? output.__abort(with: .synchronous)
-        interface.destroy()
+        try? input.abort()
+        try? output.abort()
+        releaseInterface()
     }
-    deinit { if !closed { interface.destroy() } }
+    deinit { close() }
 }

@@ -8,6 +8,7 @@ private final class SimulatedNeo: NeoTransport {
     var commands: [UInt8] = []
     var writes = 0
     var helloFailures = 0, helloAttempts = 0, resets = 0
+    var protocolVersion: [UInt8] = [2, 0x30]
     var corruptVerification = false
     var oversizedBlock = false
     var readBlocks = 0
@@ -42,7 +43,7 @@ private final class SimulatedNeo: NeoTransport {
         if data == Data([1]) {
             helloAttempts += 1
             if helloFailures > 0 { helloFailures -= 1; incoming.append(0); return }
-            incoming.append(contentsOf: [2, 0x30]); return
+            incoming.append(contentsOf: protocolVersion); return
         }
         if data.count == 8, data.first == 0x3f {
             if data[data.startIndex + 1] == 0x53 { incoming.append(Data("Switched".utf8)) }
@@ -104,8 +105,25 @@ final class ProtocolTests: XCTestCase {
     func testHandshakeRetriesAreBoundedAndLeaveAReset() {
         let device = SimulatedNeo(); device.helloFailures = 10
         XCTAssertThrowsError(try NeoProtocol(transport: device).availableMemory())
-        XCTAssertEqual(device.helloAttempts, 3)
-        XCTAssertGreaterThanOrEqual(device.resets, 3)
+        XCTAssertEqual(device.helloAttempts, 10)
+        XCTAssertEqual(device.resets, 10)
+        XCTAssertTrue(device.commands.isEmpty)
+    }
+
+    func testHandshakeStillAcceptsTheTenthLegacyProbe() throws {
+        let device = SimulatedNeo(); device.helloFailures = 9
+        _ = try NeoProtocol(transport: device).availableMemory()
+        XCTAssertEqual(device.helloAttempts, 10)
+        XCTAssertEqual(device.commands, [0x1a])
+    }
+
+    func testUnsupportedProtocolIsRejectedWithoutRetryingOrSendingCommands() {
+        let device = SimulatedNeo(); device.protocolVersion = [2, 0x2f]
+        XCTAssertThrowsError(try NeoProtocol(transport: device).availableMemory()) {
+            XCTAssertTrue($0.localizedDescription.contains("too old"))
+        }
+        XCTAssertEqual(device.helloAttempts, 1)
+        XCTAssertEqual(device.resets, 1)
         XCTAssertTrue(device.commands.isEmpty)
     }
 
