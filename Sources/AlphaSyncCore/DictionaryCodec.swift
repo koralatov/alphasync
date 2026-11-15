@@ -31,35 +31,43 @@ public enum DictionaryCodec {
     public static func convert(_ text: String) throws -> DictionaryConversion {
         guard text.utf8.count <= 4 * 1024 * 1024 else { throw NeoError.tooLarge(required: text.utf8.count, maximum: maximum) }
         var words = Set<[UInt8]>(), current: [UInt8] = []
+        current.reserveCapacity(32)
+        var currentLength = 0
         var omitted = 0, examples: [String] = []
         func isSeparator(_ byte: UInt8) -> Bool {
             byte == 32 || (9...13).contains(byte) || (33...47).contains(byte) ||
             (58...64).contains(byte) || (91...96).contains(byte) || (123...126).contains(byte)
         }
         func finish() {
-            if (2...20).contains(current.count) { words.insert(current) }
-            else if !current.isEmpty {
+            if (2...20).contains(currentLength) { words.insert(current) }
+            else if currentLength > 0 {
                 omitted += 1
                 if examples.count < 3 {
-                    var example = String(String.UnicodeScalarView(current.prefix(32).map(NeoCharacters.decode)))
-                    if current.count > 32 { example += "…" }
+                    var example = String(String.UnicodeScalarView(current.map(NeoCharacters.decode)))
+                    if currentLength > 32 { example += "…" }
                     examples.append(example)
                 }
             }
             current.removeAll(keepingCapacity: true)
+            currentLength = 0
         }
         for scalar in text.unicodeScalars {
             if scalar.value == 0xfeff { continue }
             let byte: UInt8 = [9, 10, 13].contains(scalar.value) ? 32 : try NeoCharacters.encode(scalar)
-            if isSeparator(byte) { finish() } else { current.append(byte) }
+            if isSeparator(byte) { finish() }
+            else {
+                currentLength += 1
+                if current.count < 32 { current.append(byte) }
+            }
         }
         finish()
         var header = Data(), body = Data()
+        let byLength = Dictionary(grouping: words, by: \.count)
         for length in 2...20 {
             let offset = 38 + body.count
             guard offset <= 65535 else { throw NeoError.tooLarge(required: offset, maximum: maximum) }
             header.appendBigEndian(UInt32(offset), width: 2)
-            for word in words.filter({ $0.count == length }).sorted(by: { $0.lexicographicallyPrecedes($1) }) {
+            for word in (byLength[length] ?? []).sorted(by: { $0.lexicographicallyPrecedes($1) }) {
                 guard body.count <= maximum - 38 - word.count else {
                     throw NeoError.tooLarge(required: 38 + body.count + word.count, maximum: maximum)
                 }
