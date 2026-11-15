@@ -8,9 +8,9 @@ The user corrected the proposed 2.0.6 version to the next 2.0.5 build. Prepare *
 
 The file manager wrapped NavigationSplitView in a vertical stack with warning and status rows, then clipped the browser. That confined drawing without preserving the toolbar safe area used by the native sidebar and table. Previous interface checks used ordinary titled windows, so they did not establish first-row visibility with the app’s full-size content and unified toolbar arrangement.
 
-Keep the navigation container in charge of layout. Reserve warning and status bars with public SwiftUI safe-area insets so both native scroll views receive them. Remove the clipping wrapper. Do not add fixed toolbar heights, negative padding, window repositioning, or private view traversal to the app.
+Keep the navigation container in charge of layout at the window root. Reserve warning and status rows inside its file column, around the native table. The sidebar retains its own native toolbar safe area. Remove the outer clipping wrapper. Do not add fixed toolbar heights, negative padding, window repositioning, or private view traversal to the app.
 
-Apple’s [safeAreaInset documentation](https://developer.apple.com/documentation/swiftui/view/safeareainset(edge:alignment:spacing:content:)) describes reserving adjacent content space and updating the safe area. AppKit’s [contentLayoutRect](https://developer.apple.com/documentation/appkit/nswindow/contentlayoutrect) gives the area not obscured by the title bar and toolbar. Measure those live coordinates in the native checks instead of assuming the same toolbar height on every macOS version.
+AppKit’s [contentLayoutRect](https://developer.apple.com/documentation/appkit/nswindow/contentlayoutrect) gives the area not obscured by the title bar and toolbar. Measure those live coordinates in the native checks instead of assuming the same toolbar height on every macOS version. Keep normal SwiftUI layout inside each navigation column so the file table cannot draw beneath its neighbouring bars.
 
 The related review found that the toolbar and File menu enabled Clear for files from different writable applets, although the operation and context menu require one applet at a time. Enforce that rule in shared command eligibility. Keep a valid selection from one writable applet enabled, with the existing confirmation and recovery protections. The built-in Help already explains this rule.
 
@@ -25,6 +25,8 @@ Add twenty native browser layout observations across Light and Dark Mode, using 
 Inspect captured images as well as geometry. Independently verify artifact digests, all twelve assets, both Help books, and authored files against the tested source. Keep a separate private Apple Silicon ZIP and preserve earlier candidates. Record actual results after execution; hosted checks cannot establish every real Neo operation.
 
 The initial milestone source `8bc3fbd21135c1b40a4942465d465fe041d0ec4a` hit the older compiler’s type-checking limit in the expanded sample-file expression before tests ran. Replace that expression with typed intermediate values and a simple loop, without changing the app correction. Require a fresh full milestone for the corrected source and retain the failed run as diagnostic history.
+
+The corrected fixture source `52cee3f46131024d243525ff8dfe9936adef5211` passed 157 Swift tests, all 55 fixtures, and both app builds on the older host. Its new full-toolbar checks confirmed first-row visibility but caught the connection warning overlapping the headings and File 1 on macOS 15. A root-level safe-area inset did not reserve that warning’s space in the native split view. Keep the root navigation container and move both bars into the file column instead. Retain the failing warning assertion, capture failure images and partial geometry, and repeat the full milestone before handover.
 
 ## Physical checks and 2.1
 

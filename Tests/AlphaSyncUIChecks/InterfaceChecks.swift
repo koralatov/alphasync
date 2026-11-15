@@ -182,6 +182,12 @@ struct InterfaceChecks {
     static func main() {
         do { try run() }
         catch {
+            let output = URL(fileURLWithPath: CommandLine.arguments.dropFirst().first ?? "build/interface-checks", isDirectory: true)
+            for window in NSApplication.shared.windows where window.isVisible {
+                try? capture(window, "failure-\(window.windowNumber)", to: output)
+            }
+            try? JSONSerialization.data(withJSONObject: browserLayouts, options: [.prettyPrinted, .sortedKeys])
+                .write(to: output.appendingPathComponent("browser-layout.json"), options: .atomic)
             FileHandle.standardError.write(Data("Interface check failed: \(error)\n".utf8))
             exit(EXIT_FAILURE)
         }
@@ -226,7 +232,8 @@ struct InterfaceChecks {
             let withWarning = try capture(connected, "connection-warning-" + label, to: output)
             try require(withWarning != withoutWarning, "A connected Neo must visibly show its connection warning")
             let warnedRow = try checkBrowser(in: connected, stage: "connection-warning-" + label)
-            try require(warnedRow.maxY < initialRow.maxY - 12, "A connection warning must reserve space above the first file")
+            try require(warnedRow.maxY < initialRow.maxY - 12,
+                        "A connection warning must reserve space above the first file: before \(initialRow), after \(warnedRow)")
             resize(connected, visibleSize: NSSize(width: 760, height: 460))
             try checkBrowser(in: connected, stage: "minimum-warning-" + label)
             try capture(connected, "files-minimum-" + label, to: output)

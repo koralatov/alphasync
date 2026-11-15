@@ -84,14 +84,7 @@ public struct MainView: View {
         }.padding(24)
     }
     private var fileManager: some View {
-        // Let the navigation container pass toolbar and bar insets to both native scroll views.
-        fileBrowser
-            .safeAreaInset(edge: .top, spacing: 0) {
-                if let issue = store.connectionIssue { connectionWarning(issue) }
-            }
-            .safeAreaInset(edge: .bottom, spacing: 0) { connectionStatus }
-    }
-    private var fileBrowser: some View {
+        // Keep navigation at the root and reserve bars inside its file column.
         NavigationSplitView {
             List(selection: $store.sidebar) {
                 ForEach(store.devices, id: \.connection) { device in
@@ -105,31 +98,38 @@ public struct MainView: View {
                 }
             }.listStyle(.sidebar).navigationSplitViewColumnWidth(min: 180, ideal: 220, max: 300)
         } detail: {
-            Table(store.files, selection: $store.selection) {
-                TableColumn("Name") { file in
-                    Label(file.displayName, systemImage: "doc.text")
-                        .draggable(FileDrag(file: file.id, service: store.service, staging: store.temporaryExports))
-                        .dropDestination(for: URL.self) { urls, _ in
-                            store.importDroppedFiles(urls, replacing: file.id) != nil
-                        }
-                }.width(min: 200, ideal: 360)
-                TableColumn("Size") { file in
-                    Text(FileSize.compact(file.size)).monospacedDigit().frame(maxWidth: .infinity, alignment: .trailing)
-                }.width(min: 90, ideal: 110, max: 160)
+            VStack(spacing: 0) {
+                if let issue = store.connectionIssue { connectionWarning(issue) }
+                fileTable
+                connectionStatus
             }
-            .contextMenu(forSelectionType: NeoFileID.self) { ids in
-                Button("Open Read-only") { openReaders(ids) }.disabled(ids.isEmpty)
-                Button("Save to Mac…") { store.selection = ids; store.beginExport() }.disabled(ids.isEmpty || store.busy)
-                Button("Rename…") { renaming = store.files.first { ids.contains($0.id) } }
-                    .disabled(ids.count != 1 || store.busy || !ids.allSatisfy { store.applet(for: $0)?.canWrite == true })
-                Divider()
-                Button(ids.count == 1 ? "Clear File…" : "Clear Selected Files…", role: .destructive) {
-                    store.selection = ids; Task { await store.requestClear() }
-                }.disabled(store.busy || ids.isEmpty || Set(ids.map(\.applet)).count != 1 || !ids.allSatisfy { store.applet(for: $0)?.canWrite == true })
-            } primaryAction: { ids in openReaders(ids) }
-            .dropDestination(for: URL.self) { urls, _ in
-                store.importDroppedFiles(urls) != nil
-            }
+        }
+    }
+    private var fileTable: some View {
+        Table(store.files, selection: $store.selection) {
+            TableColumn("Name") { file in
+                Label(file.displayName, systemImage: "doc.text")
+                    .draggable(FileDrag(file: file.id, service: store.service, staging: store.temporaryExports))
+                    .dropDestination(for: URL.self) { urls, _ in
+                        store.importDroppedFiles(urls, replacing: file.id) != nil
+                    }
+            }.width(min: 200, ideal: 360)
+            TableColumn("Size") { file in
+                Text(FileSize.compact(file.size)).monospacedDigit().frame(maxWidth: .infinity, alignment: .trailing)
+            }.width(min: 90, ideal: 110, max: 160)
+        }
+        .contextMenu(forSelectionType: NeoFileID.self) { ids in
+            Button("Open Read-only") { openReaders(ids) }.disabled(ids.isEmpty)
+            Button("Save to Mac…") { store.selection = ids; store.beginExport() }.disabled(ids.isEmpty || store.busy)
+            Button("Rename…") { renaming = store.files.first { ids.contains($0.id) } }
+                .disabled(ids.count != 1 || store.busy || !ids.allSatisfy { store.applet(for: $0)?.canWrite == true })
+            Divider()
+            Button(ids.count == 1 ? "Clear File…" : "Clear Selected Files…", role: .destructive) {
+                store.selection = ids; Task { await store.requestClear() }
+            }.disabled(store.busy || ids.isEmpty || Set(ids.map(\.applet)).count != 1 || !ids.allSatisfy { store.applet(for: $0)?.canWrite == true })
+        } primaryAction: { ids in openReaders(ids) }
+        .dropDestination(for: URL.self) { urls, _ in
+            store.importDroppedFiles(urls) != nil
         }
     }
     private func connectionWarning(_ issue: String) -> some View {
