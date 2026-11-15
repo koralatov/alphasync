@@ -8,7 +8,7 @@ The user corrected the proposed 2.0.6 version to the next 2.0.5 build. Prepare *
 
 The file manager wrapped NavigationSplitView in a vertical stack with warning and status rows, then clipped the browser. That confined drawing without preserving the toolbar safe area used by the native sidebar and table. Previous interface checks used ordinary titled windows, so they did not establish first-row visibility with the app’s full-size content and unified toolbar arrangement.
 
-Keep the navigation container in charge of layout at the window root. Reserve warning and status rows inside its file column, around the native table. The sidebar retains its own native toolbar safe area. Remove the outer clipping wrapper. Do not add fixed toolbar heights, negative padding, window repositioning, or private view traversal to the app.
+Keep the navigation container within the window’s measured viewport. Reserve warning and status rows inside its file column, around a table sized to the remaining space. The sidebar retains its native toolbar safe area. Remove the outer clipping wrapper; clip only the table’s own measured viewport. Do not add fixed toolbar heights, negative padding, window repositioning, or private view traversal to the app.
 
 AppKit’s [contentLayoutRect](https://developer.apple.com/documentation/appkit/nswindow/contentlayoutrect) gives the area not obscured by the title bar and toolbar. Measure those live coordinates in the native checks instead of assuming the same toolbar height on every macOS version. Keep normal SwiftUI layout inside each navigation column so the file table cannot draw beneath its neighbouring bars.
 
@@ -27,6 +27,8 @@ Inspect captured images as well as geometry. Independently verify artifact diges
 The initial milestone source `8bc3fbd21135c1b40a4942465d465fe041d0ec4a` hit the older compiler’s type-checking limit in the expanded sample-file expression before tests ran. Replace that expression with typed intermediate values and a simple loop, without changing the app correction. Require a fresh full milestone for the corrected source and retain the failed run as diagnostic history.
 
 The corrected fixture source `52cee3f46131024d243525ff8dfe9936adef5211` passed 157 Swift tests, all 55 fixtures, and both app builds on the older host. Its new full-toolbar checks confirmed first-row visibility but caught the connection warning overlapping the headings and File 1 on macOS 15. A root-level safe-area inset did not reserve that warning’s space in the native split view. Keep the root navigation container and move both bars into the file column instead. Retain the failing warning assertion, capture failure images and partial geometry, and repeat the full milestone before handover.
+
+The file-column source `2bf2aafbead3542df22d59f92c196a803f37ad48` passed all 157 Swift tests and 55 fixtures on Intel. Its native check caught the browser expanding to a 1,024-point intrinsic height after adding a warning, beyond the 560-point unobscured window. Pin the navigation container and native table to their measured GeometryReader viewports so intrinsic ideal sizes cannot displace visible rows. Keep every geometry assertion. Move the existing native checker before the app builds and require its success there, retaining all build, package, and publication gates. This catches layout faults sooner without weakening verification. Explicitly discard the diagnostic capture’s optional result to keep both compilers clean.
 
 ## Physical checks and 2.1
 

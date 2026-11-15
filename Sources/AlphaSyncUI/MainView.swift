@@ -84,7 +84,12 @@ public struct MainView: View {
         }.padding(24)
     }
     private var fileManager: some View {
-        // Keep navigation at the root and reserve bars inside its file column.
+        // Native navigation and tables must use the viewport, not their intrinsic ideal size.
+        GeometryReader { viewport in
+            fileBrowser.frame(width: viewport.size.width, height: viewport.size.height)
+        }
+    }
+    private var fileBrowser: some View {
         NavigationSplitView {
             List(selection: $store.sidebar) {
                 ForEach(store.devices, id: \.connection) { device in
@@ -100,7 +105,9 @@ public struct MainView: View {
         } detail: {
             VStack(spacing: 0) {
                 if let issue = store.connectionIssue { connectionWarning(issue) }
-                fileTable
+                GeometryReader { viewport in
+                    fileTable.frame(width: viewport.size.width, height: viewport.size.height).clipped()
+                }
                 connectionStatus
             }
         }

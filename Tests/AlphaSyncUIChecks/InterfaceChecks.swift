@@ -184,7 +184,7 @@ struct InterfaceChecks {
         catch {
             let output = URL(fileURLWithPath: CommandLine.arguments.dropFirst().first ?? "build/interface-checks", isDirectory: true)
             for window in NSApplication.shared.windows where window.isVisible {
-                try? capture(window, "failure-\(window.windowNumber)", to: output)
+                _ = try? capture(window, "failure-\(window.windowNumber)", to: output)
             }
             try? JSONSerialization.data(withJSONObject: browserLayouts, options: [.prettyPrinted, .sortedKeys])
                 .write(to: output.appendingPathComponent("browser-layout.json"), options: .atomic)
