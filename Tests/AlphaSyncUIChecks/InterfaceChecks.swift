@@ -7,7 +7,7 @@ import AlphaSyncCore
 private struct CheckFailure: Error, CustomStringConvertible { let description: String }
 
 @MainActor
-private final class InterfaceLoginItem: LoginItemManaging {
+final class InterfaceLoginItem: LoginItemManaging {
     var status: SMAppService.Status { .notRegistered }
     func register() throws { throw CheckFailure(description: "Interface checks must not register a login item") }
     func unregister() throws { throw CheckFailure(description: "Interface checks must not unregister a login item") }
@@ -25,6 +25,7 @@ struct InterfaceChecks {
         if !condition() { throw CheckFailure(description: message) }
     }
     static func settle() { RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.35)) }
+    static func yieldLayout() async { try? await Task.sleep(for: .milliseconds(350)) }
     static func descendants(_ root: NSView) -> [NSView] { [root] + root.subviews.flatMap(descendants) }
     static func fileTable(in window: NSWindow) throws -> NSTableView {
         guard let content = window.contentView,
@@ -41,11 +42,10 @@ struct InterfaceChecks {
     static func resize(_ window: NSWindow, visibleSize: NSSize) {
         let chrome = max(0, (window.contentView?.bounds.height ?? 0) - window.contentLayoutRect.height)
         window.setContentSize(NSSize(width: visibleSize.width, height: visibleSize.height + chrome))
-        settle()
     }
 
     @discardableResult
-    static func checkBrowser(in window: NSWindow, stage: String, rows: Int = 8) throws -> NSRect {
+    static func checkBrowser(in window: NSWindow, stage: String, rows: Int = 8) async throws -> NSRect {
         checkpoint("Checking browser layout: " + stage)
         guard let content = window.contentView else { throw CheckFailure(description: "Missing content view") }
         let table = try fileTable(in: window)
@@ -55,9 +55,11 @@ struct InterfaceChecks {
         try require(table.numberOfRows == rows, "The file table lost rows during \(stage)")
         if rows > 0 { table.scrollRowToVisible(0) }
         sidebar.scrollRowToVisible(0)
-        settle()
+        await yieldLayout()
         let safe = window.contentLayoutRect
-        var record: [String: Any] = ["stage": stage, "contentLayout": frameRecord(safe), "fileRows": rows]
+        var record: [String: Any] = ["stage": stage, "contentLayout": frameRecord(safe), "fileRows": rows,
+                                     "fullSizeContentView": window.styleMask.contains(.fullSizeContentView),
+                                     "toolbarItems": window.toolbar?.items.count ?? 0]
         for (name, list, indices) in [("files", table, rows > 0 ? [0] : []), ("sidebar", sidebar, [0, 1])] {
             guard let scroll = list.enclosingScrollView else { throw CheckFailure(description: "Missing scroll view") }
             let clip = scroll.contentView.convert(scroll.contentView.bounds, to: nil)
@@ -81,10 +83,10 @@ struct InterfaceChecks {
         return rows > 0 ? table.convert(table.rect(ofRow: 0), to: nil) : .zero
     }
 
-    static func checkLastFile(in window: NSWindow, stage: String) throws {
+    static func checkLastFile(in window: NSWindow, stage: String) async throws {
         let table = try fileTable(in: window)
         table.scrollRowToVisible(table.numberOfRows - 1)
-        settle()
+        await yieldLayout()
         guard let scroll = table.enclosingScrollView else { throw CheckFailure(description: "Missing file scroll view") }
         let row = table.convert(table.rect(ofRow: table.numberOfRows - 1), to: nil)
         let clip = scroll.contentView.convert(scroll.contentView.bounds, to: nil)
@@ -94,31 +96,24 @@ struct InterfaceChecks {
         browserLayouts.append(["stage": stage, "lastFile": frameRecord(row), "contentLayout": frameRecord(safe)])
     }
 
-    static func window<V: View>(_ view: V, size: NSSize, title: String, fullSizeToolbar: Bool = false) -> NSWindow {
+    static func window<V: View>(_ view: V, size: NSSize, title: String) -> NSWindow {
         checkpoint("Opening " + title)
         let result = NSWindow(contentRect: NSRect(origin: .zero, size: size),
-                              styleMask: fullSizeToolbar ? [.titled, .closable, .resizable, .fullSizeContentView] : [.titled, .closable, .resizable],
+                              styleMask: [.titled, .closable, .resizable],
                               backing: .buffered, defer: false)
         result.isReleasedWhenClosed = false
         result.title = title
         result.contentViewController = NSHostingController(rootView: view)
-        if fullSizeToolbar {
-            result.toolbarStyle = .unified
-            result.toolbar = result.toolbar ?? NSToolbar(identifier: "AlphaSync-InterfaceChecks")
-        }
         result.setContentSize(size)
         result.center(); result.makeKeyAndOrderFront(nil)
         settle()
-        if fullSizeToolbar {
-            resize(result, visibleSize: size)
-            checkpoint("Full-size toolbar window ready")
-        }
         return result
     }
     @discardableResult
-    static func capture(_ window: NSWindow, _ name: String, to output: URL) throws -> Data {
+    static func capture(_ window: NSWindow, _ name: String, to output: URL, includingTitlebar: Bool = false) throws -> Data {
         checkpoint("Capturing " + name)
-        guard let view = window.contentView else { throw CheckFailure(description: "Missing content view") }
+        guard let content = window.contentView else { throw CheckFailure(description: "Missing content view") }
+        let view = includingTitlebar ? content.superview ?? content : content
         view.layoutSubtreeIfNeeded(); view.displayIfNeeded()
         guard let bitmap = view.bitmapImageRepForCachingDisplay(in: view.bounds) else { throw CheckFailure(description: "Cannot capture \(name)") }
         view.cacheDisplay(in: view.bounds, to: bitmap)
@@ -180,6 +175,10 @@ struct InterfaceChecks {
                            availableROM: 1_048_576, applets: [applet, readOnly])
     }
     static func main() {
+        if CommandLine.arguments.contains("--window-scene") {
+            WindowSceneChecksApp.main()
+            return
+        }
         do { try run() }
         catch {
             let output = URL(fileURLWithPath: CommandLine.arguments.dropFirst().first ?? "build/interface-checks", isDirectory: true)
@@ -214,58 +213,7 @@ struct InterfaceChecks {
         try require(FileSize.exact(1) == "1 byte", "A single byte must have singular wording")
         for (label, appearance) in [("light", NSAppearance.Name.aqua), ("dark", .darkAqua)] {
             app.appearance = NSAppearance(named: appearance)
-            preferences.filter = .textApplets
-            store.devices = []; store.sidebar = nil; store.selection = []
-            let connected = window(MainView(store: store), size: NSSize(width: 360, height: 230),
-                                   title: "AlphaSync", fullSizeToolbar: true)
-            try capture(connected, "waiting-" + label, to: output)
             store.devices = [snapshot]; store.reconcileSelection()
-            settle(); resize(connected, visibleSize: NSSize(width: 820, height: 560))
-            try require(connected.contentView!.bounds.width >= 760, "Connected window is too narrow")
-            try require(connected.styleMask.contains(.fullSizeContentView) && connected.toolbar != nil &&
-                        connected.contentView!.bounds.height > connected.contentLayoutRect.height + 10,
-                        "The layout fixture must include content beneath a real title bar and toolbar")
-            let initialRow = try checkBrowser(in: connected, stage: "connected-" + label)
-            let withoutWarning = try capture(connected, "files-" + label, to: output)
-            store.connectionIssue = "A second Neo could not be opened. Close other Neo software and choose Try Again."
-            settle()
-            let withWarning = try capture(connected, "connection-warning-" + label, to: output)
-            try require(withWarning != withoutWarning, "A connected Neo must visibly show its connection warning")
-            let warnedRow = try checkBrowser(in: connected, stage: "connection-warning-" + label)
-            try require(warnedRow.maxY < initialRow.maxY - 12,
-                        "A connection warning must reserve space above the first file: before \(initialRow), after \(warnedRow)")
-            resize(connected, visibleSize: NSSize(width: 760, height: 460))
-            try checkBrowser(in: connected, stage: "minimum-warning-" + label)
-            try capture(connected, "files-minimum-" + label, to: output)
-            resize(connected, visibleSize: NSSize(width: 1120, height: 720))
-            try checkBrowser(in: connected, stage: "expanded-warning-" + label)
-            store.connectionIssue = nil
-            settle()
-            try checkBrowser(in: connected, stage: "warning-cleared-" + label)
-            let manyFiles = try sample(fileCount: 64)
-            store.devices = [manyFiles]; store.reconcileSelection()
-            resize(connected, visibleSize: NSSize(width: 760, height: 460))
-            try checkBrowser(in: connected, stage: "many-files-top-" + label, rows: 64)
-            try checkLastFile(in: connected, stage: "many-files-bottom-" + label)
-            try capture(connected, "files-scrolled-" + label, to: output)
-            preferences.filter = .allApplets
-            settle()
-            store.sidebar = .applet(manyFiles.connection, 0xb000)
-            settle()
-            try require(!store.canClear && !store.canImport, "An empty read-only applet must not enable file changes")
-            try checkBrowser(in: connected, stage: "empty-read-only-applet-" + label, rows: 0)
-            try capture(connected, "empty-applet-" + label, to: output)
-            preferences.filter = .alphaWord
-            settle()
-            try require(store.chosenApplet?.id == NeoApplet.alphaWord, "Changing the filter must replace a hidden applet selection")
-            try checkBrowser(in: connected, stage: "filtered-applets-" + label, rows: 64)
-            store.devices = []; store.reconcileSelection()
-            resize(connected, visibleSize: NSSize(width: 360, height: 230))
-            store.devices = [snapshot]; store.reconcileSelection()
-            settle(); resize(connected, visibleSize: NSSize(width: 760, height: 460))
-            try checkBrowser(in: connected, stage: "reconnected-" + label)
-            try capture(connected, "reconnected-" + label, to: output)
-            connected.close()
             let about = window(AboutView(), size: NSSize(width: 420, height: 570), title: "About AlphaSync")
             if let button = about.firstResponder as? NSButton {
                 try require(!["Project", "Release notes", "Licence"].contains(button.title), "An About link received initial focus")
@@ -302,9 +250,6 @@ struct InterfaceChecks {
             try require(privateClipboard.setString(view.string, forType: .string) && privateClipboard.string(forType: .string) == text, "Clipboard text differs from the full preview")
             try capture(reader, "reader-" + label, to: output); reader.close()
         }
-        try JSONSerialization.data(withJSONObject: browserLayouts, options: [.prettyPrinted, .sortedKeys])
-            .write(to: output.appendingPathComponent("browser-layout.json"), options: .atomic)
-        print("Checked \(browserLayouts.count) native browser layouts with full-size toolbars.")
-        print("Native interface checks passed. No USB devices or login registrations were changed.")
+        print("Native component checks passed. No USB devices or login registrations were changed.")
     }
 }
