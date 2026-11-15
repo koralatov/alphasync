@@ -19,8 +19,11 @@ final class AccessibilityAnnouncements {
     deinit { pending?.cancel() }
 
     static func systemPost(_ message: String) {
-        guard NSWorkspace.shared.isVoiceOverEnabled, NSApplication.shared.isActive else { return }
-        NSAccessibility.post(element: NSApplication.shared, notification: .announcementRequested,
+        guard NSWorkspace.shared.isVoiceOverEnabled else { return }
+        let app = NSApplication.shared
+        guard app.isActive, app.modalWindow == nil, app.keyWindow?.sheetParent == nil,
+              app.mainWindow?.attachedSheet == nil else { return }
+        NSAccessibility.post(element: app, notification: .announcementRequested,
             userInfo: [.announcement: message, .priority: NSAccessibilityPriorityLevel.low.rawValue])
     }
     func connectionChanged(count: Int, issue: String?) {

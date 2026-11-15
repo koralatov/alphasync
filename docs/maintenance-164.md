@@ -18,7 +18,7 @@ Use cancellable inventories for read-only preparation and the initial backup sca
 
 Give transfer indicators task-specific accessible labels.  Hide the decorative duplicate spinner from VoiceOver when a determinate indicator is available.  Retain native percentage values.  Show transfer progress only for active work, while a waiting confirmation still keeps conflicting controls unavailable.
 
-Use public AppKit accessibility announcements for non-modal connection and completion updates.  Combine related connection and error changes over 200 ms, suppress identical state updates, avoid duplicating a modal warning’s announcement, and cancel queued speech on Quit.  Post only when VoiceOver is enabled and AlphaSync is active.  Four isolated regressions check feedback through actual AppStore operations without enabling speech or changing system preferences.  Capture both known and unknown progress in both appearances.
+Use public AppKit accessibility announcements for non-modal connection and completion updates.  Combine related connection and error changes over 200 ms, suppress identical state updates, avoid duplicating a modal warning’s announcement, and cancel queued speech on Quit.  Post only when VoiceOver is enabled and AlphaSync is active, with no modal window or attached sheet competing for speech.  Four isolated regressions check feedback through actual AppStore operations without enabling speech or changing system preferences.  Capture both known and unknown progress in both appearances.
 
 ## Menu availability
 
@@ -39,6 +39,8 @@ The initial candidate used an immutable format style.  Its native comparison cau
 Review the five commits before running tests.  The planned suite is **190 Swift tests**, with the existing **55 fixtures**, both pinned compilers, both app editions and helpers, all **thirty-two browser observations per host**, sidebar widths and sizes, all toolbar modes, and the combined failing 120-second interface deadline.  Native captures increase to **54 per host, 108 overall**, including progress states and Find in both appearances.
 
 Require native execution of both exact canonical packages on Apple Silicon, architectures, minimum deployment, signatures, hardened runtime, helpers, matching symbols, four independent artifact digests, twelve asset hashes, and both Help books against tested source.  Review captured images and preserve permanent results under `releases/verification/2.0.5-164`.  Provide a separate Apple Silicon test ZIP after verification.  Preserve earlier private copies, public 1.5.1 and 2.0.4 notes and assets, all twelve version tags, and frozen legacy source.
+
+The next compile caught an actor-isolation omission in the diagnostic baseline callback.  Its explicit main-actor annotation changes the checker only.  Keep this failed candidate distinct from the final verified source.
 
 ## Physical checks before 2.1
 
