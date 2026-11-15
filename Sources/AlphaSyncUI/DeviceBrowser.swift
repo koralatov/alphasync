@@ -13,9 +13,7 @@ struct DeviceBrowser<Sidebar: View, Detail: View>: NSViewControllerRepresentable
 
     private func pane<Content: View>(_ content: Content, context: Context) -> AnyView {
         AnyView(content
-            .environment(\.sidebarRowSize, context.environment.sidebarRowSize)
-            .environment(\.colorScheme, context.environment.colorScheme)
-            .environment(\.accessibilityContrast, context.environment.accessibilityContrast)
+            .environment(\.self, context.environment)
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity))
     }
 

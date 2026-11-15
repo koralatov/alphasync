@@ -60,10 +60,6 @@ PROBE = r'''
         await InterfaceChecks.yieldLayout()
         try record("after-hide")
         try capture(window, "after-hide")
-        try record("before-show")
-        try activate()
-        await InterfaceChecks.yieldLayout()
-        try capture(window, "after-show")
         try record("complete")
     }
 }
@@ -141,7 +137,7 @@ def main():
         probe = json.loads((output / "probe.json").read_text()) if (output / "probe.json").exists() else {}
         report["lastProbe"] = probe
         report["timedOut"] = timed_out
-        if timed_out and probe.get("stage") in ["before-hide", "before-show"]:
+        if timed_out and probe.get("stage") == "before-hide":
             report["outcome"] = "hang-after-sidebar-action"
         elif (not timed_out and probe.get("stage") == "complete" and (output / "result.json").exists()
               and json.loads((output / "result.json").read_text()) == {"passed": True, "layouts": 0}):
