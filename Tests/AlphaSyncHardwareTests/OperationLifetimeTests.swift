@@ -67,6 +67,25 @@ final class OperationLifetimeTests: XCTestCase {
         XCTAssertNil(store.notice)
     }
 
+    func testQuitStopsAnExplicitRefreshBetweenInventoryRequests() async throws {
+        let gate = OperationGate(), observations = SimulatedObservations()
+        defer { gate.release() }
+        let store = store(SimulatedConfiguration(beforeSnapshot: { if $0 == 2 { gate.wait() } }), observations)
+        await store.refresh()
+        let original = try XCTUnwrap(store.devices.first?.connection)
+        let refreshing = Task { await store.refresh() }
+        try await eventually { gate.entered.isRequested }
+        let quitting = Task { await store.shutdown() }
+        try await eventually { store.shuttingDown }
+        gate.release()
+        await refreshing.value
+        await quitting.value
+        XCTAssertEqual(store.devices.first?.connection, original)
+        XCTAssertEqual(observations.writeCount, 0)
+        XCTAssertEqual(observations.closeCount, 1)
+        XCTAssertNil(store.notice)
+    }
+
     func testQuitStopsRenameAfterPreparationBeforeTheFirstWrite() async throws {
         let gate = OperationGate(), observations = SimulatedObservations()
         defer { gate.release() }

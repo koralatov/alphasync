@@ -15,7 +15,7 @@ protocol DeviceAttachment: AnyObject {
 
 protocol DeviceConnection: AnyObject {
     func close()
-    func snapshot(connection: UUID, registryID: UInt64) throws -> NeoSnapshot
+    func snapshot(connection: UUID, registryID: UInt64, checkingCancellation: () throws -> Void) throws -> NeoSnapshot
     func fileLimits(applet: UInt16) throws -> NeoFileLimits
     func availableMemory() throws -> (ram: Int, rom: Int)
     func attributes(applet: UInt16, index: UInt8) throws -> NeoFileAttributes
@@ -29,6 +29,10 @@ protocol DeviceConnection: AnyObject {
 }
 
 extension DeviceConnection {
+    func snapshot(connection: UUID, registryID: UInt64) throws -> NeoSnapshot {
+        try snapshot(connection: connection, registryID: registryID, checkingCancellation: {})
+    }
+
     func readFile(applet: UInt16, index: UInt8) throws -> Data {
         try readFile(applet: applet, index: index, checkingCancellation: {})
     }

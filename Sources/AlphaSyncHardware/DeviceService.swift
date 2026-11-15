@@ -58,11 +58,11 @@ public final class DeviceService: @unchecked Sendable {
         }
     }
 
-    public func scan() async throws -> DiscoveryResult {
-        try await perform { access in try access.scan() }
+    public func scan(stop: StopRequest? = nil) async throws -> DiscoveryResult {
+        try await perform { access in try access.scan(stop: stop) }
     }
-    public func refresh(retryConnections: Bool = false) async throws -> DiscoveryResult {
-        try await perform { access in try access.scan(refresh: true, retryConnections: retryConnections) }
+    public func refresh(retryConnections: Bool = false, stop: StopRequest? = nil) async throws -> DiscoveryResult {
+        try await perform { access in try access.scan(refresh: true, retryConnections: retryConnections, stop: stop) }
     }
     public func read(_ file: NeoFileID, stop: StopRequest? = nil) async throws -> Data {
         try await perform { access in
@@ -125,31 +125,36 @@ public final class DeviceService: @unchecked Sendable {
             guard let connection = service.connections.values.first(where: { $0.generation == generation }) else { throw NeoError.disconnected }
             return connection.snapshot
         }
-        func update(_ generation: UUID) throws -> NeoSnapshot {
+        func update(_ generation: UUID, checkingCancellation: () throws -> Void = {}) throws -> NeoSnapshot {
             dispatchPrecondition(condition: .onQueue(service.queue))
             guard let key = service.connections.first(where: { $0.value.generation == generation })?.key,
                   var connection = service.connections[key] else { throw NeoError.disconnected }
-            let value = try connection.engine.snapshot(connection: generation, registryID: key)
+            let value = try connection.engine.snapshot(connection: generation, registryID: key, checkingCancellation: checkingCancellation)
             connection.snapshot = value
             service.connections[key] = connection
             return value
         }
-        fileprivate func scan(refresh: Bool = false, retryConnections: Bool = false) throws -> DiscoveryResult {
+        fileprivate func scan(refresh: Bool = false, retryConnections: Bool = false, stop: StopRequest? = nil) throws -> DiscoveryResult {
             dispatchPrecondition(condition: .onQueue(service.queue))
+            try checkCancellation(stop)
             let discovery = service.discovery ?? service.discoveryFactory()
             service.discovery = discovery
             let found = try discovery.devices()
+            try checkCancellation(stop)
             let attached = Set(found.map(\.registryID))
             service.connectionFailures = service.connectionFailures.filter { attached.contains($0.key) }
             for key in Array(service.connections.keys) where !attached.contains(key) {
                 service.connections.removeValue(forKey: key)?.engine.close()
             }
             for item in found {
+                try checkCancellation(stop)
                 if let connection = service.connections[item.registryID] {
                     guard refresh else { continue }
                     do {
-                        _ = try update(connection.generation)
+                        _ = try update(connection.generation, checkingCancellation: { try self.checkCancellation(stop) })
                         continue
+                    } catch is CancellationError {
+                        throw CancellationError()
                     } catch {
                         service.connections.removeValue(forKey: item.registryID)?.engine.close()
                         service.connectionFailures[item.registryID] = error.localizedDescription
@@ -164,16 +169,23 @@ public final class DeviceService: @unchecked Sendable {
                     let engine = try item.open()
                     opened = engine
                     let generation = UUID()
-                    let snapshot = try engine.snapshot(connection: generation, registryID: item.registryID)
+                    let snapshot = try engine.snapshot(connection: generation, registryID: item.registryID,
+                                                       checkingCancellation: { try self.checkCancellation(stop) })
+                    try checkCancellation(stop)
                     service.connections[item.registryID] = Connection(generation: generation, engine: engine, snapshot: snapshot)
                     service.connectionFailures.removeValue(forKey: item.registryID)
+                } catch is CancellationError {
+                    opened?.close()
+                    throw CancellationError()
                 } catch {
                     opened?.close()
                     service.connectionFailures[item.registryID] = "The Neo could not be opened. \(error.localizedDescription)"
                 }
             }
             var issues = service.connectionFailures.keys.sorted().compactMap { service.connectionFailures[$0] }
+            try checkCancellation(stop)
             if let modeIssue = discovery.modeSwitchIssue(retryFailures: retryConnections) { issues.append(modeIssue) }
+            try checkCancellation(stop)
             return DiscoveryResult(devices: service.connections.values.map(\.snapshot).sorted { $0.registryID < $1.registryID },
                                    issue: issues.isEmpty ? nil : issues.joined(separator: "\n\n"))
         }

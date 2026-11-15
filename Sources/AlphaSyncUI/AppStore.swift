@@ -246,7 +246,7 @@ public final class AppStore: ObservableObject {
         catch {
             if shuttingDown || error is CancellationError { return }
             notice = AppNotice("The operation could not be completed", error.localizedDescription)
-            if let result = try? await service.refresh() {
+            if let result = try? await service.refresh(stop: activity.stop) {
                 devices = result.devices
                 contentRevision = UUID()
                 discoveryIssue = result.issue
@@ -256,8 +256,8 @@ public final class AppStore: ObservableObject {
         }
     }
     public func refresh() async {
-        await run("Refreshing files…") { _ in
-            let result = try await service.refresh(retryConnections: true)
+        await run("Refreshing files…") { stop in
+            let result = try await service.refresh(retryConnections: true, stop: stop)
             devices = result.devices; discoveryIssue = result.issue
             updateConnectionIssue()
             contentRevision = UUID()

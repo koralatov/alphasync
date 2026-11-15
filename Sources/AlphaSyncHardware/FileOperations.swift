@@ -51,8 +51,10 @@ extension DeviceService {
                   let node = applet.files.first(where: { $0.id == file }) else { throw NeoError.disconnected }
             let engine = try access.engine(for: file.connection)
             let limits = try engine.fileLimits(applet: file.applet)
+            try access.checkCancellation(stop)
             let replacement = try FileCodec.converted(TextFiles.read(source), applet: file.applet, limits: limits, dictionaryConsent: dictionaryConsent)
             let memory = try engine.availableMemory()
+            try access.checkCancellation(stop)
             let attributes = try engine.attributes(applet: file.applet, index: file.index)
             try limits.validate(replacement.count, allocation: attributes.allocation, available: memory.ram)
             let original = try engine.readFile(applet: file.applet, index: file.index) { try access.checkCancellation(stop) }
@@ -68,7 +70,7 @@ extension DeviceService {
                              stop: StopRequest? = nil) async throws -> PreparedChange {
         try await perform { access in
             try access.checkCancellation(stop)
-            let snapshot = try access.update(connection)
+            let snapshot = try access.update(connection, checkingCancellation: { try access.checkCancellation(stop) })
             guard let applet = snapshot.applets.first(where: { $0.id == appletID }), applet.canWrite else {
                 throw NeoError.device("This applet’s files cannot be cleared by AlphaSync.")
             }
@@ -98,7 +100,7 @@ extension DeviceService {
             do {
                 try access.checkCancellation(stop)
                 let engine = try access.engine(for: change.connection)
-                let latest = try access.update(change.connection)
+                let latest = try access.update(change.connection, checkingCancellation: { try access.checkCancellation(stop) })
                 guard let applet = latest.applets.first(where: { $0.id == change.applet.id }) else { throw NeoError.disconnected }
                 guard change.items.allSatisfy({ item in applet.files.contains(where: { $0.id == item.file.id }) }) else { throw NeoError.disconnected }
                 // Recheck every original before saving recovery or beginning a multi-file clear.

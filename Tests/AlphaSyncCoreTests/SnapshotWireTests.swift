@@ -10,6 +10,7 @@ private final class LegacySnapshotWire: NeoTransport {
     var missingAlphaWordFile: UInt8?
     var corruptParameterReply = false
     var requests: [[UInt8]] = []
+    var onCommand: (([UInt8]) -> Void)?
     let fileData = Data((0..<512).map { UInt8(truncatingIfNeeded: $0) })
     private var incoming = Data()
     private var pendingFile: Data?
@@ -70,6 +71,7 @@ private final class LegacySnapshotWire: NeoTransport {
             throw NeoError.invalidData("An outgoing fixture packet is invalid.")
         }
         requests.append(bytes)
+        onCommand?(bytes)
         let applet = UInt16(bytes[5]) << 8 | UInt16(bytes[6])
         switch bytes[0] {
         case 0x04:
@@ -142,6 +144,50 @@ private final class LegacySnapshotWire: NeoTransport {
 }
 
 final class SnapshotWireTests: XCTestCase {
+    func testCancelledInventoryStopsBeforeRequestingAnotherFile() {
+        let wire = LegacySnapshotWire()
+        var cancelled = false
+        wire.onCommand = { if Array($0.prefix(7)) == [0x13, 0, 0, 0, 1, 0xa0, 0] { cancelled = true } }
+        XCTAssertThrowsError(try NeoProtocol(transport: wire).snapshot(connection: UUID(), registryID: 1,
+            checkingCancellation: { if cancelled { throw CancellationError() } })) {
+            XCTAssertTrue($0 is CancellationError)
+        }
+        XCTAssertTrue(cancelled)
+        XCTAssertEqual(wire.requests.filter { $0[0] == 0x13 }.map { $0[4] }, [1])
+        XCTAssertFalse(wire.queried(0x1b, applet: 0xa005))
+        XCTAssertEqual(wire.fileWrites, 0)
+    }
+
+    func testCancelledHeaderReadStopsBeforeTheSystemVersionRequest() {
+        let wire = LegacySnapshotWire()
+        var cancelled = false
+        wire.onCommand = { if $0[0] == 4 { cancelled = true } }
+        XCTAssertThrowsError(try NeoProtocol(transport: wire).snapshot(connection: UUID(), registryID: 1,
+            checkingCancellation: { if cancelled { throw CancellationError() } })) {
+            XCTAssertTrue($0 is CancellationError)
+        }
+        XCTAssertEqual(wire.requests.map { $0[0] }, [4])
+        XCTAssertEqual(wire.fileWrites, 0)
+    }
+
+    func testCancellationBeforeOptionalLimitsIsNotSwallowedAsAnUnavailableLimit() {
+        let wire = LegacySnapshotWire()
+        var usageCount = 0, cancelled = false
+        wire.onCommand = {
+            if $0[0] == 0x1b && $0[5] == 0xa0 && $0[6] == 0 {
+                usageCount += 1
+                if usageCount == 2 { cancelled = true }
+            }
+        }
+        XCTAssertThrowsError(try NeoProtocol(transport: wire).snapshot(connection: UUID(), registryID: 1,
+            checkingCancellation: { if cancelled { throw CancellationError() } })) {
+            XCTAssertTrue($0 is CancellationError)
+        }
+        XCTAssertTrue(cancelled)
+        XCTAssertFalse(wire.requests.contains { $0[0] == 0x0c })
+        XCTAssertEqual(wire.fileWrites, 0)
+    }
+
     private func snapshot(_ wire: LegacySnapshotWire) throws -> NeoSnapshot {
         try NeoProtocol(transport: wire).snapshot(connection: UUID(), registryID: 1)
     }

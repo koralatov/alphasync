@@ -99,10 +99,12 @@ public final class NeoProtocol {
         return data
     }
 
-    public func appletHeaders() throws -> [NeoApplet] {
-        try transaction {
+    public func appletHeaders(checkingCancellation: () throws -> Void = {}) throws -> [NeoApplet] {
+        try checkingCancellation()
+        return try transaction {
             var result: [NeoApplet] = [], seen = Set<UInt16>()
             while result.count < 256 {
+                try checkingCancellation()
                 var request = NeoMessage(command: 4)
                 try request.set(UInt32(result.count), at: 1, width: 4)
                 try request.set(7, at: 5, width: 2)
@@ -293,11 +295,16 @@ public final class NeoProtocol {
         }
     }
 
-    public func snapshot(connection: UUID, registryID: UInt64) throws -> NeoSnapshot {
-        var applets = try appletHeaders()
+    public func snapshot(connection: UUID, registryID: UInt64,
+                         checkingCancellation: () throws -> Void = {}) throws -> NeoSnapshot {
+        var applets = try appletHeaders(checkingCancellation: checkingCancellation)
         guard applets.contains(where: { $0.id == 0 }) else { throw NeoError.invalidData("The system applet is missing.") }
-        let version = try systemVersion(), memory = try availableMemory()
+        try checkingCancellation()
+        let version = try systemVersion()
+        try checkingCancellation()
+        let memory = try availableMemory()
         for position in applets.indices {
+            try checkingCancellation()
             let id = applets[position].id
             // The System applet has no file collection and rejects request 0x1b with 0x90.
             guard id != 0 else { continue }
@@ -308,6 +315,7 @@ public final class NeoProtocol {
                 // Only accept a fileless read-only applet after confirming that index 1 is absent.
                 // Keep real files, other errors, and all writable applets subject to strict checks.
                 do {
+                    try checkingCancellation()
                     _ = try attributes(applet: id, index: 1)
                 } catch let missing as NeoReplyError where missing.request == 0x13 && missing.reply == 0x90 {
                     continue
@@ -317,15 +325,21 @@ public final class NeoProtocol {
             var files: [NeoFile] = []
             if before.count > 0 {
                 for index in 1...before.count {
+                    try checkingCancellation()
                     let info = try attributes(applet: id, index: UInt8(index))
                     files.append(NeoFile(id: NeoFileID(connection: connection, applet: id, index: UInt8(index)), attributes: info, size: info.allocation))
                 }
             }
+            try checkingCancellation()
             let after = try resourceUsage(applet: id)
             guard after.count == before.count else { throw NeoError.invalidData("The file list changed while it was being read. Reconnect and try again.") }
             applets[position].files = files; applets[position].ramUsed = after.ram
-            if applets[position].canWrite { applets[position].limits = try? fileLimits(applet: id) }
+            if applets[position].canWrite {
+                try checkingCancellation()
+                applets[position].limits = try? fileLimits(applet: id)
+            }
         }
+        try checkingCancellation()
         return NeoSnapshot(connection: connection, registryID: registryID, systemVersion: version,
                            availableRAM: memory.ram, availableROM: memory.rom, applets: applets)
     }

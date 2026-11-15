@@ -15,6 +15,7 @@ struct SimulatedConfiguration: Sendable {
     var afterRead: (@Sendable (UInt8) -> Void)?
     var beforeCreate: (@Sendable () -> Void)?
     var beforeRename: (@Sendable () -> Void)?
+    var beforeSnapshot: (@Sendable (Int) -> Void)?
 }
 
 /// Only observations cross executors.  Device data remains inside the simulated connection.
@@ -167,8 +168,11 @@ private final class SimulatedConnection: DeviceConnection {
 
     func close() { observations.didClose() }
 
-    func snapshot(connection: UUID, registryID: UInt64) throws -> NeoSnapshot {
+    func snapshot(connection: UUID, registryID: UInt64, checkingCancellation: () throws -> Void) throws -> NeoSnapshot {
+        try checkingCancellation()
         snapshots += 1
+        configuration.beforeSnapshot?(snapshots)
+        try checkingCancellation()
         if configuration.failingSnapshotNumber == snapshots { throw NeoError.disconnected }
         if configuration.failRefreshAfterWriting && writes > 0 { throw NeoError.disconnected }
         var header = Data(repeating: 0, count: NeoApplet.headerSize)
@@ -180,10 +184,12 @@ private final class SimulatedConnection: DeviceConnection {
         var applet = try NeoApplet(header: header)
         applet.limits = limits
         applet.files = try contents.keys.sorted().map { index in
+            try checkingCancellation()
             let info = try attributes(applet: applet.id, index: index)
             return NeoFile(id: NeoFileID(connection: connection, applet: applet.id, index: index),
                            attributes: info, size: info.allocation)
         }
+        try checkingCancellation()
         return NeoSnapshot(connection: connection, registryID: registryID, systemVersion: "3.6",
                            availableRAM: 300_000, availableROM: 1_000_000, applets: [applet])
     }

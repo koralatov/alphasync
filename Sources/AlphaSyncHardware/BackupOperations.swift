@@ -14,7 +14,12 @@ extension DeviceService {
         try await perform { access in
             func shouldStop() -> Bool { stop.isRequested || access.isCancellationRequested }
             // Validate all included lists before creating folders or treating a prefix as a complete backup.
-            let snapshots = try connections.map { try access.update($0) }
+            let snapshots: [NeoSnapshot]
+            do {
+                snapshots = try connections.map { try access.update($0, checkingCancellation: { try access.checkCancellation(stop) }) }
+            } catch is CancellationError {
+                return BackupResult(saved: 0, expected: 0, folders: [], stopped: true, failures: [])
+            }
             let expected = snapshots.reduce(0) { total, snapshot in
                 total + snapshot.applets.filter { includedApplets?.contains($0.id) ?? true }.reduce(0) { $0 + $1.files.count }
             }
