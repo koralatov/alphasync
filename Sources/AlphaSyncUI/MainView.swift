@@ -97,13 +97,14 @@ public struct MainView: View {
                 }
             }.listStyle(.sidebar).navigationSplitViewColumnWidth(min: 180, ideal: 220, max: 300)
         } detail: {
-            // Keep the native table as the column root so its scroll view receives bar insets.
-            fileTable
-                .safeAreaInset(edge: .top, spacing: 0) {
-                    if let issue = store.connectionIssue { connectionWarning(issue) }
-                }
-                .safeAreaInset(edge: .bottom, spacing: 0) { connectionStatus }
+            VStack(spacing: 0) {
+                if let issue = store.connectionIssue { connectionWarning(issue) }
+                fileTable
+                connectionStatus
+            }
+            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
         }
+        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
     }
     private var fileTable: some View {
         Table(store.files, selection: $store.selection) {
@@ -118,6 +119,8 @@ public struct MainView: View {
                 Text(FileSize.compact(file.size)).monospacedDigit().frame(maxWidth: .infinity, alignment: .trailing)
             }.width(min: 90, ideal: 110, max: 160)
         }
+        // The scroll view can shrink below its ideal size when a warning reserves space.
+        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
         .contextMenu(forSelectionType: NeoFileID.self) { ids in
             Button("Open Read-only") { openReaders(ids) }.disabled(ids.isEmpty)
             Button("Save to Mac…") { store.selection = ids; store.beginExport() }.disabled(ids.isEmpty || store.busy)
