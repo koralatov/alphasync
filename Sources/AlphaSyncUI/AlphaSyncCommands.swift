@@ -30,7 +30,7 @@ public struct AlphaSyncCommands: Commands {
                 Button("Use Selection for Find") { AppActions.find(.setFindString) }.keyboardShortcut("e")
             }
         }
-        CommandGroup(after: .sidebar) {
+        CommandGroup(replacing: .sidebar) {
             Menu("Toolbar Appearance") {
                 Picker("Toolbar Appearance", selection: $preferences.toolbarAppearance) {
                     ForEach(ToolbarAppearance.allCases) { Text($0.title).tag($0) }

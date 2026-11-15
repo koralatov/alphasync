@@ -93,21 +93,23 @@ public struct MainView: View {
         }.padding(24)
     }
     private var fileManager: some View {
-        NavigationSplitView {
+        DeviceBrowser {
             List(selection: $store.sidebar) {
                 ForEach(store.devices, id: \.connection) { device in
                     Section {
                         Label(device.name, systemImage: SelectionSymbols.device)
                             .fontWeight(.semibold).foregroundStyle(.primary)
                             .accessibilityAddTraits(.isHeader).accessibilityIdentifier("neo-heading")
-                        Label("All Files", systemImage: "doc.on.doc").tag(SidebarSelection.device(device.connection))
+                        Label("All Files", systemImage: "doc.on.doc")
+                            .padding(.leading, 14).tag(SidebarSelection.device(device.connection))
                         ForEach(device.applets.filter { preferences.filter.appletIDs?.contains($0.id) ?? true }) { applet in
                             Label(applet.name.isEmpty ? "Applet \(String(format: "0x%04X", applet.id))" : applet.name, systemImage: SelectionSymbols.applet(applet.id))
+                                .padding(.leading, 14)
                                 .tag(SidebarSelection.applet(device.connection, applet.id))
                         }
                     }
                 }
-            }.listStyle(.sidebar).navigationSplitViewColumnWidth(min: 180, ideal: 220, max: 300)
+            }.listStyle(.sidebar)
         } detail: {
             VStack(spacing: 0) {
                 if let issue = store.connectionIssue { connectionWarning(issue) }
