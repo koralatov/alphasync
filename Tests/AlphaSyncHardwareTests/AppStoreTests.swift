@@ -6,6 +6,70 @@ import AlphaSyncCore
 
 @MainActor
 final class AppStoreTests: XCTestCase {
+    func testAFileListRefreshAfterRenameKeepsItsSelectionAndNewSortOrder() async throws {
+        let store = makeStore()
+        await store.refresh()
+        let file = try XCTUnwrap(store.files.first)
+        store.selection = [file.id]
+        await store.rename(file.id, to: "Zed")
+        XCTAssertEqual(store.files.map(\.displayName), ["File 2", "Zed"])
+        XCTAssertEqual(store.selectedFiles.map(\.id), [file.id])
+        XCTAssertEqual(store.selectedFiles.first?.displayName, "Zed")
+        await store.shutdown()
+    }
+
+    func testFileListsFollowFilterAndSidebarChanges() async throws {
+        let observations = SimulatedObservations()
+        observations.setAttached([1, 2])
+        let store = makeStore(observations: observations)
+        await store.refresh()
+        let first = try XCTUnwrap(store.devices.first)
+        let second = store.devices[1]
+        var header = Data(repeating: 0, count: NeoApplet.headerSize)
+        header.replaceSubrange(0..<4, with: [0xc0, 0xff, 0xee, 0xad])
+        header[20] = 0xa0; header[21] = 5
+        var dictionary = try NeoApplet(header: header)
+        dictionary.files = [NeoFile(id: NeoFileID(connection: first.connection, applet: dictionary.id, index: 1),
+            attributes: try NeoFileAttributes(name: "Dictionary"), size: 512)]
+        store.devices[0] = NeoSnapshot(connection: first.connection, registryID: first.registryID,
+            systemVersion: first.systemVersion, availableRAM: first.availableRAM, availableROM: first.availableROM,
+            applets: first.applets + [dictionary])
+        store.sidebar = .device(first.connection)
+        store.preferences.filter = .alphaWord
+        XCTAssertEqual(store.files.map(\.displayName), ["File 1", "File 2"])
+        store.preferences.filter = .textApplets
+        XCTAssertEqual(store.files.map(\.displayName), ["Dictionary", "File 1", "File 2"])
+        store.sidebar = .applet(first.connection, dictionary.id)
+        XCTAssertEqual(store.files.map(\.displayName), ["Dictionary"])
+        store.preferences.filter = .alphaWord
+        store.reconcileSelection()
+        XCTAssertEqual(store.files.map(\.displayName), ["File 1", "File 2"])
+        store.sidebar = .device(second.connection)
+        XCTAssertTrue(store.files.allSatisfy { $0.id.connection == second.connection })
+        store.sidebar = .device(first.connection)
+        XCTAssertTrue(store.files.allSatisfy { $0.id.connection == first.connection })
+        await store.shutdown()
+    }
+
+    func testAFileListDiscardsDisconnectedFilesAndUsesTheNewConnectionIdentity() async throws {
+        let observations = SimulatedObservations()
+        let store = makeStore(observations: observations)
+        await store.refresh()
+        let original = try XCTUnwrap(store.files.first?.id)
+        store.selection = [original]
+        observations.setAttached([])
+        await store.refresh()
+        XCTAssertTrue(store.files.isEmpty)
+        XCTAssertTrue(store.selectedFiles.isEmpty)
+        XCTAssertTrue(store.selection.isEmpty)
+        observations.setAttached([1])
+        await store.refresh()
+        XCTAssertEqual(store.files.count, 2)
+        XCTAssertNotEqual(store.files.first?.id.connection, original.connection)
+        XCTAssertTrue(store.selection.isEmpty)
+        await store.shutdown()
+    }
+
     private func makeStore(_ configuration: SimulatedConfiguration = SimulatedConfiguration(),
                            observations: SimulatedObservations = SimulatedObservations()) -> AppStore {
         let suite = "AlphaSync-StoreTests-" + UUID().uuidString

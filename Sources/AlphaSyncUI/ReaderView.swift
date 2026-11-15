@@ -97,9 +97,12 @@ public struct ReadOnlyText: NSViewRepresentable {
     }
     public func updateNSView(_ scroll: NSScrollView, context: Context) {
         guard let view = scroll.documentView as? NSTextView else { return }
+        let font: NSFont = monospaced ? .monospacedSystemFont(ofSize: NSFont.systemFontSize, weight: .regular) : .systemFont(ofSize: NSFont.systemFontSize)
+        let textChanged = view.string != text, fontChanged = view.font != font
+        guard textChanged || fontChanged else { return }
         let ranges = view.selectedRanges, origin = scroll.contentView.bounds.origin
-        if view.string != text { view.string = text }
-        view.font = monospaced ? .monospacedSystemFont(ofSize: NSFont.systemFontSize, weight: .regular) : .systemFont(ofSize: NSFont.systemFontSize)
+        if textChanged { view.string = text }
+        if fontChanged { view.font = font }
         let valid = ranges.filter { NSMaxRange($0.rangeValue) <= (text as NSString).length }
         view.selectedRanges = valid.isEmpty ? [NSValue(range: NSRange(location: 0, length: 0))] : valid
         scroll.contentView.scroll(to: origin)

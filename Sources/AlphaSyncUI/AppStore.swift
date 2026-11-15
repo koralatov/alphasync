@@ -55,7 +55,7 @@ enum FileConfirmation: Identifiable {
 
 @MainActor
 public final class AppStore: ObservableObject {
-    @Published public var devices: [NeoSnapshot] = []
+    @Published public var devices: [NeoSnapshot] = [] { didSet { fileListCache = nil } }
     @Published public var sidebar: SidebarSelection?
     @Published public var selection = Set<NeoFileID>()
     @Published public var notice: AppNotice?
@@ -90,11 +90,16 @@ public final class AppStore: ObservableObject {
         guard case .applet(_, let id) = sidebar else { return nil }
         return chosenDevice?.applets.first { $0.id == id }
     }
+    private var fileListCache: (sidebar: SidebarSelection?, filter: FileFilter, files: [NeoFile])?
     public var files: [NeoFile] {
+        if let cache = fileListCache, cache.sidebar == sidebar, cache.filter == preferences.filter { return cache.files }
         let applets = chosenApplet.map { [$0] } ?? chosenDevice?.applets ?? []
-        return applets.filter { preferences.filter.appletIDs?.contains($0.id) ?? true }.flatMap(\.files).sorted {
+        let included = preferences.filter.appletIDs
+        let result = applets.filter { included?.contains($0.id) ?? true }.flatMap(\.files).sorted {
             $0.displayName.localizedStandardCompare($1.displayName) == .orderedAscending
         }
+        fileListCache = (sidebar, preferences.filter, result)
+        return result
     }
     public var selectedFiles: [NeoFile] { files.filter { selection.contains($0.id) } }
     var inspectorPreviewID: InspectorPreviewID? {
@@ -263,13 +268,13 @@ public final class AppStore: ObservableObject {
     public func readText(_ id: NeoFileID) async throws -> String {
         try Task.checkCancellation()
         guard !shuttingDown else { throw NeoError.cancelled }
-        guard let applet = applet(for: id) else { throw NeoError.disconnected }
+        guard applet(for: id) != nil else { throw NeoError.disconnected }
         let activity = beginActivity()
         defer { finishActivity(activity.id) }
-        let bytes = try await service.read(id, stop: activity.stop)
+        let text = try await service.readText(id, stop: activity.stop)
         try Task.checkCancellation()
         if activity.stop.isRequested { throw CancellationError() }
-        return try FileCodec.text(bytes, applet: applet)
+        return text
     }
     private func importTarget(replacing file: NeoFileID? = nil) -> ImportTarget? {
         guard !busy else { return nil }

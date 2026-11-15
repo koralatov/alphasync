@@ -262,7 +262,7 @@ struct InterfaceChecks {
                 try require(destructive == 0, "Space triggered \(action)")
                 warning.close()
             }
-            let text = "A read-only preview\n\nAlphaSmart Neo text stays selectable.\n" + String(repeating: "More text for scrolling and Find.\n", count: 20)
+            let text = "A read-only preview\n\nAlphaSmart Neo text stays selectable.\n" + String(repeating: "More text for scrolling and Find.\n", count: 80)
             let reader = window(ReadOnlyText(text: text), size: NSSize(width: 660, height: 500), title: "File 1")
             guard let view = reader.contentView.flatMap({ descendants($0).first { $0 is NSTextView } }) as? NSTextView else {
                 throw CheckFailure(description: "Missing native read-only text view")
@@ -270,11 +270,30 @@ struct InterfaceChecks {
             try require(!view.isEditable && view.isSelectable && view.usesFindBar, "Preview must be read-only, selectable, and support Find")
             try require(view.string == text && view.font == .systemFont(ofSize: NSFont.systemFontSize), "Preview changed text or system font")
             view.setSelectedRange(NSRange(location: 2, length: 10))
+            guard let controller = reader.contentViewController as? NSHostingController<ReadOnlyText> else {
+                throw CheckFailure(description: "Missing read-only text controller")
+            }
+            let selected = view.selectedRanges
+            view.scrollRangeToVisible(NSRange(location: (text as NSString).length - 1, length: 1))
+            settle()
+            let origin = view.enclosingScrollView?.contentView.bounds.origin
+            try require((origin?.y ?? 0) > 0, "The preview fixture did not exercise scrolling")
+            controller.rootView = ReadOnlyText(text: text)
+            settle()
+            try require(view.selectedRanges == selected && view.enclosingScrollView?.contentView.bounds.origin == origin,
+                        "An unchanged preview reset its selection or scroll position")
+            controller.rootView = ReadOnlyText(text: text, monospaced: true)
+            settle()
+            try require(view.font == .monospacedSystemFont(ofSize: NSFont.systemFontSize, weight: .regular) && view.selectedRanges == selected,
+                        "Changing the preview font lost its selection")
+            controller.rootView = ReadOnlyText(text: text)
+            settle()
             let privateClipboard = NSPasteboard.withUniqueName()
             defer { privateClipboard.releaseGlobally() }
             try require(privateClipboard.setString(view.string, forType: .string) && privateClipboard.string(forType: .string) == text, "Clipboard text differs from the full preview")
             try capture(reader, "reader-" + label, to: output); reader.close()
         }
+        try PerformanceChecks.run(to: output)
         print("Native component checks passed. No USB devices or login registrations were changed.")
     }
 }
