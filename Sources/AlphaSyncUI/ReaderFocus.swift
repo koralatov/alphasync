@@ -25,7 +25,7 @@ final class ReaderFindRegistry: ObservableObject {
 
     private init() {
         // These observers share the process-lifetime registry and do not retain it.
-        for name in [NSWindow.didBecomeKeyNotification, .didResignKeyNotification, .willCloseNotification] {
+        for name in [NSWindow.didBecomeKeyNotification, NSWindow.didResignKeyNotification, NSWindow.willCloseNotification] {
             _ = NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
                 MainActor.assumeIsolated { self?.scheduleUpdate() }
             }
