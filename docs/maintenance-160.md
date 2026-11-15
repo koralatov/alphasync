@@ -1,6 +1,6 @@
 # Performance and correctness in build 160
 
-Prepare a private **2.0.5, build 160** from verified build 159.  The user requested performance, bug fixes, and code correctness only.  Keep both current editions, the native interface, the working USB packet handling, and the connected-window correction.  The planned stable release remains 2.1 for Apple Silicon.  This work does not authorise publication, retirement, or changes to frozen legacy source.
+Private **2.0.5, build 160** follows verified build 159.  The user requested performance, bug fixes, and code correctness only.  Keep both current editions, the native interface, the working USB packet handling, and the connected-window correction.  The planned stable release remains 2.1 for Apple Silicon.  This work does not authorise publication, retirement, or changes to frozen legacy source.
 
 ## Review and changes
 
@@ -28,6 +28,21 @@ Record a same-host comparison between 500 repeated sorts of a 64-file fixture an
 Require both pinned Mac compilers, all 170 Swift tests, all 55 Help and release fixtures, both app editions and helpers, native interfaces, signatures, architectures, hardened runtime, matching symbols, and native execution of both exact canonical downloads.  Independently verify four artifact digests, twelve asset hashes, and both Help books against tested source.  Inspect captured interfaces and retain the known macOS 26 compositor limitation explicitly.
 
 Create a separate private Apple Silicon ZIP and permanent verification under `releases/verification/2.0.5-160` only after the checks pass.  Preserve all earlier candidates and evidence.  Compare protected releases, notes, every asset, all twelve version tags, frozen legacy source, and the latest-release state with the fresh baseline.
+
+## Verified result
+
+Source `03306e812d4e830af514554ad9d0c2445a78fb0f` passed [run 43725850279](https://github.com/koralatov/alphasync/actions/runs/43725850279) on 15 November 2026 at its first attempt.  Both pinned compilers passed all 170 Swift tests, all 55 fixtures, both app and helper builds, the preview checks, and twenty real-window observations.  Both exact canonical apps ran natively on Apple Silicon.  Independent downloads matched all four artifact digests, twelve assets, and both packaged Help books, including twenty authored files per edition.  Swift compiler warnings were absent.
+
+Review covered 52 captured images.  macOS 15 captures show the complete browser.  macOS 26 layer captures omit compositor-backed sidebar and toolbar backgrounds; live row geometry passed, while screen-composited appearance and accessibility remain manual checks.  See the [permanent record](../releases/verification/2.0.5-160/verification.json), [native geometry](../releases/verification/2.0.5-160/interface-layouts.json), and [performance data](../releases/verification/2.0.5-160/performance.json).
+
+| Host | 500 repeated sorts | 500 cached accesses | Results |
+| --- | ---: | ---: | --- |
+| Apple Silicon, Xcode 16.4 | 22.84 ms | 0.806 ms | Identical |
+| Intel, Xcode 26.6 | 58.05 ms | 1.356 ms | Identical |
+
+These are same-host, warm-cache measurements of a 64-file list in the SwiftPM debug checker.  They do not measure USB throughput or overall release-app speed.  Other improvements are established by moving conversion off the main actor, avoiding unnecessary text-view updates, and bounding an omitted-word buffer to 32 bytes while still validating all input.
+
+The separate private Apple Silicon ZIP is ready.  Both public release listings, their notes and assets, all twelve version tags, frozen legacy source, and latest release state match the fresh baseline.  Only 1.5.1 and 2.0.4 remain public.
 
 ## Physical checks
 
