@@ -1,0 +1,220 @@
+{
+  "version": "2.0.5",
+  "build": "163",
+  "status": "verified-private-test-build",
+  "sourceCommit": "92c5424251ef5ffc2e4f180b6a8bf4ec2454b2dc",
+  "sourceTree": "fc810d80837ea2b7dbe11d087e54d0fad2759031",
+  "runID": 43756388436,
+  "runURL": "https://github.com/koralatov/alphasync/actions/runs/43756388436",
+  "runConclusion": "success",
+  "runAttempt": 1,
+  "changes": [
+    "Inspector Preview and its heading appear only for exactly one selected file",
+    "Neo and applet header icons and More Information remain without an enlarged duplicate symbol",
+    "Multiple file selection hides the whole Preview section",
+    "Existing file text, loading, error, cancellation, and asynchronous reading logic retained",
+    "Updated bundled Help and documentation; native capture of a live single-to-multiple selection change"
+  ],
+  "preserved": "Only AuxiliaryViews.swift changed among application Sources.  Core, hardware, USB, file operations, selection identity, the complete preview task, permanent sidebar, toolbar, recovery, and data protection match build 162.",
+  "hosts": [
+    {
+      "host": "arm",
+      "architecture": "arm64",
+      "xcode": "16.4",
+      "macOS": "15.8.2",
+      "jobID": 132941303336,
+      "conclusion": "success",
+      "swiftRegressions": 172,
+      "fixtures": 55,
+      "realWindowLayoutObservations": 32,
+      "sidebarWidthAndSizeRecords": 12,
+      "toolbarModesPerAppearance": 3,
+      "capturedImages": 48,
+      "swiftCompilerWarnings": 0,
+      "builtEditions": [
+        "universal",
+        "apple-silicon"
+      ]
+    },
+    {
+      "host": "intel",
+      "architecture": "x86_64",
+      "xcode": "26.6",
+      "macOS": "26.6.1",
+      "jobID": 132941303250,
+      "conclusion": "success",
+      "swiftRegressions": 172,
+      "fixtures": 55,
+      "realWindowLayoutObservations": 32,
+      "sidebarWidthAndSizeRecords": 12,
+      "toolbarModesPerAppearance": 3,
+      "capturedImages": 48,
+      "swiftCompilerWarnings": 0,
+      "builtEditions": [
+        "universal",
+        "apple-silicon"
+      ]
+    }
+  ],
+  "nativeChecks": {
+    "inspector": "File, live multiple selection, Neo, AlphaWord, dictionary, and unknown-app cases captured in Light and Dark and reviewed on both hosts.",
+    "browser": "All thirty-two window observations per host, first and final rows, warnings, reconnection, sidebar width and size cases, absent hide commands, and former-action checks passed.",
+    "toolbar": "All four commands, three display modes, saved changes, and minimum-width visibility passed in both appearances.",
+    "confirmation": "No default button; safe Return, keypad Enter, and initial Space; Escape cancels in both appearances.",
+    "preview": "Existing read-only text selection, scrolling, font, Find capability, and full clipboard checks passed.",
+    "deadline": "Both interface phases retain the combined failing 120-second deadline."
+  },
+  "verification": {
+    "allAutomatedChecksPassed": true,
+    "artifactDigests": 4,
+    "assetHashes": 12,
+    "help": [
+      {
+        "edition": "universal",
+        "version": "2.0.5",
+        "build": "163",
+        "authoredHelpFilesMatched": 20,
+        "searchIndexes": 1,
+        "help": "passed"
+      },
+      {
+        "edition": "apple-silicon",
+        "version": "2.0.5",
+        "build": "163",
+        "authoredHelpFilesMatched": 20,
+        "searchIndexes": 1,
+        "help": "passed"
+      }
+    ],
+    "offlineHelpPages": 18,
+    "offlineHelpLinks": 83,
+    "signatures": "ad hoc; hardened runtime and matching crash symbols verified",
+    "minimumDeployment": "13.0",
+    "nativeCanonicalDownloadsJob": 132943688496,
+    "nativeCanonicalDownloads": "Both exact canonical editions executed on Apple Silicon.",
+    "capturedImagesReviewed": 96,
+    "greenStatusAreas": [
+      {
+        "host": "arm",
+        "appearance": "light",
+        "greenPixelsInStatusArea": 116
+      },
+      {
+        "host": "arm",
+        "appearance": "dark",
+        "greenPixelsInStatusArea": 116
+      },
+      {
+        "host": "intel",
+        "appearance": "light",
+        "greenPixelsInStatusArea": 112
+      },
+      {
+        "host": "intel",
+        "appearance": "dark",
+        "greenPixelsInStatusArea": 118
+      }
+    ],
+    "swiftCompilerWarnings": 0,
+    "buildToolNotices": "Existing App Intents extraction and signed-helper stripping notices remain; both editions and helpers passed.",
+    "publication": "not requested; job skipped; no release or tag created",
+    "protectedReferences": {
+      "passed": true,
+      "publicTags": [
+        "v1.5.1",
+        "v2.0.4"
+      ],
+      "publicReleaseNotesAndAssetsUnchanged": true,
+      "retainedAssets": 18,
+      "versionTagsUnchanged": 12,
+      "frozenLegacyUnchanged": true,
+      "latest": "v2.0.4",
+      "ignoredVolatileFields": [
+        "download_count"
+      ],
+      "metadataFiles": {
+        "protected-before.json": "f35afd982d4e92a8d713ac0e95cc72383240123595c3fe0955cfd6252e1715af",
+        "protected-after.json": "f35afd982d4e92a8d713ac0e95cc72383240123595c3fe0955cfd6252e1715af"
+      }
+    }
+  },
+  "diagnosticRuns": [],
+  "artifacts": [
+    {
+      "id": 14178591770,
+      "name": "AlphaSync-interface-and-logs-macos-15-92c5424251ef5ffc2e4f180b6a8bf4ec2454b2dc",
+      "size": 1581791,
+      "digest": "sha256:157de2a05f943cf8b3c82845edf8365fdc7ced3e0a403d687f04210888d2d02b",
+      "downloadedDigest": "matched",
+      "url": "https://github.com/koralatov/alphasync/actions/runs/43756388436/artifacts/14178591770"
+    },
+    {
+      "id": 14178587593,
+      "name": "AlphaSync-interface-and-logs-macos-26-intel-92c5424251ef5ffc2e4f180b6a8bf4ec2454b2dc",
+      "size": 1614962,
+      "digest": "sha256:84f47b14e618b3648acd5a6acf2572066010a6d649e6b860bd5c150b31c83ea1",
+      "downloadedDigest": "matched",
+      "url": "https://github.com/koralatov/alphasync/actions/runs/43756388436/artifacts/14178587593"
+    },
+    {
+      "id": 14178293704,
+      "name": "AlphaSync-arm64-package-verification-92c5424251ef5ffc2e4f180b6a8bf4ec2454b2dc",
+      "size": 1261,
+      "digest": "sha256:3d75aef7148fd3477e47fe46563a5b7bd261dcb5a6fe45bb61dd89872354d11e",
+      "downloadedDigest": "matched",
+      "url": "https://github.com/koralatov/alphasync/actions/runs/43756388436/artifacts/14178293704"
+    },
+    {
+      "id": 14178219126,
+      "name": "AlphaSync-packages-92c5424251ef5ffc2e4f180b6a8bf4ec2454b2dc",
+      "size": 20940887,
+      "digest": "sha256:bd4354567fe67a6d7c08cafda2950e7ea77e3dd0f41488fc27f6ee369b124ea3",
+      "downloadedDigest": "matched",
+      "url": "https://github.com/koralatov/alphasync/actions/runs/43756388436/artifacts/14178219126"
+    }
+  ],
+  "privateTestZIP": {
+    "filename": "AlphaSync-2.0.5-163-macOS-13-apple-silicon.zip",
+    "size": 2918437,
+    "sha256": "da831ad34a5f7aec63c6ed6b81050721e65c05ba9e9c1860ffd76036eaa71043",
+    "availability": "separate private test copy; earlier candidates retained"
+  },
+  "physicalReport": "The user reports that build 162 appears to work on the M2 Air and will complete the remaining functional tests as available.  This is not a pass for every manual check.",
+  "unverified": [
+    "Physical M2 Air selection, file preview refresh, empty files, transfers, recovery, backup, and readback",
+    "Actual system sidebar size changes, final compositor appearance, full keyboard navigation, and VoiceOver",
+    "macOS 13 runtime, actual Login Items approval, and native Help Viewer"
+  ],
+  "stableGoal": "2.1 for Apple Silicon, followed by macOS compatibility maintenance; publication requires a separate request.",
+  "checkedAt": "2026-11-15T20:19:17.963787+00:00",
+  "files": {
+    "assets.json": {
+      "size": 2043,
+      "sha256": "4ea3fd62af20643d60c903c2e71ff771800071493209751dc63f31f122e4f02b"
+    },
+    "interface-layouts.json": {
+      "size": 43303,
+      "sha256": "46948731265d16fbbc1be31b95b542fe106f375e9595d25720cd50abae3287dc"
+    },
+    "interface-review.json": {
+      "size": 26900,
+      "sha256": "cfd941ee2576e448b2cef0f2eea7daaae7d26c2c4d418d8f77a0a864f05433ba"
+    },
+    "performance.json": {
+      "size": 817,
+      "sha256": "13236013b3ac5953e512c5bbd67aa6dec7f04a18861147db0840f473d1d6372d"
+    },
+    "protected-comparison.json": {
+      "size": 501,
+      "sha256": "aa3ef03011b1f34c3cb203568f2a28835a2b8bf791f9e26c051a9b45bd532b8c"
+    },
+    "sidebar-checks.json": {
+      "size": 2955,
+      "sha256": "5876183c1c89018494535d77fd5d70b63fde1d2de93078b95f919fa5e4e25cee"
+    },
+    "toolbar-checks.json": {
+      "size": 3449,
+      "sha256": "12984ab8f366a4cd11b1e4c2d7e30a5209a3d5393adb1a0b06a0f91d0a0c18dd"
+    }
+  }
+}

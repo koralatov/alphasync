@@ -1,0 +1,25 @@
+{
+  "kind": "existing diagnostic getter comparison; no USB throughput claim",
+  "results": {
+    "arm": {
+      "cachedAccessSeconds": 0.001125334,
+      "configuration": "SwiftPM debug checker; same host and fixture; warm cache",
+      "fileCount": 64,
+      "iterations": 500,
+      "kind": "AlphaSyncFileListComparison",
+      "repeatedSortSeconds": 0.04140475,
+      "resultsMatched": true,
+      "timingThreshold": "none; diagnostic only"
+    },
+    "intel": {
+      "cachedAccessSeconds": 0.003404848,
+      "configuration": "SwiftPM debug checker; same host and fixture; warm cache",
+      "fileCount": 64,
+      "iterations": 500,
+      "kind": "AlphaSyncFileListComparison",
+      "repeatedSortSeconds": 0.116231102,
+      "resultsMatched": true,
+      "timingThreshold": "none; diagnostic only"
+    }
+  }
+}
