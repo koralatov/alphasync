@@ -21,6 +21,8 @@ The toolbar bridge uses public `NSView.window`, `NSToolbar.displayMode`, and key
 
 The Neo heading remains grouped with its items.  A normal, untagged Label row inherits native sidebar font and symbol metrics, including the system’s Sidebar Icon Size choice.  It is not a new selection destination.  Keep the NavigationSplitView at the root and the zero-minimum flexible frames that corrected build 159’s table sizing.
 
+The native sidebar table includes a zero-height structural row for a Section without a separate header.  Geometry checks skip only that first structural row, then require the Neo heading and All Files row to have positive height and remain inside the visible viewport.  They do not skip clipped or zero-height content rows.
+
 Only wording changes in FileOperations.  Preserve the existing mode switch, USB buffers, serial executor, packet handling, limits, operation consent, backup cancellation, recovery-before-write rule, and readback verification.  Keep all prior private builds and evidence, public release notes and assets, all twelve version tags, and frozen legacy source.
 
 ## Full compile and build milestone

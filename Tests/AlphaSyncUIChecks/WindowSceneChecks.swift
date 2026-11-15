@@ -161,7 +161,8 @@ private final class WindowSceneDriver: ObservableObject {
         await InterfaceChecks.yieldLayout()
         let table = try InterfaceChecks.fileTable(in: window)
         if let content = window.contentView, let sidebar = InterfaceChecks.descendants(content).compactMap({ $0 as? NSTableView }).first(where: { $0 !== table && $0.numberOfRows >= 3 }) {
-            try InterfaceChecks.require(abs(sidebar.rect(ofRow: 0).height - sidebar.rect(ofRow: 1).height) < 1,
+            let first = sidebar.rect(ofRow: 0).height == 0 ? 1 : 0
+            try InterfaceChecks.require(sidebar.rect(ofRow: first).height > 0 && abs(sidebar.rect(ofRow: first).height - sidebar.rect(ofRow: first + 1).height) < 1,
                                         "The Neo heading is still smaller than its child rows")
         } else { try InterfaceChecks.require(false, "Missing sidebar while checking the Neo heading") }
     }
@@ -183,6 +184,7 @@ private final class WindowSceneDriver: ObservableObject {
             await resize(window, width: 820, height: 560)
             try InterfaceChecks.require(window.toolbar != nil && !(window.toolbar?.items.isEmpty ?? true),
                                         "The real SwiftUI scene did not install the app toolbar")
+            InterfaceChecks.checkpoint("Connected toolbar labels: \(window.toolbar?.items.map(\.label) ?? [])")
             let initial = try await InterfaceChecks.checkBrowser(in: window, stage: "connected-" + label)
             store.connectionIssue = "A second Neo could not be opened. Close other Neo software and choose Try Again."
             await InterfaceChecks.yieldLayout()

@@ -61,7 +61,10 @@ struct InterfaceChecks {
         var record: [String: Any] = ["stage": stage, "contentLayout": frameRecord(safe), "fileRows": rows,
                                      "fullSizeContentView": window.styleMask.contains(.fullSizeContentView),
                                      "toolbarItems": window.toolbar?.items.count ?? 0]
-        for (name, list, indices) in [("files", table, rows > 0 ? [0] : []), ("sidebar", sidebar, [0, 1])] {
+        // A Section without a separate header has a zero-height structural row before its content.
+        let firstSidebarRow = sidebar.rect(ofRow: 0).height == 0 ? 1 : 0
+        record["firstSidebarContentRow"] = firstSidebarRow
+        for (name, list, indices) in [("files", table, rows > 0 ? [0] : []), ("sidebar", sidebar, [firstSidebarRow, firstSidebarRow + 1])] {
             guard let scroll = list.enclosingScrollView else { throw CheckFailure(description: "Missing scroll view") }
             let clip = scroll.contentView.convert(scroll.contentView.bounds, to: nil)
             for index in indices {
