@@ -84,12 +84,6 @@ public struct MainView: View {
         }.padding(24)
     }
     private var fileManager: some View {
-        // Native navigation and tables must use the viewport, not their intrinsic ideal size.
-        GeometryReader { viewport in
-            fileBrowser.frame(width: viewport.size.width, height: viewport.size.height)
-        }
-    }
-    private var fileBrowser: some View {
         NavigationSplitView {
             List(selection: $store.sidebar) {
                 ForEach(store.devices, id: \.connection) { device in
@@ -103,13 +97,12 @@ public struct MainView: View {
                 }
             }.listStyle(.sidebar).navigationSplitViewColumnWidth(min: 180, ideal: 220, max: 300)
         } detail: {
-            VStack(spacing: 0) {
-                if let issue = store.connectionIssue { connectionWarning(issue) }
-                GeometryReader { viewport in
-                    fileTable.frame(width: viewport.size.width, height: viewport.size.height).clipped()
+            // Keep the native table as the column root so its scroll view receives bar insets.
+            fileTable
+                .safeAreaInset(edge: .top, spacing: 0) {
+                    if let issue = store.connectionIssue { connectionWarning(issue) }
                 }
-                connectionStatus
-            }
+                .safeAreaInset(edge: .bottom, spacing: 0) { connectionStatus }
         }
     }
     private var fileTable: some View {

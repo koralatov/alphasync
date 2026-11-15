@@ -8,7 +8,7 @@ The user corrected the proposed 2.0.6 version to the next 2.0.5 build. Prepare *
 
 The file manager wrapped NavigationSplitView in a vertical stack with warning and status rows, then clipped the browser. That confined drawing without preserving the toolbar safe area used by the native sidebar and table. Previous interface checks used ordinary titled windows, so they did not establish first-row visibility with the app’s full-size content and unified toolbar arrangement.
 
-Keep the navigation container within the window’s measured viewport. Reserve warning and status rows inside its file column, around a table sized to the remaining space. The sidebar retains its native toolbar safe area. Remove the outer clipping wrapper; clip only the table’s own measured viewport. Do not add fixed toolbar heights, negative padding, window repositioning, or private view traversal to the app.
+Keep NavigationSplitView and its native table as their respective layout roots. Apply warning and status safe-area insets directly to the table so its own scroll view receives the reserved space. The sidebar retains its native toolbar safe area. Remove the clipping and geometry wrappers. Do not add fixed toolbar heights, negative padding, window repositioning, or private view traversal to the app.
 
 AppKit’s [contentLayoutRect](https://developer.apple.com/documentation/appkit/nswindow/contentlayoutrect) gives the area not obscured by the title bar and toolbar. Measure those live coordinates in the native checks instead of assuming the same toolbar height on every macOS version. Keep normal SwiftUI layout inside each navigation column so the file table cannot draw beneath its neighbouring bars.
 
@@ -35,6 +35,8 @@ Source `f61b51cdd1fa51d7f53d2f46d111de15b040b80a` passed the Swift regressions o
 The first scene harness, source `a52dc451661c654f3fbed204aadbe7eccab21039`, passed component checks but timed out in the application event loop before opening its window. Its regular activation policy was set in a driver created only by that window. Move activation to application launch through the test App delegate, with startup and probe checkpoints. Keep the timeout and all assertions; the production app is unchanged by this harness correction.
 
 The activated harness reached application launch but still opened no window as a bare command-line executable. Launch the checker through Launch Services in a temporary, ad-hoc-signed app bundle with a unique test identifier. Pass the output directory as a named argument, capture stdout and stderr, and sample the app’s own PID on timeout. Require a fresh success receipt for all twenty layouts in addition to the launcher’s exit status, since the launcher does not report the app’s status. Both phases still share the combined 120-second deadline. No temporary fixture bundle is shipped or added to the repository.
+
+The bundled harness opened the actual window and reproduced the overflow. Its public view hierarchy showed a 1,163-point native split view inside a 612-point content view, with a 1,024-point table, after warning insertion. Geometry wrappers did not correct the native column’s sizing. Remove those wrappers and keep the table as the detail column’s root; attach both bar insets directly to that table instead of wrapping the column or the navigation container. The real scene, warnings, first-row assertions, and scrolling checks remain mandatory.
 
 ## Physical checks and 2.1
 
