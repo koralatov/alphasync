@@ -134,3 +134,9 @@ The user reports that build 158 now connects and lists Neo files on the M2 Air. 
 The [layout investigation and 2.1 checklist](../docs/connected-layout.md) define the remaining physical transfer, backup, recovery, encoding, dictionary, accessibility, Help, Login Items, and macOS checks.  Passing the hosted layout checks does not complete these real-device checks.  Keep the public releases and all earlier private candidates unchanged.
 
 Build 159 passed the full non-publishing [run 43718196869](https://github.com/koralatov/alphasync/actions/runs/43718196869).  Both hosts passed 157 Swift tests, all 55 fixtures, twenty actual-window observations, and both app builds.  Both exact packaged apps passed native Apple Silicon execution.  Independent asset and Help checks and captured-image review are complete.  These results do not complete the physical checklist above.  See the [record](../releases/verification/2.0.5-159/verification.json).
+
+## Build 160 maintenance checks
+
+Confirm 2.0.5 (160) in About.  Repeat the build 159 layout checks, file-list filtering, renaming, device switching, and reconnection.  Check that lists update immediately and that selection does not move to another file.  Scroll a read-only preview, change its font, and confirm selection, Find, and copy still work.  Check Refresh or Try Again after a recoverable connection failure.
+
+Back up disposable files and stop during a read.  Confirm earlier files remain available, the incomplete folder stays marked, and the log accurately records cancellation.  Exercise dictionary input with long omitted words and unsupported characters, review its warning, and verify imported results.  Repeat opening, saving, drag export, replacement, recovery, and readback checks.  The [maintenance review](../docs/maintenance-160.md) distinguishes hosted verification and diagnostic timing from physical results.

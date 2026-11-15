@@ -8,6 +8,8 @@ A Neo can remain in keyboard mode with public version 2.0.4.  Unpublished 2.0.5 
 
 Private **2.0.5, build 159** is ready to test the correction for sidebar and file rows hidden beneath the toolbar.  It also aligns Clear with its one-applet rule and preserves the working USB code. [Run 43718196869](https://github.com/koralatov/alphasync/actions/runs/43718196869) passed 157 Swift tests, all 55 fixtures, twenty browser layout observations per host, both app builds, and exact-package execution on Apple Silicon.  Independent hashes and Help checks passed.  The [layout investigation](docs/connected-layout.md) and [record](releases/verification/2.0.5-159/verification.json) explain the results and remaining physical checks toward stable **2.1 for Apple Silicon**.  After that release is verified and published, planned development will pause except for future macOS compatibility updates.  Only 1.5.1 and 2.0.4 are public.
 
+**Build 160 is being prepared for performance and correctness testing.**  It improves preview responsiveness, list reuse, dictionary import memory use, explicit retry, and backup cancellation.  See the [maintenance review](docs/maintenance-160.md).  It adds no features and preserves the working USB packet handling and build 159’s layout.
+
 ## Version 2.0.4
 
 Version 2.0.4 improves the Swift rewrite first released as 2.0 and requires **macOS 13 or later**. It includes all changes prepared under the unpublished 2.0.1 development version.
