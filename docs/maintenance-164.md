@@ -53,3 +53,13 @@ Continue the [manual checklist](../tests/manual-checks.md) on the M2 Air when av
 - [Menus](https://developer.apple.com/design/human-interface-guidelines/menus)
 - [Context menus](https://developer.apple.com/design/human-interface-guidelines/context-menus)
 - [Byte-count format style](https://developer.apple.com/documentation/foundation/bytecountformatstyle)
+
+## Verified private candidate
+
+Final source `f79cf1d532375e4c38b72486e9488fb2aa3868cf` passed [run 43772376923](https://github.com/koralatov/alphasync/actions/runs/43772376923) on 15 November 2026.  Both pinned compilers passed all 190 Swift regressions, 55 fixtures, native component and scene checks, exact formatting comparisons, and both app and helper builds without Swift compiler warnings.  Each host retained thirty-two browser observations, twelve sidebar records, six toolbar records, six Find observations, and 54 captures.  The native Find menu command opened the loaded Reader’s Find bar with an unrelated field focused in both appearances.
+
+Both exact canonical packages ran on Apple Silicon.  Independent checks matched four artifact digests, twelve asset hashes, both Help books, and their tested source.  All 108 captures were reviewed.  Layer captures do not establish final system-composited appearance: the Intel dark captures include opaque white toolbar material masks.  That appearance remains a physical check.  The unbundled About fixture also uses its documented fallback icon; package metadata and artwork were checked separately.
+
+The final checker calls the native menu’s public delegate before validating lazy menu content, matching AppKit’s preparation before display.  It independently requires the correct active Reader target and retains every command-availability and Find-bar assertion.  Only the checker changed in the final source.  The [permanent record](../releases/verification/2.0.5-164/verification.json) preserves earlier failed candidates and all verification limits.
+
+The private Apple Silicon test ZIP is saved separately.  Public releases, their notes and assets, all twelve version tags, and the frozen legacy branch are unchanged.  Publication was skipped.  Continue the physical checks above before deciding on stable 2.1.

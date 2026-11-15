@@ -1,0 +1,291 @@
+{
+  "version": "2.0.5",
+  "build": "164",
+  "status": "verified-private-test-build",
+  "sourceCommit": "f79cf1d532375e4c38b72486e9488fb2aa3868cf",
+  "sourceTree": "84a5021c1519a383ca062b2fccf728104c9925dc",
+  "runID": 43772376923,
+  "runURL": "https://github.com/koralatov/alphasync/actions/runs/43772376923",
+  "runConclusion": "success",
+  "runAttempt": 1,
+  "changes": [
+    "Cancellation reaches the final handshake before creation, renaming, replacement, or clearing; committed writes finish and verify",
+    "Read-only inventories stop between completed requests; cancelled refreshes preserve healthy connections and unpublished handles are closed",
+    "Stopped initial backup reports cancellation without creating folders or claiming completeness",
+    "Task-labelled progress and coalesced non-modal accessibility updates, with modal and Quit speech suppression",
+    "Native Find uses the loaded active Reader target even when another control is focused; irrelevant context actions are hidden",
+    "One main-actor formatter reuses existing byte and KB rules and resets on locale changes",
+    "Current Help, release notes, technical review, and manual checklist"
+  ],
+  "focusedCommits": "commits.json",
+  "regressionCoverage": {
+    "previousSwiftTests": 172,
+    "newWriteCancellationTests": 7,
+    "newInventoryCancellationTests": 7,
+    "newAccessibilityFeedbackTests": 4,
+    "totalSwiftTests": 190
+  },
+  "preserved": {
+    "baseline": "0a94cb3c2b1659b436dfa696e8bff48a2d762ba0",
+    "exactPaths": [
+      "Sources/AlphaSyncHardware/USBTransferBuffers.swift",
+      "Sources/AlphaSyncHardware/USBDiscovery.swift",
+      "Sources/AlphaSyncHardware/USBHostTransport.swift",
+      "Sources/AlphaSyncHardware/USBNotifications.swift",
+      "Sources/AlphaSyncHardware/USBModeSwitchConnection.swift",
+      "Sources/AlphaSyncHardware/NeoModeSwitch.swift",
+      "Sources/AlphaSyncUI/DeviceBrowser.swift",
+      "Sources/AlphaSyncUI/AuxiliaryViews.swift",
+      "Sources/AlphaSyncCore/AtomicFileStore.swift",
+      "Sources/AlphaSyncCore/AlphaWordCodec.swift",
+      "Sources/AlphaSyncCore/DictionaryCodec.swift"
+    ],
+    "behaviour": "Working USB setup, endpoints, packet fields and successful command sequences, codecs, atomic files, recovery material, permanent sidebar, and file-only Inspector are retained.  Independent legacy wire tests verify writes and readback."
+  },
+  "hosts": [
+    {
+      "host": "arm",
+      "architecture": "arm64",
+      "xcode": "16.4",
+      "macOS": "15.8.2",
+      "jobID": 132990948276,
+      "conclusion": "success",
+      "swiftRegressions": 190,
+      "fixtures": 55,
+      "realWindowLayoutObservations": 32,
+      "sidebarWidthAndSizeRecords": 12,
+      "toolbarRecords": 6,
+      "findCommandRecords": 6,
+      "capturedImages": 54,
+      "swiftCompilerWarnings": 0,
+      "buildToolNotices": 6,
+      "builtEditions": [
+        "universal",
+        "apple-silicon"
+      ]
+    },
+    {
+      "host": "intel",
+      "architecture": "x86_64",
+      "xcode": "26.6",
+      "macOS": "26.6.1",
+      "jobID": 132990948037,
+      "conclusion": "success",
+      "swiftRegressions": 190,
+      "fixtures": 55,
+      "realWindowLayoutObservations": 32,
+      "sidebarWidthAndSizeRecords": 12,
+      "toolbarRecords": 6,
+      "findCommandRecords": 6,
+      "capturedImages": 54,
+      "swiftCompilerWarnings": 0,
+      "buildToolNotices": 6,
+      "builtEditions": [
+        "universal",
+        "apple-silicon"
+      ]
+    }
+  ],
+  "nativeChecks": {
+    "find": "Browser disabled, active Reader enabled, and browser disabled after closing Reader, in both appearances.  The actual native menu action opens the Reader Find bar with an unrelated field focused.",
+    "progress": "Known and unknown progress captured in both appearances.  Native progress values and explicit task labels are retained; duplicate decorative elements are hidden from accessibility.",
+    "feedback": "Isolated AppStore tests cover coalescing, duplicate suppression, successful operations, pending warnings, and shutdown.  Actual VoiceOver speech remains manual.",
+    "browser": "All previous thirty-two observations, sidebar widths and sizes, toolbar modes, warnings, first and final rows, and reconnection passed.",
+    "keyboard": "Existing no-default destructive confirmation and read-only selection, scrolling, font, Find capability, and clipboard checks passed.",
+    "deadline": "The existing combined failing 120-second interface deadline is unchanged."
+  },
+  "verification": {
+    "allAutomatedChecksPassed": true,
+    "artifactDigests": 4,
+    "assetHashes": 12,
+    "help": [
+      {
+        "edition": "universal",
+        "version": "2.0.5",
+        "build": "164",
+        "authoredHelpFilesMatched": 20,
+        "searchIndexes": 1,
+        "help": "passed"
+      },
+      {
+        "edition": "apple-silicon",
+        "version": "2.0.5",
+        "build": "164",
+        "authoredHelpFilesMatched": 20,
+        "searchIndexes": 1,
+        "help": "passed"
+      }
+    ],
+    "offlineHelpPages": 18,
+    "offlineHelpLinks": 83,
+    "signatures": "ad hoc; hardened runtime, helper identities, and matching crash symbols verified",
+    "minimumDeployment": "13.0",
+    "nativeCanonicalDownloadsJob": 132993540718,
+    "nativeCanonicalDownloads": "Both exact canonical editions executed on Apple Silicon.",
+    "capturedImagesReviewed": 108,
+    "greenStatusAreas": [
+      {
+        "host": "arm",
+        "appearance": "light",
+        "greenPixelsInStatusArea": 116
+      },
+      {
+        "host": "arm",
+        "appearance": "dark",
+        "greenPixelsInStatusArea": 116
+      },
+      {
+        "host": "intel",
+        "appearance": "light",
+        "greenPixelsInStatusArea": 112
+      },
+      {
+        "host": "intel",
+        "appearance": "dark",
+        "greenPixelsInStatusArea": 118
+      }
+    ],
+    "swiftCompilerWarnings": 0,
+    "publication": "not requested; skipped; no release or tag created",
+    "protectedReferences": {
+      "passed": true,
+      "publicTags": [
+        "v1.5.1",
+        "v2.0.4"
+      ],
+      "publicReleaseNotesAndAssetsUnchanged": true,
+      "retainedAssets": 18,
+      "versionTagsUnchanged": 12,
+      "frozenLegacyUnchanged": true,
+      "latest": "v2.0.4",
+      "ignoredVolatileFields": [
+        "download_count"
+      ],
+      "metadataFiles": {
+        "protected-before.json": "f35afd982d4e92a8d713ac0e95cc72383240123595c3fe0955cfd6252e1715af",
+        "protected-after.json": "f35afd982d4e92a8d713ac0e95cc72383240123595c3fe0955cfd6252e1715af"
+      }
+    }
+  },
+  "diagnosticRuns": [
+    {
+      "source": "6272f3c7839f9c3ccaaa3946b8a71541d6a32ccb",
+      "runID": 43768957269,
+      "result": "Apple Silicon passed 190 Swift tests and 55 fixtures, then the native comparison caught changed units and rounding from ByteCountFormatStyle.  The output assertion was retained; final code reuses the previous formatter."
+    },
+    {
+      "source": "ccca60a2f308f6085044ade15c85c4977e605cdc",
+      "runID": 43769493174,
+      "result": "The diagnostic timing baseline required an explicit main-actor annotation under Swift 6.  The final helper retains the exact-output comparison and diagnostic timings without a speed threshold."
+    },
+    {
+      "source": "2703cae5b18158ac9b2e77fecc9e1d6ca735a613",
+      "runID": 43769905312,
+      "result": "Intel passed 190 Swift tests, 55 fixtures, native components, and exact formatting, then the real-window Find check caught unavailable commands.  The older compiler also required an explicitly typed Sendable timing closure."
+    },
+    {
+      "source": "992be3fdb6d3b0df1d8450c0f1e83a32418c2dee",
+      "runID": 43770646520,
+      "result": "Both hosts passed 190 Swift tests, 55 fixtures, native components, and exact formatting.  Find remained unavailable in a key Reader despite shared scene commands.  The final correction uses public key-window notifications and weak references to owned text views; all original menu and native Find-bar assertions remain."
+    },
+    {
+      "source": "8652e709b62e994a5d8a2679d0f3853866d8b3f4",
+      "runID": 43771761939,
+      "result": "The registry candidate required fully qualified NSWindow notification names.  The correction keeps the same public notifications, weak text-view associations, and native assertions."
+    },
+    {
+      "source": "de4930bf9aec4bdf396a13a28d7c4c3c9fc1fd24",
+      "runID": 43771890814,
+      "result": "Both hosts reached the native interface check, which still observed unavailable Reader Find items before preparing the lazy native menu.  The final checker calls the public menu delegate as AppKit does before display, asserts the active Reader target independently, and retains every command-availability and native Find-bar assertion.  Only the checker changed in the final source."
+    }
+  ],
+  "artifacts": [
+    {
+      "id": 14185412142,
+      "name": "AlphaSync-arm64-package-verification-f79cf1d532375e4c38b72486e9488fb2aa3868cf",
+      "size": 1260,
+      "digest": "sha256:3592e07a4e5badf54a637f2d3219e5c5ff857db95a5a50ad1817660b2a06c8e6",
+      "downloadedDigest": "matched",
+      "url": "https://github.com/koralatov/alphasync/actions/runs/43772376923/artifacts/14185412142"
+    },
+    {
+      "id": 14184957003,
+      "name": "AlphaSync-packages-f79cf1d532375e4c38b72486e9488fb2aa3868cf",
+      "size": 21209795,
+      "digest": "sha256:b08a345b2839b49df0ca28fc94972b163b4c5f03b2e3eeb391a3c587df833c30",
+      "downloadedDigest": "matched",
+      "url": "https://github.com/koralatov/alphasync/actions/runs/43772376923/artifacts/14184957003"
+    },
+    {
+      "id": 14184911991,
+      "name": "AlphaSync-interface-and-logs-macos-26-intel-f79cf1d532375e4c38b72486e9488fb2aa3868cf",
+      "size": 1657747,
+      "digest": "sha256:ff6f37e55e1c83a2a0210ea1d65cff9b8adefbdf8272c2044b32e0221bd25088",
+      "downloadedDigest": "matched",
+      "url": "https://github.com/koralatov/alphasync/actions/runs/43772376923/artifacts/14184911991"
+    },
+    {
+      "id": 14184683032,
+      "name": "AlphaSync-interface-and-logs-macos-15-f79cf1d532375e4c38b72486e9488fb2aa3868cf",
+      "size": 1621950,
+      "digest": "sha256:59a18b04b4b2ea7f05015f490b129df20f6273b8a0c11dfa02365e9839e6d466",
+      "downloadedDigest": "matched",
+      "url": "https://github.com/koralatov/alphasync/actions/runs/43772376923/artifacts/14184683032"
+    }
+  ],
+  "privateTestZIP": {
+    "filename": "AlphaSync-2.0.5-164-macOS-13-apple-silicon.zip",
+    "size": 2945318,
+    "sha256": "b0d8ad250b7b4c0f8737f6fabac3954a76229e816b247886981906e6c6671757",
+    "availability": "separate private test copy; earlier candidates retained"
+  },
+  "unverified": [
+    "Physical M2 Air transfers, Quit boundaries, recovery, stopped initial backups, and readback",
+    "Actual VoiceOver speech and focus, context-menu behaviour, regional settings, and full screen-composited appearance",
+    "macOS 13 runtime, actual Login Items approval, and native Help Viewer"
+  ],
+  "stableGoal": "The user will test this copy before deciding whether to prepare and publish stable 2.1.",
+  "checkedAt": "2026-11-15T23:46:15.225391+00:00",
+  "files": {
+    "assets.json": {
+      "size": 2043,
+      "sha256": "b8082b67570b0df916593ba64ec50582acc13e6e85fbbe79573553596e112fdb"
+    },
+    "commits.json": {
+      "size": 3485,
+      "sha256": "5d175a35cb0d4659815783563a07f20386e5342d98179ffad2129ad2516c1cbc"
+    },
+    "find-command-checks.json": {
+      "size": 2661,
+      "sha256": "b65458eb0acf6bd19991df442338102211658671698215a416a5ac2311683621"
+    },
+    "formatting-performance.json": {
+      "size": 1694,
+      "sha256": "604ff5a4b476c74f77f865885ebb1a3f1a5e7dee3c193e0c42674f7af4623f05"
+    },
+    "interface-layouts.json": {
+      "size": 43303,
+      "sha256": "46948731265d16fbbc1be31b95b542fe106f375e9595d25720cd50abae3287dc"
+    },
+    "interface-review.json": {
+      "size": 29881,
+      "sha256": "80e7ea0e22a9571508042d6986d8b05eb86b6731fe003f8d3c03ffcbee8c8cc2"
+    },
+    "performance.json": {
+      "size": 683,
+      "sha256": "8131e5b975c9d178d763402e5752dc2235f239aeaadd254a161068b9ea134fae"
+    },
+    "protected-comparison.json": {
+      "size": 501,
+      "sha256": "aa3ef03011b1f34c3cb203568f2a28835a2b8bf791f9e26c051a9b45bd532b8c"
+    },
+    "sidebar-checks.json": {
+      "size": 2955,
+      "sha256": "5876183c1c89018494535d77fd5d70b63fde1d2de93078b95f919fa5e4e25cee"
+    },
+    "toolbar-checks.json": {
+      "size": 3449,
+      "sha256": "12984ab8f366a4cd11b1e4c2d7e30a5209a3d5393adb1a0b06a0f91d0a0c18dd"
+    }
+  }
+}
