@@ -208,10 +208,22 @@ struct OperationProgress: View {
 }
 
 public enum FileSize {
-    private static let byteCountStyle = ByteCountFormatStyle(style: .file, allowedUnits: [.bytes, .kb],
-        spellsOutZero: false, includesActualByteCount: false, locale: .autoupdatingCurrent)
+    private static func makeByteCountFormatter() -> ByteCountFormatter {
+        let formatter = ByteCountFormatter()
+        formatter.countStyle = .file; formatter.allowedUnits = [.useBytes, .useKB]
+        formatter.allowsNonnumericFormatting = false
+        return formatter
+    }
+    @MainActor private static var byteCountFormatter = makeByteCountFormatter()
+    // The process-lifetime observer resets Foundation’s locale-dependent formatter on the main queue.
+    @MainActor private static let localeObserver = NotificationCenter.default.addObserver(
+        forName: NSLocale.currentLocaleDidChangeNotification, object: nil, queue: .main) { _ in
+            MainActor.assumeIsolated { byteCountFormatter = makeByteCountFormatter() }
+        }
+    @MainActor
     public static func compact(_ value: Int) -> String {
-        byteCountStyle.format(Int64(value))
+        _ = localeObserver
+        return byteCountFormatter.string(fromByteCount: Int64(value))
     }
     public static func exact(_ value: Int) -> String { "\(value.formatted()) " + (value == 1 ? "byte" : "bytes") }
 }

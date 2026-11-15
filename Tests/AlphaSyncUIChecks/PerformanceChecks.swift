@@ -55,10 +55,12 @@ enum PerformanceChecks {
             return formatter.string(fromByteCount: Int64(value))
         }
         let expected = sizes.map(previous)
-        let actual = sizes.map(FileSize.compact)
+        let actual = sizes.map { FileSize.compact($0) }
         try InterfaceChecks.require(actual == expected, "File-size formatting changed: previous \(expected), current \(actual)")
+        NotificationCenter.default.post(name: NSLocale.currentLocaleDidChangeNotification, object: nil)
+        try InterfaceChecks.require(sizes.map { FileSize.compact($0) } == expected, "Locale invalidation changed file-size labels")
         let iterations = 100
-        func measure(_ format: (Int) -> String) -> (seconds: Double, characters: Int) {
+        func measure(_ format: @MainActor (Int) -> String) -> (seconds: Double, characters: Int) {
             var characters = 0
             let duration = ContinuousClock().measure {
                 for _ in 0..<iterations { for size in sizes { characters += format(size).count } }
@@ -69,9 +71,9 @@ enum PerformanceChecks {
         let baseline = measure(previous), reusable = measure(FileSize.compact)
         try InterfaceChecks.require(baseline.characters == reusable.characters, "The formatter comparison lost results")
         let report: [String: Any] = ["kind": "AlphaSyncFileSizeFormattingComparison", "locale": Locale.current.identifier,
-            "configuration": "SwiftPM debug checker; same host, values, and locale; warm format style",
+            "configuration": "SwiftPM debug checker; same host, values, and locale; warm reused formatter",
             "sizes": sizes, "formatted": actual, "iterations": iterations,
-            "freshFormatterSeconds": baseline.seconds, "reusableStyleSeconds": reusable.seconds,
+            "freshFormatterSeconds": baseline.seconds, "reusedFormatterSeconds": reusable.seconds,
             "resultsMatched": true, "timingThreshold": "none; diagnostic only"]
         try JSONSerialization.data(withJSONObject: report, options: [.prettyPrinted, .sortedKeys])
             .write(to: output.appendingPathComponent("formatting-performance.json"), options: .atomic)

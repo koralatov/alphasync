@@ -30,7 +30,9 @@ The real SwiftUI scene checker exercises all four Find commands’ availability 
 
 ## File-size formatting
 
-Use one immutable byte-count format style with the autoupdating locale, decimal file units, bytes and KB, numeric zero, and no extra actual-byte-count suffix.  Compare eleven boundary and representative values against build 163’s fresh formatter on each native host.  Record same-host warm diagnostic timings without a speed threshold or USB throughput claim.  Exact byte counts remain unchanged.
+Reuse one main-actor byte-count formatter with the existing decimal file units, bytes and KB, and numeric zero.  Reset it on the system’s locale-change notification.  Compare eleven boundary and representative values against build 163’s fresh formatter on each native host, including after locale invalidation.  Record same-host warm diagnostic timings without a speed threshold or USB throughput claim.  Exact byte counts remain unchanged.
+
+The initial candidate used an immutable format style.  Its native comparison caught changed units and rounding at 999 bytes and at larger sizes.  The final implementation reuses the existing formatter API instead, retaining the same comparison and recording this correction as a focused follow-up commit.
 
 ## Compile and build milestone
 
