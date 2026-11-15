@@ -24,6 +24,8 @@ Add twenty native browser layout observations across Light and Dark Mode, using 
 
 Inspect captured images as well as geometry. Independently verify artifact digests, all twelve assets, both Help books, and authored files against the tested source. Keep a separate private Apple Silicon ZIP and preserve earlier candidates. Record actual results after execution; hosted checks cannot establish every real Neo operation.
 
+The initial milestone source `8bc3fbd21135c1b40a4942465d465fe041d0ec4a` hit the older compiler’s type-checking limit in the expanded sample-file expression before tests ran. Replace that expression with typed intermediate values and a simple loop, without changing the app correction. Require a fresh full milestone for the corrected source and retain the failed run as diagnostic history.
+
 ## Physical checks and 2.1
 
 The intended stable release is **2.1 for Apple Silicon**. Build 159 is a test toward that goal. Retain both current targets during validation; this request does not retire an edition or publish 2.1. After 2.1 is verified and released, suspend feature development and limit planned maintenance to future macOS compatibility.

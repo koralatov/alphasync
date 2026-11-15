@@ -162,10 +162,15 @@ struct InterfaceChecks {
         var applet = try NeoApplet(header: header)
         let id = UUID()
         applet.limits = try NeoFileLimits(minimum: 512, maximum: 51_200)
-        applet.files = try (0..<fileCount).map { index in
-            NeoFile(id: NeoFileID(connection: id, applet: applet.id, index: UInt8(index + 1)),
-                    attributes: try NeoFileAttributes(name: "File \(index + 1)", fileSpace: index % 8 + 1), size: 512 + index * 1024)
+        var files: [NeoFile] = []
+        for index in 0..<fileCount {
+            let number = index + 1
+            let size = 512 + (index % 8) * 1024
+            let fileID = NeoFileID(connection: id, applet: applet.id, index: UInt8(number))
+            let attributes = try NeoFileAttributes(name: "File \(number)", allocation: size, fileSpace: (index % 8) + 1)
+            files.append(NeoFile(id: fileID, attributes: attributes, size: size))
         }
+        applet.files = files
         header[20] = 0xb0
         header.replaceSubrange(24..<60, with: Data(repeating: 0, count: 36))
         let readOnlyName = Data("Read-only Applet".utf8)
