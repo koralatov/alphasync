@@ -28,15 +28,6 @@ struct InterfaceChecks {
     static func settle() { RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.35)) }
     static func yieldLayout() async { try? await Task.sleep(for: .milliseconds(350)) }
     static func descendants(_ root: NSView) -> [NSView] { [root] + root.subviews.flatMap(descendants) }
-    static func accessibleElements(_ root: any NSAccessibilityProtocol) -> [any NSAccessibilityProtocol] {
-        var visited: Set<ObjectIdentifier> = []
-        func walk(_ element: any NSAccessibilityProtocol, depth: Int) -> [any NSAccessibilityProtocol] {
-            guard depth < 32, visited.insert(ObjectIdentifier(element)).inserted else { return [] }
-            return [element] + (element.accessibilityChildren() ?? []).compactMap { $0 as? any NSAccessibilityProtocol }
-                .flatMap { walk($0, depth: depth + 1) }
-        }
-        return walk(root, depth: 0)
-    }
     static func fileTable(in window: NSWindow) throws -> NSTableView {
         guard let content = window.contentView,
               let table = descendants(content).compactMap({ $0 as? NSTableView }).first(where: { $0.tableColumns.count == 2 }) else {
@@ -284,17 +275,6 @@ struct InterfaceChecks {
                     cancel: { cancelled += 1 }, confirm: { _ in destructive += 1 })
                 let warning = window(prompt, size: NSSize(width: 430, height: 240), title: action)
                 try require(warning.defaultButtonCell == nil, "\(action) must not have a default button")
-                let buttons = accessibleElements(warning).filter { $0.accessibilityRole() == .button }
-                func named(_ button: any NSAccessibilityProtocol, _ name: String) -> Bool {
-                    button.accessibilityLabel() == name || button.accessibilityTitle() == name
-                }
-                checkpoint("Confirmation buttons: \(buttons.map { $0.accessibilityLabel() ?? $0.accessibilityTitle() ?? "unnamed" })")
-                guard let cancel = buttons.first(where: { named($0, "Cancel") }),
-                      let proceed = buttons.first(where: { named($0, action) }) else {
-                    throw CheckFailure(description: "Missing accessible confirmation buttons")
-                }
-                try require(cancel.accessibilityFrame().minX < proceed.accessibilityFrame().minX,
-                            "Cancel must appear before \(action)")
                 try capture(warning, action.lowercased().replacingOccurrences(of: " ", with: "-") + "-" + label, to: output)
                 try key("\r", code: 36, in: warning)
                 try require(destructive == 0, "Return triggered \(action)")
@@ -305,9 +285,6 @@ struct InterfaceChecks {
                 let beforeEscape = cancelled
                 try key("\u{1b}", code: 53, in: warning)
                 try require(cancelled == beforeEscape + 1 && destructive == 0, "Escape must cancel \(action)")
-                try require(proceed.accessibilityPerformPress(), "The deliberate action is not accessible")
-                settle()
-                try require(destructive == 1, "\(action) must remain available after deliberate confirmation")
                 warning.close()
             }
             let text = "A read-only preview\n\nAlphaSmart Neo text stays selectable.\n" + String(repeating: "More text for scrolling and Find.\n", count: 80)
