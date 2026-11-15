@@ -25,25 +25,27 @@ struct WindowSceneChecksApp: App {
     }
 
     var body: some Scene {
-        Window("AlphaSync", id: "main") {
-            MainView(store: driver.store)
-                .environment(\.sidebarRowSize, driver.sidebarSize)
-                .background(WindowSceneProbe { driver.start(in: $0) })
-                .background(FindSceneLauncher(driver: driver))
-        }
-        .defaultSize(width: 360, height: 230)
-        .windowResizability(.contentSize)
-        .commands { AlphaSyncCommands(store: driver.store) }
-        Window("Find fixture", id: "find-fixture") {
-            VStack {
-                FindFocusControl().frame(width: 260, height: 26).padding(8)
-                ReadOnlyText(text: "Find this file text.\nA second line for native Find.", findContext: driver.findContext)
+        Group {
+            Window("AlphaSync", id: "main") {
+                MainView(store: driver.store)
+                    .environment(\.sidebarRowSize, driver.sidebarSize)
+                    .background(WindowSceneProbe { driver.start(in: $0) })
+                    .background(FindSceneLauncher(driver: driver))
             }
-            .frame(minWidth: 440, minHeight: 240)
-            .focusedSceneValue(\.readerFind, driver.findContext)
-            .background(WindowSceneProbe { driver.registerFindWindow($0) })
+            .defaultSize(width: 360, height: 230)
+            .windowResizability(.contentSize)
+            Window("Find fixture", id: "find-fixture") {
+                VStack {
+                    FindFocusControl().frame(width: 260, height: 26).padding(8)
+                    ReadOnlyText(text: "Find this file text.\nA second line for native Find.", findContext: driver.findContext)
+                }
+                .frame(minWidth: 440, minHeight: 240)
+                .focusedSceneValue(\.readerFind, driver.findContext)
+                .background(WindowSceneProbe { driver.registerFindWindow($0) })
+            }
+            .defaultSize(width: 660, height: 320)
         }
-        .defaultSize(width: 660, height: 320)
+        .commands { AlphaSyncCommands(store: driver.store) }
     }
 }
 
@@ -182,6 +184,7 @@ private final class WindowSceneDriver: ObservableObject {
         func check(_ enabled: Bool, stage: String) throws {
             let titles: Set<String> = ["Find…", "Find Next", "Find Previous", "Use Selection for Find"]
             let commands = NSApplication.shared.mainMenu.map(items)?.filter { titles.contains($0.title) } ?? []
+            InterfaceChecks.checkpoint("Find availability during \(stage): key \(NSApplication.shared.keyWindow?.title ?? "none"), items \(commands.map { "\($0.title)=\($0.isEnabled)" })")
             try InterfaceChecks.require(commands.count == 4, "The Find menu lost its four commands")
             try InterfaceChecks.require(commands.allSatisfy { $0.isEnabled == enabled }, "Find commands have the wrong availability during " + stage)
             findChecks.append(["appearance": appearance, "stage": stage, "enabled": enabled, "commands": commands.map(\.title)])

@@ -22,7 +22,7 @@ Use public AppKit accessibility announcements for non-modal connection and compl
 
 ## Menu availability
 
-Find commands use the active, loaded Reader’s focused scene context and weak text-view target.  They stay unavailable in other windows, during loading, and after failure.  Direct targeting keeps Find working when another control in the Reader has keyboard focus.  Avoid traversing private framework views in application code.  Retain the native Find bar, shortcuts, and existing read-only text behaviour.
+Find commands use the active, loaded Reader’s focused scene context and weak text-view target.  Install the shared commands on the complete scene group so each active window supplies its own context.  They stay unavailable in other windows, during loading, and after failure.  Direct targeting keeps Find working when another control in the Reader has keyboard focus.  Avoid traversing private framework views in application code.  Retain the native Find bar, shortcuts, and existing read-only text behaviour.
 
 Context menus contain relevant actions.  Hide Rename and Clear for read-only data, hide unavailable transfer actions while busy, and keep the destructive action last.  Preserve the existing connection identities, target capture, consent, and backend checks.
 
@@ -40,7 +40,7 @@ Review the five commits before running tests.  The planned suite is **190 Swift 
 
 Require native execution of both exact canonical packages on Apple Silicon, architectures, minimum deployment, signatures, hardened runtime, helpers, matching symbols, four independent artifact digests, twelve asset hashes, and both Help books against tested source.  Review captured images and preserve permanent results under `releases/verification/2.0.5-164`.  Provide a separate Apple Silicon test ZIP after verification.  Preserve earlier private copies, public 1.5.1 and 2.0.4 notes and assets, all twelve version tags, and frozen legacy source.
 
-The next compile caught an actor-isolation omission in the diagnostic baseline callback.  Its explicit main-actor annotation changes the checker only.  Keep this failed candidate distinct from the final verified source.
+The next compiles caught an isolation and sendability omission in the diagnostic baseline callback.  Its explicitly typed main-actor Sendable closure changes the checker only.  The first native Find run caught commands attached only to the main scene; the correction applies them to the complete scene group in both the app and its real-window checker.  Keep this failed candidate distinct from the final verified source.
 
 ## Physical checks before 2.1
 

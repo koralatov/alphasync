@@ -16,23 +16,25 @@ struct AlphaSyncApp: App {
     }
 
     var body: some Scene {
-        Window("AlphaSync", id: "main") {
-            MainView(store: store).onAppear { delegate.store = store }
+        Group {
+            Window("AlphaSync", id: "main") {
+                MainView(store: store).onAppear { delegate.store = store }
+            }
+            .defaultSize(width: 360, height: 230)
+            .windowResizability(.contentSize)
+
+            WindowGroup(for: ReaderRequest.self) { $request in
+                if let request { ReaderView(request: request, store: store) }
+            }
+            .defaultSize(width: 660, height: 500)
+
+            Window("Inspector", id: "inspector") { InspectorView(store: store) }
+                .windowResizability(.contentSize)
+            Window("About AlphaSync", id: "about") { AboutView() }
+                .windowResizability(.contentSize)
+            Settings { SettingsView(preferences: store.preferences) }
         }
-        .defaultSize(width: 360, height: 230)
-        .windowResizability(.contentSize)
         .commands { AlphaSyncCommands(store: store) }
-
-        WindowGroup(for: ReaderRequest.self) { $request in
-            if let request { ReaderView(request: request, store: store) }
-        }
-        .defaultSize(width: 660, height: 500)
-
-        Window("Inspector", id: "inspector") { InspectorView(store: store) }
-            .windowResizability(.contentSize)
-        Window("About AlphaSync", id: "about") { AboutView() }
-            .windowResizability(.contentSize)
-        Settings { SettingsView(preferences: store.preferences) }
     }
 }
 
