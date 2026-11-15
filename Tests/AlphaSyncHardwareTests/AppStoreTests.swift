@@ -28,6 +28,45 @@ final class AppStoreTests: XCTestCase {
         return url
     }
 
+    func testClearRejectsAMixedWritableAppletSelectionWithoutAConfirmationOrWrite() async throws {
+        let observations = SimulatedObservations()
+        let store = makeStore(observations: observations)
+        // The extra applet is UI snapshot data; no device write is needed to construct it.
+        await store.refresh()
+        let original = try XCTUnwrap(store.devices.first)
+        var header = Data(repeating: 0, count: NeoApplet.headerSize)
+        header.replaceSubrange(0..<4, with: [0xc0, 0xff, 0xee, 0xad])
+        header[20] = 0xa0; header[21] = 5
+        var dictionary = try NeoApplet(header: header)
+        dictionary.files = [NeoFile(id: NeoFileID(connection: original.connection, applet: dictionary.id, index: 1),
+            attributes: try NeoFileAttributes(name: "Dictionary"), size: 512)]
+        store.devices = [NeoSnapshot(connection: original.connection, registryID: original.registryID,
+            systemVersion: original.systemVersion, availableRAM: original.availableRAM, availableROM: original.availableROM,
+            applets: original.applets + [dictionary])]
+        store.sidebar = .device(original.connection)
+        store.selection = [try XCTUnwrap(original.applets.first?.files.first?.id), dictionary.files[0].id]
+        XCTAssertEqual(store.selectedFiles.count, 2)
+        XCTAssertFalse(store.canClear)
+        await store.requestClear()
+        XCTAssertNil(store.pendingChange)
+        XCTAssertNil(store.notice)
+        XCTAssertEqual(observations.writeCount, 0)
+        await store.shutdown()
+    }
+
+    func testClearStillPreparesASelectionFromOneWritableApplet() async throws {
+        let observations = SimulatedObservations()
+        let store = makeStore(observations: observations)
+        await store.refresh()
+        store.selection = Set(store.files.map(\.id))
+        XCTAssertEqual(store.selectedFiles.count, 2)
+        XCTAssertTrue(store.canClear)
+        await store.requestClear()
+        XCTAssertEqual(store.pendingChange?.items.count, 2)
+        XCTAssertEqual(observations.writeCount, 0)
+        await store.shutdown()
+    }
+
     func testReplacementKeepsTheFileChosenBeforeThePickerOpened() async throws {
         let store = makeStore()
         await store.refresh()

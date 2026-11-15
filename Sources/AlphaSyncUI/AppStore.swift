@@ -107,7 +107,8 @@ public final class AppStore: ObservableObject {
     }
     public var canClear: Bool {
         !busy && (selection.isEmpty ? (chosenApplet?.canWrite == true && !(chosenApplet?.files.isEmpty ?? true)) :
-                  selectedFiles.count == selection.count && selectedFiles.allSatisfy { applet(for: $0.id)?.canWrite == true })
+                  selectedFiles.count == selection.count && Set(selection.map(\.applet)).count == 1 &&
+                  selectedFiles.allSatisfy { applet(for: $0.id)?.canWrite == true })
     }
     public var importApplet: NeoApplet? {
         if selection.count == 1, let file = selectedFiles.first { return applet(for: file.id) }

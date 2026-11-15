@@ -84,11 +84,12 @@ public struct MainView: View {
         }.padding(24)
     }
     private var fileManager: some View {
-        VStack(spacing: 0) {
-            if let issue = store.connectionIssue { connectionWarning(issue) }
-            fileBrowser.frame(maxWidth: .infinity, maxHeight: .infinity).clipped()
-            connectionStatus
-        }
+        // Let the navigation container pass toolbar and bar insets to both native scroll views.
+        fileBrowser
+            .safeAreaInset(edge: .top, spacing: 0) {
+                if let issue = store.connectionIssue { connectionWarning(issue) }
+            }
+            .safeAreaInset(edge: .bottom, spacing: 0) { connectionStatus }
     }
     private var fileBrowser: some View {
         NavigationSplitView {
