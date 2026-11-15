@@ -9,7 +9,20 @@ struct WindowSceneChecksApp: App {
     @StateObject private var driver = WindowSceneDriver()
     @NSApplicationDelegateAdaptor(WindowSceneLaunchDelegate.self) private var launch
 
-    init() { InterfaceChecks.checkpoint("Starting real SwiftUI window scene") }
+    init() {
+        InterfaceChecks.checkpoint("Starting real SwiftUI window scene")
+        let output = Self.outputDirectory
+        try? FileManager.default.createDirectory(at: output, withIntermediateDirectories: true)
+        try? String(ProcessInfo.processInfo.processIdentifier)
+            .write(to: output.appendingPathComponent("process-id"), atomically: true, encoding: .utf8)
+    }
+
+    static var outputDirectory: URL {
+        let prefix = "--output-directory="
+        let argument = CommandLine.arguments.first { $0.hasPrefix(prefix) }
+        let path = argument.map { String($0.dropFirst(prefix.count)) } ?? "build/interface-checks/window-scene"
+        return URL(fileURLWithPath: path, isDirectory: true)
+    }
 
     var body: some Scene {
         Window("AlphaSync", id: "main") {
@@ -28,7 +41,7 @@ private final class WindowSceneLaunchDelegate: NSObject, NSApplicationDelegate {
         NSApplication.shared.setActivationPolicy(.regular)
         NSApplication.shared.activate(ignoringOtherApps: true)
         NSApplication.shared.windows.first?.makeKeyAndOrderFront(nil)
-        InterfaceChecks.checkpoint("Window-scene application launched")
+        InterfaceChecks.checkpoint("Window-scene application launched with \(NSApplication.shared.windows.count) windows")
     }
 }
 
@@ -70,7 +83,8 @@ private final class WindowSceneDriver: ObservableObject {
         let preferences = Preferences(defaults: defaults, loginItem: InterfaceLoginItem())
         self.domain = domain; self.defaults = defaults; self.preferences = preferences
         store = AppStore(preferences: preferences, monitoringEnabled: false)
-        output = URL(fileURLWithPath: CommandLine.arguments.dropFirst().first ?? "build/interface-checks/window-scene", isDirectory: true)
+        output = WindowSceneChecksApp.outputDirectory
+        InterfaceChecks.checkpoint("Window-scene driver initialised")
     }
 
     func start(in window: NSWindow) {
@@ -81,6 +95,9 @@ private final class WindowSceneDriver: ObservableObject {
             do {
                 try await run(in: window)
                 await store.shutdown()
+                let result: [String: Any] = ["passed": true, "layouts": InterfaceChecks.browserLayouts.count]
+                try JSONSerialization.data(withJSONObject: result)
+                    .write(to: output.appendingPathComponent("result.json"), options: .atomic)
                 defaults.removePersistentDomain(forName: domain)
                 print("SwiftUI window-scene checks passed: \(InterfaceChecks.browserLayouts.count) browser layouts.")
                 exit(EXIT_SUCCESS)

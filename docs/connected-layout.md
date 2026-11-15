@@ -34,6 +34,8 @@ Source `f61b51cdd1fa51d7f53d2f46d111de15b040b80a` passed the Swift regressions o
 
 The first scene harness, source `a52dc451661c654f3fbed204aadbe7eccab21039`, passed component checks but timed out in the application event loop before opening its window. Its regular activation policy was set in a driver created only by that window. Move activation to application launch through the test App delegate, with startup and probe checkpoints. Keep the timeout and all assertions; the production app is unchanged by this harness correction.
 
+The activated harness reached application launch but still opened no window as a bare command-line executable. Launch the checker through Launch Services in a temporary, ad-hoc-signed app bundle with a unique test identifier. Pass the output directory as a named argument, capture stdout and stderr, and sample the app’s own PID on timeout. Require a fresh success receipt for all twenty layouts in addition to the launcher’s exit status, since the launcher does not report the app’s status. Both phases still share the combined 120-second deadline. No temporary fixture bundle is shipped or added to the repository.
+
 ## Physical checks and 2.1
 
 The intended stable release is **2.1 for Apple Silicon**. Build 159 is a test toward that goal. Retain both current targets during validation; this request does not retire an edition or publish 2.1. After 2.1 is verified and released, suspend feature development and limit planned maintenance to future macOS compatibility.
