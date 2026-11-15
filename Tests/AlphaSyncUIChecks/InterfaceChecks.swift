@@ -28,6 +28,7 @@ struct InterfaceChecks {
     static func settle() { RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.35)) }
     static func yieldLayout() async { try? await Task.sleep(for: .milliseconds(350)) }
     static func descendants(_ root: NSView) -> [NSView] { [root] + root.subviews.flatMap(descendants) }
+    static func controllers(_ root: NSViewController) -> [NSViewController] { [root] + root.children.flatMap(controllers) }
     static func fileTable(in window: NSWindow) throws -> NSTableView {
         guard let content = window.contentView,
               let table = descendants(content).compactMap({ $0 as? NSTableView }).first(where: { $0.tableColumns.count == 2 }) else {
@@ -257,6 +258,8 @@ struct InterfaceChecks {
             try capture(about, "about-" + label, to: output); about.close()
             let settings = window(SettingsView(preferences: preferences), size: NSSize(width: 560, height: 610), title: "Settings")
             try capture(settings, "settings-" + label, to: output); settings.close()
+            store.sidebar = .device(snapshot.connection)
+            store.selection = [snapshot.applets[0].files[0].id]
             let inspector = window(InspectorView(store: store), size: NSSize(width: 400, height: 560), title: "Inspector")
             try capture(inspector, "inspector-" + label, to: output); inspector.close()
             store.selection = []

@@ -27,6 +27,7 @@ struct WindowSceneChecksApp: App {
     var body: some Scene {
         Window("AlphaSync", id: "main") {
             MainView(store: driver.store)
+                .environment(\.sidebarRowSize, driver.sidebarSize)
                 .background(WindowSceneProbe { driver.start(in: $0) })
         }
         .defaultSize(width: 360, height: 230)
@@ -71,12 +72,14 @@ private struct WindowSceneProbe: NSViewRepresentable {
 @MainActor
 private final class WindowSceneDriver: ObservableObject {
     let store: AppStore
+    @Published var sidebarSize = SidebarRowSize.medium
     private let preferences: Preferences
     private let defaults: UserDefaults
     private let domain: String
     private let output: URL
     private var started = false
     private var toolbarChecks: [[String: Any]] = []
+    private var sidebarChecks: [[String: Any]] = []
 
     init() {
         let domain = "AlphaSync-WindowSceneChecks-" + UUID().uuidString
@@ -133,6 +136,50 @@ private final class WindowSceneDriver: ObservableObject {
             .write(to: output.appendingPathComponent("browser-layout.json"), options: .atomic)
         try JSONSerialization.data(withJSONObject: toolbarChecks, options: [.prettyPrinted, .sortedKeys])
             .write(to: output.appendingPathComponent("toolbar-checks.json"), options: .atomic)
+        try JSONSerialization.data(withJSONObject: sidebarChecks, options: [.prettyPrinted, .sortedKeys])
+            .write(to: output.appendingPathComponent("sidebar-checks.json"), options: .atomic)
+    }
+
+    private func checkSidebar(in window: NSWindow, appearance: String) async throws {
+        guard let root = window.contentViewController,
+              let controller = InterfaceChecks.controllers(root).compactMap({ $0 as? DeviceBrowserController }).first else {
+            try InterfaceChecks.require(false, "The connected browser lost its native split controller")
+            return
+        }
+        func menuItems(_ menu: NSMenu) -> [NSMenuItem] {
+            menu.items + menu.items.compactMap(\.submenu).flatMap(menuItems)
+        }
+        let items = NSApplication.shared.mainMenu.map(menuItems) ?? []
+        let toggle = #selector(NSSplitViewController.toggleSidebar(_:))
+        try InterfaceChecks.require(!items.contains { $0.action == toggle || ["Hide Sidebar", "Show Sidebar", "Toggle Sidebar"].contains($0.title) },
+                                    "A menu still lets the sidebar be hidden")
+        try InterfaceChecks.require(!(window.toolbar?.items.contains { $0.label.localizedCaseInsensitiveContains("sidebar") } ?? true),
+                                    "The toolbar still contains a sidebar control")
+        try InterfaceChecks.require(controller.splitViewItems.count == 2 && controller.splitViewItems.allSatisfy { !$0.canCollapse && !$0.isCollapsed },
+                                    "A browser pane can still collapse")
+        for index in 0..<2 {
+            InterfaceChecks.checkpoint("Exercising the former sidebar action \(index + 1) in " + appearance)
+            try InterfaceChecks.require(NSApplication.shared.sendAction(toggle, to: controller, from: nil), "The sidebar action did not reach the native controller")
+            await InterfaceChecks.yieldLayout()
+            try InterfaceChecks.require(controller.splitViewItems.allSatisfy { !$0.isCollapsed }, "The former sidebar action hid a pane")
+        }
+        for width in [180.0, 300.0, 220.0] {
+            controller.splitView.setPosition(width, ofDividerAt: 0)
+            await InterfaceChecks.yieldLayout()
+            let actual = controller.sidebarHost.view.frame.width
+            try InterfaceChecks.require(abs(actual - width) < 2, "The sidebar width did not follow the divider: \(width), actual \(actual)")
+            try await InterfaceChecks.checkBrowser(in: window, stage: "sidebar-width-\(Int(width))-" + appearance)
+            sidebarChecks.append(["appearance": appearance, "kind": "width", "requested": width, "actual": actual, "canCollapse": false])
+        }
+        for (name, size) in [("small", SidebarRowSize.small), ("medium", .medium), ("large", .large)] {
+            sidebarSize = size
+            await InterfaceChecks.yieldLayout()
+            try await InterfaceChecks.checkBrowser(in: window, stage: "sidebar-size-" + name + "-" + appearance)
+            try capture(window, "sidebar-" + name + "-" + appearance)
+            sidebarChecks.append(["appearance": appearance, "kind": "size", "value": name, "width": controller.sidebarHost.view.frame.width])
+        }
+        sidebarSize = .medium
+        await InterfaceChecks.yieldLayout()
     }
 
     private func checkToolbar(in window: NSWindow, appearance: String) async throws {
@@ -196,6 +243,7 @@ private final class WindowSceneDriver: ObservableObject {
             try await InterfaceChecks.checkBrowser(in: window, stage: "minimum-warning-" + label)
             try capture(window, "files-minimum-" + label)
             try await checkToolbar(in: window, appearance: label)
+            try await checkSidebar(in: window, appearance: label)
             await resize(window, width: 1120, height: 720)
             try await InterfaceChecks.checkBrowser(in: window, stage: "expanded-warning-" + label)
             store.connectionIssue = nil
@@ -231,7 +279,7 @@ private final class WindowSceneDriver: ObservableObject {
                                         "Reconnection lost the saved toolbar appearance")
             try capture(window, "reconnected-" + label)
         }
-        try InterfaceChecks.require(InterfaceChecks.browserLayouts.count == 20, "Missing window-scene layout observations")
+        try InterfaceChecks.require(InterfaceChecks.browserLayouts.count == 32, "Missing window-scene layout observations")
         try saveGeometry()
     }
 }

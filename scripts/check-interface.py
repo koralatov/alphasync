@@ -101,8 +101,8 @@ def main():
         if result:
             return result
         receipt = scene / "result.json"
-        if not receipt.exists() or json.loads(receipt.read_text()) != {"passed": True, "layouts": 20}:
-            print("The window-scene app did not confirm all twenty layout checks.", file=sys.stderr, flush=True)
+        if not receipt.exists() or json.loads(receipt.read_text()) != {"passed": True, "layouts": 32}:
+            print("The window-scene app did not confirm all thirty-two layout checks.", file=sys.stderr, flush=True)
             return 1
     print("Native interface checks passed. No USB devices or login registrations were changed.", flush=True)
     return 0

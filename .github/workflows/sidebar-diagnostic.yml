@@ -1,0 +1,32 @@
+name: Build 161 sidebar diagnosis
+
+on:
+  push:
+    paths:
+      - scripts/check-sidebar-regression.py
+      - .github/workflows/sidebar-diagnostic.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sidebar-baseline:
+    runs-on: macos-15
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Select the compatibility compiler on Apple Silicon
+        run: |
+          test "$(uname -m)" = arm64
+          printf 'DEVELOPER_DIR=%s\n' /Applications/Xcode_16.4.app/Contents/Developer >> "$GITHUB_ENV"
+      - name: Probe the exact build 161 sidebar action with a bounded deadline
+        run: python3 scripts/check-sidebar-regression.py build/sidebar-diagnosis
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: AlphaSync-sidebar-diagnosis-${{ github.sha }}
+          path: build/sidebar-diagnosis/*
+          if-no-files-found: error
