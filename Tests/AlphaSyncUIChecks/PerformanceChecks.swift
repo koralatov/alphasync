@@ -48,7 +48,7 @@ enum PerformanceChecks {
 
     private static func checkSizeFormatting(to output: URL) throws {
         let sizes = [0, 1, 2, 999, 1_000, 1_024, 12_000, 51_200, 65_536, 378_880, 16_777_215]
-        func previous(_ value: Int) -> String {
+        @MainActor func previous(_ value: Int) -> String {
             let formatter = ByteCountFormatter()
             formatter.countStyle = .file; formatter.allowedUnits = [.useBytes, .useKB]
             formatter.allowsNonnumericFormatting = false
