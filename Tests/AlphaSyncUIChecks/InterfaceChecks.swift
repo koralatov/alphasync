@@ -196,8 +196,13 @@ struct InterfaceChecks {
         let readOnlyName = Data("Read-only Applet".utf8)
         header.replaceSubrange(24..<(24 + readOnlyName.count), with: readOnlyName)
         let readOnly = try NeoApplet(header: header)
+        header[20] = 0xa0; header[21] = 5
+        header.replaceSubrange(24..<60, with: Data(repeating: 0, count: 36))
+        let dictionaryName = Data("SpellCheck Large UK".utf8)
+        header.replaceSubrange(24..<(24 + dictionaryName.count), with: dictionaryName)
+        let dictionary = try NeoApplet(header: header)
         return NeoSnapshot(connection: id, registryID: 1, systemVersion: "3.6", availableRAM: 378_880,
-                           availableROM: 1_048_576, applets: [applet, readOnly])
+                           availableROM: 1_048_576, applets: [applet, readOnly, dictionary])
     }
     static func main() {
         if CommandLine.arguments.contains("--window-scene") {
@@ -236,6 +241,9 @@ struct InterfaceChecks {
         store.sidebar = .applet(snapshot.connection, 0x9999); store.reconcileSelection()
         try require(store.chosenApplet?.id == NeoApplet.alphaWord, "An absent applet must not leave a stale selection")
         try require(FileSize.exact(1) == "1 byte", "A single byte must have singular wording")
+        for symbol in [SelectionSymbols.device, SelectionSymbols.file] + [0, 0xa000, 0xa005, 0xb000].map({ SelectionSymbols.applet(UInt16($0)) }) {
+            try require(NSImage(systemSymbolName: symbol, accessibilityDescription: nil) != nil, "Missing system symbol: \(symbol)")
+        }
         for (label, appearance) in [("light", NSAppearance.Name.aqua), ("dark", .darkAqua)] {
             app.appearance = NSAppearance(named: appearance)
             store.devices = [snapshot]; store.reconcileSelection()
@@ -248,18 +256,45 @@ struct InterfaceChecks {
             try capture(settings, "settings-" + label, to: output); settings.close()
             let inspector = window(InspectorView(store: store), size: NSSize(width: 400, height: 560), title: "Inspector")
             try capture(inspector, "inspector-" + label, to: output); inspector.close()
+            store.selection = []
+            for (name, selection) in [("neo", SidebarSelection.device(snapshot.connection)),
+                                      ("alphaword", .applet(snapshot.connection, NeoApplet.alphaWord)),
+                                      ("dictionary", .applet(snapshot.connection, NeoApplet.dictionary)),
+                                      ("unknown-applet", .applet(snapshot.connection, 0xb000))] {
+                store.sidebar = selection
+                let inspector = window(InspectorView(store: store), size: NSSize(width: 400, height: 560), title: "Inspector")
+                try capture(inspector, "inspector-" + name + "-" + label, to: output)
+                inspector.close()
+            }
+            store.sidebar = .device(snapshot.connection)
             for action in ["Clear File", "Replace"] {
                 var cancelled = 0, destructive = 0
-                let prompt = DestructiveConfirmation(title: action + "?", action: action,
-                    explanation: "The selected contents on your Neo will be changed. This cannot be undone.",
+                let prompt = DestructiveConfirmation(title: action == "Replace" ? "Replace ‘File 1’ on your Neo?" : "Clear ‘File 1’ on your Neo?", action: action,
+                    explanation: action == "Replace" ? "This will replace the text in the file with text from ‘New note.txt’.  You can’t undo this." : "This will erase all text in the file, leaving it empty.  You can’t undo this.",
                     names: ["File 1"], saveRecovery: true,
                     cancel: { cancelled += 1 }, confirm: { _ in destructive += 1 })
                 let warning = window(prompt, size: NSSize(width: 430, height: 240), title: action)
+                try require(warning.defaultButtonCell == nil, "\(action) must not have a default button")
+                let buttons = warning.contentView.map { descendants($0).compactMap { $0 as? NSButton } } ?? []
+                guard let cancel = buttons.first(where: { $0.title == "Cancel" }),
+                      let proceed = buttons.first(where: { $0.title == action }) else {
+                    throw CheckFailure(description: "Missing native confirmation buttons")
+                }
+                try require(cancel.convert(cancel.bounds, to: nil).minX < proceed.convert(proceed.bounds, to: nil).minX,
+                            "Cancel must appear before \(action)")
+                try require(proceed.keyEquivalent.isEmpty, "\(action) acquired an implicit keyboard shortcut")
                 try capture(warning, action.lowercased().replacingOccurrences(of: " ", with: "-") + "-" + label, to: output)
                 try key("\r", code: 36, in: warning)
-                try require(cancelled == 1 && destructive == 0, "Return must cancel \(action)")
+                try require(destructive == 0, "Return triggered \(action)")
+                try key("\u{3}", code: 76, in: warning)
+                try require(destructive == 0, "Keypad Enter triggered \(action)")
                 try key(" ", code: 49, in: warning)
                 try require(destructive == 0, "Space triggered \(action)")
+                let beforeEscape = cancelled
+                try key("\u{1b}", code: 53, in: warning)
+                try require(cancelled == beforeEscape + 1 && destructive == 0, "Escape must cancel \(action)")
+                proceed.performClick(nil)
+                try require(destructive == 1, "\(action) must remain available after deliberate confirmation")
                 warning.close()
             }
             let text = "A read-only preview\n\nAlphaSmart Neo text stays selectable.\n" + String(repeating: "More text for scrolling and Find.\n", count: 80)

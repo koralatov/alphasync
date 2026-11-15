@@ -10,6 +10,8 @@ Private **2.0.5, build 159** is ready to test the correction for sidebar and fil
 
 Private **2.0.5, build 160** is ready for performance and correctness testing.  It reduces repeated list and preview work, bounds dictionary word buffers, and fixes explicit retry and late backup cancellation.  [Run 43725850279](https://github.com/koralatov/alphasync/actions/runs/43725850279) passed 170 Swift tests, all 55 fixtures, both host builds and native interfaces, and exact-package execution on Apple Silicon.  Independent hashes and Help checks passed.  See the [maintenance review](docs/maintenance-160.md) and [record](releases/verification/2.0.5-160/verification.json).  It adds no features and preserves the working USB packet handling and build 159’s layout.  Physical M2 Air checks remain required.
 
+Private **2.0.5, build 161** is being prepared with clearer Clear and Replace confirmations, distinct applet icons, a matching Neo heading, a green connection light, and labelled toolbar commands.  Choose **View → Toolbar Appearance** for Icon and Text, Icon Only, or Text Only.  Clear and Replace have no default button; Cancel has the initial keyboard focus, and Escape cancels.  **Save a copy of the text first** retains the existing recovery protection.  See the [interface review](docs/interface-polish-161.md) for scope and build checks.
+
 ## Version 2.0.4
 
 Version 2.0.4 improves the Swift rewrite first released as 2.0 and requires **macOS 13 or later**. It includes all changes prepared under the unpublished 2.0.1 development version.

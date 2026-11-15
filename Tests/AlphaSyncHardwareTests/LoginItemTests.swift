@@ -21,6 +21,27 @@ final class LoginItemTests: XCTestCase {
         return UserDefaults(suiteName: name)!
     }
 
+    func testToolbarAppearanceDefaultsToLabelsAndPersistsEveryNativeChoice() {
+        let defaults = defaults()
+        let preferences = Preferences(defaults: defaults, loginItem: FakeLoginItem())
+        XCTAssertEqual(preferences.toolbarAppearance, .iconAndText)
+        for appearance in ToolbarAppearance.allCases {
+            preferences.toolbarAppearance = appearance
+            let restored = Preferences(defaults: defaults, loginItem: FakeLoginItem())
+            XCTAssertEqual(restored.toolbarAppearance, appearance)
+            XCTAssertEqual(defaults.string(forKey: "ToolbarAppearance"), appearance.rawValue)
+        }
+    }
+
+    func testAnUnknownSavedToolbarAppearanceKeepsCommandsLabelled() {
+        let defaults = defaults()
+        defaults.set("unrecognised", forKey: "ToolbarAppearance")
+        let preferences = Preferences(defaults: defaults, loginItem: FakeLoginItem())
+        XCTAssertEqual(preferences.toolbarAppearance, .iconAndText)
+        preferences.toolbarAppearance = .iconOnly
+        XCTAssertEqual(Preferences(defaults: defaults, loginItem: FakeLoginItem()).toolbarAppearance, .iconOnly)
+    }
+
     func testIntentIsSavedBeforeTheHelperCanStart() {
         let defaults = defaults(), item = FakeLoginItem()
         let preferences = Preferences(defaults: defaults, loginItem: item)

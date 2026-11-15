@@ -35,7 +35,7 @@ enum PerformanceChecks {
         let cached = measure { store.files }
         try InterfaceChecks.require(baseline.count == 64 * iterations && cached.count == baseline.count,
                                     "The file-list comparison lost results")
-        let report: [String: Any] = ["kind": "AlphaSyncFileListComparison", "build": "160",
+        let report: [String: Any] = ["kind": "AlphaSyncFileListComparison",
             "configuration": "SwiftPM debug checker; same host and fixture; warm cache",
             "fileCount": 64, "iterations": iterations,
             "repeatedSortSeconds": baseline.seconds, "cachedAccessSeconds": cached.seconds,

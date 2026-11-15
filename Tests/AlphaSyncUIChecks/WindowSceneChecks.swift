@@ -76,6 +76,7 @@ private final class WindowSceneDriver: ObservableObject {
     private let domain: String
     private let output: URL
     private var started = false
+    private var toolbarChecks: [[String: Any]] = []
 
     init() {
         let domain = "AlphaSync-WindowSceneChecks-" + UUID().uuidString
@@ -130,6 +131,39 @@ private final class WindowSceneDriver: ObservableObject {
     private func saveGeometry() throws {
         try JSONSerialization.data(withJSONObject: InterfaceChecks.browserLayouts, options: [.prettyPrinted, .sortedKeys])
             .write(to: output.appendingPathComponent("browser-layout.json"), options: .atomic)
+        try JSONSerialization.data(withJSONObject: toolbarChecks, options: [.prettyPrinted, .sortedKeys])
+            .write(to: output.appendingPathComponent("toolbar-checks.json"), options: .atomic)
+    }
+
+    private func checkToolbar(in window: NSWindow, appearance: String) async throws {
+        guard let toolbar = window.toolbar else {
+            try InterfaceChecks.require(false, "Missing toolbar while checking display modes")
+            return
+        }
+        let expected: Set<String> = ["Back Up", "Clear Files", "Inspector", "Refresh"]
+        let labels = toolbar.items.map(\.label)
+        InterfaceChecks.checkpoint("Toolbar labels: \(labels)")
+        try InterfaceChecks.require(expected.isSubset(of: Set(labels)), "The native toolbar lost a command label")
+        for choice in ToolbarAppearance.allCases {
+            preferences.toolbarAppearance = choice
+            await InterfaceChecks.yieldLayout()
+            try InterfaceChecks.require(toolbar.displayMode == choice.displayMode, "The toolbar ignored \(choice.title)")
+            let visible = Set((toolbar.visibleItems ?? []).map(\.label))
+            try InterfaceChecks.require(expected.isSubset(of: visible), "A command overflowed at minimum width in \(choice.title)")
+            try capture(window, "toolbar-" + choice.rawValue + "-" + appearance)
+            toolbarChecks.append(["appearance": appearance, "mode": choice.rawValue, "labels": labels, "visible": visible.sorted()])
+        }
+        toolbar.displayMode = .iconOnly
+        await InterfaceChecks.yieldLayout()
+        try InterfaceChecks.require(preferences.toolbarAppearance == .iconOnly && defaults.string(forKey: "ToolbarAppearance") == ToolbarAppearance.iconOnly.rawValue,
+                                    "A native display-mode change was not saved")
+        preferences.toolbarAppearance = .iconAndText
+        await InterfaceChecks.yieldLayout()
+        let table = try InterfaceChecks.fileTable(in: window)
+        if let content = window.contentView, let sidebar = InterfaceChecks.descendants(content).compactMap({ $0 as? NSTableView }).first(where: { $0 !== table && $0.numberOfRows >= 3 }) {
+            try InterfaceChecks.require(abs(sidebar.rect(ofRow: 0).height - sidebar.rect(ofRow: 1).height) < 1,
+                                        "The Neo heading is still smaller than its child rows")
+        } else { try InterfaceChecks.require(false, "Missing sidebar while checking the Neo heading") }
     }
 
     private func run(in window: NSWindow) async throws {
@@ -159,6 +193,7 @@ private final class WindowSceneDriver: ObservableObject {
             await resize(window, width: 760, height: 460)
             try await InterfaceChecks.checkBrowser(in: window, stage: "minimum-warning-" + label)
             try capture(window, "files-minimum-" + label)
+            try await checkToolbar(in: window, appearance: label)
             await resize(window, width: 1120, height: 720)
             try await InterfaceChecks.checkBrowser(in: window, stage: "expanded-warning-" + label)
             store.connectionIssue = nil
@@ -190,6 +225,8 @@ private final class WindowSceneDriver: ObservableObject {
             await InterfaceChecks.yieldLayout()
             await resize(window, width: 760, height: 460)
             try await InterfaceChecks.checkBrowser(in: window, stage: "reconnected-" + label)
+            try InterfaceChecks.require(window.toolbar?.displayMode == .iconAndLabel && preferences.toolbarAppearance == .iconAndText,
+                                        "Reconnection lost the saved toolbar appearance")
             try capture(window, "reconnected-" + label)
         }
         try InterfaceChecks.require(InterfaceChecks.browserLayouts.count == 20, "Missing window-scene layout observations")
