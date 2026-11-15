@@ -1,0 +1,43 @@
+{
+  "baselineSource": "1b5495c5b78efcbb09c9a700c0caf18d82047a0b",
+  "hardware": "Hosted Apple Silicon; no physical Neo",
+  "system": "ProductName:\t\tmacOS\nProductVersion:\t\t15.8.2\nBuildVersion:\t\t24H232\n",
+  "deadlineSeconds": 20,
+  "sourceChanges": "Only the diagnostic window driver is replaced; shipping sources are exact build 161.",
+  "mainViewSHA256": "4b6928ef91f852d94e983e5396787124c4a051f45e25deacecb063c026d40713",
+  "lastProbe": {
+    "frame": {
+      "height": 512,
+      "width": 760,
+      "x": 332,
+      "y": 19
+    },
+    "stage": "complete",
+    "toolbar": [
+      "Show Sidebar",
+      "",
+      "Back Up",
+      "Clear Files",
+      "Inspector",
+      "Refresh"
+    ]
+  },
+  "timedOut": false,
+  "outcome": "no-hang-reproduced",
+  "runID": 43742062437,
+  "runURL": "https://github.com/koralatov/alphasync/actions/runs/43742062437",
+  "diagnosticSource": "51d75816bd3b79fe2a2f2e488aa3f80fc9891a67",
+  "jobID": 132897169652,
+  "runConclusion": "success",
+  "interpretation": "The actual Hide Sidebar action returned and the original sidebar hid on hosted macOS 15.8.2.  This does not reproduce or explain the reported freeze on the physical M2 Air running macOS 14.7.1.  Build 162 removes the collapsing control and action path instead of claiming an established cause.",
+  "captures": {
+    "after-hide.png": {
+      "size": 34121,
+      "sha256": "ba9a763031b2249c1f8df969b4ae3d878a6cce054bd0022924ca633d3a3864a6"
+    },
+    "before-hide.png": {
+      "size": 41741,
+      "sha256": "d8d814d4616484fb03ba2851e5ad31a68b92c5953c4b66867911bc488739bc9a"
+    }
+  }
+}

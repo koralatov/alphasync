@@ -1,0 +1,198 @@
+{
+  "arm": [
+    {
+      "appearance": "light",
+      "labels": [
+        "Back Up",
+        "Clear Files",
+        "Inspector",
+        "Refresh"
+      ],
+      "mode": "iconAndText",
+      "visible": [
+        "Back Up",
+        "Clear Files",
+        "Inspector",
+        "Refresh"
+      ]
+    },
+    {
+      "appearance": "light",
+      "labels": [
+        "Back Up",
+        "Clear Files",
+        "Inspector",
+        "Refresh"
+      ],
+      "mode": "iconOnly",
+      "visible": [
+        "Back Up",
+        "Clear Files",
+        "Inspector",
+        "Refresh"
+      ]
+    },
+    {
+      "appearance": "light",
+      "labels": [
+        "Back Up",
+        "Clear Files",
+        "Inspector",
+        "Refresh"
+      ],
+      "mode": "textOnly",
+      "visible": [
+        "Back Up",
+        "Clear Files",
+        "Inspector",
+        "Refresh"
+      ]
+    },
+    {
+      "appearance": "dark",
+      "labels": [
+        "Back Up",
+        "Clear Files",
+        "Inspector",
+        "Refresh"
+      ],
+      "mode": "iconAndText",
+      "visible": [
+        "Back Up",
+        "Clear Files",
+        "Inspector",
+        "Refresh"
+      ]
+    },
+    {
+      "appearance": "dark",
+      "labels": [
+        "Back Up",
+        "Clear Files",
+        "Inspector",
+        "Refresh"
+      ],
+      "mode": "iconOnly",
+      "visible": [
+        "Back Up",
+        "Clear Files",
+        "Inspector",
+        "Refresh"
+      ]
+    },
+    {
+      "appearance": "dark",
+      "labels": [
+        "Back Up",
+        "Clear Files",
+        "Inspector",
+        "Refresh"
+      ],
+      "mode": "textOnly",
+      "visible": [
+        "Back Up",
+        "Clear Files",
+        "Inspector",
+        "Refresh"
+      ]
+    }
+  ],
+  "intel": [
+    {
+      "appearance": "light",
+      "labels": [
+        "Back Up",
+        "Clear Files",
+        "Inspector",
+        "Refresh"
+      ],
+      "mode": "iconAndText",
+      "visible": [
+        "Back Up",
+        "Clear Files",
+        "Inspector",
+        "Refresh"
+      ]
+    },
+    {
+      "appearance": "light",
+      "labels": [
+        "Back Up",
+        "Clear Files",
+        "Inspector",
+        "Refresh"
+      ],
+      "mode": "iconOnly",
+      "visible": [
+        "Back Up",
+        "Clear Files",
+        "Inspector",
+        "Refresh"
+      ]
+    },
+    {
+      "appearance": "light",
+      "labels": [
+        "Back Up",
+        "Clear Files",
+        "Inspector",
+        "Refresh"
+      ],
+      "mode": "textOnly",
+      "visible": [
+        "Back Up",
+        "Clear Files",
+        "Inspector",
+        "Refresh"
+      ]
+    },
+    {
+      "appearance": "dark",
+      "labels": [
+        "Back Up",
+        "Clear Files",
+        "Inspector",
+        "Refresh"
+      ],
+      "mode": "iconAndText",
+      "visible": [
+        "Back Up",
+        "Clear Files",
+        "Inspector",
+        "Refresh"
+      ]
+    },
+    {
+      "appearance": "dark",
+      "labels": [
+        "Back Up",
+        "Clear Files",
+        "Inspector",
+        "Refresh"
+      ],
+      "mode": "iconOnly",
+      "visible": [
+        "Back Up",
+        "Clear Files",
+        "Inspector",
+        "Refresh"
+      ]
+    },
+    {
+      "appearance": "dark",
+      "labels": [
+        "Back Up",
+        "Clear Files",
+        "Inspector",
+        "Refresh"
+      ],
+      "mode": "textOnly",
+      "visible": [
+        "Back Up",
+        "Clear Files",
+        "Inspector",
+        "Refresh"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,262 @@
+{
+  "version": "2.0.5",
+  "build": "162",
+  "status": "verified-private-test-build",
+  "sourceCommit": "87254457b8c31d1651db567e18202789d2e9e5a2",
+  "sourceTree": "e9c14585dde25a46c4de9af1294fdcdf67ae697c",
+  "runID": 43743043759,
+  "runURL": "https://github.com/koralatov/alphasync/actions/runs/43743043759",
+  "runConclusion": "success",
+  "runAttempt": 1,
+  "changes": [
+    "Permanent, non-collapsible native split panes; sidebar divider remains adjustable",
+    "Hide Sidebar removed from toolbar and menu; former toggle action does not collapse either pane",
+    "All Files and applets indented fourteen points beneath the Neo",
+    "Shared keyboard.fill symbol for the Neo sidebar and Inspector",
+    "Complete public environment forwarded across hosting controllers; retained zero-minimum flexible file frames",
+    "Native width and sidebar size checks extend twenty layout observations to thirty-two per host",
+    "Corrected Dark file Inspector fixture and retained bounded native checker",
+    "Current Help, release notes, manual checklist, and technical documentation"
+  ],
+  "preserved": "All AlphaSyncCore and AlphaSyncHardware sources match build 161.  USB, transfer, recovery, backup, cancellation, and readback logic are unchanged.  Earlier interface polish is retained.",
+  "hosts": [
+    {
+      "host": "arm",
+      "architecture": "arm64",
+      "xcode": "16.4",
+      "jobID": 132900191989,
+      "conclusion": "success",
+      "swiftRegressions": 172,
+      "fixtures": 55,
+      "realWindowLayoutObservations": 32,
+      "toolbarModesPerAppearance": 3,
+      "capturedImages": 46,
+      "swiftCompilerWarnings": 0,
+      "builtEditions": [
+        "universal",
+        "apple-silicon"
+      ],
+      "macOS": "15.8.2",
+      "sidebarWidthAndSizeRecords": 12
+    },
+    {
+      "host": "intel",
+      "architecture": "x86_64",
+      "xcode": "26.6",
+      "jobID": 132900192216,
+      "conclusion": "success",
+      "swiftRegressions": 172,
+      "fixtures": 55,
+      "realWindowLayoutObservations": 32,
+      "toolbarModesPerAppearance": 3,
+      "capturedImages": 46,
+      "swiftCompilerWarnings": 0,
+      "builtEditions": [
+        "universal",
+        "apple-silicon"
+      ],
+      "macOS": "26.6.1",
+      "sidebarWidthAndSizeRecords": 12
+    }
+  ],
+  "nativeChecks": {
+    "confirmation": "No default button; safe Return, keypad Enter, and initial Space; Escape cancels, in both appearances on both hosts.  Button order was reviewed visually.  Deliberate physical activation remains manual.",
+    "toolbar": "Four native commands, three display modes in both appearances, visibility at minimum width, saved changes, and reconnection passed.  Final compositor appearance remains manual.",
+    "sidebar": "Both panes are non-collapsible; requested navigation widths 180, 300, and 220 points were achieved exactly in both appearances.  Small, Medium, and Large public sidebar environments passed.  The Neo and All Files have positive matching row heights and remain below the toolbar.",
+    "symbolAvailability": "All chosen system symbols resolved on both native hosts.",
+    "preview": "Selection, scrolling, font changes, and full clipboard contents passed.",
+    "deadline": "Both phases share the existing failing 120-second deadline.",
+    "formerAction": "No toolbar or menu toggle is present.  Delivering the old public toggleSidebar action twice per appearance does not hide either ordinary split item."
+  },
+  "verification": {
+    "allAutomatedChecksPassed": true,
+    "artifactDigests": 5,
+    "assetHashes": 12,
+    "help": [
+      {
+        "edition": "universal",
+        "version": "2.0.5",
+        "build": "162",
+        "authoredHelpFilesMatched": 20,
+        "searchIndexes": 1,
+        "help": "passed"
+      },
+      {
+        "edition": "apple-silicon",
+        "version": "2.0.5",
+        "build": "162",
+        "authoredHelpFilesMatched": 20,
+        "searchIndexes": 1,
+        "help": "passed"
+      }
+    ],
+    "offlineHelpPages": 18,
+    "offlineHelpLinks": 83,
+    "signatures": "ad hoc; hardened runtime and matching crash symbols verified",
+    "minimumDeployment": "13.0",
+    "nativeCanonicalDownloadsJob": 132902814837,
+    "nativeCanonicalDownloads": "Both exact canonical editions executed on Apple Silicon.",
+    "capturedImagesReviewed": 92,
+    "greenStatusAreas": [
+      {
+        "host": "arm",
+        "appearance": "light",
+        "greenPixelsInStatusArea": 116
+      },
+      {
+        "host": "arm",
+        "appearance": "dark",
+        "greenPixelsInStatusArea": 116
+      },
+      {
+        "host": "intel",
+        "appearance": "light",
+        "greenPixelsInStatusArea": 112
+      },
+      {
+        "host": "intel",
+        "appearance": "dark",
+        "greenPixelsInStatusArea": 118
+      }
+    ],
+    "swiftCompilerWarnings": 0,
+    "buildToolNotices": "Six build-tool notices per host: App Intents extraction and signed-helper stripping.  Swift compiler warnings were absent; both editions and helpers passed.",
+    "publication": "not requested; job skipped; no release or tag created",
+    "protectedReferences": {
+      "passed": true,
+      "publicTags": [
+        "v1.5.1",
+        "v2.0.4"
+      ],
+      "publicReleaseNotesAndAssetsUnchanged": true,
+      "retainedAssets": 18,
+      "versionTagsUnchanged": 12,
+      "frozenLegacyUnchanged": true,
+      "latest": "v2.0.4",
+      "ignoredVolatileFields": [
+        "download_count"
+      ],
+      "metadataFiles": {
+        "protected-before.json": "704a4b443d9a6142b0a93f317b4d717242928dde18f0a566febfa38ce6dcf261",
+        "protected-after.json": "704a4b443d9a6142b0a93f317b4d717242928dde18f0a566febfa38ce6dcf261"
+      }
+    }
+  },
+  "diagnosticRuns": [
+    {
+      "source": "401a5e50aaf4a9bb74bfea29fb94e4393c2105ce",
+      "runID": 43741667699,
+      "result": "Initial candidate did not compile because of an incorrect environment key.  Final source forwards the complete public SwiftUI environment."
+    },
+    {
+      "source": "401a5e50aaf4a9bb74bfea29fb94e4393c2105ce",
+      "runID": 43741667726,
+      "result": "Initial old-build diagnostic completed Hide Sidebar but could not invoke the overflowed Show control through its public view.  This was a probe limitation, not a second observed app failure.  Final diagnostic isolates the reported Hide action."
+    },
+    {
+      "source": "51d75816bd3b79fe2a2f2e488aa3f80fc9891a67",
+      "runID": 43742062410,
+      "result": "Swift tests, fixtures, and initial layout checks passed.  The new checker failed to find the split controller through window children; final code resolves it through the public NSSplitView delegate."
+    },
+    {
+      "source": "43607a26178aacd58e6d312005de13af57838d6b",
+      "runID": 43742472920,
+      "result": "The checker found the controller and passed absent-toggle and former-action checks, then caught a real divider-resizing failure.  A high holding priority prevented the requested 300-point position.  Final code uses documented priorities 200 and 199; the same native width assertions passed."
+    }
+  ],
+  "artifacts": [
+    {
+      "id": 14173407133,
+      "name": "AlphaSync-arm64-package-verification-87254457b8c31d1651db567e18202789d2e9e5a2",
+      "size": 1260,
+      "digest": "sha256:e7b0a0f86f200278abc5a376cab137cc52bd2b17f2dec49875da8fff3fceebda",
+      "downloadedDigest": "matched",
+      "url": "https://github.com/koralatov/alphasync/actions/runs/43743043759/artifacts/14173407133"
+    },
+    {
+      "id": 14172858822,
+      "name": "AlphaSync-interface-and-logs-macos-15-87254457b8c31d1651db567e18202789d2e9e5a2",
+      "size": 1587571,
+      "digest": "sha256:f69246d3e6c2e2ded4826ffed28a22f7f884ff082b56a8a020b6864b6457c4bb",
+      "downloadedDigest": "matched",
+      "url": "https://github.com/koralatov/alphasync/actions/runs/43743043759/artifacts/14172858822"
+    },
+    {
+      "id": 14172753537,
+      "name": "AlphaSync-packages-87254457b8c31d1651db567e18202789d2e9e5a2",
+      "size": 20955547,
+      "digest": "sha256:069328002a8b354c9e8a8affbf8c9672985730ab29e300fe5fab417e71f347b2",
+      "downloadedDigest": "matched",
+      "url": "https://github.com/koralatov/alphasync/actions/runs/43743043759/artifacts/14172753537"
+    },
+    {
+      "id": 14172718630,
+      "name": "AlphaSync-interface-and-logs-macos-26-intel-87254457b8c31d1651db567e18202789d2e9e5a2",
+      "size": 1618838,
+      "digest": "sha256:65a8f868cc83bcc216058d0bd400760dec1a30433079214ad4a10dadde53f0f7",
+      "downloadedDigest": "matched",
+      "url": "https://github.com/koralatov/alphasync/actions/runs/43743043759/artifacts/14172718630"
+    },
+    {
+      "id": 14173021066,
+      "name": "AlphaSync-sidebar-diagnosis-51d75816bd3b79fe2a2f2e488aa3f80fc9891a67",
+      "size": 65593,
+      "digest": "sha256:cb716e2463eaa17dcafc67247c1938332e5d11bbcd38085a53d2e3c45eea5852",
+      "downloadedDigest": "matched",
+      "url": "https://github.com/koralatov/alphasync/actions/runs/43742062437/artifacts/14173021066"
+    }
+  ],
+  "privateTestZIP": {
+    "filename": "AlphaSync-2.0.5-162-macOS-13-apple-silicon.zip",
+    "size": 2920090,
+    "sha256": "1b21318dcdf985281e9990d7e7ece23555784bd3ff7528dce77de27a89ce94e7",
+    "availability": "separate private test copy; earlier candidates retained"
+  },
+  "unverified": [
+    "Physical M2 Air confirmation of the permanent sidebar, full screen, all file operations, recovery, transfers, and readback",
+    "Actual system Sidebar Icon Size changes, final screen-composited toolbar appearance, complete keyboard navigation, and VoiceOver",
+    "macOS 13 runtime, actual Login Items approval, and native Help Viewer"
+  ],
+  "stableGoal": "2.1 for Apple Silicon, followed by macOS compatibility maintenance; publication requires a separate request.",
+  "checkedAt": "2026-11-15T19:40:04.651543+00:00",
+  "files": {
+    "assets.json": {
+      "size": 2043,
+      "sha256": "f6f97fc760438247a4516b384c0ef469ee5b286c54e30bcbfd4faf504261106c"
+    },
+    "baseline-probe.json": {
+      "size": 1589,
+      "sha256": "fd858108d695748205136e6c688e1a82b6fb72b94f66545f391b917dd4987341"
+    },
+    "interface-layouts.json": {
+      "size": 43303,
+      "sha256": "46948731265d16fbbc1be31b95b542fe106f375e9595d25720cd50abae3287dc"
+    },
+    "interface-review.json": {
+      "size": 26184,
+      "sha256": "72200a9955c081fa702f922c2b581fbb2057e2013522fbc418207701661c78db"
+    },
+    "performance.json": {
+      "size": 812,
+      "sha256": "891cc24eef66295e7551b7a44335738f4aaf794b84ed2d59edea2381746058bb"
+    },
+    "protected-comparison.json": {
+      "size": 501,
+      "sha256": "02eef22f48268eb6b22999ac68c4130b39ab14f1bd36462934e10ba13a19047f"
+    },
+    "sidebar-checks.json": {
+      "size": 2955,
+      "sha256": "5876183c1c89018494535d77fd5d70b63fde1d2de93078b95f919fa5e4e25cee"
+    },
+    "toolbar-checks.json": {
+      "size": 3449,
+      "sha256": "12984ab8f366a4cd11b1e4c2d7e30a5209a3d5393adb1a0b06a0f91d0a0c18dd"
+    }
+  },
+  "baselineProbe": {
+    "record": "baseline-probe.json",
+    "runID": 43742062437,
+    "outcome": "no-hang-reproduced",
+    "physicalCauseEstablished": false
+  }
+}
