@@ -208,11 +208,10 @@ struct OperationProgress: View {
 }
 
 public enum FileSize {
+    private static let byteCountStyle = ByteCountFormatStyle(style: .file, allowedUnits: [.bytes, .kb],
+        spellsOutZero: false, includesActualByteCount: false, locale: .autoupdatingCurrent)
     public static func compact(_ value: Int) -> String {
-        let formatter = ByteCountFormatter()
-        formatter.countStyle = .file; formatter.allowedUnits = [.useBytes, .useKB]
-        formatter.allowsNonnumericFormatting = false
-        return formatter.string(fromByteCount: Int64(value))
+        byteCountStyle.format(Int64(value))
     }
     public static func exact(_ value: Int) -> String { "\(value.formatted()) " + (value == 1 ? "byte" : "bytes") }
 }
