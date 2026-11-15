@@ -177,13 +177,14 @@ private final class WindowSceneDriver: ObservableObject {
 
     private func checkFind(in mainWindow: NSWindow, appearance: String) async throws {
         func items(_ menu: NSMenu) -> [NSMenuItem] {
+            menu.delegate?.menuNeedsUpdate?(menu)
             menu.update()
             return menu.items + menu.items.compactMap(\.submenu).flatMap(items)
         }
         func check(_ enabled: Bool, stage: String) throws {
             let titles: Set<String> = ["Find…", "Find Next", "Find Previous", "Use Selection for Find"]
             let commands = NSApplication.shared.mainMenu.map(items)?.filter { titles.contains($0.title) } ?? []
-            InterfaceChecks.checkpoint("Find availability during \(stage): key \(NSApplication.shared.keyWindow?.title ?? "none"), items \(commands.map { "\($0.title)=\($0.isEnabled)" })")
+            InterfaceChecks.checkpoint("Find availability during \(stage): key \(NSApplication.shared.keyWindow?.title ?? "none"), target \(ReaderFindRegistry.shared.active?.textView?.window?.title ?? "none"), items \(commands.map { "\($0.title)=\($0.isEnabled)" })")
             try InterfaceChecks.require(commands.count == 4, "The Find menu lost its four commands")
             try InterfaceChecks.require(commands.allSatisfy { $0.isEnabled == enabled }, "Find commands have the wrong availability during " + stage)
             findChecks.append(["appearance": appearance, "stage": stage, "enabled": enabled, "commands": commands.map(\.title)])
@@ -204,6 +205,8 @@ private final class WindowSceneDriver: ObservableObject {
         reader.makeKeyAndOrderFront(nil)
         try InterfaceChecks.require(reader.makeFirstResponder(field), "The unrelated field could not receive keyboard focus")
         await InterfaceChecks.yieldLayout()
+        try InterfaceChecks.require(ReaderFindRegistry.shared.active === findContext,
+                                    "The loaded key Reader did not become the native Find target")
         try check(true, stage: "reader")
         guard let command = NSApplication.shared.mainMenu.map(items)?.first(where: { $0.title == "Find…" }), let menu = command.menu else {
             throw CheckFailure(description: "Missing enabled Find command")
@@ -355,7 +358,7 @@ private final class WindowSceneDriver: ObservableObject {
             await resize(window, width: 760, height: 460)
             try await InterfaceChecks.checkBrowser(in: window, stage: "reconnected-" + label)
             try InterfaceChecks.require(window.toolbar?.displayMode == .iconAndLabel && preferences.toolbarAppearance == .iconAndText,
-                                        "Reconnection lost the saved toolbar appearance")
+                                        "Reconnection lost the saved toolbar appearance: native \(window.toolbar.map { String($0.displayMode.rawValue) } ?? "none"), saved \(preferences.toolbarAppearance.rawValue), stored \(defaults.string(forKey: "ToolbarAppearance") ?? "none")")
             try capture(window, "reconnected-" + label)
             try await checkFind(in: window, appearance: label)
         }
