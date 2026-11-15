@@ -260,7 +260,11 @@ struct InterfaceChecks {
             store.sidebar = .device(snapshot.connection)
             store.selection = [snapshot.applets[0].files[0].id]
             let inspector = window(InspectorView(store: store), size: NSSize(width: 400, height: 560), title: "Inspector")
-            try capture(inspector, "inspector-" + label, to: output); inspector.close()
+            try capture(inspector, "inspector-" + label, to: output)
+            store.selection = Set(snapshot.applets[0].files.prefix(2).map(\.id))
+            settle()
+            try capture(inspector, "inspector-multiple-" + label, to: output)
+            inspector.close()
             store.selection = []
             for (name, selection) in [("neo", SidebarSelection.device(snapshot.connection)),
                                       ("alphaword", .applet(snapshot.connection, NeoApplet.alphaWord)),

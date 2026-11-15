@@ -14,6 +14,8 @@ Private **2.0.5, build 161** is ready for testing with clearer Clear and Replace
 
 Private **2.0.5, build 162** is ready for testing with a permanently visible sidebar, slightly indented child items, and a filled keyboard icon for the Neo.  It removes the Hide Sidebar control reported to freeze build 161.  The sidebar width remains adjustable.  Both pinned hosts passed 172 Swift tests, all 55 fixtures, thirty-two native window observations, and both editions in [run 43743043759](https://github.com/koralatov/alphasync/actions/runs/43743043759).  Both exact packaged apps ran on Apple Silicon.  Independent hashes, both Help books, and 92-image review passed.  See the [sidebar review](docs/sidebar-162.md) and [record](releases/verification/2.0.5-162/verification.json).  The old freeze was not reproduced on hosted macOS 15.8.2; confirmation on the affected M2 Air remains required.
 
+Private **2.0.5, build 163** is being prepared with Preview shown only for one selected file.  A Neo or applet keeps its header icon and More Information, without the redundant enlarged icon below.  Multiple selected files have no Preview section.  File reading and all earlier fixes are retained.  The [Inspector review](docs/inspector-163.md) records this small interface change and the full non-publishing build milestone.  The user reports that build 162 appears to work; the remaining physical checks towards 2.1 continue separately.
+
 ## Version 2.0.4
 
 Version 2.0.4 improves the Swift rewrite first released as 2.0 and requires **macOS 13 or later**. It includes all changes prepared under the unpublished 2.0.1 development version.

@@ -149,11 +149,12 @@ public struct InspectorView: View {
                         LabeledContent("Available ROM:", value: FileSize.exact(device.availableROM))
                     } else { Text("Select a file, applet, or Neo to see its information.").foregroundStyle(.secondary) }
                 }
-                Section("Preview") {
-                    if let preview { Text(preview).textSelection(.enabled).lineLimit(12).frame(maxWidth: .infinity, alignment: .leading) }
-                    else if let previewError { Text(previewError).foregroundStyle(.secondary) }
-                    else if file != nil { ProgressView("Reading preview…") }
-                    else { Image(systemName: symbol).font(.system(size: 80)).frame(maxWidth: .infinity).foregroundStyle(.secondary).accessibilityHidden(true) }
+                if file != nil {
+                    Section("Preview") {
+                        if let preview { Text(preview).textSelection(.enabled).lineLimit(12).frame(maxWidth: .infinity, alignment: .leading) }
+                        else if let previewError { Text(previewError).foregroundStyle(.secondary) }
+                        else { ProgressView("Reading preview…") }
+                    }
                 }
             }.formStyle(.grouped).textSelection(.enabled)
         }.frame(width: 400).frame(minHeight: 430, idealHeight: 560, maxHeight: 700)
