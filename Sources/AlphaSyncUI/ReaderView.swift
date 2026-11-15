@@ -15,6 +15,7 @@ public struct ReaderView: View {
     @State private var copyFailure = false
     @State private var retry: UInt64 = 0
     @State private var monospaced = UserDefaults.standard.bool(forKey: "FileViewerMonospaced")
+    @StateObject private var findContext = ReaderFindContext()
     public init(request: ReaderRequest, store: AppStore) { self.request = request; self.store = store }
     public var body: some View {
         VStack(spacing: 0) {
@@ -27,7 +28,7 @@ public struct ReaderView: View {
             }.padding(12)
             Divider()
             if let text {
-                ReadOnlyText(text: text, monospaced: monospaced)
+                ReadOnlyText(text: text, monospaced: monospaced, findContext: findContext)
             } else if let failure {
                 VStack(spacing: 14) {
                     Label("The file could not be read", systemImage: "exclamationmark.triangle").font(.headline)
@@ -51,6 +52,7 @@ public struct ReaderView: View {
         }
         .frame(minWidth: 440, idealWidth: 660, maxWidth: .infinity, minHeight: 320, idealHeight: 500, maxHeight: .infinity)
         .navigationTitle(request.name)
+        .focusedSceneValue(\.readerFind, text == nil ? nil : findContext)
         .alert("The text could not be copied", isPresented: $copyFailure) {
             Button("OK", role: .cancel) {}
         } message: { Text("Try copying the text again.") }
@@ -76,7 +78,11 @@ public struct ReaderView: View {
 public struct ReadOnlyText: NSViewRepresentable {
     public let text: String
     public let monospaced: Bool
-    public init(text: String, monospaced: Bool = false) { self.text = text; self.monospaced = monospaced }
+    private let findContext: ReaderFindContext?
+    public init(text: String, monospaced: Bool = false) { self.text = text; self.monospaced = monospaced; findContext = nil }
+    init(text: String, monospaced: Bool = false, findContext: ReaderFindContext) {
+        self.text = text; self.monospaced = monospaced; self.findContext = findContext
+    }
     public func makeNSView(context: Context) -> NSScrollView {
         let scroll = NSScrollView()
         scroll.hasVerticalScroller = true; scroll.autohidesScrollers = true
@@ -93,10 +99,12 @@ public struct ReadOnlyText: NSViewRepresentable {
         view.textColor = .textColor; view.backgroundColor = .textBackgroundColor
         view.setAccessibilityLabel("Read-only file text")
         scroll.documentView = view
+        findContext?.attach(view)
         return scroll
     }
     public func updateNSView(_ scroll: NSScrollView, context: Context) {
         guard let view = scroll.documentView as? NSTextView else { return }
+        findContext?.attach(view)
         let font: NSFont = monospaced ? .monospacedSystemFont(ofSize: NSFont.systemFontSize, weight: .regular) : .systemFont(ofSize: NSFont.systemFontSize)
         let textChanged = view.string != text, fontChanged = view.font != font
         guard textChanged || fontChanged else { return }

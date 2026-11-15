@@ -5,6 +5,7 @@ public struct AlphaSyncCommands: Commands {
     @ObservedObject private var store: AppStore
     @ObservedObject private var preferences: Preferences
     @Environment(\.openWindow) private var openWindow
+    @FocusedValue(\.readerFind) private var readerFind
     public init(store: AppStore) { self.store = store; preferences = store.preferences }
     public var body: some Commands {
         CommandGroup(replacing: .appInfo) {
@@ -24,10 +25,14 @@ public struct AlphaSyncCommands: Commands {
         }
         CommandGroup(after: .textEditing) {
             Menu("Find") {
-                Button("Find…") { AppActions.find(.showFindPanel) }.keyboardShortcut("f")
-                Button("Find Next") { AppActions.find(.next) }.keyboardShortcut("g")
-                Button("Find Previous") { AppActions.find(.previous) }.keyboardShortcut("g", modifiers: [.command, .shift])
-                Button("Use Selection for Find") { AppActions.find(.setFindString) }.keyboardShortcut("e")
+                Button("Find…") { readerFind?.perform(.showFindPanel) }.keyboardShortcut("f")
+                    .disabled(readerFind == nil)
+                Button("Find Next") { readerFind?.perform(.next) }.keyboardShortcut("g")
+                    .disabled(readerFind == nil)
+                Button("Find Previous") { readerFind?.perform(.previous) }.keyboardShortcut("g", modifiers: [.command, .shift])
+                    .disabled(readerFind == nil)
+                Button("Use Selection for Find") { readerFind?.perform(.setFindString) }.keyboardShortcut("e")
+                    .disabled(readerFind == nil)
             }
         }
         CommandGroup(replacing: .sidebar) {

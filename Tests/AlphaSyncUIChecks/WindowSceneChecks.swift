@@ -29,11 +29,36 @@ struct WindowSceneChecksApp: App {
             MainView(store: driver.store)
                 .environment(\.sidebarRowSize, driver.sidebarSize)
                 .background(WindowSceneProbe { driver.start(in: $0) })
+                .background(FindSceneLauncher(driver: driver))
         }
         .defaultSize(width: 360, height: 230)
         .windowResizability(.contentSize)
         .commands { AlphaSyncCommands(store: driver.store) }
+        Window("Find fixture", id: "find-fixture") {
+            VStack {
+                FindFocusControl().frame(width: 260, height: 26).padding(8)
+                ReadOnlyText(text: "Find this file text.\nA second line for native Find.", findContext: driver.findContext)
+            }
+            .frame(minWidth: 440, minHeight: 240)
+            .focusedSceneValue(\.readerFind, driver.findContext)
+            .background(WindowSceneProbe { driver.registerFindWindow($0) })
+        }
+        .defaultSize(width: 660, height: 320)
     }
+}
+
+@MainActor
+private struct FindSceneLauncher: View {
+    let driver: WindowSceneDriver
+    @Environment(\.openWindow) private var openWindow
+    var body: some View {
+        Color.clear.frame(width: 0, height: 0).onAppear { driver.setOpenWindow(openWindow) }
+    }
+}
+
+private struct FindFocusControl: NSViewRepresentable {
+    func makeNSView(context: Context) -> NSTextField { NSTextField(string: "Unrelated field with keyboard focus") }
+    func updateNSView(_ view: NSTextField, context: Context) {}
 }
 
 @MainActor
@@ -80,6 +105,13 @@ private final class WindowSceneDriver: ObservableObject {
     private var started = false
     private var toolbarChecks: [[String: Any]] = []
     private var sidebarChecks: [[String: Any]] = []
+    private var findChecks: [[String: Any]] = []
+    private var openWindow: OpenWindowAction?
+    private weak var findWindow: NSWindow?
+    let findContext = ReaderFindContext()
+
+    func setOpenWindow(_ action: OpenWindowAction) { openWindow = action }
+    func registerFindWindow(_ window: NSWindow) { findWindow = window }
 
     init() {
         let domain = "AlphaSync-WindowSceneChecks-" + UUID().uuidString
@@ -138,6 +170,50 @@ private final class WindowSceneDriver: ObservableObject {
             .write(to: output.appendingPathComponent("toolbar-checks.json"), options: .atomic)
         try JSONSerialization.data(withJSONObject: sidebarChecks, options: [.prettyPrinted, .sortedKeys])
             .write(to: output.appendingPathComponent("sidebar-checks.json"), options: .atomic)
+        try JSONSerialization.data(withJSONObject: findChecks, options: [.prettyPrinted, .sortedKeys])
+            .write(to: output.appendingPathComponent("find-command-checks.json"), options: .atomic)
+    }
+
+    private func checkFind(in mainWindow: NSWindow, appearance: String) async throws {
+        func items(_ menu: NSMenu) -> [NSMenuItem] {
+            menu.update()
+            return menu.items + menu.items.compactMap(\.submenu).flatMap(items)
+        }
+        func check(_ enabled: Bool, stage: String) throws {
+            let titles: Set<String> = ["Find…", "Find Next", "Find Previous", "Use Selection for Find"]
+            let commands = NSApplication.shared.mainMenu.map(items)?.filter { titles.contains($0.title) } ?? []
+            try InterfaceChecks.require(commands.count == 4, "The Find menu lost its four commands")
+            try InterfaceChecks.require(commands.allSatisfy { $0.isEnabled == enabled }, "Find commands have the wrong availability during " + stage)
+            findChecks.append(["appearance": appearance, "stage": stage, "enabled": enabled, "commands": commands.map(\.title)])
+        }
+        mainWindow.makeKeyAndOrderFront(nil)
+        await InterfaceChecks.yieldLayout()
+        try check(false, stage: "browser")
+        guard let openWindow else { throw CheckFailure(description: "Missing native scene opener") }
+        openWindow(id: "find-fixture")
+        for _ in 0..<20 {
+            if findWindow?.isVisible == true { break }
+            await InterfaceChecks.yieldLayout()
+        }
+        guard let reader = findWindow, let content = reader.contentView, let text = findContext.textView,
+              let field = InterfaceChecks.descendants(content).compactMap({ $0 as? NSTextField }).first else {
+            throw CheckFailure(description: "The native Find fixture did not open")
+        }
+        reader.makeKeyAndOrderFront(nil)
+        try InterfaceChecks.require(reader.makeFirstResponder(field), "The unrelated field could not receive keyboard focus")
+        await InterfaceChecks.yieldLayout()
+        try check(true, stage: "reader")
+        guard let command = NSApplication.shared.mainMenu.map(items)?.first(where: { $0.title == "Find…" }), let menu = command.menu else {
+            throw CheckFailure(description: "Missing enabled Find command")
+        }
+        menu.performActionForItem(at: menu.index(of: command))
+        await InterfaceChecks.yieldLayout()
+        try InterfaceChecks.require(text.enclosingScrollView?.isFindBarVisible == true, "Find did not open the native Find bar")
+        try capture(reader, "find-reader-" + appearance)
+        reader.close()
+        mainWindow.makeKeyAndOrderFront(nil)
+        await InterfaceChecks.yieldLayout()
+        try check(false, stage: "reader-closed")
     }
 
     private func checkSidebar(in window: NSWindow, appearance: String) async throws {
@@ -279,6 +355,7 @@ private final class WindowSceneDriver: ObservableObject {
             try InterfaceChecks.require(window.toolbar?.displayMode == .iconAndLabel && preferences.toolbarAppearance == .iconAndText,
                                         "Reconnection lost the saved toolbar appearance")
             try capture(window, "reconnected-" + label)
+            try await checkFind(in: window, appearance: label)
         }
         try InterfaceChecks.require(InterfaceChecks.browserLayouts.count == 32, "Missing window-scene layout observations")
         try saveGeometry()

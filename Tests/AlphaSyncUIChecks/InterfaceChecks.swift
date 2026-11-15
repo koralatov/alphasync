@@ -5,7 +5,7 @@ import ServiceManagement
 @testable import AlphaSyncUI
 import AlphaSyncCore
 
-private struct CheckFailure: Error, CustomStringConvertible { let description: String }
+struct CheckFailure: Error, CustomStringConvertible { let description: String }
 
 @MainActor
 final class InterfaceLoginItem: LoginItemManaging {

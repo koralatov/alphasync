@@ -136,14 +136,21 @@ public struct MainView: View {
         // The scroll view can shrink below its ideal size when a warning reserves space.
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
         .contextMenu(forSelectionType: NeoFileID.self) { ids in
-            Button("Open Read-only") { openReaders(ids) }.disabled(ids.isEmpty)
-            Button("Save to Mac…") { store.selection = ids; store.beginExport() }.disabled(ids.isEmpty || store.busy)
-            Button("Rename…") { renaming = store.files.first { ids.contains($0.id) } }
-                .disabled(ids.count != 1 || store.busy || !ids.allSatisfy { store.applet(for: $0)?.canWrite == true })
-            Divider()
-            Button(ids.count == 1 ? "Clear File…" : "Clear Selected Files…", role: .destructive) {
-                store.selection = ids; Task { await store.requestClear() }
-            }.disabled(store.busy || ids.isEmpty || Set(ids.map(\.applet)).count != 1 || !ids.allSatisfy { store.applet(for: $0)?.canWrite == true })
+            if !ids.isEmpty {
+                Button("Open Read-only") { openReaders(ids) }
+                if !store.busy {
+                    Button("Save to Mac…") { store.selection = ids; store.beginExport() }
+                    if ids.count == 1 && ids.allSatisfy({ store.applet(for: $0)?.canWrite == true }) {
+                        Button("Rename…") { renaming = store.files.first { ids.contains($0.id) } }
+                    }
+                    if Set(ids.map(\.applet)).count == 1 && ids.allSatisfy({ store.applet(for: $0)?.canWrite == true }) {
+                        Divider()
+                        Button(ids.count == 1 ? "Clear File…" : "Clear Selected Files…", role: .destructive) {
+                            store.selection = ids; Task { await store.requestClear() }
+                        }
+                    }
+                }
+            }
         } primaryAction: { ids in openReaders(ids) }
         .dropDestination(for: URL.self) { urls, _ in
             store.importDroppedFiles(urls) != nil
