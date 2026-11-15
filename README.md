@@ -4,9 +4,9 @@ AlphaSync copies text files between your Mac and an AlphaSmart Neo. It can also 
 
 ## Connection fixes in testing
 
-A Neo can remain in keyboard mode with public version 2.0.4. Unpublished 2.0.5 corrects the mode switch, USB buffers, and System applet query. On 15 November 2026, the user reported that the private build 158 now works on the M2 Air; its screenshot confirms a connected file list. The [USB comparison](docs/usb-parity-audit.md) and [build 158 record](releases/verification/2.0.5-158/verification.json) preserve the changes and passed checks.
+A Neo can remain in keyboard mode with public version 2.0.4.  Unpublished 2.0.5 corrects the mode switch, USB buffers, and System applet query.  On 15 November 2026, the user reported that the private build 158 now works on the M2 Air; its screenshot confirms a connected file list.  The [USB comparison](docs/usb-parity-audit.md) and [build 158 record](releases/verification/2.0.5-158/verification.json) preserve the changes and passed checks.
 
-Build 159 is being prepared to fix the top sidebar and file rows hidden beneath the toolbar and align Clear with its one-applet rule. It preserves the working USB code. The [layout investigation](docs/connected-layout.md) records the full build milestone and physical checks toward stable **2.1 for Apple Silicon**. After that release is verified and published, planned development will pause except for future macOS compatibility updates. Only 1.5.1 and 2.0.4 are public.
+Private **2.0.5, build 159** is ready to test the correction for sidebar and file rows hidden beneath the toolbar.  It also aligns Clear with its one-applet rule and preserves the working USB code. [Run 43718196869](https://github.com/koralatov/alphasync/actions/runs/43718196869) passed 157 Swift tests, all 55 fixtures, twenty browser layout observations per host, both app builds, and exact-package execution on Apple Silicon.  Independent hashes and Help checks passed.  The [layout investigation](docs/connected-layout.md) and [record](releases/verification/2.0.5-159/verification.json) explain the results and remaining physical checks toward stable **2.1 for Apple Silicon**.  After that release is verified and published, planned development will pause except for future macOS compatibility updates.  Only 1.5.1 and 2.0.4 are public.
 
 ## Version 2.0.4
 

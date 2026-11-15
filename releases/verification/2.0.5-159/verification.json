@@ -1,0 +1,320 @@
+{
+  "formatVersion": 1,
+  "state": "built-not-published",
+  "version": "2.0.5",
+  "build": "159",
+  "releaseTag": null,
+  "preparedReleaseTag": "v2.0.5",
+  "sourceCommit": "97f15dd1ab338f119df8d093fd87260bf0be82c1",
+  "sourceTree": "4f9a67c8591953d4fca68964b363fcc1cf232c67",
+  "workflow": {
+    "runID": 43718196869,
+    "url": "https://github.com/koralatov/alphasync/actions/runs/43718196869",
+    "attempt": 1,
+    "event": "push",
+    "conclusion": "success",
+    "publication": "skipped"
+  },
+  "hardwareReport": {
+    "date": "2026-11-15",
+    "model": "M2 MacBook Air",
+    "previousCandidateBuild": "158",
+    "reportedResult": "The user says the Neo now works. The screenshot confirms a connected file list, with the top sidebar and file rows hidden beneath the toolbar.",
+    "candidateHardwareResult": "Build 159 has not yet been physically tested. Confirm layout and functional results on the affected Mac.",
+    "scope": "Sanitised observation only; the user screenshot is not copied into the public repository."
+  },
+  "correction": {
+    "scope": "Keep native navigation at the root, reserve warning and status rows inside the file column, and give the table, column, and container explicit flexible zero-minimum frames. Align Clear eligibility with its one-applet rule.",
+    "reference": "../../../docs/connected-layout.md",
+    "usbAndCoreSources": "unchanged from build 158 source 74be91b1e4d65fcb43bd270cec2fb2ef12c81cc6",
+    "dataProtection": "Existing confirmations, preflights, recovery, and readback verification are unchanged."
+  },
+  "hosts": [
+    {
+      "architecture": "x86_64",
+      "xcode": "26.6",
+      "jobID": 132824206709,
+      "conclusion": "success",
+      "swiftRegressions": 157,
+      "newClearRegressions": 2,
+      "helpFixtures": 13,
+      "packagingFixtures": 10,
+      "publicationFixtures": 22,
+      "retirementFixtures": 10,
+      "builtEditions": [
+        "universal",
+        "apple-silicon"
+      ],
+      "nativeInterface": "passed",
+      "realWindowLayoutObservations": 20,
+      "capturedImages": 26,
+      "swiftCompilerWarnings": 0
+    },
+    {
+      "architecture": "arm64",
+      "xcode": "16.4",
+      "jobID": 132824206915,
+      "conclusion": "success",
+      "swiftRegressions": 157,
+      "newClearRegressions": 2,
+      "helpFixtures": 13,
+      "packagingFixtures": 10,
+      "publicationFixtures": 22,
+      "retirementFixtures": 10,
+      "builtEditions": [
+        "universal",
+        "apple-silicon"
+      ],
+      "nativeInterface": "passed",
+      "realWindowLayoutObservations": 20,
+      "capturedImages": 26,
+      "swiftCompilerWarnings": 0
+    }
+  ],
+  "verification": {
+    "appAndHelper": "passed",
+    "architectures": "passed",
+    "minimumDeployment": "13.0",
+    "signing": "ad-hoc",
+    "hardenedRuntime": "passed",
+    "crashSymbols": "passed",
+    "releaseMetadata": "2.0.5, build 159; prepared tag v2.0.5; no tag created",
+    "offlineHelp": {
+      "pages": 18,
+      "links": 83,
+      "authoredFilesMatchedPerEdition": 20,
+      "searchIndex": "nonempty in both downloaded apps",
+      "originalLicence": "preserved",
+      "sourceComparison": "matched the tested source"
+    },
+    "allTwelveBuildAssetHashes": "matched the independent native Apple Silicon manifest",
+    "allFourArtifactDigests": "matched independent downloads",
+    "nativeAppleSiliconPackageVerification": {
+      "jobID": 132825413407,
+      "editions": [
+        "universal",
+        "apple-silicon"
+      ],
+      "result": "passed; exact packaged apps executed natively"
+    },
+    "realWindowLayoutObservations": 40,
+    "capturedImagesReviewed": 52,
+    "captureLimit": "macOS 26 compositor-backed sidebar and toolbar backgrounds are absent from layer captures. Native row geometry passed on both hosts; macOS 15 images show the full browser. System-composited appearance and accessibility remain manual checks.",
+    "swiftCompilerWarnings": 0,
+    "buildToolNotices": "Xcode 16.4 reports inherited App Intents extraction and signed-helper stripping notices; both app builds pass.",
+    "publicReleasePublication": "not requested; skipped",
+    "protectedPublicReleases": [
+      "v2.0.4",
+      "v1.5.1"
+    ],
+    "allTwelveVersionTags": "unchanged",
+    "legacyBranchSource": "6cb821c9ab8073ff950414952bf2480eb4638c5d",
+    "latestPublicRelease": "v2.0.4",
+    "protectedReferencesCheckedAt": "2026-11-15T13:23:03.691Z",
+    "allAutomatedChecksPassed": true
+  },
+  "preservedVersionTagObjects": {
+    "refs/tags/v1.4.1": {
+      "sha": "a7a98ca2097fc2ac2b409fd1d35e8afbd41f9199",
+      "type": "commit",
+      "url": "https://api.github.com/repos/koralatov/alphasync/git/commits/a7a98ca2097fc2ac2b409fd1d35e8afbd41f9199"
+    },
+    "refs/tags/v1.4.2": {
+      "sha": "f614f61dda822be6f7afd14938cbe4d2bacc26a3",
+      "type": "commit",
+      "url": "https://api.github.com/repos/koralatov/alphasync/git/commits/f614f61dda822be6f7afd14938cbe4d2bacc26a3"
+    },
+    "refs/tags/v1.4.3": {
+      "sha": "d5a2a54b99a1e3a0fdb0ea87788d72812f6a0e46",
+      "type": "commit",
+      "url": "https://api.github.com/repos/koralatov/alphasync/git/commits/d5a2a54b99a1e3a0fdb0ea87788d72812f6a0e46"
+    },
+    "refs/tags/v1.4.4": {
+      "sha": "077b4acdcde7a709269078885b6f98eacf8cd771",
+      "type": "commit",
+      "url": "https://api.github.com/repos/koralatov/alphasync/git/commits/077b4acdcde7a709269078885b6f98eacf8cd771"
+    },
+    "refs/tags/v1.4.5": {
+      "sha": "4e3756f952b32b056b8dcf7b1a77c1aace6e28f7",
+      "type": "commit",
+      "url": "https://api.github.com/repos/koralatov/alphasync/git/commits/4e3756f952b32b056b8dcf7b1a77c1aace6e28f7"
+    },
+    "refs/tags/v1.5": {
+      "sha": "3ba2abfd32b7f4cbae833079f2e81296761e6b22",
+      "type": "commit",
+      "url": "https://api.github.com/repos/koralatov/alphasync/git/commits/3ba2abfd32b7f4cbae833079f2e81296761e6b22"
+    },
+    "refs/tags/v1.5.1": {
+      "sha": "6cb821c9ab8073ff950414952bf2480eb4638c5d",
+      "type": "commit",
+      "url": "https://api.github.com/repos/koralatov/alphasync/git/commits/6cb821c9ab8073ff950414952bf2480eb4638c5d"
+    },
+    "refs/tags/v2.0": {
+      "sha": "a508da036db4516d65d98b0a33e1d031e96f8b88",
+      "type": "commit",
+      "url": "https://api.github.com/repos/koralatov/alphasync/git/commits/a508da036db4516d65d98b0a33e1d031e96f8b88"
+    },
+    "refs/tags/v2.0.2": {
+      "sha": "807b4bedf1bb1cd655e934e1495723bb5c203c93",
+      "type": "commit",
+      "url": "https://api.github.com/repos/koralatov/alphasync/git/commits/807b4bedf1bb1cd655e934e1495723bb5c203c93"
+    },
+    "refs/tags/v2.0.2-build.152": {
+      "sha": "fbcc566207d550ee313245e3eff39a55d3c986fb",
+      "type": "commit",
+      "url": "https://api.github.com/repos/koralatov/alphasync/git/commits/fbcc566207d550ee313245e3eff39a55d3c986fb"
+    },
+    "refs/tags/v2.0.3": {
+      "sha": "db3ff4c23253c024726dd812868e6ac745a7b831",
+      "type": "commit",
+      "url": "https://api.github.com/repos/koralatov/alphasync/git/commits/db3ff4c23253c024726dd812868e6ac745a7b831"
+    },
+    "refs/tags/v2.0.4": {
+      "sha": "7b71c9fa7f8de748c91e26990050decfb2a98472",
+      "type": "commit",
+      "url": "https://api.github.com/repos/koralatov/alphasync/git/commits/7b71c9fa7f8de748c91e26990050decfb2a98472"
+    }
+  },
+  "artifacts": [
+    {
+      "id": 14163810648,
+      "name": "AlphaSync-interface-and-logs-macos-26-intel-97f15dd1ab338f119df8d093fd87260bf0be82c1",
+      "size": 817708,
+      "digest": "sha256:4d66dd632243e5ec1f88f119aa6be0d3f088ec51f42e47ffe1c9f0597f646d0f",
+      "downloadedDigest": "matched",
+      "url": "https://github.com/koralatov/alphasync/actions/runs/43718196869/artifacts/14163810648"
+    },
+    {
+      "id": 14163491991,
+      "name": "AlphaSync-interface-and-logs-macos-15-97f15dd1ab338f119df8d093fd87260bf0be82c1",
+      "size": 812696,
+      "digest": "sha256:09c44d7ddf353fd1705e3080fd8f7c3d25b9c378ba45aabeb24d013e90e91971",
+      "downloadedDigest": "matched",
+      "url": "https://github.com/koralatov/alphasync/actions/runs/43718196869/artifacts/14163491991"
+    },
+    {
+      "id": 14163093762,
+      "name": "AlphaSync-arm64-package-verification-97f15dd1ab338f119df8d093fd87260bf0be82c1",
+      "size": 1264,
+      "digest": "sha256:cf26bc1ffcc4abfa73ff1a9ca5803c9b38f2dc08124e8cf0ce5126402a14e5c0",
+      "downloadedDigest": "matched",
+      "url": "https://github.com/koralatov/alphasync/actions/runs/43718196869/artifacts/14163093762"
+    },
+    {
+      "id": 14162844369,
+      "name": "AlphaSync-packages-97f15dd1ab338f119df8d093fd87260bf0be82c1",
+      "size": 20578433,
+      "digest": "sha256:a92b0e4cb8bbde0e45598a68e04abd39f2971b8c18e3b717b7ba90731309f9b0",
+      "downloadedDigest": "matched",
+      "url": "https://github.com/koralatov/alphasync/actions/runs/43718196869/artifacts/14162844369"
+    }
+  ],
+  "privateTestZIP": {
+    "filename": "AlphaSync-2.0.5-159-macOS-13-apple-silicon.zip",
+    "size": 2883213,
+    "sha256": "7058161770cca60c38fe0bdba2cc5552a4b3885c5bb1e34e02f4eda60f335c9d",
+    "availability": "separate private test copy; not a public release asset"
+  },
+  "unverified": [
+    "Physical build 159 layout on the M2 Air, launch before and after attachment, resizing, warning display, and reconnection",
+    "Physical opening, saving, backup, drag export, import, rename, replacement, dictionary, recovery, and readback verification",
+    "Actual Login Items approval",
+    "macOS 13 and other intended runtime versions",
+    "Native Help Viewer, indexed search, cached-book upgrades, screen-composited appearance, keyboard focus, and VoiceOver"
+  ],
+  "stableGoal": {
+    "version": "2.1",
+    "platform": "Apple Silicon",
+    "afterRelease": "Suspend feature development and limit planned maintenance to future macOS compatibility.",
+    "releaseAuthorisation": "A separate release request and reviewed functional results are required."
+  },
+  "previousCandidates": [
+    {
+      "build": "158",
+      "record": "../2.0.5-158/verification.json"
+    },
+    {
+      "build": "157",
+      "record": "../2.0.5-157/verification.json"
+    },
+    {
+      "build": "156",
+      "record": "../2.0.5-156/verification.json"
+    },
+    {
+      "build": "155",
+      "record": "../2.0.5-155/verification.json"
+    }
+  ],
+  "checkedAt": "2026-11-15T13:26:24.551531+00:00",
+  "diagnosticRuns": [
+    {
+      "sourceCommit": "8bc3fbd21135c1b40a4942465d465fe041d0ec4a",
+      "runID": 43711490305,
+      "observation": "Sample expression exceeded the older compiler’s type-checking limit.",
+      "superseded": true
+    },
+    {
+      "sourceCommit": "52cee3f46131024d243525ff8dfe9936adef5211",
+      "runID": 43711712317,
+      "observation": "The root safe-area inset did not reserve warning space.",
+      "superseded": true
+    },
+    {
+      "sourceCommit": "2bf2aafbead3542df22d59f92c196a803f37ad48",
+      "runID": 43712357414,
+      "observation": "Warning insertion expanded the browser beyond the visible window.",
+      "superseded": true
+    },
+    {
+      "sourceCommit": "f61b51cdd1fa51d7f53d2f46d111de15b040b80a",
+      "runID": 43713390238,
+      "observation": "Geometry wrappers did not resolve the standalone browser fixture.",
+      "superseded": true
+    },
+    {
+      "sourceCommit": "a52dc451661c654f3fbed204aadbe7eccab21039",
+      "runID": 43714833784,
+      "observation": "The bare SwiftUI scene checker opened no window before its deadline.",
+      "superseded": true
+    },
+    {
+      "sourceCommit": "c3f326faac968bbc11e8cc98227997acb7efdf02",
+      "runID": 43715391613,
+      "observation": "Activation alone did not open a window; superseded run cancelled.",
+      "superseded": true
+    },
+    {
+      "sourceCommit": "f3b933d968157a8150b77255310df265b6742c71",
+      "runID": 43716161336,
+      "observation": "Launch Services opened the real app bundle and reproduced overflow.",
+      "superseded": true
+    },
+    {
+      "sourceCommit": "333a52a9b4169ba79e534f804c30b71aa0f28371",
+      "runID": 43717018611,
+      "observation": "Table-root bar insets retained the oversized native view.",
+      "superseded": true
+    },
+    {
+      "sourceCommit": "6f7a8cb825729c82e1825bc7ad8c41dbbaad8376",
+      "runID": 43717698251,
+      "observation": "Overflow reproduced before any connected snapshot; capture was not the cause.",
+      "superseded": true
+    }
+  ],
+  "files": {
+    "assets.json": {
+      "size": 2043,
+      "sha256": "87eb9ad196caeecb04c4901f21b473c1905f290bce2d8e732a70dbea5c5c5e11"
+    },
+    "interface-layouts.json": {
+      "size": 24783,
+      "sha256": "4e783dccd68922534b85368e18d5c832a3f9a0f7830bf3c833fabcd7c24adc88"
+    },
+    "interface-review.json": {
+      "size": 9669,
+      "sha256": "42e41ef1588179a598abd45f69b4dd9bf4db76cc69f8700bb206fcb5696204cc"
+    }
+  }
+}
