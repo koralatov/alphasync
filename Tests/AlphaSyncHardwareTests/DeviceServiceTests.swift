@@ -4,6 +4,108 @@ import AlphaSyncCore
 @testable import AlphaSyncHardware
 
 final class DeviceServiceTests: XCTestCase {
+    func testExplicitRetryReopensAStaleConnectionInTheSameScan() async throws {
+        let observations = SimulatedObservations()
+        let service = makeService(SimulatedConfiguration(failingSnapshotNumber: 2), observations: observations)
+        let original = try await device(service)
+        let oldFile = try XCTUnwrap(original.applets.first?.files.first?.id)
+        let result = try await service.refresh(retryConnections: true)
+        let replacement = try XCTUnwrap(result.devices.first)
+        XCTAssertNil(result.issue)
+        XCTAssertNotEqual(replacement.connection, original.connection)
+        XCTAssertEqual(observations.openCount, 2)
+        XCTAssertEqual(observations.closeCount, 1)
+        do {
+            _ = try await service.readText(oldFile)
+            XCTFail("An old file request reached the replacement connection")
+        } catch { XCTAssertEqual(error as? NeoError, .disconnected) }
+        XCTAssertEqual(observations.writeCount, 0)
+        await service.shutdown()
+    }
+
+    func testOrdinaryRefreshDoesNotRepeatedlyReopenAFailedConnection() async throws {
+        let observations = SimulatedObservations()
+        let service = makeService(SimulatedConfiguration(failingSnapshotNumber: 2), observations: observations)
+        _ = try await device(service)
+        let failed = try await service.refresh()
+        XCTAssertTrue(failed.devices.isEmpty)
+        XCTAssertNotNil(failed.issue)
+        _ = try await service.scan()
+        _ = try await service.refresh()
+        XCTAssertEqual(observations.openCount, 1)
+        let recovered = try await service.refresh(retryConnections: true)
+        XCTAssertEqual(recovered.devices.count, 1)
+        XCTAssertNil(recovered.issue)
+        XCTAssertEqual(observations.openCount, 2)
+        await service.shutdown()
+    }
+
+    func testDecodedReadsPreserveTextAndLosslessAppletData() async throws {
+        for appletID: UInt16 in [NeoApplet.alphaWord, NeoApplet.dictionary, 0xb000] {
+            let configuration = SimulatedConfiguration(beforeRead: { _ in XCTAssertFalse(Thread.isMainThread) }, appletID: appletID)
+            let service = makeService(configuration, observations: SimulatedObservations())
+            let snapshot = try await device(service)
+            let file = try XCTUnwrap(snapshot.applets.first?.files.first?.id)
+            let text = try await service.readText(file)
+            switch appletID {
+            case NeoApplet.alphaWord: XCTAssertEqual(text, "Original 1")
+            case NeoApplet.dictionary: XCTAssertEqual(text, "Original")
+            default:
+                XCTAssertTrue(text.contains("<appletID>0xb000</appletID>"))
+                XCTAssertTrue(text.contains("<data>01000102</data>"))
+            }
+            await service.shutdown()
+        }
+    }
+
+    func testDecodedReadsRejectMissingFilesBeforeReadingTheDevice() async throws {
+        let read = StopRequest()
+        let service = makeService(SimulatedConfiguration(beforeRead: { _ in read.stop() }), observations: SimulatedObservations())
+        let snapshot = try await device(service)
+        let missing = NeoFileID(connection: snapshot.connection, applet: NeoApplet.alphaWord, index: 200)
+        do {
+            _ = try await service.readText(missing)
+            XCTFail("A missing file was accepted")
+        } catch { XCTAssertEqual(error as? NeoError, .disconnected) }
+        XCTAssertFalse(read.isRequested)
+        await service.shutdown()
+    }
+
+    func testDecodedReadsHonourCancellationAfterTheLastUSBBlock() async throws {
+        let stop = StopRequest()
+        let service = makeService(SimulatedConfiguration(afterRead: { _ in stop.stop() }), observations: SimulatedObservations())
+        let snapshot = try await device(service)
+        let file = try XCTUnwrap(snapshot.applets.first?.files.first?.id)
+        do {
+            _ = try await service.readText(file, stop: stop)
+            XCTFail("A cancelled read returned decoded text")
+        } catch { XCTAssertTrue(error is CancellationError) }
+        await service.shutdown()
+    }
+
+    func testBackupCancellationAfterTheLastUSBBlockKeepsOnlyCompletedFiles() async throws {
+        let stop = StopRequest()
+        let service = makeService(SimulatedConfiguration(afterRead: { if $0 == 2 { stop.stop() } }), observations: SimulatedObservations())
+        let snapshot = try await device(service)
+        let root = try temporaryFolder()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let result = try await service.backup(connections: [snapshot.connection], includedApplets: nil,
+                                              destination: root, saveLog: true, stop: stop, progress: { _ in })
+        XCTAssertTrue(result.stopped)
+        XCTAssertEqual(result.saved, 1)
+        XCTAssertFalse(result.complete)
+        XCTAssertTrue(result.failures.isEmpty)
+        let folder = try XCTUnwrap(result.folders.first)
+        XCTAssertTrue(folder.lastPathComponent.hasSuffix(AtomicFileStore.incompleteSuffix))
+        XCTAssertEqual(try String(contentsOf: folder.appendingPathComponent("AlphaWord/File 1.txt"), encoding: .utf8), "Original 1")
+        XCTAssertFalse(FileManager.default.fileExists(atPath: folder.appendingPathComponent("AlphaWord/File 2.txt").path))
+        let bytes = try Data(contentsOf: folder.appendingPathComponent("AlphaSync Backup Log.plist"))
+        let log = try XCTUnwrap(PropertyListSerialization.propertyList(from: bytes, format: nil) as? [String: Any])
+        XCTAssertEqual(log["status"] as? String, "cancelled")
+        XCTAssertEqual((log["files"] as? [[String: Any]])?[1]["status"] as? String, "cancelled")
+        await service.shutdown()
+    }
+
     private func makeService(_ configuration: SimulatedConfiguration = SimulatedConfiguration(),
                          observations: SimulatedObservations) -> DeviceService {
         DeviceService(discoveryFactory: { SimulatedDiscovery(configuration, observations) })

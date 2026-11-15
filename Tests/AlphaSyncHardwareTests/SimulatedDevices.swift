@@ -11,6 +11,8 @@ struct SimulatedConfiguration: Sendable {
     var beforeWrite: (@Sendable (Int) -> Void)?
     var failOpen = false
     var appletID = NeoApplet.alphaWord
+    var failingSnapshotNumber: Int?
+    var afterRead: (@Sendable (UInt8) -> Void)?
 }
 
 /// Only observations cross executors.  Device data remains inside the simulated connection.
@@ -142,6 +144,7 @@ private final class SimulatedConnection: DeviceConnection {
     private var contents: [UInt8: Data] = [:]
     private var names: [UInt8: String] = [:]
     private var writes = 0
+    private var snapshots = 0
 
     init(_ configuration: SimulatedConfiguration, _ observations: SimulatedObservations) throws {
         self.configuration = configuration
@@ -163,6 +166,8 @@ private final class SimulatedConnection: DeviceConnection {
     func close() { observations.didClose() }
 
     func snapshot(connection: UUID, registryID: UInt64) throws -> NeoSnapshot {
+        snapshots += 1
+        if configuration.failingSnapshotNumber == snapshots { throw NeoError.disconnected }
         if configuration.failRefreshAfterWriting && writes > 0 { throw NeoError.disconnected }
         var header = Data(repeating: 0, count: NeoApplet.headerSize)
         header.replaceSubrange(0..<4, with: [0xc0, 0xff, 0xee, 0xad])
@@ -195,6 +200,7 @@ private final class SimulatedConnection: DeviceConnection {
         try checkingCancellation()
         if configuration.failingRead == index { throw NeoError.device("Simulated read failure") }
         guard let bytes = contents[index] else { throw NeoError.disconnected }
+        configuration.afterRead?(index)
         return bytes
     }
 

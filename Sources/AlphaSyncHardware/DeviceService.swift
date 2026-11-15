@@ -71,6 +71,22 @@ public final class DeviceService: @unchecked Sendable {
             }
         }
     }
+    /// Decode on the device executor so large previews do not block the main actor.
+    public func readText(_ file: NeoFileID, stop: StopRequest? = nil) async throws -> String {
+        try await perform { access in
+            try access.checkCancellation(stop)
+            let snapshot = try access.snapshot(for: file.connection)
+            guard let applet = snapshot.applets.first(where: { $0.id == file.applet }),
+                  applet.files.contains(where: { $0.id == file }) else { throw NeoError.disconnected }
+            let bytes = try access.engine(for: file.connection).readFile(applet: file.applet, index: file.index) {
+                try access.checkCancellation(stop)
+            }
+            try access.checkCancellation(stop)
+            let text = try FileCodec.text(bytes, applet: applet)
+            try access.checkCancellation(stop)
+            return text
+        }
+    }
     public func shutdown() async {
         await withCheckedContinuation { continuation in
             queue.async { [self] in
@@ -130,14 +146,16 @@ public final class DeviceService: @unchecked Sendable {
             }
             for item in found {
                 if let connection = service.connections[item.registryID] {
-                    if refresh {
-                        do { _ = try update(connection.generation) }
-                        catch {
-                            service.connections.removeValue(forKey: item.registryID)?.engine.close()
-                            service.connectionFailures[item.registryID] = error.localizedDescription
-                        }
+                    guard refresh else { continue }
+                    do {
+                        _ = try update(connection.generation)
+                        continue
+                    } catch {
+                        service.connections.removeValue(forKey: item.registryID)?.engine.close()
+                        service.connectionFailures[item.registryID] = error.localizedDescription
+                        // An explicit retry can replace the stale handle in this same scan.
+                        if !retryConnections { continue }
                     }
-                    continue
                 }
                 // A failed connection waits for an explicit retry or physical reconnection.
                 if service.connectionFailures[item.registryID] != nil && !retryConnections { continue }

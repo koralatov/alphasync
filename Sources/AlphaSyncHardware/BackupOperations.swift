@@ -53,7 +53,9 @@ extension DeviceService {
                             let raw = try engine.readFile(applet: applet.id, index: file.id.index) {
                                 if shouldStop() { throw CancellationError() }
                             }
+                            try access.checkCancellation(stop)
                             let text = try FileCodec.text(raw, applet: applet)
+                            try access.checkCancellation(stop)
                             let folder: URL
                             if let existing = appletFolders[applet.id] { folder = existing }
                             else {
