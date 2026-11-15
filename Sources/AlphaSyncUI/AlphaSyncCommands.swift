@@ -5,7 +5,7 @@ public struct AlphaSyncCommands: Commands {
     @ObservedObject private var store: AppStore
     @ObservedObject private var preferences: Preferences
     @Environment(\.openWindow) private var openWindow
-    @FocusedValue(\.readerFind) private var readerFind
+    @ObservedObject private var readerFind = ReaderFindRegistry.shared
     public init(store: AppStore) { self.store = store; preferences = store.preferences }
     public var body: some Commands {
         CommandGroup(replacing: .appInfo) {
@@ -25,14 +25,14 @@ public struct AlphaSyncCommands: Commands {
         }
         CommandGroup(after: .textEditing) {
             Menu("Find") {
-                Button("Find…") { readerFind?.perform(.showFindPanel) }.keyboardShortcut("f")
-                    .disabled(readerFind == nil)
-                Button("Find Next") { readerFind?.perform(.next) }.keyboardShortcut("g")
-                    .disabled(readerFind == nil)
-                Button("Find Previous") { readerFind?.perform(.previous) }.keyboardShortcut("g", modifiers: [.command, .shift])
-                    .disabled(readerFind == nil)
-                Button("Use Selection for Find") { readerFind?.perform(.setFindString) }.keyboardShortcut("e")
-                    .disabled(readerFind == nil)
+                Button("Find…") { readerFind.active?.perform(.showFindPanel) }.keyboardShortcut("f")
+                    .disabled(readerFind.active == nil)
+                Button("Find Next") { readerFind.active?.perform(.next) }.keyboardShortcut("g")
+                    .disabled(readerFind.active == nil)
+                Button("Find Previous") { readerFind.active?.perform(.previous) }.keyboardShortcut("g", modifiers: [.command, .shift])
+                    .disabled(readerFind.active == nil)
+                Button("Use Selection for Find") { readerFind.active?.perform(.setFindString) }.keyboardShortcut("e")
+                    .disabled(readerFind.active == nil)
             }
         }
         CommandGroup(replacing: .sidebar) {

@@ -40,7 +40,6 @@ struct WindowSceneChecksApp: App {
                     ReadOnlyText(text: "Find this file text.\nA second line for native Find.", findContext: driver.findContext)
                 }
                 .frame(minWidth: 440, minHeight: 240)
-                .focusedSceneValue(\.readerFind, driver.findContext)
                 .background(WindowSceneProbe { driver.registerFindWindow($0) })
             }
             .defaultSize(width: 660, height: 320)

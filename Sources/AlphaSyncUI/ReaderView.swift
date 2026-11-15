@@ -52,7 +52,6 @@ public struct ReaderView: View {
         }
         .frame(minWidth: 440, idealWidth: 660, maxWidth: .infinity, minHeight: 320, idealHeight: 500, maxHeight: .infinity)
         .navigationTitle(request.name)
-        .focusedSceneValue(\.readerFind, text == nil ? nil : findContext)
         .alert("The text could not be copied", isPresented: $copyFailure) {
             Button("OK", role: .cancel) {}
         } message: { Text("Try copying the text again.") }
@@ -86,7 +85,8 @@ public struct ReadOnlyText: NSViewRepresentable {
     public func makeNSView(context: Context) -> NSScrollView {
         let scroll = NSScrollView()
         scroll.hasVerticalScroller = true; scroll.autohidesScrollers = true
-        let view = NSTextView()
+        let view = ReaderTextView()
+        view.findContext = findContext
         view.isEditable = false; view.isSelectable = true; view.isRichText = false
         view.usesFindBar = true; view.isIncrementalSearchingEnabled = true
         view.isHorizontallyResizable = false; view.isVerticallyResizable = true
@@ -115,5 +115,14 @@ public struct ReadOnlyText: NSViewRepresentable {
         view.selectedRanges = valid.isEmpty ? [NSValue(range: NSRange(location: 0, length: 0))] : valid
         scroll.contentView.scroll(to: origin)
         scroll.reflectScrolledClipView(scroll.contentView)
+    }
+}
+
+@MainActor
+private final class ReaderTextView: NSTextView {
+    weak var findContext: ReaderFindContext?
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        findContext?.attach(self)
     }
 }
