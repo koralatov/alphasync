@@ -21,7 +21,7 @@ extension ToolbarAppearance {
 
 /// Apply the saved display mode to SwiftUI’s own toolbar using public AppKit API.
 struct ToolbarAppearanceController: NSViewRepresentable {
-    let preferences: Preferences
+    @ObservedObject var preferences: Preferences
     let connected: Bool
 
     func makeNSView(context: Context) -> ToolbarAppearanceView {
