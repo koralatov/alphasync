@@ -48,13 +48,13 @@ enum PerformanceChecks {
 
     private static func checkSizeFormatting(to output: URL) throws {
         let sizes = [0, 1, 2, 999, 1_000, 1_024, 12_000, 51_200, 65_536, 378_880, 16_777_215]
-        @MainActor func previous(_ value: Int) -> String {
+        let previous: @MainActor @Sendable (Int) -> String = { value in
             let formatter = ByteCountFormatter()
             formatter.countStyle = .file; formatter.allowedUnits = [.useBytes, .useKB]
             formatter.allowsNonnumericFormatting = false
             return formatter.string(fromByteCount: Int64(value))
         }
-        let expected = sizes.map(previous)
+        let expected = sizes.map { previous($0) }
         let actual = sizes.map { FileSize.compact($0) }
         try InterfaceChecks.require(actual == expected, "File-size formatting changed: previous \(expected), current \(actual)")
         NotificationCenter.default.post(name: NSLocale.currentLocaleDidChangeNotification, object: nil)
