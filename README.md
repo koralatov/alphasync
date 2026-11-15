@@ -16,6 +16,8 @@ Private **2.0.5, build 162** is ready for testing with a permanently visible sid
 
 Private **2.0.5, build 163** is ready for testing with Preview shown only for one selected file.  A Neo or applet keeps its header icon and More Information, without the redundant enlarged icon below.  Multiple selected files have no Preview section.  Both pinned hosts passed 172 Swift tests, all 55 fixtures, thirty-two native window observations, and both editions in [run 43756388436](https://github.com/koralatov/alphasync/actions/runs/43756388436).  Both exact packaged apps ran on Apple Silicon.  Independent hashes, both Help books, and 96-image review passed.  File reading and all earlier fixes are retained.  See the [Inspector review](docs/inspector-163.md) and [record](releases/verification/2.0.5-163/verification.json).  The user reports that build 162 appears to work; the remaining physical checks towards 2.1 continue separately.
 
+Private **2.0.5, build 164** is being prepared with more consistent cancellation, clearer VoiceOver feedback, relevant menu commands, and reusable file-size formatting.  The five changes are in focused commits.  The [maintenance review](docs/maintenance-164.md) documents the full build milestone and remaining M2 Air checks before the decision on stable 2.1.
+
 ## Version 2.0.4
 
 Version 2.0.4 improves the Swift rewrite first released as 2.0 and requires **macOS 13 or later**. It includes all changes prepared under the unpublished 2.0.1 development version.
