@@ -1,0 +1,767 @@
+{
+  "images": [
+    {
+      "host": "arm",
+      "part": "components",
+      "appearance": "light",
+      "name": "about-light.png",
+      "width": 420,
+      "height": 464,
+      "sha256": "43b05ebe0709ac641e7e055d07aeeeb2902de2a1e6242775a7cf3c95e80265bc"
+    },
+    {
+      "host": "arm",
+      "part": "components",
+      "appearance": "light",
+      "name": "clear-file-light.png",
+      "width": 430,
+      "height": 186,
+      "sha256": "30a18a3419b79ae7dbcb091787ab5b99d062394ee6abb1c46d28ae43b1f4a39f"
+    },
+    {
+      "host": "arm",
+      "part": "components",
+      "appearance": "light",
+      "name": "inspector-alphaword-light.png",
+      "width": 400,
+      "height": 560,
+      "sha256": "60f8b466ce9442e55b629d8581b95aef2f87b14d08cc286661471951665e5c28"
+    },
+    {
+      "host": "arm",
+      "part": "components",
+      "appearance": "light",
+      "name": "inspector-dictionary-light.png",
+      "width": 400,
+      "height": 560,
+      "sha256": "43af847f5a396030f2cb3ac52e65d01230744652fe1706464e3d4c8151c63521"
+    },
+    {
+      "host": "arm",
+      "part": "components",
+      "appearance": "light",
+      "name": "inspector-light.png",
+      "width": 400,
+      "height": 560,
+      "sha256": "7e4cd59dc9c22cd13011d6dfe25cd31ba1a9e05a9ee7b04eb184315191705735"
+    },
+    {
+      "host": "arm",
+      "part": "components",
+      "appearance": "light",
+      "name": "inspector-neo-light.png",
+      "width": 400,
+      "height": 560,
+      "sha256": "7f02379bafbc7f20976c6967799f37ad6cdf406016b819205d824c9e0258dfeb"
+    },
+    {
+      "host": "arm",
+      "part": "components",
+      "appearance": "light",
+      "name": "inspector-unknown-applet-light.png",
+      "width": 400,
+      "height": 560,
+      "sha256": "38f8141857c83690220a206ab43aee3f4a0c07d8a7e70f6b85f7f167aec90834"
+    },
+    {
+      "host": "arm",
+      "part": "components",
+      "appearance": "light",
+      "name": "reader-light.png",
+      "width": 660,
+      "height": 500,
+      "sha256": "77d09365102b2cddfb275a039f957053d71f91279199625e5803417ceb8bb362"
+    },
+    {
+      "host": "arm",
+      "part": "components",
+      "appearance": "light",
+      "name": "replace-light.png",
+      "width": 430,
+      "height": 186,
+      "sha256": "24ec94cb00b08e3855476076df63c7719119411e34fc7b883ee0d2bcc731f2c1"
+    },
+    {
+      "host": "arm",
+      "part": "components",
+      "appearance": "light",
+      "name": "settings-light.png",
+      "width": 560,
+      "height": 610,
+      "sha256": "ba98e633a6c32764872b8760a3b7b2e9d53e8aac99a20353fe45d6303a4c64ad"
+    },
+    {
+      "host": "arm",
+      "part": "components",
+      "appearance": "dark",
+      "name": "about-dark.png",
+      "width": 420,
+      "height": 464,
+      "sha256": "0fcff903a69d292aea0271c5ec052ca2d5a2b4c3e4a576de9cccc607da597d2f"
+    },
+    {
+      "host": "arm",
+      "part": "components",
+      "appearance": "dark",
+      "name": "clear-file-dark.png",
+      "width": 430,
+      "height": 186,
+      "sha256": "4242ca72c284006fe566d4316ff95399802b842b27cb0b978dfd3f6b071dda89"
+    },
+    {
+      "host": "arm",
+      "part": "components",
+      "appearance": "dark",
+      "name": "inspector-alphaword-dark.png",
+      "width": 400,
+      "height": 560,
+      "sha256": "7f8404df19acb62ecdbf89ac05096cbed388370a2d919f5990e5063f3f24e2a9"
+    },
+    {
+      "host": "arm",
+      "part": "components",
+      "appearance": "dark",
+      "name": "inspector-dark.png",
+      "width": 400,
+      "height": 560,
+      "sha256": "31da47d1c9be74fb6259628f68dc4fc2c4ee7d1a388bb4f0a3311a526816401f"
+    },
+    {
+      "host": "arm",
+      "part": "components",
+      "appearance": "dark",
+      "name": "inspector-dictionary-dark.png",
+      "width": 400,
+      "height": 560,
+      "sha256": "8443b81589bff89e0d960c4f4102ce3399e0532a155e069b1b016f9f5cee7c00"
+    },
+    {
+      "host": "arm",
+      "part": "components",
+      "appearance": "dark",
+      "name": "inspector-neo-dark.png",
+      "width": 400,
+      "height": 560,
+      "sha256": "31da47d1c9be74fb6259628f68dc4fc2c4ee7d1a388bb4f0a3311a526816401f"
+    },
+    {
+      "host": "arm",
+      "part": "components",
+      "appearance": "dark",
+      "name": "inspector-unknown-applet-dark.png",
+      "width": 400,
+      "height": 560,
+      "sha256": "b627d14146f4a0ebe1162f5a72399dc9e7996b8d18cebd1fe0e244bacb4a8360"
+    },
+    {
+      "host": "arm",
+      "part": "components",
+      "appearance": "dark",
+      "name": "reader-dark.png",
+      "width": 660,
+      "height": 500,
+      "sha256": "aa0ebabe4e26a573a9c7f69c6a5d619ba566d000b33c189db303aad07e771e90"
+    },
+    {
+      "host": "arm",
+      "part": "components",
+      "appearance": "dark",
+      "name": "replace-dark.png",
+      "width": 430,
+      "height": 186,
+      "sha256": "68efdc26c6a776d919688de2ab608ee7cefcabe01ce70518a7dd89b7ccb312df"
+    },
+    {
+      "host": "arm",
+      "part": "components",
+      "appearance": "dark",
+      "name": "settings-dark.png",
+      "width": 560,
+      "height": 610,
+      "sha256": "d98c06016ccb268d19f23e3f3e073a0b0b4ff3131bf59e8a9bb04205163039c2"
+    },
+    {
+      "host": "arm",
+      "part": "window-scene",
+      "appearance": "light",
+      "name": "connection-warning-light.png",
+      "width": 820,
+      "height": 612,
+      "sha256": "6f31d9f25a83d384654fe669718adaa336cd2d2e8f40f8c44bf64132c5593959"
+    },
+    {
+      "host": "arm",
+      "part": "window-scene",
+      "appearance": "light",
+      "name": "empty-applet-light.png",
+      "width": 760,
+      "height": 512,
+      "sha256": "d178bdcfbbbe0b46188431e09c64c2ebee40c6cdb1a30103439a8f0f078da55b"
+    },
+    {
+      "host": "arm",
+      "part": "window-scene",
+      "appearance": "light",
+      "name": "files-light.png",
+      "width": 820,
+      "height": 612,
+      "sha256": "9ed92f9d32605c7fa71290c07036155f53d8931f05df331e6517ce2b7c6c4a6c"
+    },
+    {
+      "host": "arm",
+      "part": "window-scene",
+      "appearance": "light",
+      "name": "files-minimum-light.png",
+      "width": 760,
+      "height": 512,
+      "sha256": "3008d5375beeb2fb3545d1dd7906d0021c72d4dc48388129af822964135eb9c3"
+    },
+    {
+      "host": "arm",
+      "part": "window-scene",
+      "appearance": "light",
+      "name": "files-scrolled-light.png",
+      "width": 760,
+      "height": 512,
+      "sha256": "7f94d2fdd8712c262c39d16e49b2df5e98c40475c1aaf73018d89e4bc6169235"
+    },
+    {
+      "host": "arm",
+      "part": "window-scene",
+      "appearance": "light",
+      "name": "reconnected-light.png",
+      "width": 760,
+      "height": 512,
+      "sha256": "74f9022dd3de4104fda232042bc664e6701666ee41f2741b7d3010b0d810fb3f"
+    },
+    {
+      "host": "arm",
+      "part": "window-scene",
+      "appearance": "light",
+      "name": "toolbar-iconAndText-light.png",
+      "width": 760,
+      "height": 512,
+      "sha256": "3008d5375beeb2fb3545d1dd7906d0021c72d4dc48388129af822964135eb9c3"
+    },
+    {
+      "host": "arm",
+      "part": "window-scene",
+      "appearance": "light",
+      "name": "toolbar-iconOnly-light.png",
+      "width": 760,
+      "height": 512,
+      "sha256": "d29e630fb13b5ce157336e22d22bf803acab3bdabca0854130a12f9789446c00"
+    },
+    {
+      "host": "arm",
+      "part": "window-scene",
+      "appearance": "light",
+      "name": "toolbar-textOnly-light.png",
+      "width": 760,
+      "height": 512,
+      "sha256": "3e1516df9febbf2bc90342aaf7612138d9b1f138ed0b099f499d66023c00c9c0"
+    },
+    {
+      "host": "arm",
+      "part": "window-scene",
+      "appearance": "light",
+      "name": "waiting-light.png",
+      "width": 360,
+      "height": 258,
+      "sha256": "1bc438e0bda4e379bf1024987040f3fcbaec38a78c5a408776141552914f4ad8"
+    },
+    {
+      "host": "arm",
+      "part": "window-scene",
+      "appearance": "dark",
+      "name": "connection-warning-dark.png",
+      "width": 820,
+      "height": 612,
+      "sha256": "a58260cb2219f0541e9d01cc7dbe4e6c1cf2f455cd3a3b017dd464c64652ff1d"
+    },
+    {
+      "host": "arm",
+      "part": "window-scene",
+      "appearance": "dark",
+      "name": "empty-applet-dark.png",
+      "width": 760,
+      "height": 512,
+      "sha256": "33b7c4100c9a6de83f383a1a76f10523092c522c3c715bbb482b439a6d9d731e"
+    },
+    {
+      "host": "arm",
+      "part": "window-scene",
+      "appearance": "dark",
+      "name": "files-dark.png",
+      "width": 820,
+      "height": 612,
+      "sha256": "ba92705cfe0c02744ddb553d0358c647b03f15eb422ed8c59c59dfae04c6a9f4"
+    },
+    {
+      "host": "arm",
+      "part": "window-scene",
+      "appearance": "dark",
+      "name": "files-minimum-dark.png",
+      "width": 760,
+      "height": 512,
+      "sha256": "19a852a8fe9daccac30b42738593ea25a3a99be89e1077babb0b937661f04158"
+    },
+    {
+      "host": "arm",
+      "part": "window-scene",
+      "appearance": "dark",
+      "name": "files-scrolled-dark.png",
+      "width": 760,
+      "height": 512,
+      "sha256": "64626f4a6e1e38834656cfca66f6d44912aaebb061873e37dea2cee5ff7f2858"
+    },
+    {
+      "host": "arm",
+      "part": "window-scene",
+      "appearance": "dark",
+      "name": "reconnected-dark.png",
+      "width": 760,
+      "height": 512,
+      "sha256": "6d7f2de9abb69f23fa045641c0bd02385d569c071c199f0a32302152501a6ff3"
+    },
+    {
+      "host": "arm",
+      "part": "window-scene",
+      "appearance": "dark",
+      "name": "toolbar-iconAndText-dark.png",
+      "width": 760,
+      "height": 512,
+      "sha256": "19a852a8fe9daccac30b42738593ea25a3a99be89e1077babb0b937661f04158"
+    },
+    {
+      "host": "arm",
+      "part": "window-scene",
+      "appearance": "dark",
+      "name": "toolbar-iconOnly-dark.png",
+      "width": 760,
+      "height": 512,
+      "sha256": "118d8d8e3c1169246669d4befbae6f6ba15fcb710984729d0563141c84ec46fe"
+    },
+    {
+      "host": "arm",
+      "part": "window-scene",
+      "appearance": "dark",
+      "name": "toolbar-textOnly-dark.png",
+      "width": 760,
+      "height": 512,
+      "sha256": "863ce8ad6e156b3b2de035ef62385a370c904168d0e65082f6e8c999caffdff2"
+    },
+    {
+      "host": "arm",
+      "part": "window-scene",
+      "appearance": "dark",
+      "name": "waiting-dark.png",
+      "width": 360,
+      "height": 258,
+      "sha256": "f28a14d09b545ff3432593e81b63d2bcfa6c426fbf5aa113dc3abe9671d122be"
+    },
+    {
+      "host": "intel",
+      "part": "components",
+      "appearance": "light",
+      "name": "about-light.png",
+      "width": 420,
+      "height": 464,
+      "sha256": "8770e53e2abf93711efa5668b322329185f8ebf5cdc9f14a9a42806632f12ca0"
+    },
+    {
+      "host": "intel",
+      "part": "components",
+      "appearance": "light",
+      "name": "clear-file-light.png",
+      "width": 430,
+      "height": 191,
+      "sha256": "f861cb70d020d4de6c1ea11614b91fcd3e24b14853cfaa99d6737f1b25662758"
+    },
+    {
+      "host": "intel",
+      "part": "components",
+      "appearance": "light",
+      "name": "inspector-alphaword-light.png",
+      "width": 400,
+      "height": 560,
+      "sha256": "115b758317430500887e1ab66d1c45cfa1bd46e23fe21cf8c545da69b64b07eb"
+    },
+    {
+      "host": "intel",
+      "part": "components",
+      "appearance": "light",
+      "name": "inspector-dictionary-light.png",
+      "width": 400,
+      "height": 560,
+      "sha256": "758eb1ade6ad15630018e1b66903ffc371d5e3424762876ee34e10ab071c2667"
+    },
+    {
+      "host": "intel",
+      "part": "components",
+      "appearance": "light",
+      "name": "inspector-light.png",
+      "width": 400,
+      "height": 560,
+      "sha256": "f521491c5a000bae24b0236dfe9a4a7140d1c0dfaa2ed52f1100bd010bc3510d"
+    },
+    {
+      "host": "intel",
+      "part": "components",
+      "appearance": "light",
+      "name": "inspector-neo-light.png",
+      "width": 400,
+      "height": 560,
+      "sha256": "7fef6306d2aa2c565b26ecc0061adaa67ff9cdd7e3d794e57a31505d03e89037"
+    },
+    {
+      "host": "intel",
+      "part": "components",
+      "appearance": "light",
+      "name": "inspector-unknown-applet-light.png",
+      "width": 400,
+      "height": 560,
+      "sha256": "9bf3f8cb7513e83c21bf57eeaa84d04bb620c2f455a9eb968e9fb818d08d5ddd"
+    },
+    {
+      "host": "intel",
+      "part": "components",
+      "appearance": "light",
+      "name": "reader-light.png",
+      "width": 660,
+      "height": 500,
+      "sha256": "d9effef06c292c0f58a3368e08821d86a6d2794794cfa244dc617ac836919ad5"
+    },
+    {
+      "host": "intel",
+      "part": "components",
+      "appearance": "light",
+      "name": "replace-light.png",
+      "width": 430,
+      "height": 191,
+      "sha256": "62be12e4e92c162e63e1d5f199cbf659e8db56d7dd28142d927a95740f842434"
+    },
+    {
+      "host": "intel",
+      "part": "components",
+      "appearance": "light",
+      "name": "settings-light.png",
+      "width": 560,
+      "height": 610,
+      "sha256": "dd850ec414cad15544d560d21a089fe9a367e37caae4f38e9ec4f1d46ddea912"
+    },
+    {
+      "host": "intel",
+      "part": "components",
+      "appearance": "dark",
+      "name": "about-dark.png",
+      "width": 420,
+      "height": 464,
+      "sha256": "16f9400f2b605d331565261cbca3bb402ce04b4ab4f71ad8a4411aad77153acd"
+    },
+    {
+      "host": "intel",
+      "part": "components",
+      "appearance": "dark",
+      "name": "clear-file-dark.png",
+      "width": 430,
+      "height": 191,
+      "sha256": "e5189f848d980786fb5797edded746c1d8bb6274ccbb065b0449ae8e11c4c4e3"
+    },
+    {
+      "host": "intel",
+      "part": "components",
+      "appearance": "dark",
+      "name": "inspector-alphaword-dark.png",
+      "width": 400,
+      "height": 560,
+      "sha256": "83048a6e76899663354376b2f35f20802d41182bddd3138369ea6413abbd0370"
+    },
+    {
+      "host": "intel",
+      "part": "components",
+      "appearance": "dark",
+      "name": "inspector-dark.png",
+      "width": 400,
+      "height": 560,
+      "sha256": "4c2d4e3f4d1cb4cb72646fd3417e5e25116920999d32c8aa22ce8358a7e38db3"
+    },
+    {
+      "host": "intel",
+      "part": "components",
+      "appearance": "dark",
+      "name": "inspector-dictionary-dark.png",
+      "width": 400,
+      "height": 560,
+      "sha256": "209f68e4aaf43fb5c631810103d27d89849f218565c000c93bdf191d29884734"
+    },
+    {
+      "host": "intel",
+      "part": "components",
+      "appearance": "dark",
+      "name": "inspector-neo-dark.png",
+      "width": 400,
+      "height": 560,
+      "sha256": "4c2d4e3f4d1cb4cb72646fd3417e5e25116920999d32c8aa22ce8358a7e38db3"
+    },
+    {
+      "host": "intel",
+      "part": "components",
+      "appearance": "dark",
+      "name": "inspector-unknown-applet-dark.png",
+      "width": 400,
+      "height": 560,
+      "sha256": "759acf81f8de015eccb3f16d7a8d04599bc087b2cf0e2371ad40d469ec6f1de4"
+    },
+    {
+      "host": "intel",
+      "part": "components",
+      "appearance": "dark",
+      "name": "reader-dark.png",
+      "width": 660,
+      "height": 500,
+      "sha256": "83feee4db00071ad869ae9bab06e10ce5746dae1b7385f4821547c020c20cf72"
+    },
+    {
+      "host": "intel",
+      "part": "components",
+      "appearance": "dark",
+      "name": "replace-dark.png",
+      "width": 430,
+      "height": 191,
+      "sha256": "ebdf6cbb21599317029935908414c59d29b5e592733d80e4c5054b801bbf9e9f"
+    },
+    {
+      "host": "intel",
+      "part": "components",
+      "appearance": "dark",
+      "name": "settings-dark.png",
+      "width": 560,
+      "height": 610,
+      "sha256": "d38ca4e8e69fa33793d483d39e1c3dc157d541a859628d029fba6c1fc85b6905"
+    },
+    {
+      "host": "intel",
+      "part": "window-scene",
+      "appearance": "light",
+      "name": "connection-warning-light.png",
+      "width": 820,
+      "height": 626,
+      "sha256": "6bedd233ec385da0a9fffa7a497c34fb13235ee16093a1a88a7da90e1e510327"
+    },
+    {
+      "host": "intel",
+      "part": "window-scene",
+      "appearance": "light",
+      "name": "empty-applet-light.png",
+      "width": 760,
+      "height": 526,
+      "sha256": "9a519538783a00127e0820755ede9642801af2048b5c2b153f0edf8bae331233"
+    },
+    {
+      "host": "intel",
+      "part": "window-scene",
+      "appearance": "light",
+      "name": "files-light.png",
+      "width": 820,
+      "height": 626,
+      "sha256": "474d744f94c3539a876d7b13e24edc64bf4464da0aa984aeed11a6069506f747"
+    },
+    {
+      "host": "intel",
+      "part": "window-scene",
+      "appearance": "light",
+      "name": "files-minimum-light.png",
+      "width": 760,
+      "height": 526,
+      "sha256": "136a55e1bcd1fd4359a3c4c7771d5823b78091faaea6f5e57e65928a25ad3179"
+    },
+    {
+      "host": "intel",
+      "part": "window-scene",
+      "appearance": "light",
+      "name": "files-scrolled-light.png",
+      "width": 760,
+      "height": 526,
+      "sha256": "d72316494cc840bbadd9842ea3de8c853e23a903112c6101914e8af640058855"
+    },
+    {
+      "host": "intel",
+      "part": "window-scene",
+      "appearance": "light",
+      "name": "reconnected-light.png",
+      "width": 760,
+      "height": 526,
+      "sha256": "730b64fa3755b0acf920fcfd16db00c03c022ea3c6dfce7b45a8337cd9208c4b"
+    },
+    {
+      "host": "intel",
+      "part": "window-scene",
+      "appearance": "light",
+      "name": "toolbar-iconAndText-light.png",
+      "width": 760,
+      "height": 526,
+      "sha256": "136a55e1bcd1fd4359a3c4c7771d5823b78091faaea6f5e57e65928a25ad3179"
+    },
+    {
+      "host": "intel",
+      "part": "window-scene",
+      "appearance": "light",
+      "name": "toolbar-iconOnly-light.png",
+      "width": 760,
+      "height": 526,
+      "sha256": "21bd48fd0d9ba9b25f300229f69c8adbe719516ed1581e907c3bda349d9371e9"
+    },
+    {
+      "host": "intel",
+      "part": "window-scene",
+      "appearance": "light",
+      "name": "toolbar-textOnly-light.png",
+      "width": 760,
+      "height": 526,
+      "sha256": "6078fa034559a8cfb49821a73a2cf4af926be051c38c1ae0444e1953cdf380c1"
+    },
+    {
+      "host": "intel",
+      "part": "window-scene",
+      "appearance": "light",
+      "name": "waiting-light.png",
+      "width": 360,
+      "height": 262,
+      "sha256": "5a0f03c82b21456bff9cf4194435454fad7696f7bec645179296871cca43ec10"
+    },
+    {
+      "host": "intel",
+      "part": "window-scene",
+      "appearance": "dark",
+      "name": "connection-warning-dark.png",
+      "width": 820,
+      "height": 626,
+      "sha256": "1c77f5370496c046b51ab7f7881e22228638fead8dce0e85e07850d54c63d7de"
+    },
+    {
+      "host": "intel",
+      "part": "window-scene",
+      "appearance": "dark",
+      "name": "empty-applet-dark.png",
+      "width": 760,
+      "height": 526,
+      "sha256": "4c6781492775f42ede78e8c2c3695bbdca80d14bf324a5a36ce36b5a422cfd68"
+    },
+    {
+      "host": "intel",
+      "part": "window-scene",
+      "appearance": "dark",
+      "name": "files-dark.png",
+      "width": 820,
+      "height": 626,
+      "sha256": "601a4f83942c5a7437fc9351591008ba7d14f75c540783765a3f7cc9299e78b7"
+    },
+    {
+      "host": "intel",
+      "part": "window-scene",
+      "appearance": "dark",
+      "name": "files-minimum-dark.png",
+      "width": 760,
+      "height": 526,
+      "sha256": "839c764a6ddcf0a1aa2421c40fdd7e39bf357dc4d58a2fd95083637b31044c70"
+    },
+    {
+      "host": "intel",
+      "part": "window-scene",
+      "appearance": "dark",
+      "name": "files-scrolled-dark.png",
+      "width": 760,
+      "height": 526,
+      "sha256": "80598a85cb1d614935b979e9e339478b8f86448e105ad47daeedbd70b013de6e"
+    },
+    {
+      "host": "intel",
+      "part": "window-scene",
+      "appearance": "dark",
+      "name": "reconnected-dark.png",
+      "width": 760,
+      "height": 526,
+      "sha256": "88eafbbb85ec931eed89ab799fb26afa496c1bdcad2e99e9470bf5cfd1cf19a9"
+    },
+    {
+      "host": "intel",
+      "part": "window-scene",
+      "appearance": "dark",
+      "name": "toolbar-iconAndText-dark.png",
+      "width": 760,
+      "height": 526,
+      "sha256": "839c764a6ddcf0a1aa2421c40fdd7e39bf357dc4d58a2fd95083637b31044c70"
+    },
+    {
+      "host": "intel",
+      "part": "window-scene",
+      "appearance": "dark",
+      "name": "toolbar-iconOnly-dark.png",
+      "width": 760,
+      "height": 526,
+      "sha256": "1d85830cdda9f1448e5fd1d2cb2c0de75b7dd8adeb09d8738e682509d7bff05a"
+    },
+    {
+      "host": "intel",
+      "part": "window-scene",
+      "appearance": "dark",
+      "name": "toolbar-textOnly-dark.png",
+      "width": 760,
+      "height": 526,
+      "sha256": "2c370c0b6b004683656aaaf5ea474d062d7a92e77329ff5bbd401ad0fc523553"
+    },
+    {
+      "host": "intel",
+      "part": "window-scene",
+      "appearance": "dark",
+      "name": "waiting-dark.png",
+      "width": 360,
+      "height": 262,
+      "sha256": "8bba6ce62e00f46281c12d3d9d4c74dc04471936102356b94154c1e4ef5cf6c4"
+    }
+  ],
+  "atlases": [
+    "arm-components-light.png",
+    "arm-components-dark.png",
+    "arm-window-scene-light.png",
+    "arm-window-scene-dark.png",
+    "intel-components-light.png",
+    "intel-components-dark.png",
+    "intel-window-scene-light.png",
+    "intel-window-scene-dark.png"
+  ],
+  "greenStatusChecks": [
+    {
+      "host": "arm",
+      "appearance": "light",
+      "greenPixelsInStatusArea": 116
+    },
+    {
+      "host": "arm",
+      "appearance": "dark",
+      "greenPixelsInStatusArea": 116
+    },
+    {
+      "host": "intel",
+      "appearance": "light",
+      "greenPixelsInStatusArea": 112
+    },
+    {
+      "host": "intel",
+      "appearance": "dark",
+      "greenPixelsInStatusArea": 118
+    }
+  ],
+  "review": "complete",
+  "reviewedAt": "2026-11-15T16:24:38.536810+00:00",
+  "confirmationOrder": "Cancel before Clear File and Replace; neither appears as the default in both appearances on both hosts.",
+  "nativeGeometry": "All twenty window observations and six toolbar-mode captures per host passed.",
+  "captureLimits": [
+    "macOS 26 layer captures omit compositor-backed sidebar content and some toolbar effects; live geometry and native item properties passed.  macOS 15 captures show the complete sidebar.",
+    "macOS 15 Text Only dark capture retains a light toolbar background in the layer image; screen-composited appearance still needs manual review.",
+    "The generic Inspector dark capture uses the Neo selection after the preceding fixture.  The unchanged file-document symbol and file details were captured in Light; the Neo, AlphaWord, dictionary, and unknown-app Inspectors were captured in both appearances.",
+    "Unbundled About uses the existing document fallback; packaged artwork and version were separately validated.  The fixture disables USB, so its file preview reports a disconnected source."
+  ],
+  "manualChecks": "Physical Neo operations, complete keyboard navigation, system sidebar size variants, VoiceOver, and screen-composited appearance remain in the manual checklist."
+}

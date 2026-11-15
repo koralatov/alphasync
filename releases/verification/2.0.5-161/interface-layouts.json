@@ -1,0 +1,1350 @@
+{
+  "arm": [
+    {
+      "contentLayout": {
+        "height": 560,
+        "width": 820,
+        "x": 0,
+        "y": 0
+      },
+      "fileHeadings": {
+        "height": 28,
+        "width": 599,
+        "x": 221,
+        "y": 532
+      },
+      "fileRows": 8,
+      "filesRow0": {
+        "height": 25,
+        "width": 599,
+        "x": 221,
+        "y": 502
+      },
+      "firstSidebarContentRow": 1,
+      "fullSizeContentView": true,
+      "sidebarRow1": {
+        "height": 28,
+        "width": 220,
+        "x": 0,
+        "y": 532
+      },
+      "sidebarRow2": {
+        "height": 28,
+        "width": 220,
+        "x": 0,
+        "y": 504
+      },
+      "stage": "connected-light",
+      "toolbarItems": 6
+    },
+    {
+      "contentLayout": {
+        "height": 560,
+        "width": 820,
+        "x": 0,
+        "y": 0
+      },
+      "fileHeadings": {
+        "height": 28,
+        "width": 599,
+        "x": 221,
+        "y": 475
+      },
+      "fileRows": 8,
+      "filesRow0": {
+        "height": 25,
+        "width": 599,
+        "x": 221,
+        "y": 445
+      },
+      "firstSidebarContentRow": 1,
+      "fullSizeContentView": true,
+      "sidebarRow1": {
+        "height": 28,
+        "width": 220,
+        "x": 0,
+        "y": 532
+      },
+      "sidebarRow2": {
+        "height": 28,
+        "width": 220,
+        "x": 0,
+        "y": 504
+      },
+      "stage": "connection-warning-light",
+      "toolbarItems": 6
+    },
+    {
+      "contentLayout": {
+        "height": 460,
+        "width": 760,
+        "x": 0,
+        "y": 0
+      },
+      "fileHeadings": {
+        "height": 28,
+        "width": 539,
+        "x": 221,
+        "y": 375
+      },
+      "fileRows": 8,
+      "filesRow0": {
+        "height": 25,
+        "width": 539,
+        "x": 221,
+        "y": 345
+      },
+      "firstSidebarContentRow": 1,
+      "fullSizeContentView": true,
+      "sidebarRow1": {
+        "height": 28,
+        "width": 220,
+        "x": 0,
+        "y": 432
+      },
+      "sidebarRow2": {
+        "height": 28,
+        "width": 220,
+        "x": 0,
+        "y": 404
+      },
+      "stage": "minimum-warning-light",
+      "toolbarItems": 6
+    },
+    {
+      "contentLayout": {
+        "height": 632,
+        "width": 1120,
+        "x": 0,
+        "y": 0
+      },
+      "fileHeadings": {
+        "height": 28,
+        "width": 899,
+        "x": 221,
+        "y": 559
+      },
+      "fileRows": 8,
+      "filesRow0": {
+        "height": 25,
+        "width": 899,
+        "x": 221,
+        "y": 529
+      },
+      "firstSidebarContentRow": 1,
+      "fullSizeContentView": true,
+      "sidebarRow1": {
+        "height": 28,
+        "width": 220,
+        "x": 0,
+        "y": 604
+      },
+      "sidebarRow2": {
+        "height": 28,
+        "width": 220,
+        "x": 0,
+        "y": 576
+      },
+      "stage": "expanded-warning-light",
+      "toolbarItems": 6
+    },
+    {
+      "contentLayout": {
+        "height": 560,
+        "width": 820,
+        "x": 0,
+        "y": 0
+      },
+      "fileHeadings": {
+        "height": 28,
+        "width": 599,
+        "x": 221,
+        "y": 532
+      },
+      "fileRows": 8,
+      "filesRow0": {
+        "height": 25,
+        "width": 599,
+        "x": 221,
+        "y": 502
+      },
+      "firstSidebarContentRow": 1,
+      "fullSizeContentView": true,
+      "sidebarRow1": {
+        "height": 28,
+        "width": 220,
+        "x": 0,
+        "y": 532
+      },
+      "sidebarRow2": {
+        "height": 28,
+        "width": 220,
+        "x": 0,
+        "y": 504
+      },
+      "stage": "warning-cleared-light",
+      "toolbarItems": 6
+    },
+    {
+      "contentLayout": {
+        "height": 460,
+        "width": 760,
+        "x": 0,
+        "y": 0
+      },
+      "fileHeadings": {
+        "height": 28,
+        "width": 524,
+        "x": 221,
+        "y": 432
+      },
+      "fileRows": 64,
+      "filesRow0": {
+        "height": 25,
+        "width": 524,
+        "x": 221,
+        "y": 402
+      },
+      "firstSidebarContentRow": 1,
+      "fullSizeContentView": true,
+      "sidebarRow1": {
+        "height": 28,
+        "width": 220,
+        "x": 0,
+        "y": 432
+      },
+      "sidebarRow2": {
+        "height": 28,
+        "width": 220,
+        "x": 0,
+        "y": 404
+      },
+      "stage": "many-files-top-light",
+      "toolbarItems": 6
+    },
+    {
+      "contentLayout": {
+        "height": 460,
+        "width": 760,
+        "x": 0,
+        "y": 0
+      },
+      "lastFile": {
+        "height": 25,
+        "width": 524,
+        "x": 221,
+        "y": 40
+      },
+      "stage": "many-files-bottom-light"
+    },
+    {
+      "contentLayout": {
+        "height": 460,
+        "width": 760,
+        "x": 0,
+        "y": 0
+      },
+      "fileRows": 0,
+      "firstSidebarContentRow": 1,
+      "fullSizeContentView": true,
+      "sidebarRow1": {
+        "height": 28,
+        "width": 220,
+        "x": 0,
+        "y": 432
+      },
+      "sidebarRow2": {
+        "height": 28,
+        "width": 220,
+        "x": 0,
+        "y": 404
+      },
+      "stage": "empty-read-only-applet-light",
+      "toolbarItems": 6
+    },
+    {
+      "contentLayout": {
+        "height": 460,
+        "width": 760,
+        "x": 0,
+        "y": 0
+      },
+      "fileHeadings": {
+        "height": 28,
+        "width": 524,
+        "x": 221,
+        "y": 432
+      },
+      "fileRows": 64,
+      "filesRow0": {
+        "height": 25,
+        "width": 524,
+        "x": 221,
+        "y": 402
+      },
+      "firstSidebarContentRow": 1,
+      "fullSizeContentView": true,
+      "sidebarRow1": {
+        "height": 28,
+        "width": 220,
+        "x": 0,
+        "y": 432
+      },
+      "sidebarRow2": {
+        "height": 28,
+        "width": 220,
+        "x": 0,
+        "y": 404
+      },
+      "stage": "filtered-applets-light",
+      "toolbarItems": 6
+    },
+    {
+      "contentLayout": {
+        "height": 460,
+        "width": 760,
+        "x": 0,
+        "y": 0
+      },
+      "fileHeadings": {
+        "height": 28,
+        "width": 539,
+        "x": 221,
+        "y": 432
+      },
+      "fileRows": 8,
+      "filesRow0": {
+        "height": 25,
+        "width": 539,
+        "x": 221,
+        "y": 402
+      },
+      "firstSidebarContentRow": 1,
+      "fullSizeContentView": true,
+      "sidebarRow1": {
+        "height": 28,
+        "width": 220,
+        "x": 0,
+        "y": 432
+      },
+      "sidebarRow2": {
+        "height": 28,
+        "width": 220,
+        "x": 0,
+        "y": 404
+      },
+      "stage": "reconnected-light",
+      "toolbarItems": 6
+    },
+    {
+      "contentLayout": {
+        "height": 560,
+        "width": 820,
+        "x": 0,
+        "y": 0
+      },
+      "fileHeadings": {
+        "height": 28,
+        "width": 599,
+        "x": 221,
+        "y": 532
+      },
+      "fileRows": 8,
+      "filesRow0": {
+        "height": 25,
+        "width": 599,
+        "x": 221,
+        "y": 502
+      },
+      "firstSidebarContentRow": 1,
+      "fullSizeContentView": true,
+      "sidebarRow1": {
+        "height": 28,
+        "width": 220,
+        "x": 0,
+        "y": 532
+      },
+      "sidebarRow2": {
+        "height": 28,
+        "width": 220,
+        "x": 0,
+        "y": 504
+      },
+      "stage": "connected-dark",
+      "toolbarItems": 6
+    },
+    {
+      "contentLayout": {
+        "height": 560,
+        "width": 820,
+        "x": 0,
+        "y": 0
+      },
+      "fileHeadings": {
+        "height": 28,
+        "width": 599,
+        "x": 221,
+        "y": 475
+      },
+      "fileRows": 8,
+      "filesRow0": {
+        "height": 25,
+        "width": 599,
+        "x": 221,
+        "y": 445
+      },
+      "firstSidebarContentRow": 1,
+      "fullSizeContentView": true,
+      "sidebarRow1": {
+        "height": 28,
+        "width": 220,
+        "x": 0,
+        "y": 532
+      },
+      "sidebarRow2": {
+        "height": 28,
+        "width": 220,
+        "x": 0,
+        "y": 504
+      },
+      "stage": "connection-warning-dark",
+      "toolbarItems": 6
+    },
+    {
+      "contentLayout": {
+        "height": 460,
+        "width": 760,
+        "x": 0,
+        "y": 0
+      },
+      "fileHeadings": {
+        "height": 28,
+        "width": 539,
+        "x": 221,
+        "y": 375
+      },
+      "fileRows": 8,
+      "filesRow0": {
+        "height": 25,
+        "width": 539,
+        "x": 221,
+        "y": 345
+      },
+      "firstSidebarContentRow": 1,
+      "fullSizeContentView": true,
+      "sidebarRow1": {
+        "height": 28,
+        "width": 220,
+        "x": 0,
+        "y": 432
+      },
+      "sidebarRow2": {
+        "height": 28,
+        "width": 220,
+        "x": 0,
+        "y": 404
+      },
+      "stage": "minimum-warning-dark",
+      "toolbarItems": 6
+    },
+    {
+      "contentLayout": {
+        "height": 632,
+        "width": 1120,
+        "x": 0,
+        "y": 0
+      },
+      "fileHeadings": {
+        "height": 28,
+        "width": 899,
+        "x": 221,
+        "y": 559
+      },
+      "fileRows": 8,
+      "filesRow0": {
+        "height": 25,
+        "width": 899,
+        "x": 221,
+        "y": 529
+      },
+      "firstSidebarContentRow": 1,
+      "fullSizeContentView": true,
+      "sidebarRow1": {
+        "height": 28,
+        "width": 220,
+        "x": 0,
+        "y": 604
+      },
+      "sidebarRow2": {
+        "height": 28,
+        "width": 220,
+        "x": 0,
+        "y": 576
+      },
+      "stage": "expanded-warning-dark",
+      "toolbarItems": 6
+    },
+    {
+      "contentLayout": {
+        "height": 560,
+        "width": 820,
+        "x": 0,
+        "y": 0
+      },
+      "fileHeadings": {
+        "height": 28,
+        "width": 599,
+        "x": 221,
+        "y": 532
+      },
+      "fileRows": 8,
+      "filesRow0": {
+        "height": 25,
+        "width": 599,
+        "x": 221,
+        "y": 502
+      },
+      "firstSidebarContentRow": 1,
+      "fullSizeContentView": true,
+      "sidebarRow1": {
+        "height": 28,
+        "width": 220,
+        "x": 0,
+        "y": 532
+      },
+      "sidebarRow2": {
+        "height": 28,
+        "width": 220,
+        "x": 0,
+        "y": 504
+      },
+      "stage": "warning-cleared-dark",
+      "toolbarItems": 6
+    },
+    {
+      "contentLayout": {
+        "height": 460,
+        "width": 760,
+        "x": 0,
+        "y": 0
+      },
+      "fileHeadings": {
+        "height": 28,
+        "width": 524,
+        "x": 221,
+        "y": 432
+      },
+      "fileRows": 64,
+      "filesRow0": {
+        "height": 25,
+        "width": 524,
+        "x": 221,
+        "y": 402
+      },
+      "firstSidebarContentRow": 1,
+      "fullSizeContentView": true,
+      "sidebarRow1": {
+        "height": 28,
+        "width": 220,
+        "x": 0,
+        "y": 432
+      },
+      "sidebarRow2": {
+        "height": 28,
+        "width": 220,
+        "x": 0,
+        "y": 404
+      },
+      "stage": "many-files-top-dark",
+      "toolbarItems": 6
+    },
+    {
+      "contentLayout": {
+        "height": 460,
+        "width": 760,
+        "x": 0,
+        "y": 0
+      },
+      "lastFile": {
+        "height": 25,
+        "width": 524,
+        "x": 221,
+        "y": 40
+      },
+      "stage": "many-files-bottom-dark"
+    },
+    {
+      "contentLayout": {
+        "height": 460,
+        "width": 760,
+        "x": 0,
+        "y": 0
+      },
+      "fileRows": 0,
+      "firstSidebarContentRow": 1,
+      "fullSizeContentView": true,
+      "sidebarRow1": {
+        "height": 28,
+        "width": 220,
+        "x": 0,
+        "y": 432
+      },
+      "sidebarRow2": {
+        "height": 28,
+        "width": 220,
+        "x": 0,
+        "y": 404
+      },
+      "stage": "empty-read-only-applet-dark",
+      "toolbarItems": 6
+    },
+    {
+      "contentLayout": {
+        "height": 460,
+        "width": 760,
+        "x": 0,
+        "y": 0
+      },
+      "fileHeadings": {
+        "height": 28,
+        "width": 524,
+        "x": 221,
+        "y": 432
+      },
+      "fileRows": 64,
+      "filesRow0": {
+        "height": 25,
+        "width": 524,
+        "x": 221,
+        "y": 402
+      },
+      "firstSidebarContentRow": 1,
+      "fullSizeContentView": true,
+      "sidebarRow1": {
+        "height": 28,
+        "width": 220,
+        "x": 0,
+        "y": 432
+      },
+      "sidebarRow2": {
+        "height": 28,
+        "width": 220,
+        "x": 0,
+        "y": 404
+      },
+      "stage": "filtered-applets-dark",
+      "toolbarItems": 6
+    },
+    {
+      "contentLayout": {
+        "height": 460,
+        "width": 760,
+        "x": 0,
+        "y": 0
+      },
+      "fileHeadings": {
+        "height": 28,
+        "width": 539,
+        "x": 221,
+        "y": 432
+      },
+      "fileRows": 8,
+      "filesRow0": {
+        "height": 25,
+        "width": 539,
+        "x": 221,
+        "y": 402
+      },
+      "firstSidebarContentRow": 1,
+      "fullSizeContentView": true,
+      "sidebarRow1": {
+        "height": 28,
+        "width": 220,
+        "x": 0,
+        "y": 432
+      },
+      "sidebarRow2": {
+        "height": 28,
+        "width": 220,
+        "x": 0,
+        "y": 404
+      },
+      "stage": "reconnected-dark",
+      "toolbarItems": 6
+    }
+  ],
+  "intel": [
+    {
+      "contentLayout": {
+        "height": 560,
+        "width": 820,
+        "x": 0,
+        "y": 0
+      },
+      "fileHeadings": {
+        "height": 28,
+        "width": 592,
+        "x": 228,
+        "y": 532
+      },
+      "fileRows": 8,
+      "filesRow0": {
+        "height": 25,
+        "width": 592,
+        "x": 228,
+        "y": 502
+      },
+      "firstSidebarContentRow": 1,
+      "fullSizeContentView": true,
+      "sidebarRow1": {
+        "height": 32,
+        "width": 220,
+        "x": 8,
+        "y": 528
+      },
+      "sidebarRow2": {
+        "height": 32,
+        "width": 220,
+        "x": 8,
+        "y": 496
+      },
+      "stage": "connected-light",
+      "toolbarItems": 7
+    },
+    {
+      "contentLayout": {
+        "height": 560,
+        "width": 820,
+        "x": 0,
+        "y": 0
+      },
+      "fileHeadings": {
+        "height": 28,
+        "width": 592,
+        "x": 228,
+        "y": 475
+      },
+      "fileRows": 8,
+      "filesRow0": {
+        "height": 25,
+        "width": 592,
+        "x": 228,
+        "y": 445
+      },
+      "firstSidebarContentRow": 1,
+      "fullSizeContentView": true,
+      "sidebarRow1": {
+        "height": 32,
+        "width": 220,
+        "x": 8,
+        "y": 528
+      },
+      "sidebarRow2": {
+        "height": 32,
+        "width": 220,
+        "x": 8,
+        "y": 496
+      },
+      "stage": "connection-warning-light",
+      "toolbarItems": 7
+    },
+    {
+      "contentLayout": {
+        "height": 460,
+        "width": 760,
+        "x": 0,
+        "y": 0
+      },
+      "fileHeadings": {
+        "height": 28,
+        "width": 532,
+        "x": 228,
+        "y": 375
+      },
+      "fileRows": 8,
+      "filesRow0": {
+        "height": 25,
+        "width": 532,
+        "x": 228,
+        "y": 345
+      },
+      "firstSidebarContentRow": 1,
+      "fullSizeContentView": true,
+      "sidebarRow1": {
+        "height": 32,
+        "width": 220,
+        "x": 8,
+        "y": 428
+      },
+      "sidebarRow2": {
+        "height": 32,
+        "width": 220,
+        "x": 8,
+        "y": 396
+      },
+      "stage": "minimum-warning-light",
+      "toolbarItems": 7
+    },
+    {
+      "contentLayout": {
+        "height": 720,
+        "width": 1120,
+        "x": 0,
+        "y": 0
+      },
+      "fileHeadings": {
+        "height": 28,
+        "width": 892,
+        "x": 228,
+        "y": 643
+      },
+      "fileRows": 8,
+      "filesRow0": {
+        "height": 25,
+        "width": 892,
+        "x": 228,
+        "y": 613
+      },
+      "firstSidebarContentRow": 1,
+      "fullSizeContentView": true,
+      "sidebarRow1": {
+        "height": 32,
+        "width": 220,
+        "x": 8,
+        "y": 688
+      },
+      "sidebarRow2": {
+        "height": 32,
+        "width": 220,
+        "x": 8,
+        "y": 656
+      },
+      "stage": "expanded-warning-light",
+      "toolbarItems": 7
+    },
+    {
+      "contentLayout": {
+        "height": 560,
+        "width": 820,
+        "x": 0,
+        "y": 0
+      },
+      "fileHeadings": {
+        "height": 28,
+        "width": 592,
+        "x": 228,
+        "y": 532
+      },
+      "fileRows": 8,
+      "filesRow0": {
+        "height": 25,
+        "width": 592,
+        "x": 228,
+        "y": 502
+      },
+      "firstSidebarContentRow": 1,
+      "fullSizeContentView": true,
+      "sidebarRow1": {
+        "height": 32,
+        "width": 220,
+        "x": 8,
+        "y": 528
+      },
+      "sidebarRow2": {
+        "height": 32,
+        "width": 220,
+        "x": 8,
+        "y": 496
+      },
+      "stage": "warning-cleared-light",
+      "toolbarItems": 7
+    },
+    {
+      "contentLayout": {
+        "height": 460,
+        "width": 760,
+        "x": 0,
+        "y": 0
+      },
+      "fileHeadings": {
+        "height": 28,
+        "width": 515,
+        "x": 228,
+        "y": 432
+      },
+      "fileRows": 64,
+      "filesRow0": {
+        "height": 25,
+        "width": 515,
+        "x": 228,
+        "y": 402
+      },
+      "firstSidebarContentRow": 1,
+      "fullSizeContentView": true,
+      "sidebarRow1": {
+        "height": 32,
+        "width": 220,
+        "x": 8,
+        "y": 428
+      },
+      "sidebarRow2": {
+        "height": 32,
+        "width": 220,
+        "x": 8,
+        "y": 396
+      },
+      "stage": "many-files-top-light",
+      "toolbarItems": 7
+    },
+    {
+      "contentLayout": {
+        "height": 460,
+        "width": 760,
+        "x": 0,
+        "y": 0
+      },
+      "lastFile": {
+        "height": 25,
+        "width": 515,
+        "x": 228,
+        "y": 40
+      },
+      "stage": "many-files-bottom-light"
+    },
+    {
+      "contentLayout": {
+        "height": 460,
+        "width": 760,
+        "x": 0,
+        "y": 0
+      },
+      "fileRows": 0,
+      "firstSidebarContentRow": 1,
+      "fullSizeContentView": true,
+      "sidebarRow1": {
+        "height": 32,
+        "width": 220,
+        "x": 8,
+        "y": 428
+      },
+      "sidebarRow2": {
+        "height": 32,
+        "width": 220,
+        "x": 8,
+        "y": 396
+      },
+      "stage": "empty-read-only-applet-light",
+      "toolbarItems": 7
+    },
+    {
+      "contentLayout": {
+        "height": 460,
+        "width": 760,
+        "x": 0,
+        "y": 0
+      },
+      "fileHeadings": {
+        "height": 28,
+        "width": 515,
+        "x": 228,
+        "y": 432
+      },
+      "fileRows": 64,
+      "filesRow0": {
+        "height": 25,
+        "width": 515,
+        "x": 228,
+        "y": 402
+      },
+      "firstSidebarContentRow": 1,
+      "fullSizeContentView": true,
+      "sidebarRow1": {
+        "height": 32,
+        "width": 220,
+        "x": 8,
+        "y": 428
+      },
+      "sidebarRow2": {
+        "height": 32,
+        "width": 220,
+        "x": 8,
+        "y": 396
+      },
+      "stage": "filtered-applets-light",
+      "toolbarItems": 7
+    },
+    {
+      "contentLayout": {
+        "height": 460,
+        "width": 760,
+        "x": 0,
+        "y": 0
+      },
+      "fileHeadings": {
+        "height": 28,
+        "width": 532,
+        "x": 228,
+        "y": 432
+      },
+      "fileRows": 8,
+      "filesRow0": {
+        "height": 25,
+        "width": 532,
+        "x": 228,
+        "y": 402
+      },
+      "firstSidebarContentRow": 1,
+      "fullSizeContentView": true,
+      "sidebarRow1": {
+        "height": 32,
+        "width": 220,
+        "x": 8,
+        "y": 428
+      },
+      "sidebarRow2": {
+        "height": 32,
+        "width": 220,
+        "x": 8,
+        "y": 396
+      },
+      "stage": "reconnected-light",
+      "toolbarItems": 7
+    },
+    {
+      "contentLayout": {
+        "height": 560,
+        "width": 820,
+        "x": 0,
+        "y": 0
+      },
+      "fileHeadings": {
+        "height": 28,
+        "width": 592,
+        "x": 228,
+        "y": 532
+      },
+      "fileRows": 8,
+      "filesRow0": {
+        "height": 25,
+        "width": 592,
+        "x": 228,
+        "y": 502
+      },
+      "firstSidebarContentRow": 1,
+      "fullSizeContentView": true,
+      "sidebarRow1": {
+        "height": 32,
+        "width": 220,
+        "x": 8,
+        "y": 528
+      },
+      "sidebarRow2": {
+        "height": 32,
+        "width": 220,
+        "x": 8,
+        "y": 496
+      },
+      "stage": "connected-dark",
+      "toolbarItems": 7
+    },
+    {
+      "contentLayout": {
+        "height": 560,
+        "width": 820,
+        "x": 0,
+        "y": 0
+      },
+      "fileHeadings": {
+        "height": 28,
+        "width": 592,
+        "x": 228,
+        "y": 475
+      },
+      "fileRows": 8,
+      "filesRow0": {
+        "height": 25,
+        "width": 592,
+        "x": 228,
+        "y": 445
+      },
+      "firstSidebarContentRow": 1,
+      "fullSizeContentView": true,
+      "sidebarRow1": {
+        "height": 32,
+        "width": 220,
+        "x": 8,
+        "y": 528
+      },
+      "sidebarRow2": {
+        "height": 32,
+        "width": 220,
+        "x": 8,
+        "y": 496
+      },
+      "stage": "connection-warning-dark",
+      "toolbarItems": 7
+    },
+    {
+      "contentLayout": {
+        "height": 460,
+        "width": 760,
+        "x": 0,
+        "y": 0
+      },
+      "fileHeadings": {
+        "height": 28,
+        "width": 532,
+        "x": 228,
+        "y": 375
+      },
+      "fileRows": 8,
+      "filesRow0": {
+        "height": 25,
+        "width": 532,
+        "x": 228,
+        "y": 345
+      },
+      "firstSidebarContentRow": 1,
+      "fullSizeContentView": true,
+      "sidebarRow1": {
+        "height": 32,
+        "width": 220,
+        "x": 8,
+        "y": 428
+      },
+      "sidebarRow2": {
+        "height": 32,
+        "width": 220,
+        "x": 8,
+        "y": 396
+      },
+      "stage": "minimum-warning-dark",
+      "toolbarItems": 7
+    },
+    {
+      "contentLayout": {
+        "height": 720,
+        "width": 1120,
+        "x": 0,
+        "y": 0
+      },
+      "fileHeadings": {
+        "height": 28,
+        "width": 892,
+        "x": 228,
+        "y": 643
+      },
+      "fileRows": 8,
+      "filesRow0": {
+        "height": 25,
+        "width": 892,
+        "x": 228,
+        "y": 613
+      },
+      "firstSidebarContentRow": 1,
+      "fullSizeContentView": true,
+      "sidebarRow1": {
+        "height": 32,
+        "width": 220,
+        "x": 8,
+        "y": 688
+      },
+      "sidebarRow2": {
+        "height": 32,
+        "width": 220,
+        "x": 8,
+        "y": 656
+      },
+      "stage": "expanded-warning-dark",
+      "toolbarItems": 7
+    },
+    {
+      "contentLayout": {
+        "height": 560,
+        "width": 820,
+        "x": 0,
+        "y": 0
+      },
+      "fileHeadings": {
+        "height": 28,
+        "width": 592,
+        "x": 228,
+        "y": 532
+      },
+      "fileRows": 8,
+      "filesRow0": {
+        "height": 25,
+        "width": 592,
+        "x": 228,
+        "y": 502
+      },
+      "firstSidebarContentRow": 1,
+      "fullSizeContentView": true,
+      "sidebarRow1": {
+        "height": 32,
+        "width": 220,
+        "x": 8,
+        "y": 528
+      },
+      "sidebarRow2": {
+        "height": 32,
+        "width": 220,
+        "x": 8,
+        "y": 496
+      },
+      "stage": "warning-cleared-dark",
+      "toolbarItems": 7
+    },
+    {
+      "contentLayout": {
+        "height": 460,
+        "width": 760,
+        "x": 0,
+        "y": 0
+      },
+      "fileHeadings": {
+        "height": 28,
+        "width": 515,
+        "x": 228,
+        "y": 432
+      },
+      "fileRows": 64,
+      "filesRow0": {
+        "height": 25,
+        "width": 515,
+        "x": 228,
+        "y": 402
+      },
+      "firstSidebarContentRow": 1,
+      "fullSizeContentView": true,
+      "sidebarRow1": {
+        "height": 32,
+        "width": 220,
+        "x": 8,
+        "y": 428
+      },
+      "sidebarRow2": {
+        "height": 32,
+        "width": 220,
+        "x": 8,
+        "y": 396
+      },
+      "stage": "many-files-top-dark",
+      "toolbarItems": 7
+    },
+    {
+      "contentLayout": {
+        "height": 460,
+        "width": 760,
+        "x": 0,
+        "y": 0
+      },
+      "lastFile": {
+        "height": 25,
+        "width": 515,
+        "x": 228,
+        "y": 40
+      },
+      "stage": "many-files-bottom-dark"
+    },
+    {
+      "contentLayout": {
+        "height": 460,
+        "width": 760,
+        "x": 0,
+        "y": 0
+      },
+      "fileRows": 0,
+      "firstSidebarContentRow": 1,
+      "fullSizeContentView": true,
+      "sidebarRow1": {
+        "height": 32,
+        "width": 220,
+        "x": 8,
+        "y": 428
+      },
+      "sidebarRow2": {
+        "height": 32,
+        "width": 220,
+        "x": 8,
+        "y": 396
+      },
+      "stage": "empty-read-only-applet-dark",
+      "toolbarItems": 7
+    },
+    {
+      "contentLayout": {
+        "height": 460,
+        "width": 760,
+        "x": 0,
+        "y": 0
+      },
+      "fileHeadings": {
+        "height": 28,
+        "width": 515,
+        "x": 228,
+        "y": 432
+      },
+      "fileRows": 64,
+      "filesRow0": {
+        "height": 25,
+        "width": 515,
+        "x": 228,
+        "y": 402
+      },
+      "firstSidebarContentRow": 1,
+      "fullSizeContentView": true,
+      "sidebarRow1": {
+        "height": 32,
+        "width": 220,
+        "x": 8,
+        "y": 428
+      },
+      "sidebarRow2": {
+        "height": 32,
+        "width": 220,
+        "x": 8,
+        "y": 396
+      },
+      "stage": "filtered-applets-dark",
+      "toolbarItems": 7
+    },
+    {
+      "contentLayout": {
+        "height": 460,
+        "width": 760,
+        "x": 0,
+        "y": 0
+      },
+      "fileHeadings": {
+        "height": 28,
+        "width": 532,
+        "x": 228,
+        "y": 432
+      },
+      "fileRows": 8,
+      "filesRow0": {
+        "height": 25,
+        "width": 532,
+        "x": 228,
+        "y": 402
+      },
+      "firstSidebarContentRow": 1,
+      "fullSizeContentView": true,
+      "sidebarRow1": {
+        "height": 32,
+        "width": 220,
+        "x": 8,
+        "y": 428
+      },
+      "sidebarRow2": {
+        "height": 32,
+        "width": 220,
+        "x": 8,
+        "y": 396
+      },
+      "stage": "reconnected-dark",
+      "toolbarItems": 7
+    }
+  ]
+}

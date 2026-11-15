@@ -1,0 +1,229 @@
+{
+  "version": "2.0.5",
+  "build": "161",
+  "status": "verified-private-test-build",
+  "sourceCommit": "1b5495c5b78efcbb09c9a700c0caf18d82047a0b",
+  "sourceTree": "133971c5002ab228f5c48dfa8d11515f1a21c23a",
+  "runID": 43734374426,
+  "runURL": "https://github.com/koralatov/alphasync/actions/runs/43734374426",
+  "runConclusion": "success",
+  "runAttempt": 1,
+  "changes": [
+    "Plain scope-specific Clear and Replace wording and recovery-copy checkbox",
+    "Cancel first, no default button, initial focus on Cancel, and Escape cancellation",
+    "Shared AlphaWord, dictionary, System, generic applet, file, and Neo symbols",
+    "Neo heading uses ordinary sidebar metrics with semibold weight",
+    "System-green connection light with text and accessible status",
+    "Four native labelled toolbar commands and three saved display modes",
+    "Current Help, manual checklist, release notes, and technical documentation"
+  ],
+  "preserved": "USB, protocol, codecs, executor, and backend operations are unchanged.  FileOperations changes only displayed wording.  Existing recovery, backup, cancellation, and readback checks remain intact.",
+  "hosts": [
+    {
+      "host": "arm",
+      "architecture": "arm64",
+      "xcode": "16.4",
+      "jobID": 132873640749,
+      "conclusion": "success",
+      "swiftRegressions": 172,
+      "fixtures": 55,
+      "realWindowLayoutObservations": 20,
+      "toolbarModesPerAppearance": 3,
+      "capturedImages": 40,
+      "swiftCompilerWarnings": 0,
+      "builtEditions": [
+        "universal",
+        "apple-silicon"
+      ]
+    },
+    {
+      "host": "intel",
+      "architecture": "x86_64",
+      "xcode": "26.6",
+      "jobID": 132873641083,
+      "conclusion": "success",
+      "swiftRegressions": 172,
+      "fixtures": 55,
+      "realWindowLayoutObservations": 20,
+      "toolbarModesPerAppearance": 3,
+      "capturedImages": 40,
+      "swiftCompilerWarnings": 0,
+      "builtEditions": [
+        "universal",
+        "apple-silicon"
+      ]
+    }
+  ],
+  "nativeChecks": {
+    "confirmation": "No default button; safe Return, keypad Enter, and initial Space; Escape cancels, in both appearances on both hosts.  Button order was reviewed visually.  Deliberate physical activation remains manual.",
+    "toolbar": "Four native labels and all commands visible at minimum width in Icon and Text, Icon Only, and Text Only; saved native changes and reconnection passed.",
+    "sidebar": "Neo heading and All Files have matching positive row heights and remain clear of toolbar and viewport boundaries; only the zero-height structural Section marker is skipped.",
+    "symbolAvailability": "All chosen system symbols resolved on both native hosts.",
+    "preview": "Selection, scrolling, font changes, and full clipboard contents passed.",
+    "deadline": "Both phases share the existing failing 120-second deadline."
+  },
+  "verification": {
+    "allAutomatedChecksPassed": true,
+    "artifactDigests": 4,
+    "assetHashes": 12,
+    "help": [
+      {
+        "edition": "universal",
+        "version": "2.0.5",
+        "build": "161",
+        "authoredHelpFilesMatched": 20,
+        "searchIndexes": 1,
+        "help": "passed"
+      },
+      {
+        "edition": "apple-silicon",
+        "version": "2.0.5",
+        "build": "161",
+        "authoredHelpFilesMatched": 20,
+        "searchIndexes": 1,
+        "help": "passed"
+      }
+    ],
+    "offlineHelpPages": 18,
+    "offlineHelpLinks": 83,
+    "signatures": "ad hoc; hardened runtime and matching crash symbols verified",
+    "minimumDeployment": "13.0",
+    "nativeCanonicalDownloadsJob": 132875118808,
+    "nativeCanonicalDownloads": "Both exact canonical editions executed on Apple Silicon.",
+    "capturedImagesReviewed": 80,
+    "greenStatusAreas": [
+      {
+        "host": "arm",
+        "appearance": "light",
+        "greenPixelsInStatusArea": 116
+      },
+      {
+        "host": "arm",
+        "appearance": "dark",
+        "greenPixelsInStatusArea": 116
+      },
+      {
+        "host": "intel",
+        "appearance": "light",
+        "greenPixelsInStatusArea": 112
+      },
+      {
+        "host": "intel",
+        "appearance": "dark",
+        "greenPixelsInStatusArea": 118
+      }
+    ],
+    "swiftCompilerWarnings": 0,
+    "buildToolNotices": "Both hosts retain App Intents extraction and signed-helper stripping notices.  Both app editions and helpers passed.",
+    "publication": "not requested; skipped; no tag created",
+    "protectedReferences": {
+      "passed": true,
+      "publicTags": [
+        "v1.5.1",
+        "v2.0.4"
+      ],
+      "publicReleaseNotesAndAssetsUnchanged": true,
+      "retainedAssets": 18,
+      "versionTagsUnchanged": 12,
+      "frozenLegacyUnchanged": true,
+      "latest": "v2.0.4",
+      "ignoredVolatileFields": [
+        "download_count"
+      ],
+      "metadataFiles": {
+        "protected-before.json": "704a4b443d9a6142b0a93f317b4d717242928dde18f0a566febfa38ce6dcf261",
+        "protected-after.json": "704a4b443d9a6142b0a93f317b4d717242928dde18f0a566febfa38ce6dcf261"
+      }
+    }
+  },
+  "diagnosticRuns": [
+    {
+      "runID": 43733427269,
+      "source": "aa4e8c2577450a56543278d085f5c841eb10022c",
+      "result": "Native checker expected NSButton subviews that SwiftUI does not expose."
+    },
+    {
+      "runID": 43733674845,
+      "source": "67e0dc5c52c23d6304ca7070874d737ee94827e2",
+      "result": "SwiftUI virtual elements did not expose the complete NSAccessibilityProtocol to the checker.  Retained direct keyboard assertions and visual order review."
+    },
+    {
+      "runID": 43734050602,
+      "source": "542751833ae1ea6034b233483be30c12217ff76e",
+      "result": "Confirmation checks passed; geometry checker then measured a zero-height structural Section row.  Final checker measures the actual Neo heading and All Files without weakening positive-height or viewport assertions."
+    }
+  ],
+  "artifacts": [
+    {
+      "id": 14170330793,
+      "name": "AlphaSync-arm64-package-verification-1b5495c5b78efcbb09c9a700c0caf18d82047a0b",
+      "size": 1262,
+      "digest": "sha256:8bf8dbb0a89a245961023a4bd9c58a9e13fcecdbc156096527528f2880a1191d",
+      "downloadedDigest": "matched",
+      "url": "https://github.com/koralatov/alphasync/actions/runs/43734374426/artifacts/14170330793"
+    },
+    {
+      "id": 14170305623,
+      "name": "AlphaSync-interface-and-logs-macos-26-intel-1b5495c5b78efcbb09c9a700c0caf18d82047a0b",
+      "size": 1286855,
+      "digest": "sha256:1aa0b75fecdc602b676894d140d0386116711239ef55463a41af1799dee826ad",
+      "downloadedDigest": "matched",
+      "url": "https://github.com/koralatov/alphasync/actions/runs/43734374426/artifacts/14170305623"
+    },
+    {
+      "id": 14169616742,
+      "name": "AlphaSync-interface-and-logs-macos-15-1b5495c5b78efcbb09c9a700c0caf18d82047a0b",
+      "size": 1352574,
+      "digest": "sha256:667e1aac5262986e70b45ec115e2d217b247872e3a30803610e311dfc5b16700",
+      "downloadedDigest": "matched",
+      "url": "https://github.com/koralatov/alphasync/actions/runs/43734374426/artifacts/14169616742"
+    },
+    {
+      "id": 14169417795,
+      "name": "AlphaSync-packages-1b5495c5b78efcbb09c9a700c0caf18d82047a0b",
+      "size": 20893438,
+      "digest": "sha256:ff2ab543174fe6afcbf8b14baa891958b3059873db379217d8157e98b7e644a1",
+      "downloadedDigest": "matched",
+      "url": "https://github.com/koralatov/alphasync/actions/runs/43734374426/artifacts/14169417795"
+    }
+  ],
+  "privateTestZIP": {
+    "filename": "AlphaSync-2.0.5-161-macOS-13-apple-silicon.zip",
+    "size": 2915530,
+    "sha256": "4f65b7eb3424038825e4a0c5ebde5a51b63543cbad771c765e17bddfca03e08b",
+    "availability": "separate private test copy; earlier candidates retained"
+  },
+  "unverified": [
+    "Physical M2 Air operations, revised confirmations, recovery, transfers, and readback",
+    "System Sidebar Icon Size variants, screen-composited appearance, complete keyboard navigation, and VoiceOver",
+    "macOS 13 runtime, actual Login Items approval, and native Help Viewer"
+  ],
+  "stableGoal": "2.1 for Apple Silicon, followed by macOS compatibility maintenance; publication requires a separate request.",
+  "checkedAt": "2026-11-15T16:24:38.561729+00:00",
+  "files": {
+    "protected-comparison.json": {
+      "size": 501,
+      "sha256": "02eef22f48268eb6b22999ac68c4130b39ab14f1bd36462934e10ba13a19047f"
+    },
+    "performance.json": {
+      "size": 803,
+      "sha256": "13f2e7ad8968d505cd6a2271167a2b132c873529cc0f8466dd81d042f25e33dd"
+    },
+    "interface-layouts.json": {
+      "size": 26043,
+      "sha256": "fe09c300cb6704f68644d5b5ae052530821b5574474bf182a894247cbe07886f"
+    },
+    "toolbar-checks.json": {
+      "size": 4313,
+      "sha256": "37edac12f9c0489c5e52eb4e7323471eb922cc70868215d23bb834c6e3e20d28"
+    },
+    "assets.json": {
+      "size": 2043,
+      "sha256": "7d2a7c2302ae5abe7f255f7b6467a34a7cde5bfc2472ea30ab85ea3046f3d3f6"
+    },
+    "interface-review.json": {
+      "size": 22581,
+      "sha256": "91b544adb4d31734606f66f85be29fd1c284dd31b0bd8b6e33d5398b72db883f"
+    }
+  }
+}

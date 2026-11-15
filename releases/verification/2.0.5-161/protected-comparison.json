@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "publicTags": [
+    "v1.5.1",
+    "v2.0.4"
+  ],
+  "publicReleaseNotesAndAssetsUnchanged": true,
+  "retainedAssets": 18,
+  "versionTagsUnchanged": 12,
+  "frozenLegacyUnchanged": true,
+  "latest": "v2.0.4",
+  "ignoredVolatileFields": [
+    "download_count"
+  ],
+  "metadataFiles": {
+    "protected-before.json": "704a4b443d9a6142b0a93f317b4d717242928dde18f0a566febfa38ce6dcf261",
+    "protected-after.json": "704a4b443d9a6142b0a93f317b4d717242928dde18f0a566febfa38ce6dcf261"
+  }
+}

@@ -1,0 +1,246 @@
+{
+  "arm": [
+    {
+      "appearance": "light",
+      "labels": [
+        "Hide Sidebar",
+        "",
+        "Back Up",
+        "Clear Files",
+        "Inspector",
+        "Refresh"
+      ],
+      "mode": "iconAndText",
+      "visible": [
+        "Back Up",
+        "Clear Files",
+        "Hide Sidebar",
+        "Inspector",
+        "Refresh"
+      ]
+    },
+    {
+      "appearance": "light",
+      "labels": [
+        "Hide Sidebar",
+        "",
+        "Back Up",
+        "Clear Files",
+        "Inspector",
+        "Refresh"
+      ],
+      "mode": "iconOnly",
+      "visible": [
+        "Back Up",
+        "Clear Files",
+        "Hide Sidebar",
+        "Inspector",
+        "Refresh"
+      ]
+    },
+    {
+      "appearance": "light",
+      "labels": [
+        "Hide Sidebar",
+        "",
+        "Back Up",
+        "Clear Files",
+        "Inspector",
+        "Refresh"
+      ],
+      "mode": "textOnly",
+      "visible": [
+        "Back Up",
+        "Clear Files",
+        "Hide Sidebar",
+        "Inspector",
+        "Refresh"
+      ]
+    },
+    {
+      "appearance": "dark",
+      "labels": [
+        "Hide Sidebar",
+        "",
+        "Back Up",
+        "Clear Files",
+        "Inspector",
+        "Refresh"
+      ],
+      "mode": "iconAndText",
+      "visible": [
+        "Back Up",
+        "Clear Files",
+        "Hide Sidebar",
+        "Inspector",
+        "Refresh"
+      ]
+    },
+    {
+      "appearance": "dark",
+      "labels": [
+        "Hide Sidebar",
+        "",
+        "Back Up",
+        "Clear Files",
+        "Inspector",
+        "Refresh"
+      ],
+      "mode": "iconOnly",
+      "visible": [
+        "Back Up",
+        "Clear Files",
+        "Hide Sidebar",
+        "Inspector",
+        "Refresh"
+      ]
+    },
+    {
+      "appearance": "dark",
+      "labels": [
+        "Hide Sidebar",
+        "",
+        "Back Up",
+        "Clear Files",
+        "Inspector",
+        "Refresh"
+      ],
+      "mode": "textOnly",
+      "visible": [
+        "Back Up",
+        "Clear Files",
+        "Hide Sidebar",
+        "Inspector",
+        "Refresh"
+      ]
+    }
+  ],
+  "intel": [
+    {
+      "appearance": "light",
+      "labels": [
+        "",
+        "Hide Sidebar",
+        "",
+        "Back Up",
+        "Clear Files",
+        "Inspector",
+        "Refresh"
+      ],
+      "mode": "iconAndText",
+      "visible": [
+        "",
+        "Back Up",
+        "Clear Files",
+        "Hide Sidebar",
+        "Inspector",
+        "Refresh"
+      ]
+    },
+    {
+      "appearance": "light",
+      "labels": [
+        "",
+        "Hide Sidebar",
+        "",
+        "Back Up",
+        "Clear Files",
+        "Inspector",
+        "Refresh"
+      ],
+      "mode": "iconOnly",
+      "visible": [
+        "",
+        "Back Up",
+        "Clear Files",
+        "Hide Sidebar",
+        "Inspector",
+        "Refresh"
+      ]
+    },
+    {
+      "appearance": "light",
+      "labels": [
+        "",
+        "Hide Sidebar",
+        "",
+        "Back Up",
+        "Clear Files",
+        "Inspector",
+        "Refresh"
+      ],
+      "mode": "textOnly",
+      "visible": [
+        "",
+        "Back Up",
+        "Clear Files",
+        "Hide Sidebar",
+        "Inspector",
+        "Refresh"
+      ]
+    },
+    {
+      "appearance": "dark",
+      "labels": [
+        "",
+        "Hide Sidebar",
+        "",
+        "Back Up",
+        "Clear Files",
+        "Inspector",
+        "Refresh"
+      ],
+      "mode": "iconAndText",
+      "visible": [
+        "",
+        "Back Up",
+        "Clear Files",
+        "Hide Sidebar",
+        "Inspector",
+        "Refresh"
+      ]
+    },
+    {
+      "appearance": "dark",
+      "labels": [
+        "",
+        "Hide Sidebar",
+        "",
+        "Back Up",
+        "Clear Files",
+        "Inspector",
+        "Refresh"
+      ],
+      "mode": "iconOnly",
+      "visible": [
+        "",
+        "Back Up",
+        "Clear Files",
+        "Hide Sidebar",
+        "Inspector",
+        "Refresh"
+      ]
+    },
+    {
+      "appearance": "dark",
+      "labels": [
+        "",
+        "Hide Sidebar",
+        "",
+        "Back Up",
+        "Clear Files",
+        "Inspector",
+        "Refresh"
+      ],
+      "mode": "textOnly",
+      "visible": [
+        "",
+        "Back Up",
+        "Clear Files",
+        "Hide Sidebar",
+        "Inspector",
+        "Refresh"
+      ]
+    }
+  ]
+}
