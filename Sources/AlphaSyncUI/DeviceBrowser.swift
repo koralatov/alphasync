@@ -46,10 +46,12 @@ final class DeviceBrowserController: NSSplitViewController {
         navigation.canCollapse = false
         navigation.minimumThickness = 180
         navigation.maximumThickness = 300
-        navigation.holdingPriority = .defaultHigh
+        // Preserve the sidebar on window resize while allowing the divider to move.
+        navigation.holdingPriority = .init(rawValue: 200)
         let files = NSSplitViewItem(viewController: detailHost)
         files.canCollapse = false
         files.minimumThickness = 400
+        files.holdingPriority = .init(rawValue: 199)
         addSplitViewItem(navigation)
         addSplitViewItem(files)
     }

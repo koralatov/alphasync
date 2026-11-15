@@ -8,6 +8,8 @@ Build 161 uses NavigationSplitView, which supplies the automatic sidebar toolbar
 
 Use a public NSSplitViewController containing two ordinary NSSplitViewItems, rather than sidebar-behaviour items.  Both have `canCollapse = false`.  The navigation pane is 180–300 points wide, initially 220, and the file pane has a 400-point minimum.  The connected window retains its 760-point minimum.  These constraints leave room for both panes.  Ordinary items do not participate in the controller’s `toggleSidebar` action or automatic sidebar collapsing.  No new toolbar button or hide command is added.
 
+Use holding priorities 200 for navigation and 199 for files, following Apple’s primary-detail example.  A high-priority sidebar holding constraint prevented the divider from following requested positions in the initial candidate.  Keep the sidebar’s priority above the file pane’s, while allowing ordinary divider constraints to move it.  Retain the native 180-, 300-, and 220-point assertions; this was a real candidate resizing failure.
+
 The two hosting controllers have empty sizing options because split items own their widths and the outer SwiftUI window owns its limits.  This avoids competing minimum, maximum, and ideal content constraints during a pane transition.  Retain the original flexible zero-minimum frames on the file table and its containers.  Pass system sidebar size, appearance, and contrast through the hosting boundary, and preserve each controller when updating its SwiftUI content.  Set the initial divider once, so ordinary updates retain the user’s width.
 
 Replace the default sidebar command group with the existing toolbar appearance, Inspector, and Refresh commands.  This removes alternate menu routes to hiding.  Keep all four labelled toolbar actions and their saved display modes.  Indent All Files and each applet by fourteen points without changing their font, symbol size, or selection scope.  Share `keyboard.fill` between the sidebar and device Inspector; use system colours in both appearances.
@@ -39,3 +41,4 @@ Use the [manual checklist](../tests/manual-checks.md) on the affected M2 Air.  C
 - [canCollapse](https://developer.apple.com/documentation/appkit/nssplitviewitem/cancollapse)
 - [toggleSidebar](https://developer.apple.com/documentation/appkit/nssplitviewcontroller/togglesidebar(_:))
 - [Hosting sizing options](https://developer.apple.com/documentation/swiftui/nshostingcontroller/sizingoptions)
+- [Primary-detail split-view example](https://developer.apple.com/documentation/appkit/navigating-hierarchical-data-using-outline-and-split-views)
