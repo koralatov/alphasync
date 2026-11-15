@@ -12,6 +12,8 @@ Private **2.0.5, build 160** is ready for performance and correctness testing.  
 
 Private **2.0.5, build 161** is ready for testing with clearer Clear and Replace confirmations, distinct applet icons, a matching Neo heading, a green connection light, and labelled toolbar commands.  Choose **View → Toolbar Appearance** for Icon and Text, Icon Only, or Text Only.  Clear and Replace have no default button; Cancel has the initial keyboard focus, and Escape cancels.  **Save a copy of the text first** retains the existing recovery protection.  Both hosts passed 172 Swift tests, all 55 fixtures, native interfaces, and both editions in [run 43734374426](https://github.com/koralatov/alphasync/actions/runs/43734374426); both exact packaged apps ran on Apple Silicon.  Independent hashes, Help validation, and eighty-image review passed.  See the [interface review](docs/interface-polish-161.md) and [record](releases/verification/2.0.5-161/verification.json).  Physical M2 Air checks remain required.
 
+Private **2.0.5, build 162** is being prepared with a permanently visible sidebar, slightly indented child items, and a filled keyboard icon for the Neo.  It removes the Hide Sidebar control reported to freeze build 161.  The sidebar width remains adjustable.  See the [sidebar review](docs/sidebar-162.md) for the native layout, bounded baseline probe, and full build milestone.
+
 ## Version 2.0.4
 
 Version 2.0.4 improves the Swift rewrite first released as 2.0 and requires **macOS 13 or later**. It includes all changes prepared under the unpublished 2.0.1 development version.

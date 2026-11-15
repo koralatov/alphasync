@@ -50,3 +50,7 @@ Source `97f15dd1ab338f119df8d093fd87260bf0be82c1` passed [run 43718196869](https
 5.  Publish 2.1 only on a release request after reviewing functional results.  Preserve frozen 1.5.1, existing assets and tags, and public 2.0.4 until an authorised release and retirement plan changes them.
 
 After 2.1 is verified and released, suspend feature development and limit planned maintenance to future macOS compatibility.
+
+## Build 162 sidebar change
+
+The user subsequently reported that build 161 freezes when Hide Sidebar is clicked and requested a sidebar that cannot be hidden.  [Build 162](sidebar-162.md) therefore replaces the collapsing navigation container with a public AppKit split controller.  It retains the same SwiftUI content, flexible zero-minimum frames, and every earlier layout observation.  Additional width and system-size checks extend the native observations to thirty-two per host.  The earlier NavigationSplitView-root instruction describes builds 159–161; use the new permanent split container for this authorised change.
