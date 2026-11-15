@@ -3,8 +3,9 @@ import SwiftUI
 @MainActor
 public struct AlphaSyncCommands: Commands {
     @ObservedObject private var store: AppStore
+    @ObservedObject private var preferences: Preferences
     @Environment(\.openWindow) private var openWindow
-    public init(store: AppStore) { self.store = store }
+    public init(store: AppStore) { self.store = store; preferences = store.preferences }
     public var body: some Commands {
         CommandGroup(replacing: .appInfo) {
             Button("About AlphaSync") { openWindow(id: "about") }
@@ -30,6 +31,12 @@ public struct AlphaSyncCommands: Commands {
             }
         }
         CommandGroup(after: .sidebar) {
+            Menu("Toolbar Appearance") {
+                Picker("Toolbar Appearance", selection: $preferences.toolbarAppearance) {
+                    ForEach(ToolbarAppearance.allCases) { Text($0.title).tag($0) }
+                }.pickerStyle(.inline)
+            }
+            Divider()
             Button("Show Inspector") { openWindow(id: "inspector") }.keyboardShortcut("i")
             Button("Refresh Neo Files") { Task { await store.refresh() } }.keyboardShortcut("r").disabled(!store.connected || store.busy)
         }

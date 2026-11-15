@@ -109,10 +109,15 @@ public struct InspectorView: View {
     @State private var previewError: String?
     public init(store: AppStore) { self.store = store }
     private var file: NeoFile? { store.selection.count == 1 ? store.selectedFiles.first : nil }
+    private var symbol: String {
+        if file != nil { return SelectionSymbols.file }
+        if let applet = store.chosenApplet { return SelectionSymbols.applet(applet.id) }
+        return store.chosenDevice == nil ? "info.circle" : SelectionSymbols.device
+    }
     public var body: some View {
         VStack(spacing: 0) {
             HStack(alignment: .top, spacing: 14) {
-                Image(systemName: file == nil ? "gearshape" : "doc.text").font(.system(size: 40)).foregroundStyle(.secondary)
+                Image(systemName: symbol).font(.system(size: 40)).foregroundStyle(.secondary).accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 6) {
                     Text(file?.displayName ?? store.chosenApplet?.name ?? store.chosenDevice?.name ?? "No selection").font(.headline)
                     Text(file.flatMap { store.applet(for: $0.id)?.name } ?? store.chosenApplet?.version ?? "")
@@ -148,7 +153,7 @@ public struct InspectorView: View {
                     if let preview { Text(preview).textSelection(.enabled).lineLimit(12).frame(maxWidth: .infinity, alignment: .leading) }
                     else if let previewError { Text(previewError).foregroundStyle(.secondary) }
                     else if file != nil { ProgressView("Reading preview…") }
-                    else { Image(systemName: "gearshape").font(.system(size: 80)).frame(maxWidth: .infinity).foregroundStyle(.secondary) }
+                    else { Image(systemName: symbol).font(.system(size: 80)).frame(maxWidth: .infinity).foregroundStyle(.secondary).accessibilityHidden(true) }
                 }
             }.formStyle(.grouped).textSelection(.enabled)
         }.frame(width: 400).frame(minHeight: 430, idealHeight: 560, maxHeight: 700)

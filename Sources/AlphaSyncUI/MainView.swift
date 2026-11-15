@@ -24,19 +24,28 @@ public struct MainView: View {
         .navigationTitle("AlphaSync")
         .toolbar {
             if store.connected {
-                ToolbarItemGroup {
-                    Button { Task { await store.backup() } } label: { Label("Backup", systemImage: "externaldrive") }
+                ToolbarItem {
+                    Button { Task { await store.backup() } } label: { Label("Back Up", systemImage: "externaldrive") }
                         .help("Back up the files shown from connected Neos").disabled(store.busy)
-                    Button { Task { await store.requestClear() } } label: { Label(store.clearTitle, systemImage: "trash") }
+                }
+                ToolbarItem {
+                    Button { Task { await store.requestClear() } } label: { Label("Clear Files", systemImage: "trash") }
+                        .accessibilityLabel(store.clearTitle)
                         .help(store.selection.isEmpty ? "Clear all files in the selected applet" : "Clear only the selected files")
                         .disabled(!store.canClear)
-                    Button { openWindow(id: "inspector") } label: { Label("Info", systemImage: "info.circle") }
+                }
+                ToolbarItem {
+                    Button { openWindow(id: "inspector") } label: { Label("Inspector", systemImage: "info.circle") }
                         .help("Show information about the selection")
+                }
+                ToolbarItem {
                     Button { Task { await store.refresh() } } label: { Label("Refresh", systemImage: "arrow.clockwise") }
+                        .help("Read the current files from connected Neos")
                         .disabled(store.busy)
                 }
             }
         }
+        .background(ToolbarAppearanceController(preferences: preferences, connected: store.connected).frame(width: 0, height: 0))
         .fileImporter(isPresented: $store.showImporter, allowedContentTypes: [.plainText], allowsMultipleSelection: true) { result in
             store.finishImport(result)
         }
@@ -88,12 +97,15 @@ public struct MainView: View {
             List(selection: $store.sidebar) {
                 ForEach(store.devices, id: \.connection) { device in
                     Section {
+                        Label(device.name, systemImage: SelectionSymbols.device)
+                            .fontWeight(.semibold).foregroundStyle(.primary)
+                            .accessibilityAddTraits(.isHeader).accessibilityIdentifier("neo-heading")
                         Label("All Files", systemImage: "doc.on.doc").tag(SidebarSelection.device(device.connection))
                         ForEach(device.applets.filter { preferences.filter.appletIDs?.contains($0.id) ?? true }) { applet in
-                            Label(applet.name.isEmpty ? "Applet \(String(format: "0x%04X", applet.id))" : applet.name, systemImage: "gearshape")
+                            Label(applet.name.isEmpty ? "Applet \(String(format: "0x%04X", applet.id))" : applet.name, systemImage: SelectionSymbols.applet(applet.id))
                                 .tag(SidebarSelection.applet(device.connection, applet.id))
                         }
-                    } header: { Label(device.name, systemImage: "externaldrive.connected.to.line.below") }
+                    }
                 }
             }.listStyle(.sidebar).navigationSplitViewColumnWidth(min: 180, ideal: 220, max: 300)
         } detail: {
@@ -109,7 +121,7 @@ public struct MainView: View {
     private var fileTable: some View {
         Table(store.files, selection: $store.selection) {
             TableColumn("Name") { file in
-                Label(file.displayName, systemImage: "doc.text")
+                Label(file.displayName, systemImage: SelectionSymbols.file)
                     .draggable(FileDrag(file: file.id, service: store.service, staging: store.temporaryExports))
                     .dropDestination(for: URL.self) { urls, _ in
                         store.importDroppedFiles(urls, replacing: file.id) != nil
@@ -150,7 +162,13 @@ public struct MainView: View {
         VStack(spacing: 0) {
             Divider()
             HStack(spacing: 10) {
-                Label("Connected", systemImage: "circle.fill").labelStyle(.titleAndIcon).foregroundStyle(.secondary)
+                Label {
+                    Text("Connected").foregroundStyle(.secondary)
+                } icon: {
+                    Image(systemName: "circle.fill").foregroundStyle(.green)
+                }
+                .accessibilityElement(children: .ignore).accessibilityLabel("Neo connected")
+                .accessibilityIdentifier("neo-connection-status")
                 if store.busy {
                     ProgressView().controlSize(.small)
                     Text(store.operationText).lineLimit(1)

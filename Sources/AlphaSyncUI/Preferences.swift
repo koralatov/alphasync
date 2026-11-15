@@ -30,9 +30,22 @@ public enum FileFilter: Int, CaseIterable, Identifiable, Sendable {
     }
 }
 
+public enum ToolbarAppearance: String, CaseIterable, Identifiable, Sendable {
+    case iconAndText, iconOnly, textOnly
+    public var id: String { rawValue }
+    public var title: String {
+        switch self {
+        case .iconAndText: return "Icon and Text"
+        case .iconOnly: return "Icon Only"
+        case .textOnly: return "Text Only"
+        }
+    }
+}
+
 @MainActor
 public final class Preferences: ObservableObject {
     @Published public var filter: FileFilter { didSet { defaults.set(filter.rawValue, forKey: "FilterMode") } }
+    @Published public var toolbarAppearance: ToolbarAppearance { didSet { defaults.set(toolbarAppearance.rawValue, forKey: "ToolbarAppearance") } }
     @Published public private(set) var backupFolder: URL
     @Published public private(set) var backupLocationIssue: String?
     @Published public var saveBackupLogs: Bool { didSet { defaults.set(saveBackupLogs, forKey: "SaveBackupLogs") } }
@@ -53,9 +66,10 @@ public final class Preferences: ObservableObject {
         self.loginItem = loginItem
         let initial = initialBackupFolder ?? URL(fileURLWithPath: ("~/Documents/AlphaSync" as NSString).expandingTildeInPath, isDirectory: true)
         self.initialBackupFolder = initial
-        defaults.register(defaults: ["FilterMode": 1, "BackupFolder": initial.path,
+        defaults.register(defaults: ["FilterMode": 1, "ToolbarAppearance": ToolbarAppearance.iconAndText.rawValue, "BackupFolder": initial.path,
                                      "SaveBackupLogs": false, "SaveRecoveryCopies": true, "RecoveryRetentionDays": 30, "AutoRun": false])
         filter = FileFilter(rawValue: defaults.integer(forKey: "FilterMode")) ?? .textApplets
+        toolbarAppearance = defaults.string(forKey: "ToolbarAppearance").flatMap(ToolbarAppearance.init(rawValue:)) ?? .iconAndText
         let path = defaults.string(forKey: "BackupFolder") ?? initial.path
         backupFolder = URL(fileURLWithPath: (path as NSString).expandingTildeInPath, isDirectory: true)
         saveBackupLogs = defaults.bool(forKey: "SaveBackupLogs"); saveRecoveryCopies = defaults.bool(forKey: "SaveRecoveryCopies")
