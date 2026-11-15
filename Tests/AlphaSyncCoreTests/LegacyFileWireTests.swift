@@ -8,6 +8,8 @@ private final class LegacyFileWire: NeoTransport {
     var requests: [[UInt8]] = []
     var uploads: [Data] = []
     var corruptReadback = false
+    var onSwitch: (() -> Void)?
+    var onCommand: ((UInt8) -> Void)?
     private var incoming = Data(), staged = Data(), reading = Data()
     private var metadata: [UInt32: Data] = [:]
     private var attributeTarget: UInt32?, fileTarget: UInt32?
@@ -61,6 +63,7 @@ private final class LegacyFileWire: NeoTransport {
             return
         }
         if data == Data([0x3f, 0x53, 0x77, 0x74, 0x63, 0x68, 0, 0]) {
+            onSwitch?()
             incoming.append(Data("Switched".utf8)); return
         }
         let bytes = Array(data)
@@ -68,6 +71,7 @@ private final class LegacyFileWire: NeoTransport {
             throw NeoError.invalidData("Invalid legacy command checksum.")
         }
         requests.append(bytes)
+        onCommand?(bytes[0])
         let applet = integer(bytes, 5..<7)
         if [0x13, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f].contains(bytes[0]), applet != 0xa000 && applet != 0xa005 {
             throw NeoError.invalidData("Unexpected legacy applet.")
@@ -134,6 +138,72 @@ private final class LegacyFileWire: NeoTransport {
 }
 
 final class LegacyFileWireTests: XCTestCase {
+    func testQuitDuringCreationHandshakePreventsEveryFileChangingRequest() {
+        let wire = LegacyFileWire(), original = wire.file
+        var cancelled = false
+        wire.onSwitch = { [weak wire] in if wire?.requests.last?.first == 0x1b { cancelled = true } }
+        XCTAssertThrowsError(try NeoProtocol(transport: wire).createFile(Data(repeating: 65, count: 512), name: "New File", applet: 0xa000,
+            checkingCancellationBeforeWrite: { if cancelled { throw CancellationError() } })) {
+            XCTAssertTrue($0 is CancellationError)
+        }
+        XCTAssertTrue(cancelled)
+        XCTAssertTrue(wire.requests(0x1d).isEmpty)
+        XCTAssertTrue(wire.requests(0x1f).isEmpty)
+        XCTAssertTrue(wire.uploads.isEmpty)
+        XCTAssertEqual(wire.file, original)
+    }
+
+    func testQuitDuringRenameHandshakePreservesTheOriginalAttributes() {
+        let wire = LegacyFileWire(), original = wire.file
+        var cancelled = false
+        wire.onSwitch = { [weak wire] in if wire?.requests.last?.first == 0x13 { cancelled = true } }
+        XCTAssertThrowsError(try NeoProtocol(transport: wire).rename(applet: 0xa000, index: 1, to: "Renamed",
+            checkingCancellationBeforeWrite: { if cancelled { throw CancellationError() } })) {
+            XCTAssertTrue($0 is CancellationError)
+        }
+        XCTAssertTrue(cancelled)
+        XCTAssertEqual(wire.requests.map { $0[0] }, [0x13])
+        XCTAssertTrue(wire.uploads.isEmpty)
+        XCTAssertEqual(wire.file, original)
+    }
+
+    func testQuitDuringReplacementHandshakePreventsTheFirstFileWrite() {
+        let wire = LegacyFileWire(), original = wire.file
+        var cancelled = false
+        wire.onSwitch = { [weak wire] in if wire?.requests.last?.first == 0x10 { cancelled = true } }
+        XCTAssertThrowsError(try NeoProtocol(transport: wire).writeFile(Data(repeating: 66, count: 512), applet: 0xa000, index: 1,
+            expectedOriginal: original, checkingCancellationBeforeWrite: { if cancelled { throw CancellationError() } })) {
+            XCTAssertTrue($0 is CancellationError)
+        }
+        XCTAssertTrue(cancelled)
+        XCTAssertTrue(wire.requests(0x1f).isEmpty)
+        XCTAssertEqual(wire.file, original)
+    }
+
+    func testCreationFinishesAndVerifiesAfterWritingStartsDespiteQuit() throws {
+        let wire = LegacyFileWire(), contents = Data(repeating: 66, count: 512)
+        var cancelled = false
+        wire.onCommand = { if $0 == 0x1d { cancelled = true } }
+        let index = try NeoProtocol(transport: wire).createFile(contents, name: "New File", applet: 0xa000,
+            checkingCancellationBeforeWrite: { if cancelled { throw CancellationError() } })
+        XCTAssertTrue(cancelled)
+        XCTAssertEqual(index, 9)
+        XCTAssertEqual(wire.file, contents)
+        XCTAssertEqual(wire.requests(0x15).count, 1)
+        XCTAssertEqual(wire.requests(0x1c).count, 1)
+    }
+
+    func testRenameFinishesAndVerifiesAfterWritingStartsDespiteQuit() throws {
+        let wire = LegacyFileWire(), original = wire.file
+        var cancelled = false
+        wire.onCommand = { if $0 == 0x1d { cancelled = true } }
+        try NeoProtocol(transport: wire).rename(applet: 0xa000, index: 1, to: "Renamed",
+            checkingCancellationBeforeWrite: { if cancelled { throw CancellationError() } })
+        XCTAssertTrue(cancelled)
+        XCTAssertEqual(wire.requests.map { $0[0] }, [0x13, 0x1d, 2, 0x1e, 0x13])
+        XCTAssertEqual(wire.file, original)
+    }
+
     func testReplacementUsesLegacyOffsetsBlocksChecksumsAndReadback() throws {
         let wire = LegacyFileWire(), data = Data((0..<2304).map { UInt8(truncatingIfNeeded: $0) })
         try NeoProtocol(transport: wire).writeFile(data, applet: 0xa000, index: 1, expectedOriginal: wire.file)

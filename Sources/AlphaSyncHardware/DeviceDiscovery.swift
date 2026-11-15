@@ -22,8 +22,10 @@ protocol DeviceConnection: AnyObject {
     func readFile(applet: UInt16, index: UInt8, checkingCancellation: () throws -> Void) throws -> Data
     func writeFile(_ data: Data, applet: UInt16, index: UInt8, expectedOriginal: Data,
                    checkingCancellationBeforeWrite: () throws -> Void) throws
-    func createFile(_ data: Data, name: String, applet: UInt16) throws -> UInt8
-    func rename(applet: UInt16, index: UInt8, to name: String) throws
+    func createFile(_ data: Data, name: String, applet: UInt16,
+                    checkingCancellationBeforeWrite: () throws -> Void) throws -> UInt8
+    func rename(applet: UInt16, index: UInt8, to name: String,
+                checkingCancellationBeforeWrite: () throws -> Void) throws
 }
 
 extension DeviceConnection {

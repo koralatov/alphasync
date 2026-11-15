@@ -44,6 +44,47 @@ final class OperationLifetimeTests: XCTestCase {
         XCTAssertNil(store.notice)
     }
 
+    func testQuitStopsCreationAfterPreparationBeforeTheFirstWrite() async throws {
+        let gate = OperationGate(), observations = SimulatedObservations()
+        defer { gate.release() }
+        let store = store(SimulatedConfiguration(beforeCreate: { gate.wait() }), observations)
+        await store.refresh()
+        let folder = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: false)
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let source = folder.appendingPathComponent("New file.txt")
+        try Data("New file text".utf8).write(to: source)
+        store.beginImport()
+        let creating = try XCTUnwrap(store.finishImport(.success([source])))
+        try await eventually { gate.entered.isRequested }
+        let quitting = Task { await store.shutdown() }
+        try await eventually { store.shuttingDown }
+        gate.release()
+        await creating.value
+        await quitting.value
+        XCTAssertEqual(observations.writeCount, 0)
+        XCTAssertEqual(observations.closeCount, 1)
+        XCTAssertNil(store.notice)
+    }
+
+    func testQuitStopsRenameAfterPreparationBeforeTheFirstWrite() async throws {
+        let gate = OperationGate(), observations = SimulatedObservations()
+        defer { gate.release() }
+        let store = store(SimulatedConfiguration(beforeRename: { gate.wait() }), observations)
+        await store.refresh()
+        let file = try XCTUnwrap(store.files.first)
+        let renaming = Task { await store.rename(file.id, to: "Renamed") }
+        try await eventually { gate.entered.isRequested }
+        let quitting = Task { await store.shutdown() }
+        try await eventually { store.shuttingDown }
+        gate.release()
+        await renaming.value
+        await quitting.value
+        XCTAssertEqual(observations.writeCount, 0)
+        XCTAssertEqual(observations.closeCount, 1)
+        XCTAssertNil(store.notice)
+    }
+
     func testQuitStopsReplacementPreparationWithoutWriting() async throws {
         let gate = OperationGate(), observations = SimulatedObservations()
         defer { gate.release() }

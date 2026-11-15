@@ -137,7 +137,8 @@ extension DeviceService {
                 let limits = try engine.fileLimits(applet: appletID)
                 let converted = try FileCodec.converted(TextFiles.read(source), applet: appletID, limits: limits, dictionaryConsent: dictionaryConsent)
                 try access.checkCancellation(stop)
-                _ = try engine.createFile(converted, name: source.deletingPathExtension().lastPathComponent, applet: appletID)
+                _ = try engine.createFile(converted, name: source.deletingPathExtension().lastPathComponent, applet: appletID,
+                                          checkingCancellationBeforeWrite: { try access.checkCancellation(stop) })
                 completed = 1
                 return try access.update(connection)
             } catch let warning as DictionaryImportWarning {
@@ -153,7 +154,8 @@ extension DeviceService {
             var completed = 0
             do {
                 try access.checkCancellation(stop)
-                try access.engine(for: file.connection).rename(applet: file.applet, index: file.index, to: name)
+                try access.engine(for: file.connection).rename(applet: file.applet, index: file.index, to: name,
+                                                               checkingCancellationBeforeWrite: { try access.checkCancellation(stop) })
                 completed = 1
                 return try access.update(file.connection)
             } catch {

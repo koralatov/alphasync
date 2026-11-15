@@ -13,6 +13,8 @@ struct SimulatedConfiguration: Sendable {
     var appletID = NeoApplet.alphaWord
     var failingSnapshotNumber: Int?
     var afterRead: (@Sendable (UInt8) -> Void)?
+    var beforeCreate: (@Sendable () -> Void)?
+    var beforeRename: (@Sendable () -> Void)?
 }
 
 /// Only observations cross executors.  Device data remains inside the simulated connection.
@@ -215,7 +217,10 @@ private final class SimulatedConnection: DeviceConnection {
         if configuration.failingWriteNumber == writes { throw NeoWriteError(underlying: NeoError.verificationFailed) }
     }
 
-    func createFile(_ data: Data, name: String, applet: UInt16) throws -> UInt8 {
+    func createFile(_ data: Data, name: String, applet: UInt16,
+                    checkingCancellationBeforeWrite: () throws -> Void) throws -> UInt8 {
+        configuration.beforeCreate?()
+        try checkingCancellationBeforeWrite()
         let index = UInt8(contents.count + 1)
         writes += 1
         observations.didWrite()
@@ -224,8 +229,11 @@ private final class SimulatedConnection: DeviceConnection {
         return index
     }
 
-    func rename(applet: UInt16, index: UInt8, to name: String) throws {
+    func rename(applet: UInt16, index: UInt8, to name: String,
+                checkingCancellationBeforeWrite: () throws -> Void) throws {
         guard contents[index] != nil else { throw NeoError.disconnected }
+        configuration.beforeRename?()
+        try checkingCancellationBeforeWrite()
         writes += 1
         observations.didWrite()
         names[index] = name

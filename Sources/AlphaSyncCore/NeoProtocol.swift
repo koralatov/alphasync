@@ -250,17 +250,26 @@ public final class NeoProtocol {
             throw NeoError.device("The file changed after the warning opened.  Review the current file and try again.")
         }
         try checkingCancellationBeforeWrite()
-        try transaction { try changing { try rawWrite(data, applet: applet, index: index) } }
+        try transaction {
+            try checkingCancellationBeforeWrite()
+            try changing { try rawWrite(data, applet: applet, index: index) }
+        }
     }
-    public func createFile(_ data: Data, name: String, applet: UInt16) throws -> UInt8 {
+    public func createFile(_ data: Data, name: String, applet: UInt16,
+                           checkingCancellationBeforeWrite: () throws -> Void = {}) throws -> UInt8 {
+        try checkingCancellationBeforeWrite()
         let limits = try fileLimits(applet: applet)
+        try checkingCancellationBeforeWrite()
         let memory = try availableMemory()
         try limits.validate(data.count, allocation: 0, available: memory.ram)
+        try checkingCancellationBeforeWrite()
         let usage = try resourceUsage(applet: applet)
         guard usage.count < 255 else { throw NeoError.device("The applet cannot hold another file.") }
         let index = UInt8(usage.count + 1)
         let attributes = try NeoFileAttributes(name: name, minimum: data.count, allocation: data.count)
+        try checkingCancellationBeforeWrite()
         try transaction {
+            try checkingCancellationBeforeWrite()
             try changing {
                 try rawAttributes(attributes, applet: applet, index: index)
                 try rawWrite(data, applet: applet, index: index)
@@ -268,12 +277,18 @@ public final class NeoProtocol {
         }
         return index
     }
-    public func rename(applet: UInt16, index: UInt8, to name: String) throws {
+    public func rename(applet: UInt16, index: UInt8, to name: String,
+                       checkingCancellationBeforeWrite: () throws -> Void = {}) throws {
+        try checkingCancellationBeforeWrite()
         var info = try attributes(applet: applet, index: index)
         try info.rename(name)
         try info.validateForWriting()
+        try checkingCancellationBeforeWrite()
+        try transaction {
+            try checkingCancellationBeforeWrite()
+            try changing { try rawAttributes(info, applet: applet, index: index) }
+        }
         try changing {
-            try transaction { try rawAttributes(info, applet: applet, index: index) }
             guard try attributes(applet: applet, index: index).name == name else { throw NeoError.verificationFailed }
         }
     }
