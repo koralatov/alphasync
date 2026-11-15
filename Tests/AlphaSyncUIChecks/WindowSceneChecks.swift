@@ -7,6 +7,9 @@ import AlphaSyncCore
 @MainActor
 struct WindowSceneChecksApp: App {
     @StateObject private var driver = WindowSceneDriver()
+    @NSApplicationDelegateAdaptor(WindowSceneLaunchDelegate.self) private var launch
+
+    init() { InterfaceChecks.checkpoint("Starting real SwiftUI window scene") }
 
     var body: some Scene {
         Window("AlphaSync", id: "main") {
@@ -16,6 +19,16 @@ struct WindowSceneChecksApp: App {
         .defaultSize(width: 360, height: 230)
         .windowResizability(.contentSize)
         .commands { AlphaSyncCommands(store: driver.store) }
+    }
+}
+
+@MainActor
+private final class WindowSceneLaunchDelegate: NSObject, NSApplicationDelegate {
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        NSApplication.shared.setActivationPolicy(.regular)
+        NSApplication.shared.activate(ignoringOtherApps: true)
+        NSApplication.shared.windows.first?.makeKeyAndOrderFront(nil)
+        InterfaceChecks.checkpoint("Window-scene application launched")
     }
 }
 
@@ -58,12 +71,12 @@ private final class WindowSceneDriver: ObservableObject {
         self.domain = domain; self.defaults = defaults; self.preferences = preferences
         store = AppStore(preferences: preferences, monitoringEnabled: false)
         output = URL(fileURLWithPath: CommandLine.arguments.dropFirst().first ?? "build/interface-checks/window-scene", isDirectory: true)
-        NSApplication.shared.setActivationPolicy(.regular)
     }
 
     func start(in window: NSWindow) {
         guard !started else { return }
         started = true
+        InterfaceChecks.checkpoint("Window-scene probe attached")
         Task {
             do {
                 try await run(in: window)

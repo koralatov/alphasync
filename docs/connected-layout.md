@@ -32,6 +32,8 @@ The file-column source `2bf2aafbead3542df22d59f92c196a803f37ad48` passed all 157
 
 Source `f61b51cdd1fa51d7f53d2f46d111de15b040b80a` passed the Swift regressions on Apple Silicon, but its standalone hosting-controller fixture still produced inconsistent browser sizing. Replace that artificial browser window with a SwiftUI App and Window scene using the same default size, content-size policy, commands, and shared MainView as AlphaSyncApp. Let SwiftUI create its real toolbar and manage connection transitions. Await layout asynchronously instead of running nested event loops during browser updates. Retain all twenty visibility observations, actual-window images, partial failure geometry, and view-tree diagnostics. The separate component checks still cover About, Settings, Inspector, confirmation defaults, and read-only text. Both phases must succeed within the existing combined deadline before app builds proceed.
 
+The first scene harness, source `a52dc451661c654f3fbed204aadbe7eccab21039`, passed component checks but timed out in the application event loop before opening its window. Its regular activation policy was set in a driver created only by that window. Move activation to application launch through the test App delegate, with startup and probe checkpoints. Keep the timeout and all assertions; the production app is unchanged by this harness correction.
+
 ## Physical checks and 2.1
 
 The intended stable release is **2.1 for Apple Silicon**. Build 159 is a test toward that goal. Retain both current targets during validation; this request does not retire an edition or publish 2.1. After 2.1 is verified and released, suspend feature development and limit planned maintenance to future macOS compatibility.
