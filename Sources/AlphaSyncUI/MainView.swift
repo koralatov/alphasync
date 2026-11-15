@@ -171,10 +171,8 @@ public struct MainView: View {
                 }
                 .accessibilityElement(children: .ignore).accessibilityLabel("Neo connected")
                 .accessibilityIdentifier("neo-connection-status")
-                if store.busy {
-                    ProgressView().controlSize(.small)
-                    Text(store.operationText).lineLimit(1)
-                    if let value = store.progress { ProgressView(value: value).frame(width: 90) }
+                if store.isPerformingOperation {
+                    OperationProgress(label: store.operationLabel, value: store.progress)
                     if let stop = store.stopRequest { Button("Stop") { stop.stop() }.keyboardShortcut(.cancelAction) }
                 }
                 Spacer()
@@ -184,6 +182,21 @@ public struct MainView: View {
     }
     private func openReaders(_ ids: Set<NeoFileID>) {
         for file in store.files where ids.contains(file.id) { openWindow(value: ReaderRequest(file: file)) }
+    }
+}
+
+struct OperationProgress: View {
+    let label: String
+    let value: Double?
+    var body: some View {
+        HStack(spacing: 10) {
+            ProgressView().controlSize(.small)
+                .accessibilityLabel(label).accessibilityHidden(value != nil)
+            Text(label).lineLimit(1).accessibilityHidden(true)
+            if let value {
+                ProgressView(value: value).frame(width: 90).accessibilityLabel(label)
+            }
+        }
     }
 }
 

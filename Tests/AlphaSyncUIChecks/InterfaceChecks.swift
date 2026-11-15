@@ -257,6 +257,12 @@ struct InterfaceChecks {
             try capture(about, "about-" + label, to: output); about.close()
             let settings = window(SettingsView(preferences: preferences), size: NSSize(width: 560, height: 610), title: "Settings")
             try capture(settings, "settings-" + label, to: output); settings.close()
+            for (name, value) in [("known", Optional(0.5)), ("unknown", nil)] {
+                let status = window(OperationProgress(label: "Backing up ‘File 1’…", value: value).padding(12),
+                                    size: NSSize(width: 500, height: 60), title: "Transfer progress")
+                try capture(status, "transfer-" + name + "-" + label, to: output)
+                status.close()
+            }
             store.sidebar = .device(snapshot.connection)
             store.selection = [snapshot.applets[0].files[0].id]
             let inspector = window(InspectorView(store: store), size: NSSize(width: 400, height: 560), title: "Inspector")

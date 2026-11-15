@@ -55,7 +55,12 @@ enum FileConfirmation: Identifiable {
 
 @MainActor
 public final class AppStore: ObservableObject {
-    @Published public var devices: [NeoSnapshot] = [] { didSet { fileListCache = nil } }
+    @Published public var devices: [NeoSnapshot] = [] {
+        didSet {
+            fileListCache = nil
+            announcements.connectionChanged(count: devices.count, issue: connectionIssue)
+        }
+    }
     @Published public var sidebar: SidebarSelection?
     @Published public var selection = Set<NeoFileID>()
     @Published public var notice: AppNotice?
@@ -72,7 +77,9 @@ public final class AppStore: ObservableObject {
     @Published public private(set) var lastExportedFiles: [URL] = []
     @Published public var operationText = ""
     @Published public var progress: Double?
-    @Published public var connectionIssue: String?
+    @Published public var connectionIssue: String? {
+        didSet { announcements.connectionChanged(count: devices.count, issue: connectionIssue) }
+    }
     @Published public var showImporter = false
     @Published public var showExportFolder = false
     @Published public private(set) var shuttingDown = false
@@ -84,6 +91,8 @@ public final class AppStore: ObservableObject {
     public let service: DeviceService
     public let temporaryExports = TemporaryExports()
     public var busy: Bool { activities > 0 || shuttingDown || fileConfirmation != nil }
+    public var isPerformingOperation: Bool { activities > 0 }
+    public var operationLabel: String { operationText.isEmpty ? "Reading from Neo…" : operationText }
     public var connected: Bool { !devices.isEmpty }
     public var chosenDevice: NeoSnapshot? { devices.first { $0.connection == sidebar?.connection } ?? devices.first }
     public var chosenApplet: NeoApplet? {
@@ -130,9 +139,15 @@ public final class AppStore: ObservableObject {
     private let monitoringEnabled: Bool
     private var importRequest: ImportTarget?
     private var exportRequest: [NeoFileID]?
+    private let announcements: AccessibilityAnnouncements
 
-    public init(service: DeviceService = DeviceService(), preferences: Preferences? = nil, monitoringEnabled: Bool = true) {
+    public convenience init(service: DeviceService = DeviceService(), preferences: Preferences? = nil, monitoringEnabled: Bool = true) {
+        self.init(service: service, preferences: preferences, monitoringEnabled: monitoringEnabled, announcements: AccessibilityAnnouncements())
+    }
+
+    init(service: DeviceService, preferences: Preferences?, monitoringEnabled: Bool, announcements: AccessibilityAnnouncements) {
         self.service = service; self.preferences = preferences ?? Preferences(); self.monitoringEnabled = monitoringEnabled
+        self.announcements = announcements
     }
     deinit { scanTask?.cancel() }
     public func applet(for id: NeoFileID) -> NeoApplet? {
@@ -228,7 +243,7 @@ public final class AppStore: ObservableObject {
         }
         resumeAttachmentScan()
     }
-    private func run(_ title: String, _ action: @MainActor (StopRequest) async throws -> Void) async {
+    private func run(_ title: String, completion: String? = nil, _ action: @MainActor (StopRequest) async throws -> Void) async {
         guard !shuttingDown else { return }
         guard !busy else {
             notice = AppNotice("Please wait", "Wait for the current transfer to finish, then try again.")
@@ -242,7 +257,12 @@ public final class AppStore: ObservableObject {
             stopRequest = nil
             finishActivity(activity.id)
         }
-        do { try await action(activity.stop) }
+        do {
+            try await action(activity.stop)
+            if !shuttingDown, notice == nil, fileConfirmation == nil, backupResult == nil, let completion {
+                announcements.completed(completion)
+            }
+        }
         catch {
             if shuttingDown || error is CancellationError { return }
             notice = AppNotice("The operation could not be completed", error.localizedDescription)
@@ -256,7 +276,7 @@ public final class AppStore: ObservableObject {
         }
     }
     public func refresh() async {
-        await run("Refreshing files…") { stop in
+        await run("Refreshing files…", completion: "Neo files refreshed.") { stop in
             let result = try await service.refresh(retryConnections: true, stop: stop)
             devices = result.devices; discoveryIssue = result.issue
             updateConnectionIssue()
@@ -315,7 +335,7 @@ public final class AppStore: ObservableObject {
     }
     private func importFiles(_ urls: [URL], to target: ImportTarget, dictionaryConsent: String? = nil, previouslyCreated: Int = 0) async {
         let replacing = target.file != nil
-        await run("Reading the text file…") { stop in
+        await run("Reading the text file…", completion: "Text imported to Neo.") { stop in
             var created = previouslyCreated
             do {
                 guard let applet = devices.first(where: { $0.connection == target.connection })?.applets.first(where: { $0.id == target.applet }),
@@ -376,7 +396,7 @@ public final class AppStore: ObservableObject {
     }
     public func confirm(_ change: PreparedChange, saveRecovery: Bool) async {
         pendingChange = nil
-        await run("Saving recovery copies and changing files…") { stop in
+        await run("Saving recovery copies and changing files…", completion: "Neo files changed.") { stop in
             let folder = saveRecovery ? try preferences.prepareBackupFolder() : preferences.backupFolder
             let scoped = saveRecovery && folder.startAccessingSecurityScopedResource()
             defer { if scoped { folder.stopAccessingSecurityScopedResource() } }
@@ -386,7 +406,7 @@ public final class AppStore: ObservableObject {
         }
     }
     public func rename(_ file: NeoFileID, to name: String) async {
-        await run("Renaming the file…") { stop in replace(try await service.rename(file, to: name, stop: stop)) }
+        await run("Renaming the file…", completion: "File renamed.") { stop in replace(try await service.rename(file, to: name, stop: stop)) }
     }
     public func beginExport() {
         guard !busy, !showImporter, !showExportFolder else { return }
@@ -448,6 +468,7 @@ public final class AppStore: ObservableObject {
     }
     public func shutdown() async {
         shuttingDown = true
+        announcements.cancel()
         attachmentWatcher?.stop()
         scanTask?.cancel()
         scanPending = false
