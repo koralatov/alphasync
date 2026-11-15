@@ -141,8 +141,9 @@ private final class WindowSceneDriver: ObservableObject {
     }
 
     private func checkSidebar(in window: NSWindow, appearance: String) async throws {
-        guard let root = window.contentViewController,
-              let controller = InterfaceChecks.controllers(root).compactMap({ $0 as? DeviceBrowserController }).first else {
+        guard let content = window.contentView,
+              let controller = InterfaceChecks.descendants(content).compactMap({ $0 as? NSSplitView })
+                .compactMap({ $0.delegate as? DeviceBrowserController }).first else {
             try InterfaceChecks.require(false, "The connected browser lost its native split controller")
             return
         }

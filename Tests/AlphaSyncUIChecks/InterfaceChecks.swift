@@ -28,7 +28,6 @@ struct InterfaceChecks {
     static func settle() { RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.35)) }
     static func yieldLayout() async { try? await Task.sleep(for: .milliseconds(350)) }
     static func descendants(_ root: NSView) -> [NSView] { [root] + root.subviews.flatMap(descendants) }
-    static func controllers(_ root: NSViewController) -> [NSViewController] { [root] + root.children.flatMap(controllers) }
     static func fileTable(in window: NSWindow) throws -> NSTableView {
         guard let content = window.contentView,
               let table = descendants(content).compactMap({ $0 as? NSTableView }).first(where: { $0.tableColumns.count == 2 }) else {
