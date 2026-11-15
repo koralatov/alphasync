@@ -50,12 +50,12 @@ public struct DestructiveConfirmation: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }.frame(maxHeight: 140)
             }
-            Toggle("Save a recovery copy first", isOn: $saveRecovery)
+            Toggle("Save a copy of the text first", isOn: $saveRecovery)
             HStack {
                 Spacer()
-                Button(action, role: .destructive) { confirm(saveRecovery) }
                 Button("Cancel", role: .cancel, action: cancel)
-                    .keyboardShortcut(.defaultAction).focused($cancelFocused)
+                    .keyboardShortcut(.cancelAction).focused($cancelFocused)
+                Button(action, role: .destructive) { confirm(saveRecovery) }
             }
         }
         .padding(24).frame(width: 430)

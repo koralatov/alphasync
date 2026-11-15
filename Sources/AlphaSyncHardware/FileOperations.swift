@@ -59,8 +59,8 @@ extension DeviceService {
             try access.checkCancellation(stop)
             return PreparedChange(connection: file.connection, applet: applet,
                                   items: [.init(file: node, original: original, replacement: replacement)],
-                                  title: "Replace ‘\(node.displayName)’?", action: "Replace",
-                                  explanation: "The text on your Neo will be replaced with ‘\(source.lastPathComponent)’. This cannot be undone.")
+                                  title: "Replace ‘\(node.displayName)’ on your Neo?", action: "Replace",
+                                  explanation: "This will replace the text in the file with text from ‘\(source.lastPathComponent)’.  You can’t undo this.")
         }
     }
 
@@ -84,10 +84,10 @@ extension DeviceService {
             }
             try access.checkCancellation(stop)
             let all = selected == nil
-            let title = all ? "Clear all files in ‘\(applet.name)’?" : (files.count == 1 ? "Clear ‘\(files[0].displayName)’?" : "Clear \(files.count.formatted()) selected files?")
+            let title = all ? "Clear all files in ‘\(applet.name)’ on your Neo?" : (files.count == 1 ? "Clear ‘\(files[0].displayName)’ on your Neo?" : "Clear \(files.count.formatted()) selected files on your Neo?")
             return PreparedChange(connection: connection, applet: applet, items: items,
                                   title: title, action: all ? "Clear All Files" : (files.count == 1 ? "Clear File" : "Clear Selected Files"),
-                                  explanation: "The named contents on your Neo will be cleared. This cannot be undone.")
+                                  explanation: files.count == 1 ? "This will erase all text in the file, leaving it empty.  You can’t undo this." : "This will erase all text in these files, leaving them empty.  You can’t undo this.")
         }
     }
 
