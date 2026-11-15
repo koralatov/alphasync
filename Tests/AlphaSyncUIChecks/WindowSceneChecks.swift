@@ -150,13 +150,12 @@ private final class WindowSceneDriver: ObservableObject {
             try InterfaceChecks.require(window.toolbar != nil && !(window.toolbar?.items.isEmpty ?? true),
                                         "The real SwiftUI scene did not install the app toolbar")
             let initial = try await InterfaceChecks.checkBrowser(in: window, stage: "connected-" + label)
-            try capture(window, "files-" + label)
             store.connectionIssue = "A second Neo could not be opened. Close other Neo software and choose Try Again."
             await InterfaceChecks.yieldLayout()
-            try capture(window, "connection-warning-" + label)
             let warned = try await InterfaceChecks.checkBrowser(in: window, stage: "connection-warning-" + label)
             try InterfaceChecks.require(warned.maxY < initial.maxY - 12,
                                         "The warning overlaps the first file: before \(initial), after \(warned)")
+            try capture(window, "connection-warning-" + label)
             await resize(window, width: 760, height: 460)
             try await InterfaceChecks.checkBrowser(in: window, stage: "minimum-warning-" + label)
             try capture(window, "files-minimum-" + label)
@@ -164,7 +163,9 @@ private final class WindowSceneDriver: ObservableObject {
             try await InterfaceChecks.checkBrowser(in: window, stage: "expanded-warning-" + label)
             store.connectionIssue = nil
             await InterfaceChecks.yieldLayout()
+            await resize(window, width: 820, height: 560)
             try await InterfaceChecks.checkBrowser(in: window, stage: "warning-cleared-" + label)
+            try capture(window, "files-" + label)
             let manyFiles = try InterfaceChecks.sample(fileCount: 64)
             store.devices = [manyFiles]; store.reconcileSelection()
             await resize(window, width: 760, height: 460)

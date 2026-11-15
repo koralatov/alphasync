@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import QuartzCore
 import ServiceManagement
 @testable import AlphaSyncUI
 import AlphaSyncCore
@@ -114,6 +115,30 @@ struct InterfaceChecks {
         checkpoint("Capturing " + name)
         guard let content = window.contentView else { throw CheckFailure(description: "Missing content view") }
         let view = includingTitlebar ? content.superview ?? content : content
+        if includingTitlebar {
+            // Read the displayed layer tree without making SwiftUI enter AppKit’s print/cache layout.
+            window.displayIfNeeded()
+            guard let layer = view.layer else { throw CheckFailure(description: "The window has no backing layer") }
+            let scale = window.backingScaleFactor
+            let width = Int(ceil(view.bounds.width * scale)), height = Int(ceil(view.bounds.height * scale))
+            guard let canvas = CGContext(data: nil, width: width, height: height, bitsPerComponent: 8,
+                bytesPerRow: 0, space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else {
+                throw CheckFailure(description: "Cannot create the window capture")
+            }
+            canvas.scaleBy(x: scale, y: scale)
+            window.effectiveAppearance.performAsCurrentDrawingAppearance {
+                canvas.setFillColor(NSColor.windowBackgroundColor.cgColor)
+                canvas.fill(view.bounds)
+                layer.render(in: canvas)
+            }
+            guard let image = canvas.makeImage() else { throw CheckFailure(description: "Cannot read the window capture") }
+            let bitmap = NSBitmapImageRep(cgImage: image)
+            guard let bytes = bitmap.representation(using: .png, properties: [:]), let pixels = bitmap.bitmapData else {
+                throw CheckFailure(description: "Cannot encode the window capture")
+            }
+            try bytes.write(to: output.appendingPathComponent(name + ".png"), options: .atomic)
+            return Data(bytes: pixels, count: bitmap.bytesPerRow * bitmap.pixelsHigh)
+        }
         view.layoutSubtreeIfNeeded(); view.displayIfNeeded()
         guard let bitmap = view.bitmapImageRepForCachingDisplay(in: view.bounds) else { throw CheckFailure(description: "Cannot capture \(name)") }
         view.cacheDisplay(in: view.bounds, to: bitmap)

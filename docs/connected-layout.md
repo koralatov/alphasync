@@ -38,6 +38,8 @@ The activated harness reached application launch but still opened no window as a
 
 The bundled harness opened the actual window and reproduced the overflow. Its public view hierarchy showed a 1,163-point native split view inside a 612-point content view, with a 1,024-point table, after warning insertion. Geometry wrappers did not correct the native column’s sizing. Remove those wrappers and keep the table as the detail column’s root; attach both bar insets directly to that table instead of wrapping the column or the navigation container. The real scene, warnings, first-row assertions, and scrolling checks remain mandatory.
 
+Separate layout measurement from snapshot rendering during diagnosis. Check warning insertion before taking any connected-browser snapshots, then capture the displayed layer tree rather than asking the native SwiftUI hierarchy to enter AppKit’s bitmap print/cache layout. This tests whether the diagnostic capture itself changes native sizes. Keep the first-row, heading, warning, and scrolling assertions unchanged, and inspect the resulting window images.
+
 ## Physical checks and 2.1
 
 The intended stable release is **2.1 for Apple Silicon**. Build 159 is a test toward that goal. Retain both current targets during validation; this request does not retire an edition or publish 2.1. After 2.1 is verified and released, suspend feature development and limit planned maintenance to future macOS compatibility.
