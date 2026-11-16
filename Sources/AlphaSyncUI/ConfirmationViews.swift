@@ -43,10 +43,10 @@ public struct DestructiveConfirmation: View {
     public var body: some View {
         VStack(alignment: .leading, spacing: 18) {
             Label(title, systemImage: "exclamationmark.triangle").font(.headline)
-            Text(explanation).fixedSize(horizontal: false, vertical: true)
+            Text(explanation).textSelection(.enabled).fixedSize(horizontal: false, vertical: true)
             if names.count > 1 {
                 ScrollView {
-                    Text(names.joined(separator: ", ")).foregroundStyle(.secondary)
+                    Text(names.joined(separator: "\n")).textSelection(.enabled).foregroundStyle(.secondary)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }.frame(maxHeight: 140)
             }

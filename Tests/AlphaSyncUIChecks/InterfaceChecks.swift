@@ -283,7 +283,7 @@ struct InterfaceChecks {
                 inspector.close()
             }
             store.sidebar = .device(snapshot.connection)
-            for action in ["Clear File", "Replace", "Dictionary import"] {
+            for action in ["Clear File", "Clear Selected Files", "Replace", "Dictionary import"] {
                 var cancelled = 0, destructive = 0
                 let prompt: AnyView
                 if action == "Dictionary import" {
@@ -294,12 +294,24 @@ struct InterfaceChecks {
                     prompt = AnyView(DictionaryImportConfirmation(request: request,
                         cancel: { cancelled += 1 }, confirm: { destructive += 1 }))
                 } else {
-                    prompt = AnyView(DestructiveConfirmation(title: action == "Replace" ? "Replace ‘File 1’ on your Neo?" : "Clear ‘File 1’ on your Neo?", action: action,
-                        explanation: action == "Replace" ? "This will replace the text in the file with text from ‘New note.txt’.  You can’t undo this." : "This will erase all text in the file, leaving it empty.  You can’t undo this.",
-                        names: ["File 1"], saveRecovery: true,
+                    let multiple = action == "Clear Selected Files"
+                    let names = multiple ? ["File 1", "Second, note", "Third file"] : ["File 1"]
+                    let title: String, explanation: String
+                    if multiple {
+                        title = "Clear 3 files on your Neo?"
+                        explanation = "This will erase all text in these 3 files, leaving them empty.  You can’t undo this."
+                    } else if action == "Replace" {
+                        title = "Replace ‘File 1’ on your Neo?"
+                        explanation = "This will replace the text in the file with text from ‘New note.txt’.  You can’t undo this."
+                    } else {
+                        title = "Clear ‘File 1’ on your Neo?"
+                        explanation = "This will erase all text in the file, leaving it empty.  You can’t undo this."
+                    }
+                    prompt = AnyView(DestructiveConfirmation(title: title, action: action,
+                        explanation: explanation, names: names, saveRecovery: true,
                         cancel: { cancelled += 1 }, confirm: { _ in destructive += 1 }))
                 }
-                let warning = window(prompt, size: NSSize(width: 430, height: 240), title: action)
+                let warning = window(prompt, size: NSSize(width: 430, height: action == "Clear Selected Files" ? 340 : 240), title: action)
                 try require(warning.defaultButtonCell == nil, "\(action) must not have a default button")
                 try capture(warning, action.lowercased().replacingOccurrences(of: " ", with: "-") + "-" + label, to: output)
                 try key("\r", code: 36, in: warning)
@@ -351,7 +363,7 @@ struct InterfaceChecks {
             try require(privateClipboard.setString(view.string, forType: .string) && privateClipboard.string(forType: .string) == text, "Clipboard text differs from the full preview")
             try capture(reader, "reader-" + label, to: output); reader.close()
         }
-        try require(confirmations.count == 6, "Missing native confirmation checks")
+        try require(confirmations.count == 8, "Missing native confirmation checks")
         try JSONSerialization.data(withJSONObject: confirmations, options: [.prettyPrinted, .sortedKeys])
             .write(to: output.appendingPathComponent("confirmation-checks.json"), options: .atomic)
         try PerformanceChecks.run(to: output)
