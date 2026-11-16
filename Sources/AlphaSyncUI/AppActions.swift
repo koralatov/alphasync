@@ -25,10 +25,9 @@ public enum AppActions {
             }
         }
     }
-    public static func find(_ action: NSFindPanelAction, target: NSTextView? = nil) {
+    public static func find(_ action: NSFindPanelAction, target: NSTextView) {
         let sender = NSMenuItem(title: "Find", action: nil, keyEquivalent: "")
         sender.tag = Int(action.rawValue)
-        if let target { target.performFindPanelAction(sender) }
-        else { NSApp.sendAction(#selector(NSTextView.performFindPanelAction(_:)), to: nil, from: sender) }
+        target.performFindPanelAction(sender)
     }
 }
