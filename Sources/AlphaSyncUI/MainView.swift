@@ -131,6 +131,7 @@ public struct MainView: View {
             }.width(min: 200, ideal: 360)
             TableColumn("Size") { file in
                 Text(FileSize.compact(file.size)).monospacedDigit().frame(maxWidth: .infinity, alignment: .trailing)
+                    .accessibilityLabel(FileSize.exact(file.size)).help(FileSize.exact(file.size))
             }.width(min: 90, ideal: 110, max: 160)
         }
         // The scroll view can shrink below its ideal size when a warning reserves space.
@@ -176,14 +177,21 @@ public struct MainView: View {
                 } icon: {
                     Image(systemName: "circle.fill").foregroundStyle(.green)
                 }
-                .accessibilityElement(children: .ignore).accessibilityLabel("Neo connected")
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(store.devices.count == 1 ? "Neo connected" : "\(store.devices.count.formatted()) Neos connected")
                 .accessibilityIdentifier("neo-connection-status")
                 if store.isPerformingOperation {
                     OperationProgress(label: store.operationLabel, value: store.progress)
-                    if let stop = store.stopRequest { Button("Stop") { stop.stop() }.keyboardShortcut(.cancelAction) }
+                    if let stop = store.stopRequest {
+                        Button("Stop") { stop.stop() }.keyboardShortcut(.cancelAction)
+                            .accessibilityLabel("Stop backup").help("Stop the backup after the current USB request finishes")
+                    }
                 }
                 Spacer()
-                if let memory = store.chosenDevice?.availableRAM { Text("\(FileSize.compact(memory)) available").foregroundStyle(.secondary) }
+                if let memory = store.chosenDevice?.availableRAM {
+                    Text("\(FileSize.compact(memory)) available").foregroundStyle(.secondary)
+                        .accessibilityLabel("Available memory: \(FileSize.exact(memory))").help(FileSize.exact(memory))
+                }
             }.font(.callout).padding(.horizontal, 12).padding(.vertical, 7)
         }.background(.bar)
     }
@@ -203,7 +211,7 @@ struct OperationProgress: View {
             if let value {
                 ProgressView(value: value).frame(width: 90).accessibilityLabel(label)
             }
-        }
+        }.help(label)
     }
 }
 

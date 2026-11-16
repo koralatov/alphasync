@@ -58,6 +58,8 @@ public struct SettingsView: View {
                     HStack {
                         Text(preferences.backupFolder.path).lineLimit(2).textSelection(.enabled).help(preferences.backupFolder.path)
                         Button("Choose…") { choosingFolder = true }
+                            .accessibilityLabel("Choose backup folder")
+                            .help("Choose where backups and recovery copies are saved")
                     }
                 }
                 if let issue = preferences.backupLocationIssue { Text(issue).font(.callout).foregroundStyle(.secondary).textSelection(.enabled) }
