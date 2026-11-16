@@ -110,9 +110,11 @@ final class AppStoreTests: XCTestCase {
     func testClearRejectsReadOnlyAppletAndFileSelections() async throws {
         let observations = SimulatedObservations()
         let store = makeStore(SimulatedConfiguration(appletID: 0xa001), observations: observations)
+        store.preferences.filter = .allApplets
         await store.refresh()
         XCTAssertFalse(store.canClear)
         store.selection = [try XCTUnwrap(store.files.first?.id)]
+        XCTAssertEqual(store.selectedFiles.count, 1)
         XCTAssertFalse(store.canClear)
         await store.requestClear()
         XCTAssertNil(store.pendingChange)
@@ -357,7 +359,8 @@ final class AppStoreTests: XCTestCase {
         let selected = store.files[0]
         store.selection = [selected.id]
         let previous = try XCTUnwrap(store.inspectorPreviewID)
-        await store.rename(store.files[1].id, to: "\n")
+        let missing = NeoFileID(connection: selected.id.connection, applet: selected.id.applet, index: 99)
+        await store.rename(missing, to: "Unused")
         let current = try XCTUnwrap(store.inspectorPreviewID)
         XCTAssertEqual(current.file, previous.file)
         XCTAssertNotEqual(current, previous)
