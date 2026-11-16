@@ -56,6 +56,9 @@ extension DeviceService {
             let memory = try engine.availableMemory()
             try access.checkCancellation(stop)
             let attributes = try engine.attributes(applet: file.applet, index: file.index)
+            guard NeoFile(id: file, attributes: attributes, size: attributes.allocation) == node else {
+                throw NeoError.device("The file’s details changed.  Refresh the file list and try again.")
+            }
             try limits.validate(replacement.count, allocation: attributes.allocation, available: memory.ram)
             let original = try engine.readFile(applet: file.applet, index: file.index) { try access.checkCancellation(stop) }
             try access.checkCancellation(stop)
@@ -101,8 +104,10 @@ extension DeviceService {
                 try access.checkCancellation(stop)
                 let engine = try access.engine(for: change.connection)
                 let latest = try access.update(change.connection, checkingCancellation: { try access.checkCancellation(stop) })
-                guard let applet = latest.applets.first(where: { $0.id == change.applet.id }) else { throw NeoError.disconnected }
-                guard change.items.allSatisfy({ item in applet.files.contains(where: { $0.id == item.file.id }) }) else { throw NeoError.disconnected }
+                guard let applet = latest.applets.first(where: { $0.id == change.applet.id }), applet.canWrite else { throw NeoError.disconnected }
+                guard change.items.allSatisfy({ item in applet.files.contains(item.file) }) else {
+                    throw NeoError.device("A file’s details changed after the warning opened.  Review the current files and try again.")
+                }
                 // Recheck every original before saving recovery or beginning a multi-file clear.
                 for item in change.items {
                     guard try engine.readFile(applet: applet.id, index: item.file.id.index, checkingCancellation: {
@@ -156,6 +161,10 @@ extension DeviceService {
             var completed = 0
             do {
                 try access.checkCancellation(stop)
+                let snapshot = try access.snapshot(for: file.connection)
+                guard let applet = snapshot.applets.first(where: { $0.id == file.applet }),
+                      applet.files.contains(where: { $0.id == file }) else { throw NeoError.disconnected }
+                guard applet.canWrite else { throw NeoError.device("This applet’s files cannot be renamed by AlphaSync.") }
                 try access.engine(for: file.connection).rename(applet: file.applet, index: file.index, to: name,
                                                                checkingCancellationBeforeWrite: { try access.checkCancellation(stop) })
                 completed = 1
