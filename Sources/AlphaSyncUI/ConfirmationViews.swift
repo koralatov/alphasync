@@ -12,14 +12,14 @@ struct DictionaryImportConfirmation: View {
         VStack(alignment: .leading, spacing: 18) {
             Label("Some dictionary words cannot be imported", systemImage: "exclamationmark.triangle").font(.headline)
             Text(request.sources.first?.lastPathComponent ?? "Dictionary import").textSelection(.enabled)
-            Text(request.report.explanation).fixedSize(horizontal: false, vertical: true)
-            Text("Continue with only the valid words? Replacing an existing file still requires the usual Replace confirmation.")
+            Text(request.report.explanation).textSelection(.enabled).fixedSize(horizontal: false, vertical: true)
+            Text("Continue with only the valid words?  Replacing an existing file still requires the usual Replace confirmation.")
                 .fixedSize(horizontal: false, vertical: true)
             if request.completedFiles > 0 { Text(request.completedFiles == 1 ? "One file was already added and verified." : "\(request.completedFiles.formatted()) files were already added and verified.").foregroundStyle(.secondary) }
             HStack {
                 Spacer()
+                Button("Cancel", role: .cancel, action: cancel).keyboardShortcut(.cancelAction).focused($cancelFocused)
                 Button("Continue", action: confirm)
-                Button("Cancel", role: .cancel, action: cancel).keyboardShortcut(.defaultAction).focused($cancelFocused)
             }
         }.padding(24).frame(width: 450)
             .defaultFocus($cancelFocused, true).onAppear { cancelFocused = true }
@@ -73,13 +73,28 @@ struct RenameFile: View {
     init(file: NeoFile, cancel: @escaping () -> Void, rename: @escaping (String) -> Void) {
         self.file = file; _name = State(initialValue: file.displayName); self.cancel = cancel; self.rename = rename
     }
-    private var valid: Bool { (try? NeoFileAttributes(name: name)) != nil }
+    private var validationMessage: String? {
+        guard !name.isEmpty else { return "Enter a file name." }
+        do { _ = try NeoFileAttributes(name: name); return nil }
+        catch { return error.localizedDescription }
+    }
+    private var canRename: Bool { name != file.displayName && validationMessage == nil }
+    private var guidance: String {
+        if let validationMessage { return validationMessage }
+        if name == file.displayName { return "Enter a different name to rename this file." }
+        return "Use 1 to 15 supported characters, without control characters."
+    }
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Rename ‘\(file.displayName)’").font(.headline)
             TextField("Name:", text: $name).focused($nameFocused)
-            Text("Use 1 to 15 supported characters, without control characters.").font(.callout).foregroundStyle(.secondary)
-            HStack { Spacer(); Button("Cancel", role: .cancel, action: cancel); Button("Rename") { rename(name) }.keyboardShortcut(.defaultAction).disabled(!valid) }
+                .accessibilityLabel("File name").accessibilityHint(guidance)
+            Text(guidance).font(.callout).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+            HStack {
+                Spacer()
+                Button("Cancel", role: .cancel, action: cancel).keyboardShortcut(.cancelAction)
+                Button("Rename") { rename(name) }.keyboardShortcut(.defaultAction).disabled(!canRename)
+            }
         }.padding(24).frame(width: 400).defaultFocus($nameFocused, true)
     }
 }

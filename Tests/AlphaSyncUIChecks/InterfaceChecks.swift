@@ -238,6 +238,7 @@ struct InterfaceChecks {
         checkpoint("Private preferences ready")
         let store = AppStore(preferences: preferences, monitoringEnabled: false)
         let snapshot = try sample()
+        var confirmations: [[String: Any]] = []
         store.devices = [snapshot]; store.sidebar = .device(snapshot.connection)
         store.selection = [snapshot.applets[0].files[0].id]
         try require(store.canImport && store.importApplet?.id == NeoApplet.alphaWord, "A selected file must retain its applet as an import destination")
@@ -282,12 +283,22 @@ struct InterfaceChecks {
                 inspector.close()
             }
             store.sidebar = .device(snapshot.connection)
-            for action in ["Clear File", "Replace"] {
+            for action in ["Clear File", "Replace", "Dictionary import"] {
                 var cancelled = 0, destructive = 0
-                let prompt = DestructiveConfirmation(title: action == "Replace" ? "Replace ‘File 1’ on your Neo?" : "Clear ‘File 1’ on your Neo?", action: action,
-                    explanation: action == "Replace" ? "This will replace the text in the file with text from ‘New note.txt’.  You can’t undo this." : "This will erase all text in the file, leaving it empty.  You can’t undo this.",
-                    names: ["File 1"], saveRecovery: true,
-                    cancel: { cancelled += 1 }, confirm: { _ in destructive += 1 })
+                let prompt: AnyView
+                if action == "Dictionary import" {
+                    let sourceText = "cats a extraordinarilylongdictionaryword"
+                    let request = DictionaryImportRequest(sources: [URL(fileURLWithPath: "/Fixtures/Dictionary.txt")],
+                        target: ImportTarget(connection: snapshot.connection, applet: NeoApplet.dictionary, file: nil),
+                        sourceText: sourceText, report: try DictionaryCodec.convert(sourceText).report, completedFiles: 0)
+                    prompt = AnyView(DictionaryImportConfirmation(request: request,
+                        cancel: { cancelled += 1 }, confirm: { destructive += 1 }))
+                } else {
+                    prompt = AnyView(DestructiveConfirmation(title: action == "Replace" ? "Replace ‘File 1’ on your Neo?" : "Clear ‘File 1’ on your Neo?", action: action,
+                        explanation: action == "Replace" ? "This will replace the text in the file with text from ‘New note.txt’.  You can’t undo this." : "This will erase all text in the file, leaving it empty.  You can’t undo this.",
+                        names: ["File 1"], saveRecovery: true,
+                        cancel: { cancelled += 1 }, confirm: { _ in destructive += 1 }))
+                }
                 let warning = window(prompt, size: NSSize(width: 430, height: 240), title: action)
                 try require(warning.defaultButtonCell == nil, "\(action) must not have a default button")
                 try capture(warning, action.lowercased().replacingOccurrences(of: " ", with: "-") + "-" + label, to: output)
@@ -300,8 +311,15 @@ struct InterfaceChecks {
                 let beforeEscape = cancelled
                 try key("\u{1b}", code: 53, in: warning)
                 try require(cancelled == beforeEscape + 1 && destructive == 0, "Escape must cancel \(action)")
+                confirmations.append(["appearance": label, "action": action, "defaultButton": false,
+                                      "returnChangedFiles": false, "enterChangedFiles": false,
+                                      "spaceChangedFiles": false, "escapeCancelled": true])
                 warning.close()
             }
+            let rename = window(RenameFile(file: snapshot.applets[0].files[0], cancel: {}, rename: { _ in }),
+                                size: NSSize(width: 400, height: 210), title: "Rename")
+            try capture(rename, "rename-" + label, to: output)
+            rename.close()
             let text = "A read-only preview\n\nAlphaSmart Neo text stays selectable.\n" + String(repeating: "More text for scrolling and Find.\n", count: 80)
             let reader = window(ReadOnlyText(text: text), size: NSSize(width: 660, height: 500), title: "File 1")
             guard let view = reader.contentView.flatMap({ descendants($0).first { $0 is NSTextView } }) as? NSTextView else {
@@ -333,6 +351,9 @@ struct InterfaceChecks {
             try require(privateClipboard.setString(view.string, forType: .string) && privateClipboard.string(forType: .string) == text, "Clipboard text differs from the full preview")
             try capture(reader, "reader-" + label, to: output); reader.close()
         }
+        try require(confirmations.count == 6, "Missing native confirmation checks")
+        try JSONSerialization.data(withJSONObject: confirmations, options: [.prettyPrinted, .sortedKeys])
+            .write(to: output.appendingPathComponent("confirmation-checks.json"), options: .atomic)
         try PerformanceChecks.run(to: output)
         print("Native component checks passed. No USB devices or login registrations were changed.")
     }
