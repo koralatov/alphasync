@@ -92,6 +92,67 @@ final class AppStoreTests: XCTestCase {
         return url
     }
 
+    func testClearAllRequiresANonemptyAppletRatherThanADeviceScope() async throws {
+        for configuration in [SimulatedConfiguration(), SimulatedConfiguration(fileCount: 0)] {
+            let observations = SimulatedObservations()
+            let store = makeStore(configuration, observations: observations)
+            await store.refresh()
+            XCTAssertEqual(store.canClear, configuration.fileCount > 0)
+            store.sidebar = .device(try XCTUnwrap(store.devices.first?.connection))
+            XCTAssertFalse(store.canClear)
+            await store.requestClear()
+            XCTAssertNil(store.pendingChange)
+            XCTAssertEqual(observations.writeCount, 0)
+            await store.shutdown()
+        }
+    }
+
+    func testClearRejectsReadOnlyAppletAndFileSelections() async throws {
+        let observations = SimulatedObservations()
+        let store = makeStore(SimulatedConfiguration(appletID: 0xa001), observations: observations)
+        await store.refresh()
+        XCTAssertFalse(store.canClear)
+        store.selection = [try XCTUnwrap(store.files.first?.id)]
+        XCTAssertFalse(store.canClear)
+        await store.requestClear()
+        XCTAssertNil(store.pendingChange)
+        XCTAssertEqual(observations.writeCount, 0)
+        await store.shutdown()
+    }
+
+    func testClearRejectsMissingOrReconnectedSelectedIDs() async throws {
+        let observations = SimulatedObservations()
+        let store = makeStore(observations: observations)
+        await store.refresh()
+        let file = try XCTUnwrap(store.files.first?.id)
+        let missing = NeoFileID(connection: file.connection, applet: file.applet, index: 99)
+        store.selection = [file, missing]
+        XCTAssertFalse(store.canClear)
+        await store.requestClear()
+        let previousConnection = NeoFileID(connection: UUID(), applet: file.applet, index: file.index)
+        store.selection = [previousConnection]
+        XCTAssertFalse(store.canClear)
+        await store.requestClear()
+        XCTAssertNil(store.pendingChange)
+        XCTAssertEqual(observations.writeCount, 0)
+        await store.shutdown()
+    }
+
+    func testClearStaysUnavailableDuringAConfirmationAndShutdown() async throws {
+        let observations = SimulatedObservations()
+        let store = makeStore(observations: observations)
+        await store.refresh()
+        XCTAssertTrue(store.canClear)
+        await store.requestClear()
+        XCTAssertNotNil(store.pendingChange)
+        XCTAssertFalse(store.canClear)
+        XCTAssertFalse(store.isPerformingOperation)
+        await store.shutdown()
+        store.pendingChange = nil
+        XCTAssertFalse(store.canClear)
+        XCTAssertEqual(observations.writeCount, 0)
+    }
+
     func testClearRejectsAMixedWritableAppletSelectionWithoutAConfirmationOrWrite() async throws {
         let observations = SimulatedObservations()
         let store = makeStore(observations: observations)

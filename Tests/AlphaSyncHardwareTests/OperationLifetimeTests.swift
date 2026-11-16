@@ -33,6 +33,8 @@ final class OperationLifetimeTests: XCTestCase {
         await store.refresh()
         let preparing = Task { await store.requestClear() }
         try await eventually { gate.entered.isRequested }
+        XCTAssertTrue(store.isPerformingOperation)
+        XCTAssertFalse(store.canClear)
         let quitting = Task { await store.shutdown() }
         try await eventually { store.shuttingDown }
         gate.release()
