@@ -1,0 +1,266 @@
+{
+  "version": "2.0.5",
+  "build": "165",
+  "status": "verified-private-test-build",
+  "sourceCommit": "51f7cd2282b4415b58beaa7cbe3e2d0f5e16f570",
+  "sourceTree": "d5a513af7b87839af7b4fee9eb07080bd4fa8d10",
+  "runID": 43844201560,
+  "runURL": "https://github.com/koralatov/alphasync/actions/runs/43844201560",
+  "runConclusion": "success",
+  "runAttempt": 2,
+  "changes": [
+    "Confirmations reject changed file details before saving recovery or beginning a write, including changes in a later target of a multi-file clear",
+    "Replacement preparation rejects stale details; renaming rejects absent files and read-only applets before calling the device operation",
+    "Reader removal detaches only that exact text view; late cleanup cannot remove its replacement, and native Find works after reloading",
+    "Dictionary omission consent has Cancel first, initial Cancel focus, Escape, no default button, selectable explanation text, and correct singular wording",
+    "Rename explains empty, invalid, and unchanged-name states with visible guidance and an accessibility hint",
+    "Exact accessible byte amounts, contextual backup chooser and Stop labels, plural connection status, and full-operation tooltips"
+  ],
+  "regressionCoverage": {
+    "previousSwiftTests": 190,
+    "newTargetProtectionTests": 4,
+    "totalSwiftTests": 194
+  },
+  "focusedCommits": "commits.json",
+  "hosts": [
+    {
+      "host": "arm",
+      "architecture": "arm64",
+      "xcode": "16.4",
+      "macOS": "15.8.2",
+      "jobID": 133220143707,
+      "conclusion": "success",
+      "swiftRegressions": 194,
+      "fixtures": 55,
+      "browserObservations": 32,
+      "sidebarRecords": 12,
+      "toolbarRecords": 6,
+      "findRecords": 12,
+      "confirmationRecords": 6,
+      "capturedImages": 60,
+      "swiftCompilerWarnings": 0,
+      "buildToolNotices": 6,
+      "builtEditions": [
+        "universal",
+        "apple-silicon"
+      ]
+    },
+    {
+      "host": "intel",
+      "architecture": "x86_64",
+      "xcode": "26.6",
+      "macOS": "26.6.1",
+      "jobID": 133220143140,
+      "conclusion": "success",
+      "swiftRegressions": 194,
+      "fixtures": 55,
+      "browserObservations": 32,
+      "sidebarRecords": 12,
+      "toolbarRecords": 6,
+      "findRecords": 12,
+      "confirmationRecords": 6,
+      "capturedImages": 60,
+      "swiftCompilerWarnings": 0,
+      "buildToolNotices": 6,
+      "builtEditions": [
+        "universal",
+        "apple-silicon"
+      ]
+    }
+  ],
+  "preserved": {
+    "baseline": "9621257bb340493c51e7397ac4464c6669cb0a64",
+    "exactPaths": [
+      "Sources/AlphaSyncHardware/USBHostTransport.swift",
+      "Sources/AlphaSyncHardware/USBNotifications.swift",
+      "Sources/AlphaSyncHardware/USBTransferBuffers.swift",
+      "Sources/AlphaSyncHardware/USBDiscovery.swift",
+      "Sources/AlphaSyncHardware/USBModeSwitchConnection.swift",
+      "Sources/AlphaSyncHardware/NeoModeSwitch.swift",
+      "Sources/AlphaSyncCore/NeoProtocol.swift",
+      "Sources/AlphaSyncCore/AlphaWordCodec.swift",
+      "Sources/AlphaSyncCore/AtomicFileStore.swift",
+      "Sources/AlphaSyncUI/DeviceBrowser.swift",
+      "Sources/AlphaSyncUI/SelectionSymbols.swift"
+    ],
+    "dictionaryConversionAndPayloadImplementation": "Exact source matches the baseline from DictionaryConversion onwards; only the preceding report wording changed.",
+    "behaviour": "USB setup, successful protocol command sequences, packet fields, timeouts, codecs, atomic export, recovery retention, committed-write completion, permanent sidebar, and file-only Inspector Preview are preserved."
+  },
+  "nativeChecks": {
+    "find": "Browser, loaded Reader, unloaded Reader, reloaded Reader, late old-view cleanup, and closed Reader checked in both appearances.  Actual menu commands open the native Find bar with another field focused before and after reloading.",
+    "confirmations": "Clear, Replace, and dictionary consent have no default button.  Return, keypad Enter, and Space never consent; Escape cancels in both appearances.  Button order and rename guidance are reviewed visually.",
+    "accessibility": "Native labels and hints are used.  Actual VoiceOver speech, focus, and editing remain manual.",
+    "deadline": "The combined failing 120-second interface deadline is retained."
+  },
+  "initialCandidate": {
+    "source": "985b12350f50cf9791c25c627f2a214eeda3c21b",
+    "runID": 43842283473,
+    "result": "All Intel stages passed: 194 Swift tests, 55 fixtures, native interfaces, and both editions.  Reviewing its 60 images caught the existing singular/plural report error.  The Apple Silicon job had not started.  This candidate was superseded; only the final source receives a full verification result."
+  },
+  "canonicalDownloadAttempts": [
+    {
+      "runAttempt": 1,
+      "jobID": 133227386010,
+      "conclusion": "cancelled",
+      "stepsExecuted": 0,
+      "result": "No native execution took place.  Both successful host builds and their reviewed captures were retained.  Only the unstarted native download job was retried."
+    },
+    {
+      "runAttempt": 2,
+      "jobID": 133238068956,
+      "conclusion": "success",
+      "result": "Both exact canonical app editions passed native Apple Silicon execution and package verification."
+    }
+  ],
+  "simplificationReview": {
+    "source": "51f7cd2282b4415b58beaa7cbe3e2d0f5e16f570",
+    "report": "../../../docs/simplification-review-165.md",
+    "scope": "All 49 modern production Swift source files, their ownership and state boundaries, and relevant native checks and regressions.  Frozen legacy code is excluded.",
+    "productionSourceChangedByReview": false,
+    "outcome": "One useful small Clear eligibility cleanup, an optional Find API narrowing requiring an API decision, and a snapshot helper deferred because its invalidation differences remain clearer at the call sites.  No further correctness fix was identified that requires changing this tested build."
+  },
+  "verification": {
+    "allAutomatedChecksPassed": true,
+    "artifactDigests": 4,
+    "assetHashes": 12,
+    "help": [
+      {
+        "edition": "universal",
+        "version": "2.0.5",
+        "build": "165",
+        "authoredHelpFilesMatched": 20,
+        "searchIndexes": 1,
+        "help": "passed"
+      },
+      {
+        "edition": "apple-silicon",
+        "version": "2.0.5",
+        "build": "165",
+        "authoredHelpFilesMatched": 20,
+        "searchIndexes": 1,
+        "help": "passed"
+      }
+    ],
+    "offlineHelpPages": 18,
+    "offlineHelpLinks": 83,
+    "signatures": "ad hoc; hardened runtime, helper identities, and matching crash symbols verified",
+    "minimumDeployment": "13.0",
+    "nativeCanonicalDownloadsJob": 133238068956,
+    "nativeCanonicalDownloads": "Both exact canonical editions executed on Apple Silicon.",
+    "capturedImagesReviewed": 120,
+    "swiftCompilerWarnings": 0,
+    "publication": "not requested; skipped; no release or tag created",
+    "protectedReferences": {
+      "passed": true,
+      "publicTags": [
+        "v1.5.1",
+        "v2.0.4"
+      ],
+      "publicReleaseNotesAndAssetsUnchanged": true,
+      "retainedAssets": 18,
+      "versionTagsUnchanged": 12,
+      "frozenLegacyUnchanged": true,
+      "latest": "v2.0.4",
+      "ignoredVolatileFields": [
+        "download_count"
+      ],
+      "metadataFiles": {
+        "protected-before.json": "f35afd982d4e92a8d713ac0e95cc72383240123595c3fe0955cfd6252e1715af",
+        "protected-after.json": "f35afd982d4e92a8d713ac0e95cc72383240123595c3fe0955cfd6252e1715af"
+      }
+    }
+  },
+  "artifacts": [
+    {
+      "id": 14217127650,
+      "name": "AlphaSync-arm64-package-verification-51f7cd2282b4415b58beaa7cbe3e2d0f5e16f570",
+      "size": 1260,
+      "digest": "sha256:7b7d009fae8a1fc2646e4fb9bfbc40e8ca3f813d54c59ecbb09cca1a5e29cd32",
+      "downloadedDigest": "matched",
+      "url": "https://github.com/koralatov/alphasync/actions/runs/43844201560/artifacts/14217127650"
+    },
+    {
+      "id": 14214832423,
+      "name": "AlphaSync-interface-and-logs-macos-26-intel-51f7cd2282b4415b58beaa7cbe3e2d0f5e16f570",
+      "size": 1755055,
+      "digest": "sha256:03f6d41ce90aa870a96074d1e0184ab27fdd39b75dcf951c06dc77ad06246aa2",
+      "downloadedDigest": "matched",
+      "url": "https://github.com/koralatov/alphasync/actions/runs/43844201560/artifacts/14214832423"
+    },
+    {
+      "id": 14214689479,
+      "name": "AlphaSync-interface-and-logs-macos-15-51f7cd2282b4415b58beaa7cbe3e2d0f5e16f570",
+      "size": 1716756,
+      "digest": "sha256:6c6d6a0184e4a57fae94de1cda3fd309f33628fe23aacefe7db0a7f6e15e3f24",
+      "downloadedDigest": "matched",
+      "url": "https://github.com/koralatov/alphasync/actions/runs/43844201560/artifacts/14214689479"
+    },
+    {
+      "id": 14214049413,
+      "name": "AlphaSync-packages-51f7cd2282b4415b58beaa7cbe3e2d0f5e16f570",
+      "size": 21272987,
+      "digest": "sha256:23fc4fec3f4f1a8a7353f9185eb1e7f486e929b82f8cc7b910590eb30a2258a8",
+      "downloadedDigest": "matched",
+      "url": "https://github.com/koralatov/alphasync/actions/runs/43844201560/artifacts/14214049413"
+    }
+  ],
+  "privateTestZIP": {
+    "filename": "AlphaSync-2.0.5-165-macOS-13-apple-silicon.zip",
+    "size": 2954928,
+    "sha256": "e9d3d7e3041f7b5a3ff9ba4c7f2b74866c5d796b500014f92329baa6949ab2d6",
+    "availability": "separate private test copy; earlier candidates retained"
+  },
+  "unverified": [
+    "Physical M2 Air transfers, target-change and Quit boundaries, recovery, and readback",
+    "Actual VoiceOver speech, keyboard focus and editing, context menus, and regional settings",
+    "Final system-composited appearance, macOS 13 runtime, actual Login Items approval, and native Help Viewer"
+  ],
+  "stableGoal": "Review the user’s physical results before deciding whether to prepare and publish stable 2.1.",
+  "checkedAt": "2026-11-16T10:38:50.140465+00:00",
+  "files": {
+    "assets.json": {
+      "size": 2043,
+      "sha256": "531cefa269dd46ebb573423eea2398891b9de89c9ed61a3a9a1bf765e35260f7"
+    },
+    "commits.json": {
+      "size": 1493,
+      "sha256": "c95ccd939e452a747712f967d4f4389943307fec99973705ff3f27458ca7addb"
+    },
+    "confirmation-checks.json": {
+      "size": 2865,
+      "sha256": "32bc0083020f03749609b04520fe073750b0d76377b99c05658b67cddc32f078"
+    },
+    "find-command-checks.json": {
+      "size": 5375,
+      "sha256": "45c436c7b14c097f5a07b276aeca018462d43b1a4121b440638123d1234f6547"
+    },
+    "formatting-performance.json": {
+      "size": 1703,
+      "sha256": "a460a56b1a76c3e555ab35ba2cd47c9469441b272030379f4eb7f0f16a4a1b18"
+    },
+    "interface-layouts.json": {
+      "size": 43303,
+      "sha256": "46948731265d16fbbc1be31b95b542fe106f375e9595d25720cd50abae3287dc"
+    },
+    "interface-review.json": {
+      "size": 33077,
+      "sha256": "d23aa74f25b104c4a38e6e831bab3a245bcf45328959e2112f3ed0cdd237f18f"
+    },
+    "performance.json": {
+      "size": 683,
+      "sha256": "e731b092a27ee529a1bede1bdec1b1ea4edc2eb06b58df15995e23d56fee09f5"
+    },
+    "protected-comparison.json": {
+      "size": 501,
+      "sha256": "aa3ef03011b1f34c3cb203568f2a28835a2b8bf791f9e26c051a9b45bd532b8c"
+    },
+    "sidebar-checks.json": {
+      "size": 2955,
+      "sha256": "5876183c1c89018494535d77fd5d70b63fde1d2de93078b95f919fa5e4e25cee"
+    },
+    "toolbar-checks.json": {
+      "size": 3449,
+      "sha256": "12984ab8f366a4cd11b1e4c2d7e30a5209a3d5393adb1a0b06a0f91d0a0c18dd"
+    }
+  }
+}

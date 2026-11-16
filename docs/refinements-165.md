@@ -36,6 +36,16 @@ Keep the combined failing 120-second interface deadline.  Capture fifteen compon
 
 Record final evidence under `releases/verification/2.0.5-165` and save a separate private Apple Silicon test ZIP.  Preserve public 1.5.1 and 2.0.4, their notes and assets, all twelve version tags, and frozen source.  The final system-composited appearance, actual VoiceOver, physical Neo operations, Login Items approval, native Help Viewer, and macOS 13 remain explicit manual checks before deciding on stable 2.1.
 
+## Verified result
+
+Final source `51f7cd2282b4415b58beaa7cbe3e2d0f5e16f570` passed [run 43844201560](https://github.com/koralatov/alphasync/actions/runs/43844201560) on 16 November 2026.  Both pinned hosts passed all 194 Swift regressions, 55 fixtures, native component and window checks, exact size formatting, and both app and helper builds without Swift compiler warnings.  Each host recorded thirty-two browser observations, twelve sidebar records, six toolbar records, twelve Find observations, six confirmation records, and sixty captures.  All 120 final-source captures were reviewed.
+
+The first native download job was cancelled after waiting for a runner and executed no steps.  Only that job was retried; the successful builds and reviewed captures were retained.  The retry passed native execution of both exact canonical apps on Apple Silicon.  All four artifact digests, twelve asset hashes, matching symbols, both Help books, and packaged metadata passed independent checks.  The [permanent record](../releases/verification/2.0.5-165/verification.json) distinguishes the initial candidate, the unstarted native attempt, and the final successful result.
+
+The separate private Apple Silicon test ZIP is saved and ready.  Public 1.5.1 and 2.0.4, their eighteen assets and notes, all twelve version tags, and frozen legacy source remain unchanged.  No release was published or retired.  Physical Neo testing comes next before the decision on stable 2.1; the manual and capture limits above remain open.
+
+The subsequent [simplification review](simplification-review-165.md) covers all forty-nine modern production Swift files.  It proposes a clearer Clear eligibility predicate, identifies a conditional Find API cleanup, and keeps snapshot publication explicit because its preview-invalidation rules differ.  The review makes no production change to this tested build and records the safety boundaries that a future cleanup must retain.
+
 ## Apple references
 
 - [Alerts](https://developer.apple.com/design/human-interface-guidelines/alerts)
