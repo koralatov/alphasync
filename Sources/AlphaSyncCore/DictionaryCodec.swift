@@ -7,7 +7,8 @@ public struct DictionaryImportReport: Sendable {
     public let examples: [String]
     public var explanation: String {
         let words = omittedWords == 1 ? "word cannot" : "words cannot"
-        var text = "\(omittedWords.formatted()) \(words) be stored. The Neo accepts dictionary words of 2 to 20 characters. \(acceptedWords.formatted()) distinct valid words remain."
+        let validWords = acceptedWords == 1 ? "distinct valid word remains" : "distinct valid words remain"
+        var text = "\(omittedWords.formatted()) \(words) be stored.  The Neo accepts dictionary words of 2 to 20 characters.  \(acceptedWords.formatted()) \(validWords)."
         if !examples.isEmpty { text += "\n\nExamples: " + examples.map { "‘\($0)’" }.joined(separator: ", ") }
         return text
     }

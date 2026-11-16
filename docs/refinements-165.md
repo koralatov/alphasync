@@ -8,7 +8,7 @@ A confirmation already rechecks the original bytes.  It must also reject a chang
 
 Replacement preparation compares its fresh attributes with the chosen snapshot, avoiding a warning that names stale details.  Renaming rejects an absent file or read-only applet before calling the device operation.  Four service regressions cover renamed replacement targets, later targets in a clear, read-only renaming, and absent rename targets.  Existing successful change, cancellation, recovery, and readback tests remain required.
 
-All USB setup, protocol commands, packet fields, timeouts, successful wire sequences, codecs, atomic export, recovery retention, and committed-write behaviour remain unchanged.  These checks reuse existing inventories and attribute requests.
+All USB setup, protocol commands, packet fields, timeouts, successful wire sequences, file conversion, atomic export, recovery retention, and committed-write behaviour remain unchanged.  These checks reuse existing inventories and attribute requests.  The dictionary source changes only its report wording; its conversion and byte-payload implementation match build 164 exactly.
 
 ## Reader Find lifetime
 
@@ -19,6 +19,8 @@ Extend the real-window check without removing its existing assertions.  In both 
 ## Safe, clear forms
 
 Dictionary omission consent puts Cancel before Continue, gives Cancel initial focus and Escape, and gives neither button a default action.  Return, keypad Enter, and Space must never provide consent.  The omission explanation is selectable.  Keep the subsequent Replace confirmation and exact source-text consent checks.
+
+Initial source `985b12350f50cf9791c25c627f2a214eeda3c21b` passed every Intel check in [run 43842283473](https://github.com/koralatov/alphasync/actions/runs/43842283473), including 194 tests, 55 fixtures, native interfaces, and both editions.  Its 60-image visual review caught the existing plural wording when exactly one valid dictionary word remains.  Correct that report copy and run the final source through both hosts and all download gates.  The Apple Silicon job had not started; this initial source is not a fully verified private test build.
 
 Rename uses the existing core validation rules and gives visible guidance and a matching accessibility hint.  Empty or invalid names and an unchanged name cannot enable Rename.  Escape cancels; valid renames retain their standard default action.  Capture the initial guidance in both appearances.  Physical typing, editing, focus, and actual VoiceOver speech remain manual.
 
