@@ -1,7 +1,7 @@
 {
   "version": "2.0.5",
   "build": "166",
-  "status": "pending-full-verification",
+  "status": "hosted-checks-passed-independent-review-and-saving-blocked",
   "sourceCommit": "42f643094e74ba0e4ac6a239dc7085c689c23996",
   "implementationCommit": "bd5b31d1be35bbf9ac2916ff3b4d766c8d8e7493",
   "initialCandidate": {
@@ -34,7 +34,7 @@
     "assetHashes": 12
   },
   "verification": {
-    "allAutomatedChecksPassed": false,
+    "allAutomatedChecksPassed": true,
     "independentPackageInspectionComplete": false,
     "capturedImageReviewComplete": false,
     "protectedReferencesCompared": true,
@@ -48,19 +48,19 @@
     "sent": false
   },
   "pending": [
-    "Native execution of both exact canonical downloaded apps on Apple Silicon is queued.",
-    "Independent artifact, asset, Help, symbol, and source checks remain required.",
+    "Independent download and digest verification of all four artifacts and twelve assets remain required.",
+    "Both Help books and packaged metadata need independent inspection against the tested source.",
     "All 124 new captures require visual review.",
-    "The separate test ZIP must be saved before one completion email."
+    "Save the separate Apple Silicon test ZIP after those checks, then send one completion email."
   ],
-  "environment": "The coding workspace is unavailable at this checkpoint.  Connected GitHub edits and hosted checks are possible; local artifact inspection, visual review, and saving are not complete.",
+  "environment": "The executor is explicitly unavailable.  Hosted GitHub checks and protected-reference comparison are complete; local artifact inspection, visual review, and saving are blocked.",
   "stableGoal": "Physical Neo testing comes next before deciding on stable 2.1.",
   "plan": "../../../docs/maintenance-166.md",
   "sourceTree": "2a5e6f385a3502aa5cb1b63bb5a5b112a85083d6",
   "runID": 43975990868,
   "runURL": "https://github.com/koralatov/alphasync/actions/runs/43975990868",
-  "runAttempt": 1,
-  "runConclusion": null,
+  "runAttempt": 2,
+  "runConclusion": "success",
   "focusedCommits": "commits.json",
   "hosts": [
     {
@@ -99,9 +99,17 @@
     }
   ],
   "canonicalDownloads": {
-    "jobID": 133683042128,
-    "status": "queued",
-    "conclusion": null
+    "jobID": 133703857905,
+    "status": "completed",
+    "conclusion": "success",
+    "executedCanonicalEditions": [
+      "universal",
+      "apple-silicon"
+    ],
+    "minimumDeployment": "13.0",
+    "offlineHelpPages": 18,
+    "offlineHelpLinks": 83,
+    "matchingSymbols": "verified by the hosted native checker"
   },
   "sourceReview": {
     "baseline": "51f7cd2282b4415b58beaa7cbe3e2d0f5e16f570",
@@ -124,9 +132,17 @@
     "retainedAssets": 18,
     "versionTags": 12,
     "frozenLegacy": "6cb821c9ab8073ff950414952bf2480eb4638c5d",
-    "latest": "v2.0.4"
+    "latest": "v2.0.4",
+    "checkedAt": "2026-11-16T23:53:48.269Z"
   },
   "artifacts": [
+    {
+      "id": 14284071341,
+      "name": "AlphaSync-arm64-package-verification-42f643094e74ba0e4ac6a239dc7085c689c23996",
+      "size": 1263,
+      "reportedDigest": "sha256:e71c755070e7cab1c0905f0f65e6da9b4940daebb3189fb4f00b353b3a754305",
+      "downloadedDigestVerified": false
+    },
     {
       "id": 14281271314,
       "name": "AlphaSync-interface-and-logs-macos-15-42f643094e74ba0e4ac6a239dc7085c689c23996",
@@ -149,5 +165,32 @@
       "downloadedDigestVerified": false
     }
   ],
-  "checkedAt": "2026-11-16T23:12:19.686Z"
+  "checkedAt": "2026-11-16T23:54:52.474Z",
+  "canonicalDownloadAttempts": [
+    {
+      "runAttempt": 1,
+      "jobID": 133683042128,
+      "conclusion": "cancelled",
+      "stepsExecuted": 0,
+      "result": "No native execution took place.  Both successful host builds and their artifacts were retained."
+    },
+    {
+      "runAttempt": 2,
+      "jobID": 133703857905,
+      "conclusion": "success",
+      "result": "The native-only retry verified and executed both exact canonical packages on Apple Silicon."
+    }
+  ],
+  "publication": {
+    "conclusion": "skipped",
+    "jobID": 133703984185,
+    "releasePublished": false,
+    "releaseRetired": false
+  },
+  "blocker": {
+    "kind": "executor-unavailable",
+    "missingCapability": "An available coding workspace with filesystem and execution access is required for artifact extraction, independent hashing, image review, and saving the separate ZIP.",
+    "notification": "No build-ready email or ready notification has been sent.",
+    "continuation": "Paused because the remaining work cannot be completed without a coding workspace.  Resume from the exact tested source and retained artifacts when one is available."
+  }
 }
