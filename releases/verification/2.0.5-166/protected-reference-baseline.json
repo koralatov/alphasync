@@ -1,0 +1,287 @@
+{
+  "source": "0dc28e982250f14014552b675c4f44b62b510064",
+  "releases": [
+    {
+      "id": 440948367,
+      "tag_name": "v2.0.4",
+      "name": "AlphaSync 2.0.4",
+      "body": "# AlphaSync 2.0.4\r\n\r\nAlphaSync is a free Mac app for reading, copying, and backing up files from an **AlphaSmart Neo** writing device. Connect your Neo with a USB cable to read your writing, save it on your Mac, or send text back to the Neo.\r\n\r\n**Version 2.0.4, build 154, requires macOS 13 Ventura or later.** For macOS 11 Big Sur or macOS 12 Monterey, use [AlphaSync 1.5.1](https://github.com/koralatov/alphasync/releases/tag/v1.5.1). Both versions support Intel and Apple Silicon Macs on their supported systems.\r\n\r\nAlphaSync was originally written by tSoniq. Version 2.0 was the first public release of the Swift rewrite. Version 2.0.4 brings a complete review and rewrite of the built-in Help.\r\n\r\n## What it does\r\n\r\n- **Read your files.** Open separate, read-only windows, find text, and copy it to the clipboard.\r\n- **Copy text in either direction.** Save files to your Mac, add text to the Neo, or replace a file after confirmation.\r\n- **Organise files.** Rename supported files and inspect file, applet, and Neo information.\r\n- **Protect your writing.** Make dated backups and keep recovery copies before replacing or clearing files.\r\n- **Open automatically.** Enable automatic opening in Settings and approve the helper if macOS asks.\r\n\r\n## What is new in 2.0.4\r\n\r\n**The Help starts with your task.** Its home page leads to clear steps for connecting a Neo, reading, copying, importing, renaming, backing up, clearing, changing settings, and solving problems. Choose **Help → AlphaSync Help** or press **⌘?**. The guide works offline.\r\n\r\n**Recovery has its own guide.** It explains where saved originals are kept and how to put their text back onto the correct Neo file. It also explains retention, Trash, and the difference between readable text and original Neo data.\r\n\r\n**The scope of each action is clearer.** Backup includes the chosen file types from every connected Neo. Save to Mac with nothing selected copies the current list. Clear All Files applies to the selected applet. Each procedure explains its own selection and confirmation steps.\r\n\r\n**Problems have practical next steps.** New troubleshooting and support pages cover connection failures, unavailable commands, missing destinations, interrupted copies, failed verification, and what to include in a report.\r\n\r\n**The pages are easier to read.** They use the system font, scalable text, underlined links, clearer headings, and colours that follow Light and Dark appearance. Related topics make it easier to move between tasks.\r\n\r\n**The About window has a safer fallback.** If its app artwork cannot be loaded, it shows a built-in document symbol without waiting for the system’s application-icon service.\r\n\r\nThis release carries forward the transfer and maintenance improvements in [2.0.3](https://github.com/koralatov/alphasync/blob/v2.0.3/releases/2.0.3.md), including more reliable automatic opening, remembered backup destinations, dictionary-import review, and safer stopping and quitting.\r\n\r\n## How to download it\r\n\r\nCheck your macOS version and chip in **Apple menu → About This Mac**, then choose one download:\r\n\r\n| Download | Which Mac? |\r\n| --- | --- |\r\n| [**Universal**](https://github.com/koralatov/alphasync/releases/download/v2.0.4/AlphaSync-2.0.4-154-macOS-13-universal.zip) | Intel or Apple Silicon, running macOS 13 or later. Choose this if you are unsure. |\r\n| [**Apple Silicon**](https://github.com/koralatov/alphasync/releases/download/v2.0.4/AlphaSync-2.0.4-154-macOS-13-apple-silicon.zip) | An M-series Mac running macOS 13 or later. |\r\n\r\nBoth editions offer the same features. Universal uses the original icon; Apple Silicon uses the newer icon. Install one edition. Each app includes its matching automatic-launch helper. The separate **symbols** ZIPs are for developers investigating crashes.\r\n\r\n## How to install it\r\n\r\n1. Double-click the downloaded ZIP file to unpack it.\r\n2. Quit an older copy of AlphaSync if it is running.\r\n3. Drag **AlphaSync** into your **Applications** folder. Replace the older copy if Finder asks.\r\n4. Open **Applications**, then double-click **AlphaSync**.\r\n\r\nThese downloads have ad hoc signatures and are not Apple-notarised. If macOS blocks the first opening, follow [Apple’s instructions for opening a downloaded app](https://support.apple.com/en-gb/102445). The approval is in **System Settings → Privacy & Security**. Use it only for the copy downloaded from this release.\r\n\r\nCheck automatic opening in **AlphaSync → Settings…** after upgrading. Keep the app and its bundled helper together, and follow any Login Items approval prompt.\r\n\r\n## How to use it\r\n\r\nOpen AlphaSync and connect your Neo with a USB cable. Choose the intended Neo and applet in the sidebar. An applet is a program on the Neo, such as AlphaWord.\r\n\r\n- **Read:** double-click a file. Choose Regular or Monospaced, use **Copy to Clipboard**, or search through **Edit → Find**.\r\n- **Save to your Mac:** select files and choose **File → Save to Mac…**, or drag a file’s name into Finder. Existing Mac files are preserved.\r\n- **Add text:** choose AlphaWord or the user dictionary, clear the file selection, and choose **File → Import Text Files to Neo…**. New AlphaWord files are unbound; use the Neo’s Open command to find them.\r\n- **Replace text:** select one file and import one plain-text file, or drop it onto the file’s name. Check the named target before choosing Replace.\r\n- **Rename:** Control-click one supported file’s name and choose **Rename…**. Use 1 to 15 supported characters.\r\n- **Back up:** click **Backup**. Settings controls the included file types, destination, and optional log. Stop keeps files already saved; unfinished folders stay marked **(Incomplete)**.\r\n- **Clear:** select files for **Clear File…** or **Clear Selected Files…**. With one applet selected and no files selected, **Clear All Files…** clears that applet’s files. Cancel is the default.\r\n\r\n**Save a recovery copy first** is on by default. If a requested copy fails, the change stops. Choose **Open Recovery Copies** in Settings to find saved originals. Restore by importing the saved `.txt` file onto the matching Neo file and reviewing the Replace warning. Keep the accompanying `.neo` data; it is not a text import.\r\n\r\nRecovery copies are kept for 30 days by default. Settings also offers 7 or 90 days, or no automatic expiry. Recognised complete expired copies move to Trash when a new copy is made. Keep an independent backup of important writing.\r\n\r\nAlphaWord and user dictionary files can be imported and changed. Other applet files can be read, exported, and backed up as XML, but cannot be imported back in this version.\r\n\r\nPhysical Neo transfers, real Login Items approval, macOS 13 runtime checks, and the manual Help Viewer checks described below remain unverified. Build and package checks cover compilation, simulated transfers, native app interfaces, and the packaged Help.\r\n\r\n---\r\n\r\n## Technical information\r\n\r\n### Changes since 2.0.3\r\n\r\nThe Help book has seventeen authored task and overview pages plus a licence generated from the original `LICENSE`. Seven new pages separate getting started, reading, importing, renaming, recovery, troubleshooting, and support. Existing topics are rewritten against the actual Swift commands and operation paths. The [Help review](https://github.com/koralatov/alphasync/blob/3d32aab21484f4ed9df491da0ff8103f21defb53/docs/help-review.md) maps all functions to topics and reviewed sources.\r\n\r\nThe review applies Apple’s guidance on task-focused help and clear writing. HTML declares its language, uses semantic headings and landmarks, and gives the shortcut table a caption and column headings. CSS uses relative text sizes, system appearance colours, underlined links, and visible focus. Stable `alphasync-home` and `alphasync-licence` entry anchors are preserved.\r\n\r\nA standard-library Python validator checks all local targets, fragments, assets, page reachability, titles, heading order, metadata, landmarks, link text, and offline resources. It rejects active content and changes to the original licence. Xcode runs it before `hiutil` builds the search index. Package verification runs it again on the extracted app. Thirteen disposable fixtures exercise failures and the real licence generator. Python is needed for building and verification, not for running AlphaSync. The native interface checker also uses isolated preferences and Login Items state, reports its progress, and fails with diagnostics if it exceeds its time limit.\r\n\r\n### Architecture and formats\r\n\r\nBoth targets and helpers use version 2.0.4, build 154, with a 13.0 deployment target. Universal contains x86_64 and arm64; Apple Silicon contains arm64 only. Shared Swift 6 sources use strict concurrency checking and public SwiftUI, AppKit, ServiceManagement, and IOUSBHost APIs, with no third-party runtime dependencies.\r\n\r\nCompared with [tSoniq’s 1.3 release](https://github.com/tSoniq/alphasync/releases/tag/RELEASE_1_3), the Swift rewrite updates the native interface and Mac architecture support while retaining file transfers, text conversion, backups, and automatic opening. The original BSD-style licence and copyright notices remain.\r\n\r\nText exports use UTF-8 without a byte-order mark and LF line endings. Imports accept strict UTF-8, BOM-marked UTF-16 in either byte order, and MacASCII (Mac Roman). Unsupported characters, overlong names, invalid limits, and insufficient memory are rejected before writing. Recovery copies retain readable text and original `.neo` bytes. Recovery metadata is version 2; optional backup logs are version 3.\r\n\r\n### Install and build\r\n\r\nInstall one complete app bundle in Applications. The helper stays in `Contents/Library/LoginItems`. Both editions share the existing bundle identifiers and preferences.\r\n\r\nCanonical builds use Xcode 26.6, pinned in `.xcode-version`, on a macOS 26 Intel host. Apple Silicon compatibility checks use Xcode 16.4 on macOS 15. Run `python3 scripts/generate-project.py`, then build the `AlphaSyncUniversal` or `AlphaSyncAppleSilicon` scheme in `AlphaSync/AlphaSync.xcodeproj`. The [technical guide](https://github.com/koralatov/alphasync/blob/3d32aab21484f4ed9df491da0ff8103f21defb53/TECHNICAL.md) gives the full commands.\r\n\r\n### Verification and publication\r\n\r\nPublication requires successful Intel and Apple Silicon jobs, Swift and simulated-device regressions, native interface checks, and disposable Help, packaging, publication, and retirement fixtures. App and helper checks cover architectures, minimum macOS versions, exact release metadata, signatures, hardened runtime, and matching crash symbols.\r\n\r\nBoth host jobs build both editions and run the full regressions and native interface checks. A separate Apple Silicon job downloads the canonical packages, verifies the extracted bundles, Help, symbols, reports, and hashes, and runs each app’s `--version` command natively. The Intel publication job downloads and verifies the same artifacts again. This build route retains the pinned release compiler while avoiding dependence on the unavailable macOS 26 arm64 runner pool. It uploads twelve assets to a draft and checks every uploaded size and SHA-256 digest before publishing. Published assets and source tags are never replaced. This release preserves the existing 2.0.3 release and the frozen 1.5.1 source and downloads.\r\n\r\nEach ZIP has a `.sha256` file and a build-information report with its source commit. For example:\r\n\r\n```sh\r\nshasum -a 256 -c AlphaSync-2.0.4-154-macOS-13-universal.zip.sha256\r\n```\r\n\r\nEssential release evidence is retained in the [permanent verification records](https://github.com/koralatov/alphasync/tree/master/releases/verification). Native Help Viewer navigation, topic search, upgrade-cache behaviour, keyboard focus, and VoiceOver still need manual checks on macOS. Static Help checks do not establish those results.\r\n\r\n[Build and verification record](https://github.com/koralatov/alphasync/actions/runs/42906295418).\r\n",
+      "target_commitish": "7b71c9fa7f8de748c91e26990050decfb2a98472",
+      "draft": false,
+      "prerelease": false,
+      "immutable": true,
+      "created_at": "2026-11-10T21:33:12Z",
+      "published_at": "2026-11-10T21:43:54Z",
+      "updated_at": "2026-11-10T21:48:14Z",
+      "assets": [
+        {
+          "id": 733060763,
+          "name": "AlphaSync-2.0.4-154-macOS-13-apple-silicon-symbols.zip",
+          "size": 4729006,
+          "digest": "sha256:dc7b34a45c62cd0228c5c6b50895ceb0ef400957656b920d45a1d8c1ef7de64e",
+          "state": "uploaded",
+          "created_at": "2026-11-10T21:43:49Z",
+          "updated_at": "2026-11-10T21:43:50Z",
+          "content_type": "application/zip",
+          "browser_download_url": "https://github.com/koralatov/alphasync/releases/download/v2.0.4/AlphaSync-2.0.4-154-macOS-13-apple-silicon-symbols.zip"
+        },
+        {
+          "id": 733060765,
+          "name": "AlphaSync-2.0.4-154-macOS-13-apple-silicon-symbols.zip.build-information.txt",
+          "size": 557,
+          "digest": "sha256:bdc88cb5e76ddca479d5fac46068d3e2dd8b4b2e10604250094c5923a266044e",
+          "state": "uploaded",
+          "created_at": "2026-11-10T21:43:49Z",
+          "updated_at": "2026-11-10T21:43:50Z",
+          "content_type": "text/plain; charset=utf-8",
+          "browser_download_url": "https://github.com/koralatov/alphasync/releases/download/v2.0.4/AlphaSync-2.0.4-154-macOS-13-apple-silicon-symbols.zip.build-information.txt"
+        },
+        {
+          "id": 733060762,
+          "name": "AlphaSync-2.0.4-154-macOS-13-apple-silicon-symbols.zip.sha256",
+          "size": 121,
+          "digest": "sha256:44726f6858a06286512aed0984b21e38f760b8efdee91b6605be6347f79dde46",
+          "state": "uploaded",
+          "created_at": "2026-11-10T21:43:49Z",
+          "updated_at": "2026-11-10T21:43:50Z",
+          "content_type": "application/octet-stream",
+          "browser_download_url": "https://github.com/koralatov/alphasync/releases/download/v2.0.4/AlphaSync-2.0.4-154-macOS-13-apple-silicon-symbols.zip.sha256"
+        },
+        {
+          "id": 733060750,
+          "name": "AlphaSync-2.0.4-154-macOS-13-apple-silicon.zip",
+          "size": 2870816,
+          "digest": "sha256:f2660477d1d88c9c5041a1100f13711eb55be3e239f7ab1bf28632f8c75c3821",
+          "state": "uploaded",
+          "created_at": "2026-11-10T21:43:49Z",
+          "updated_at": "2026-11-10T21:43:50Z",
+          "content_type": "application/zip",
+          "browser_download_url": "https://github.com/koralatov/alphasync/releases/download/v2.0.4/AlphaSync-2.0.4-154-macOS-13-apple-silicon.zip"
+        },
+        {
+          "id": 733060764,
+          "name": "AlphaSync-2.0.4-154-macOS-13-apple-silicon.zip.build-information.txt",
+          "size": 531,
+          "digest": "sha256:24338147f563acc04675d0bd250106ca1d9b52fc0dac9c1a5ba8d870b99b2696",
+          "state": "uploaded",
+          "created_at": "2026-11-10T21:43:49Z",
+          "updated_at": "2026-11-10T21:43:49Z",
+          "content_type": "text/plain; charset=utf-8",
+          "browser_download_url": "https://github.com/koralatov/alphasync/releases/download/v2.0.4/AlphaSync-2.0.4-154-macOS-13-apple-silicon.zip.build-information.txt"
+        },
+        {
+          "id": 733060811,
+          "name": "AlphaSync-2.0.4-154-macOS-13-apple-silicon.zip.sha256",
+          "size": 113,
+          "digest": "sha256:8c6228fa310c3abafd4c6716eee004f6b78b9857c983d86cd0d3ff9d18743de7",
+          "state": "uploaded",
+          "created_at": "2026-11-10T21:43:50Z",
+          "updated_at": "2026-11-10T21:43:50Z",
+          "content_type": "application/octet-stream",
+          "browser_download_url": "https://github.com/koralatov/alphasync/releases/download/v2.0.4/AlphaSync-2.0.4-154-macOS-13-apple-silicon.zip.sha256"
+        },
+        {
+          "id": 733060814,
+          "name": "AlphaSync-2.0.4-154-macOS-13-universal-symbols.zip",
+          "size": 9525061,
+          "digest": "sha256:6ddbf66092b94d8a56be552f935225e8ef422734d404898a8631254ea6803f35",
+          "state": "uploaded",
+          "created_at": "2026-11-10T21:43:50Z",
+          "updated_at": "2026-11-10T21:43:51Z",
+          "content_type": "application/zip",
+          "browser_download_url": "https://github.com/koralatov/alphasync/releases/download/v2.0.4/AlphaSync-2.0.4-154-macOS-13-universal-symbols.zip"
+        },
+        {
+          "id": 733060813,
+          "name": "AlphaSync-2.0.4-154-macOS-13-universal-symbols.zip.build-information.txt",
+          "size": 875,
+          "digest": "sha256:651e1b69a40f3e9355f013a9c74a741de77c428f6a437be5eae5a534709edcce",
+          "state": "uploaded",
+          "created_at": "2026-11-10T21:43:50Z",
+          "updated_at": "2026-11-10T21:43:50Z",
+          "content_type": "text/plain; charset=utf-8",
+          "browser_download_url": "https://github.com/koralatov/alphasync/releases/download/v2.0.4/AlphaSync-2.0.4-154-macOS-13-universal-symbols.zip.build-information.txt"
+        },
+        {
+          "id": 733060847,
+          "name": "AlphaSync-2.0.4-154-macOS-13-universal-symbols.zip.sha256",
+          "size": 117,
+          "digest": "sha256:9c281ffdb22e37f66b04b7eeca4261aaa69d1e3bcac789f996dc187504f0ee49",
+          "state": "uploaded",
+          "created_at": "2026-11-10T21:43:50Z",
+          "updated_at": "2026-11-10T21:43:51Z",
+          "content_type": "application/octet-stream",
+          "browser_download_url": "https://github.com/koralatov/alphasync/releases/download/v2.0.4/AlphaSync-2.0.4-154-macOS-13-universal-symbols.zip.sha256"
+        },
+        {
+          "id": 733060866,
+          "name": "AlphaSync-2.0.4-154-macOS-13-universal.zip",
+          "size": 3367883,
+          "digest": "sha256:f0092aca638d5fb7e4c47695173d8111ebe4a6a57a5b5e1809a94bce226f67ac",
+          "state": "uploaded",
+          "created_at": "2026-11-10T21:43:50Z",
+          "updated_at": "2026-11-10T21:43:51Z",
+          "content_type": "application/zip",
+          "browser_download_url": "https://github.com/koralatov/alphasync/releases/download/v2.0.4/AlphaSync-2.0.4-154-macOS-13-universal.zip"
+        },
+        {
+          "id": 733060870,
+          "name": "AlphaSync-2.0.4-154-macOS-13-universal.zip.build-information.txt",
+          "size": 530,
+          "digest": "sha256:43fe4d38040fb6946f752a6bef708807e91f1195ab686d30e632d0b13bfb5b7d",
+          "state": "uploaded",
+          "created_at": "2026-11-10T21:43:51Z",
+          "updated_at": "2026-11-10T21:43:51Z",
+          "content_type": "text/plain; charset=utf-8",
+          "browser_download_url": "https://github.com/koralatov/alphasync/releases/download/v2.0.4/AlphaSync-2.0.4-154-macOS-13-universal.zip.build-information.txt"
+        },
+        {
+          "id": 733060876,
+          "name": "AlphaSync-2.0.4-154-macOS-13-universal.zip.sha256",
+          "size": 109,
+          "digest": "sha256:15bb997ace157ead3fd3fc0031e36b33594d2f408879e857d7ceec58d4f999e2",
+          "state": "uploaded",
+          "created_at": "2026-11-10T21:43:51Z",
+          "updated_at": "2026-11-10T21:43:51Z",
+          "content_type": "application/octet-stream",
+          "browser_download_url": "https://github.com/koralatov/alphasync/releases/download/v2.0.4/AlphaSync-2.0.4-154-macOS-13-universal.zip.sha256"
+        }
+      ]
+    },
+    {
+      "id": 439077510,
+      "tag_name": "v1.5.1",
+      "name": "AlphaSync 1.5.1 for macOS 11 and 12",
+      "body": "# AlphaSync 1.5.1\r\n\r\nAlphaSync is a free Mac app for copying and backing up files from an **AlphaSmart Neo** writing device. Connect your Neo with a USB cable to read its files on your Mac, copy text in either direction, or make a backup.\r\n\r\n**Version 1.5.1, build 147, is for macOS 11 Big Sur and macOS 12 Monterey.** The same download works on Intel and Apple Silicon Macs. This is the final release for those two versions of macOS. You can check your version in **Apple menu → About This Mac**.\r\n\r\nAlphaSync was originally written by tSoniq. This version continues that work with support for newer Macs and improvements to file handling and the interface.\r\n\r\n## What it does\r\n\r\n- **Read your Neo’s files.** Open a file in a separate, read-only window, search its text, and copy it to the clipboard.\r\n- **Copy files in either direction.** Drag files between AlphaSync and Finder, including named files on your Neo.\r\n- **Back up your writing.** Click **Backup** to save the included files in a dated folder on your Mac.\r\n- **Keep recovery copies.** Before replacing or clearing a file, AlphaSync can save its original text so you can restore it later.\r\n- **Open automatically.** Enable automatic opening in Preferences to start AlphaSync when you connect your Neo.\r\n\r\n## How to download it\r\n\r\n[**Download AlphaSync 1.5.1 for macOS 11 and 12**](https://github.com/koralatov/alphasync/releases/download/v1.5.1/AlphaSync-1.5.1-147-macOS-11-12-universal.zip)\r\n\r\nDownload the file named **AlphaSync-1.5.1-147-macOS-11-12-universal.zip**. It contains the app and its automatic-launch helper. The separate **symbols** download is for developers investigating crashes.\r\n\r\n## How to install it\r\n\r\n1. Double-click the downloaded ZIP file to unpack it.\r\n2. Quit an older copy of AlphaSync if it is running.\r\n3. Drag **AlphaSync** into your **Applications** folder. Replace the older copy if Finder asks.\r\n4. Open **Applications**, then double-click **AlphaSync**.\r\n\r\nIf your Mac says that it cannot verify AlphaSync, dismiss the warning and open **System Preferences → Security & Privacy → General**. Find the message about AlphaSync, choose **Open Anyway**, and follow the prompts. Use this option only for the copy you downloaded from this release page. The [installation guide](https://github.com/koralatov/alphasync/blob/v1.5.1/README.md#if-your-mac-blocks-alphasync) has more detail.\r\n\r\n## How to use it\r\n\r\nOpen AlphaSync, then connect your Neo with a USB cable. Its files appear in the main window.\r\n\r\n- **Read:** double-click a file. Choose Regular or Monospaced for the text, and use **Copy to Clipboard** to copy the complete file.\r\n- **Save to your Mac:** drag files from AlphaSync into a Finder folder.\r\n- **Send text to your Neo:** drag a text file from Finder into AlphaSync. If a Replace warning appears, check the named file before continuing.\r\n- **Back up:** click **Backup**. Choose the destination in **AlphaSync → Preferences…**. A folder marked **(Incomplete)** contains a backup that did not finish.\r\n- **Clear:** select a file and choose **Clear File…**, or select AlphaWord and choose **Clear All Files…**. Check the warning before confirming. **Cancel** is the default.\r\n\r\n**Save a recovery copy first** is enabled by default. In Preferences, choose **Open Recovery Copies** to find the saved originals. To restore one, drag its text file onto the matching file in AlphaSync. Recovery copies are kept for 30 days by default, and expired copies move to Trash when a new copy is made. Keep a separate backup of important writing.\r\n\r\nIf a file is too large or contains a character your Neo cannot store, AlphaSync explains the problem and stops the import. Shorten or edit the text, then try again.\r\n\r\nFor the built-in guide, choose **Help → AlphaSync Help** or press **⌘?**.\r\n\r\n---\r\n\r\n## Technical information\r\n\r\n### Fixes since 1.5\r\n\r\n- **Complete backup enumeration:** backups stop if an included applet or file list is incomplete, or its file count cannot be confirmed. A partial listing cannot be reported as a complete backup.\r\n- **Safer confirmation sheets:** Replace, Clear File, and Clear All Files open with Cancel as the default button and initial keyboard target. The destructive action no longer receives initial focus.\r\n- **Toolbar layout:** the default connected window is wider so Backup, Clear, and Info fit, including the longer Clear All Files label.\r\n- **About:** links no longer receive initial focus. Compatibility text identifies macOS 11 and 12, and release-note and licence links stay tied to 1.5.1.\r\n- **Read-only windows:** a native status symbol identifies read-only text. Copy to Clipboard copies the complete loaded text. The Regular and Monospaced font choices have equal widths and explanatory tooltips.\r\n\r\n### Differences from tSoniq’s latest release\r\n\r\n[tSoniq’s latest published release is AlphaSync 1.3](https://github.com/tSoniq/alphasync/releases/tag/RELEASE_1_3). It already provided drag-and-drop transfers, one-click backups, text conversion, and optional opening when a Neo was connected.\r\n\r\nThis fork adds or updates:\r\n\r\n- **Platform support:** one Universal binary containing x86_64 and arm64 code, with an 11.0 deployment target in both the app and helper.\r\n- **Native interface:** updated AppKit windows, Light and Dark appearance, read-only file windows, system fonts, Find, selectable Inspector details, and built-in Help.\r\n- **Text handling:** UTF-8 exports and backups, plus MacASCII, UTF-8, and UTF-16 imports. Windows line endings are handled consistently, and unsupported Neo characters are rejected before writing.\r\n- **Write protection:** fresh device limits and available memory are checked after conversion. Changed contents are read back for verification. Optional recovery copies are saved before destructive operations, and a failed requested copy blocks the change.\r\n- **Backup reporting:** existing exports are preserved, unfinished folders retain an incomplete marker, and optional logs record each dated backup’s results.\r\n- **Device work:** USB requests run on one background queue, with bounded parsing and explicit checks for malformed replies.\r\n\r\nVersion 1.5.1 uses Objective-C++, C++17, and native AppKit. It has no third-party runtime libraries or separately installed USB driver. The original copyright notices and BSD-style licence are retained. The Swift and SwiftUI migration belongs to the separate 1.6 development work.\r\n\r\n### Install\r\n\r\nThe installable ZIP contains **AlphaSync.app**, including **Contents/Library/LoginItems/AlphaSyncLauncher.app**. Keep this bundle intact and install one copy in Applications before enabling automatic opening.\r\n\r\nOn macOS 11 and 12, automatic opening uses `SMLoginItemSetEnabled`. If an older installation uses a separate helper in Application Support, disable that installation’s automatic opening before replacing it.\r\n\r\nThe exact release source is preserved at [v1.5.1](https://github.com/koralatov/alphasync/tree/v1.5.1) and [legacy-macos-11-12](https://github.com/koralatov/alphasync/tree/legacy-macos-11-12). The release assets and source references stay fixed. These revised notes do not change the app or its source at that tag.\r\n\r\nTo build the preserved source, use its shared **AlphaSync** scheme and the Xcode version pinned in `.xcode-version`. Build commands and implementation details are in the [1.5.1 technical guide](https://github.com/koralatov/alphasync/blob/v1.5.1/TECHNICAL.md).\r\n\r\n### Verification\r\n\r\nThe [1.5.1 release checks](https://github.com/koralatov/alphasync/actions/runs/42611716983) passed on Intel and Apple Silicon build hosts. They cover core and native regressions, sanitizers, Debug and Release builds, app and helper architectures, macOS deployment targets, signatures, dependencies, archive layout, matching crash symbols, menus, layouts, and appearance changes.\r\n\r\nThe release includes SHA-256 checksums and build reports for the app and its separate crash symbols. Download the [app checksum](https://github.com/koralatov/alphasync/releases/download/v1.5.1/AlphaSync-1.5.1-147-macOS-11-12-universal.zip.sha256), put it beside the app ZIP, and run this command from that folder:\r\n\r\n```sh\r\nshasum -a 256 -c AlphaSync-1.5.1-147-macOS-11-12-universal.zip.sha256\r\n```\r\n\r\nThe result should end in **OK**. After installation, the bundle’s signature integrity can be checked with:\r\n\r\n```sh\r\ncodesign --verify --deep --strict /Applications/AlphaSync.app\r\n```\r\n\r\nFor source-level checks from the preserved checkout:\r\n\r\n```sh\r\nmake test\r\nmake sanitize\r\npython3 tests/release-tests.py\r\n```\r\n\r\nThe build hosts run newer macOS versions. Those results do not establish runtime or physical USB compatibility on every supported Mac. An earlier build was reported working on macOS 12, but the final 1.5.1 download still needs recorded physical Neo checks on that system. macOS 11 runtime testing also remains unverified. Record those results in the [manual checklist](https://github.com/koralatov/alphasync/blob/v1.5.1/tests/manual-checks.md).",
+      "target_commitish": "master",
+      "draft": false,
+      "prerelease": false,
+      "immutable": true,
+      "created_at": "2026-11-09T11:46:46Z",
+      "published_at": "2026-11-09T12:14:04Z",
+      "updated_at": "2026-11-09T21:36:55Z",
+      "assets": [
+        {
+          "id": 727318094,
+          "name": "AlphaSync-1.5.1-147-macOS-11-12-universal-symbols.zip",
+          "size": 781096,
+          "digest": "sha256:3d7e153b7efab033047a66cd100951f827d872c85a3ddf4c2fd074d747ac854c",
+          "state": "uploaded",
+          "created_at": "2026-11-09T11:57:16Z",
+          "updated_at": "2026-11-09T11:57:16Z",
+          "content_type": "application/zip",
+          "browser_download_url": "https://github.com/koralatov/alphasync/releases/download/v1.5.1/AlphaSync-1.5.1-147-macOS-11-12-universal-symbols.zip"
+        },
+        {
+          "id": 727318097,
+          "name": "AlphaSync-1.5.1-147-macOS-11-12-universal-symbols.zip.build-information.txt",
+          "size": 838,
+          "digest": "sha256:be4f34fff92d083f5e0601463ba1786528320e204ee88f90f79dd51afe2c9ee9",
+          "state": "uploaded",
+          "created_at": "2026-11-09T11:57:16Z",
+          "updated_at": "2026-11-09T11:57:16Z",
+          "content_type": "text/plain; charset=utf-8",
+          "browser_download_url": "https://github.com/koralatov/alphasync/releases/download/v1.5.1/AlphaSync-1.5.1-147-macOS-11-12-universal-symbols.zip.build-information.txt"
+        },
+        {
+          "id": 727318095,
+          "name": "AlphaSync-1.5.1-147-macOS-11-12-universal-symbols.zip.sha256",
+          "size": 120,
+          "digest": "sha256:b046de391bb06119db0fdc7597685e62e30c8d3c46c38f0897384d9ab7bcffc1",
+          "state": "uploaded",
+          "created_at": "2026-11-09T11:57:16Z",
+          "updated_at": "2026-11-09T11:57:16Z",
+          "content_type": "application/octet-stream",
+          "browser_download_url": "https://github.com/koralatov/alphasync/releases/download/v1.5.1/AlphaSync-1.5.1-147-macOS-11-12-universal-symbols.zip.sha256"
+        },
+        {
+          "id": 727318096,
+          "name": "AlphaSync-1.5.1-147-macOS-11-12-universal.zip",
+          "size": 2131393,
+          "digest": "sha256:4a13834a66047fce672f40eb956dea90146ff386ae08265597421ee3536b3f74",
+          "state": "uploaded",
+          "created_at": "2026-11-09T11:57:16Z",
+          "updated_at": "2026-11-09T11:57:16Z",
+          "content_type": "application/zip",
+          "browser_download_url": "https://github.com/koralatov/alphasync/releases/download/v1.5.1/AlphaSync-1.5.1-147-macOS-11-12-universal.zip"
+        },
+        {
+          "id": 727318112,
+          "name": "AlphaSync-1.5.1-147-macOS-11-12-universal.zip.build-information.txt",
+          "size": 643,
+          "digest": "sha256:1633bfd672c536615f60c4fc42c4d32707dc16979dbce1bba5d037b0857a19ac",
+          "state": "uploaded",
+          "created_at": "2026-11-09T11:57:16Z",
+          "updated_at": "2026-11-09T11:57:16Z",
+          "content_type": "text/plain; charset=utf-8",
+          "browser_download_url": "https://github.com/koralatov/alphasync/releases/download/v1.5.1/AlphaSync-1.5.1-147-macOS-11-12-universal.zip.build-information.txt"
+        },
+        {
+          "id": 727318099,
+          "name": "AlphaSync-1.5.1-147-macOS-11-12-universal.zip.sha256",
+          "size": 112,
+          "digest": "sha256:c03b9f70a708d58799c416ab8efdc3a6022939cae6a1af60baaf3e322a889d78",
+          "state": "uploaded",
+          "created_at": "2026-11-09T11:57:16Z",
+          "updated_at": "2026-11-09T11:57:16Z",
+          "content_type": "application/octet-stream",
+          "browser_download_url": "https://github.com/koralatov/alphasync/releases/download/v1.5.1/AlphaSync-1.5.1-147-macOS-11-12-universal.zip.sha256"
+        }
+      ]
+    }
+  ],
+  "tags": [
+    {
+      "ref": "refs/tags/v1.4.1",
+      "sha": "a7a98ca2097fc2ac2b409fd1d35e8afbd41f9199"
+    },
+    {
+      "ref": "refs/tags/v1.4.2",
+      "sha": "f614f61dda822be6f7afd14938cbe4d2bacc26a3"
+    },
+    {
+      "ref": "refs/tags/v1.4.3",
+      "sha": "d5a2a54b99a1e3a0fdb0ea87788d72812f6a0e46"
+    },
+    {
+      "ref": "refs/tags/v1.4.4",
+      "sha": "077b4acdcde7a709269078885b6f98eacf8cd771"
+    },
+    {
+      "ref": "refs/tags/v1.4.5",
+      "sha": "4e3756f952b32b056b8dcf7b1a77c1aace6e28f7"
+    },
+    {
+      "ref": "refs/tags/v1.5",
+      "sha": "3ba2abfd32b7f4cbae833079f2e81296761e6b22"
+    },
+    {
+      "ref": "refs/tags/v1.5.1",
+      "sha": "6cb821c9ab8073ff950414952bf2480eb4638c5d"
+    },
+    {
+      "ref": "refs/tags/v2.0",
+      "sha": "a508da036db4516d65d98b0a33e1d031e96f8b88"
+    },
+    {
+      "ref": "refs/tags/v2.0.2",
+      "sha": "807b4bedf1bb1cd655e934e1495723bb5c203c93"
+    },
+    {
+      "ref": "refs/tags/v2.0.2-build.152",
+      "sha": "fbcc566207d550ee313245e3eff39a55d3c986fb"
+    },
+    {
+      "ref": "refs/tags/v2.0.3",
+      "sha": "db3ff4c23253c024726dd812868e6ac745a7b831"
+    },
+    {
+      "ref": "refs/tags/v2.0.4",
+      "sha": "7b71c9fa7f8de748c91e26990050decfb2a98472"
+    }
+  ],
+  "legacy": {
+    "ref": "refs/heads/legacy-macos-11-12",
+    "sha": "6cb821c9ab8073ff950414952bf2480eb4638c5d"
+  }
+}

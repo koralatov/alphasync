@@ -57,3 +57,9 @@ Physical Neo operations, actual VoiceOver speech, keyboard focus and editing, re
 - [Alerts](https://developer.apple.com/design/human-interface-guidelines/alerts)
 - [Text views](https://developer.apple.com/design/human-interface-guidelines/text-views)
 - [Native text selection](https://developer.apple.com/documentation/swiftui/view/textselection(_:))
+
+## Initial candidate correction
+
+Initial source `fa3ce3cc93dfc7403e9c3c975f595c2291ec58cb` failed [run 43975219202](https://github.com/koralatov/alphasync/actions/runs/43975219202).  Both host jobs failed in the shared compile-and-test stage; native interfaces, app packages, and native download execution did not run.  The Apple Silicon log confirms all 204 tests were scheduled and reports two new fixture failures.
+
+The read-only fixture used the default filter, which hid its applet’s files.  Select All Applet Files and assert that the selected file is present.  The recovery fixture used an invalid name, but the simulated engine accepts it, writes it, and then fails to parse its next snapshot.  Use an absent rename target to exercise recovery without a write.  Keep the preview invalidation, preserved selection, notice, and zero-write assertions.  These corrections change only test setup; production source is unchanged.  Run the corrected source through the full milestone without weakening a gate.

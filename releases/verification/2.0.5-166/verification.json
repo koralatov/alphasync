@@ -1,0 +1,59 @@
+{
+  "version": "2.0.5",
+  "build": "166",
+  "status": "pending-full-verification",
+  "sourceCommit": null,
+  "implementationCommit": "bd5b31d1be35bbf9ac2916ff3b4d766c8d8e7493",
+  "initialCandidate": {
+    "source": "fa3ce3cc93dfc7403e9c3c975f595c2291ec58cb",
+    "runID": 43975219202,
+    "conclusion": "failure",
+    "failedJobs": [
+      {
+        "id": 133677354800,
+        "name": "Swift apps (Apple Silicon (compatibility))"
+      },
+      {
+        "id": 133677355156,
+        "name": "Swift apps (Intel (canonical))"
+      }
+    ],
+    "correctionCommit": "bd5b31d1be35bbf9ac2916ff3b4d766c8d8e7493",
+    "correction": "Correct two fixture assumptions while retaining all assertions.  No production source change."
+  },
+  "expected": {
+    "swiftTestsPerHost": 204,
+    "fixturesPerHost": 55,
+    "capturedImages": 124,
+    "confirmationRecordsPerHost": 8,
+    "findRecordsPerHost": 12,
+    "browserObservationsPerHost": 32,
+    "sidebarRecordsPerHost": 12,
+    "toolbarRecordsPerHost": 6,
+    "artifactDigests": 4,
+    "assetHashes": 12
+  },
+  "verification": {
+    "allAutomatedChecksPassed": false,
+    "independentPackageInspectionComplete": false,
+    "capturedImageReviewComplete": false,
+    "protectedReferencesCompared": false
+  },
+  "saving": {
+    "ready": false,
+    "filename": "AlphaSync-2.0.5-166-macOS-13-apple-silicon.zip"
+  },
+  "email": {
+    "sent": false
+  },
+  "pending": [
+    "Corrected source must pass the full non-publishing milestone on both pinned hosts.",
+    "Both exact canonical apps must run on Apple Silicon.",
+    "Independent artifact, asset, Help, symbol, and source checks remain required.",
+    "All 124 new captures require visual review.",
+    "The separate test ZIP must be saved before one completion email."
+  ],
+  "environment": "The coding workspace is unavailable at this checkpoint.  Connected GitHub edits and hosted checks are possible; local artifact inspection, visual review, and saving are not complete.",
+  "stableGoal": "Physical Neo testing comes next before deciding on stable 2.1.",
+  "plan": "../../../docs/maintenance-166.md"
+}
