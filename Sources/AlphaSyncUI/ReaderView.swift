@@ -116,6 +116,10 @@ public struct ReadOnlyText: NSViewRepresentable {
         scroll.contentView.scroll(to: origin)
         scroll.reflectScrolledClipView(scroll.contentView)
     }
+    public static func dismantleNSView(_ scroll: NSScrollView, coordinator: ()) {
+        guard let view = scroll.documentView as? ReaderTextView else { return }
+        view.findContext?.detach(view)
+    }
 }
 
 @MainActor
@@ -123,6 +127,7 @@ private final class ReaderTextView: NSTextView {
     weak var findContext: ReaderFindContext?
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
-        findContext?.attach(self)
+        if window == nil { findContext?.detach(self) }
+        else { findContext?.attach(self) }
     }
 }

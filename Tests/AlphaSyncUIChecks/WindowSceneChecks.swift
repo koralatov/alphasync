@@ -37,7 +37,11 @@ struct WindowSceneChecksApp: App {
             Window("Find fixture", id: "find-fixture") {
                 VStack {
                     FindFocusControl().frame(width: 260, height: 26).padding(8)
-                    ReadOnlyText(text: "Find this file text.\nA second line for native Find.", findContext: driver.findContext)
+                    if driver.findLoaded {
+                        ReadOnlyText(text: "Find this file text.\nA second line for native Find.", findContext: driver.findContext)
+                    } else {
+                        ProgressView("Reading from Neo…")
+                    }
                 }
                 .frame(minWidth: 440, minHeight: 240)
                 .background(WindowSceneProbe { driver.registerFindWindow($0) })
@@ -110,6 +114,7 @@ private final class WindowSceneDriver: ObservableObject {
     private var openWindow: OpenWindowAction?
     private weak var findWindow: NSWindow?
     let findContext = ReaderFindContext()
+    @Published var findLoaded = true
 
     func setOpenWindow(_ action: OpenWindowAction) { openWindow = action }
     func registerFindWindow(_ window: NSWindow) { findWindow = window }
@@ -193,6 +198,7 @@ private final class WindowSceneDriver: ObservableObject {
         await InterfaceChecks.yieldLayout()
         try check(false, stage: "browser")
         guard let openWindow else { throw CheckFailure(description: "Missing native scene opener") }
+        findLoaded = true
         openWindow(id: "find-fixture")
         for _ in 0..<20 {
             if findWindow?.isVisible == true { break }
@@ -215,6 +221,29 @@ private final class WindowSceneDriver: ObservableObject {
         await InterfaceChecks.yieldLayout()
         try InterfaceChecks.require(text.enclosingScrollView?.isFindBarVisible == true, "Find did not open the native Find bar")
         try capture(reader, "find-reader-" + appearance)
+        findLoaded = false
+        await InterfaceChecks.yieldLayout()
+        try InterfaceChecks.require(findContext.textView == nil, "An unloaded Reader retained its Find text view")
+        try check(false, stage: "reader-unloaded")
+        findLoaded = true
+        await InterfaceChecks.yieldLayout()
+        guard let replacement = findContext.textView, replacement !== text else {
+            throw CheckFailure(description: "Reloading the Reader did not attach a new text view")
+        }
+        try check(true, stage: "reader-reloaded")
+        findContext.detach(text)
+        await InterfaceChecks.yieldLayout()
+        try InterfaceChecks.require(findContext.textView === replacement,
+                                    "Late cleanup of the old Reader detached its replacement")
+        try check(true, stage: "reader-old-detached")
+        try InterfaceChecks.require(reader.makeFirstResponder(field), "The unrelated field lost keyboard focus after reloading")
+        guard let reloadedCommand = NSApplication.shared.mainMenu.map(items)?.first(where: { $0.title == "Find…" }),
+              let reloadedMenu = reloadedCommand.menu else { throw CheckFailure(description: "The reloaded Reader lost Find") }
+        reloadedMenu.performActionForItem(at: reloadedMenu.index(of: reloadedCommand))
+        await InterfaceChecks.yieldLayout()
+        try InterfaceChecks.require(replacement.enclosingScrollView?.isFindBarVisible == true,
+                                    "Find did not reach the reloaded Reader")
+        try capture(reader, "find-reloaded-" + appearance)
         reader.close()
         mainWindow.makeKeyAndOrderFront(nil)
         await InterfaceChecks.yieldLayout()

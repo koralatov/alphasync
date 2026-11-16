@@ -8,6 +8,12 @@ final class ReaderFindContext: ObservableObject {
         textView = view
         ReaderFindRegistry.shared.register(self)
     }
+    func detach(_ view: NSTextView) {
+        // An old view can finish dismantling after its replacement has already attached.
+        guard textView === view else { return }
+        textView = nil
+        ReaderFindRegistry.shared.register(self)
+    }
     func perform(_ action: NSFindPanelAction) {
         guard let textView, textView.window?.isKeyWindow == true else { return }
         AppActions.find(action, target: textView)
