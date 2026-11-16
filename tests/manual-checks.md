@@ -188,3 +188,13 @@ Review a dictionary import with omitted words.  Cancel must be on the left, init
 Try empty, unsupported, overlong, unchanged, and valid different names in Rename.  The visible guidance and VoiceOver hint must explain the disabled state.  Check exact file sizes and available memory with VoiceOver, the backup chooser label, Stop backup, and multiple Neo connection wording when available.
 
 Check native Find after closing, retrying, or reloading a Reader, including when another control has keyboard focus.  Review Light and Dark appearance, actual speech, keyboard focus, Help, Login Items approval, and physical transfers.  The [review](../docs/refinements-165.md) separates hosted checks from these physical results.
+
+## Build 166 simplifications and confirmations
+
+Confirm **2.0.5 (166)** in About and continue the existing 2.1 checklist.  Clear must remain unavailable for an empty or read-only applet, a Neo selected as a whole with no file selection, and while a confirmation or transfer is active.  A selected writable file or files from one writable applet must retain their expected scope.
+
+Open a multiple-file Clear warning using disposable files.  Check that each name is on its own line, including a name with a comma, and that names and the explanation can be selected and copied.  Keep the recovery option enabled for testing.  Return, keypad Enter, and Space must not approve the change; Escape and Cancel must cancel.  Repeat Clear, Replace, and dictionary review in both appearances with VoiceOver.
+
+Cancel a warning, open another, and check normal consent and cancellation.  Change an imported dictionary source while its omission warning is open; continuing must require a fresh review of the new source, then the usual Replace warning.  No completed or cancelled action should unexpectedly reopen a warning or repeat a file change.
+
+Keep a file selected while attaching another Neo where available.  Its preview must remain stable.  Explicit Refresh must show current text, including changes with the same file size.  Check Find after reloading and closing Readers with another control focused.  Continue the wider transfer, recovery, helper, Help, regional, accessibility, and oldest-runtime checks.  Hosted checks and physical limits are recorded separately in the [maintenance plan](../docs/maintenance-166.md).
