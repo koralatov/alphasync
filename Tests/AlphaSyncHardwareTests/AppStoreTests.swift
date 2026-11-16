@@ -350,6 +350,23 @@ final class AppStoreTests: XCTestCase {
         await store.shutdown()
     }
 
+    func testFailedOperationRecoveryInvalidatesAnUnchangedSelectedPreview() async throws {
+        let observations = SimulatedObservations()
+        let store = makeStore(observations: observations)
+        await store.refresh()
+        let selected = store.files[0]
+        store.selection = [selected.id]
+        let previous = try XCTUnwrap(store.inspectorPreviewID)
+        await store.rename(store.files[1].id, to: "\n")
+        let current = try XCTUnwrap(store.inspectorPreviewID)
+        XCTAssertEqual(current.file, previous.file)
+        XCTAssertNotEqual(current, previous)
+        XCTAssertEqual(store.selectedFiles, [selected])
+        XCTAssertNotNil(store.notice)
+        XCTAssertEqual(observations.writeCount, 0)
+        await store.shutdown()
+    }
+
     func testPartialExportReportsAndRetainsTheSavedFiles() async throws {
         let store = makeStore(SimulatedConfiguration(failingRead: 2))
         await store.refresh()

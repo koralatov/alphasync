@@ -195,9 +195,7 @@ public final class AppStore: ObservableObject {
                 let result = try await self.service.scan()
                 guard !Task.isCancelled, !self.shuttingDown else { return }
                 if observed == self.epoch && !self.busy {
-                    self.devices = result.devices; self.discoveryIssue = result.issue
-                    self.updateConnectionIssue()
-                    self.reconcileSelection()
+                    self.publish(result, invalidatingPreview: false)
                 } else { self.scanPending = true }
             } catch {
                 if !Task.isCancelled && !self.shuttingDown {
@@ -206,6 +204,14 @@ public final class AppStore: ObservableObject {
                 }
             }
         }
+    }
+    private func publish(_ result: DiscoveryResult, invalidatingPreview: Bool) {
+        devices = result.devices
+        discoveryIssue = result.issue
+        updateConnectionIssue()
+        // Refresh and recovery reread text even when its identity and size are unchanged.
+        if invalidatingPreview { contentRevision = UUID() }
+        reconcileSelection()
     }
     private func updateConnectionIssue() {
         let messages = [monitoringIssue, discoveryIssue].compactMap { $0 }
@@ -273,21 +279,14 @@ public final class AppStore: ObservableObject {
             if shuttingDown || error is CancellationError { return }
             notice = AppNotice("The operation could not be completed", error.localizedDescription)
             if let result = try? await service.refresh(stop: activity.stop) {
-                devices = result.devices
-                contentRevision = UUID()
-                discoveryIssue = result.issue
-                updateConnectionIssue()
-                reconcileSelection()
+                publish(result, invalidatingPreview: true)
             }
         }
     }
     public func refresh() async {
         await run("Refreshing files…", completion: "Neo files refreshed.") { stop in
             let result = try await service.refresh(retryConnections: true, stop: stop)
-            devices = result.devices; discoveryIssue = result.issue
-            updateConnectionIssue()
-            contentRevision = UUID()
-            reconcileSelection()
+            publish(result, invalidatingPreview: true)
         }
         resumeAfterWake()
     }

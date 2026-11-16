@@ -67,6 +67,24 @@ final class AttachmentMonitoringTests: XCTestCase {
         XCTAssertEqual(observations.closeCount, 2)
     }
 
+    func testAnAttachmentScanKeepsTheCurrentFilePreviewRevision() async throws {
+        let observations = SimulatedObservations(), feed = EventFeed()
+        let store = store(observations, events: { feed.monitor() })
+        store.start()
+        feed.continuation.yield(())
+        try await eventually { store.devices.count == 1 }
+        let file = try XCTUnwrap(store.files.first?.id)
+        store.selection = [file]
+        let previous = try XCTUnwrap(store.inspectorPreviewID)
+        observations.setAttached([1, 2])
+        feed.continuation.yield(())
+        try await eventually { store.devices.count == 2 }
+        XCTAssertEqual(store.inspectorPreviewID, previous)
+        XCTAssertEqual(store.selection, [file])
+        XCTAssertEqual(observations.writeCount, 0)
+        await store.shutdown()
+    }
+
     func testAnAttachmentDuringAReadIsReconciledAfterTheReadFinishes() async throws {
         let observations = SimulatedObservations(), feed = EventFeed(), reading = StopRequest()
         let gate = DispatchSemaphore(value: 0)
