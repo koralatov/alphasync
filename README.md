@@ -18,6 +18,8 @@ Private **2.0.5, build 163** is ready for testing with Preview shown only for on
 
 Private **2.0.5, build 164** is ready for testing with more consistent cancellation, clearer VoiceOver feedback, relevant menu commands, and reusable file-size formatting.  Both pinned hosts passed 190 Swift tests, all 55 fixtures, native Find and progress checks, thirty-two browser observations, and both editions in [run 43772376923](https://github.com/koralatov/alphasync/actions/runs/43772376923).  Both exact packaged apps ran on Apple Silicon.  Independent hashes, both Help books, and 108-image review passed.  The [maintenance review](docs/maintenance-164.md) and [record](releases/verification/2.0.5-164/verification.json) distinguish these checks from physical M2 Air testing before the decision on stable 2.1.
 
+Private **2.0.5, build 165** is being prepared with stricter confirmation targets, reliable Reader Find cleanup, consistent dictionary consent, clearer rename guidance, and more informative accessibility labels.  The [refinement review](docs/refinements-165.md) defines the four focused changes and full verification milestone.  Physical testing remains open before the decision on 2.1.
+
 ## Version 2.0.4
 
 Version 2.0.4 improves the Swift rewrite first released as 2.0 and requires **macOS 13 or later**. It includes all changes prepared under the unpublished 2.0.1 development version.

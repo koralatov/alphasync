@@ -178,3 +178,13 @@ With VoiceOver enabled, check the operation name and native progress value, conn
 Open a loaded Reader, focus its font control or another control, and use each Find command.  The Reader’s text must be the target.  Find must be unavailable in the browser, Inspector, Settings, loading readers, and failed readers, and after closing the Reader.  Right-click writable and read-only files; Rename and Clear must be absent where they do not apply, and destructive actions must remain last.  Check multiple selection and busy states without changing their original targets.
 
 Check byte and decimal KB labels, including zero, one byte, and the 1,000-byte boundary, under your actual regional settings.  Continue all earlier transfer, recovery, helper, Help, and accessibility checks when available.  The [maintenance review](../docs/maintenance-164.md) distinguishes hosted verification from these physical checks.
+
+## Build 165 refinements
+
+Confirm **2.0.5 (165)** in About and continue the existing 2.1 checklist.  Use disposable files and a verified backup.  If hardware permits changing a file’s name or details while a Replace or Clear warning is open, confirm that the stale warning cannot change any named file.  Record a boundary that cannot be exercised as untested.
+
+Review a dictionary import with omitted words.  Cancel must be on the left, initially focused, and available with Escape.  No button is the default, and Return, keypad Enter, and Space must never consent to an import.  Continuing deliberately must still require the usual Replace confirmation for an existing file.  Check selectable omission details.
+
+Try empty, unsupported, overlong, unchanged, and valid different names in Rename.  The visible guidance and VoiceOver hint must explain the disabled state.  Check exact file sizes and available memory with VoiceOver, the backup chooser label, Stop backup, and multiple Neo connection wording when available.
+
+Check native Find after closing, retrying, or reloading a Reader, including when another control has keyboard focus.  Review Light and Dark appearance, actual speech, keyboard focus, Help, Login Items approval, and physical transfers.  The [review](../docs/refinements-165.md) separates hosted checks from these physical results.
