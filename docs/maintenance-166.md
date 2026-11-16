@@ -63,3 +63,9 @@ Physical Neo operations, actual VoiceOver speech, keyboard focus and editing, re
 Initial source `fa3ce3cc93dfc7403e9c3c975f595c2291ec58cb` failed [run 43975219202](https://github.com/koralatov/alphasync/actions/runs/43975219202).  Both host jobs failed in the shared compile-and-test stage; native interfaces, app packages, and native download execution did not run.  The Apple Silicon log confirms all 204 tests were scheduled and reports two new fixture failures.
 
 The read-only fixture used the default filter, which hid its applet’s files.  Select All Applet Files and assert that the selected file is present.  The recovery fixture used an invalid name, but the simulated engine accepts it, writes it, and then fails to parse its next snapshot.  Use an absent rename target to exercise recovery without a write.  Keep the preview invalidation, preserved selection, notice, and zero-write assertions.  These corrections change only test setup; production source is unchanged.  Run the corrected source through the full milestone without weakening a gate.
+
+## Corrected candidate progress
+
+Corrected source `42f643094e74ba0e4ac6a239dc7085c689c23996` passed both host jobs in [run 43975990868](https://github.com/koralatov/alphasync/actions/runs/43975990868).  Both pinned hosts passed 204 Swift regressions, all 55 fixtures, native component and real-window checks, and both app and helper builds without Swift compiler warnings.  The separate native canonical-download job is queued at this checkpoint.
+
+The [pending record](../releases/verification/2.0.5-166/verification.json) separates these successful host checks from native canonical-download execution, independent artifact inspection, all 124 captured-image reviews, saving, and email.  The coding workspace remains unavailable.  No new test ZIP has been saved and no completion email has been sent.  Keep the record pending until every gate is complete.

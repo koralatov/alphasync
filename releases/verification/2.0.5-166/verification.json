@@ -2,7 +2,7 @@
   "version": "2.0.5",
   "build": "166",
   "status": "pending-full-verification",
-  "sourceCommit": null,
+  "sourceCommit": "42f643094e74ba0e4ac6a239dc7085c689c23996",
   "implementationCommit": "bd5b31d1be35bbf9ac2916ff3b4d766c8d8e7493",
   "initialCandidate": {
     "source": "fa3ce3cc93dfc7403e9c3c975f595c2291ec58cb",
@@ -37,7 +37,8 @@
     "allAutomatedChecksPassed": false,
     "independentPackageInspectionComplete": false,
     "capturedImageReviewComplete": false,
-    "protectedReferencesCompared": false
+    "protectedReferencesCompared": true,
+    "sourceReviewComplete": true
   },
   "saving": {
     "ready": false,
@@ -47,13 +48,106 @@
     "sent": false
   },
   "pending": [
-    "Corrected source must pass the full non-publishing milestone on both pinned hosts.",
-    "Both exact canonical apps must run on Apple Silicon.",
+    "Native execution of both exact canonical downloaded apps on Apple Silicon is queued.",
     "Independent artifact, asset, Help, symbol, and source checks remain required.",
     "All 124 new captures require visual review.",
     "The separate test ZIP must be saved before one completion email."
   ],
   "environment": "The coding workspace is unavailable at this checkpoint.  Connected GitHub edits and hosted checks are possible; local artifact inspection, visual review, and saving are not complete.",
   "stableGoal": "Physical Neo testing comes next before deciding on stable 2.1.",
-  "plan": "../../../docs/maintenance-166.md"
+  "plan": "../../../docs/maintenance-166.md",
+  "sourceTree": "2a5e6f385a3502aa5cb1b63bb5a5b112a85083d6",
+  "runID": 43975990868,
+  "runURL": "https://github.com/koralatov/alphasync/actions/runs/43975990868",
+  "runAttempt": 1,
+  "runConclusion": null,
+  "focusedCommits": "commits.json",
+  "hosts": [
+    {
+      "id": 133679975321,
+      "name": "Swift apps (Intel (canonical))",
+      "conclusion": "success",
+      "architecture": "x86_64",
+      "xcode": "26.6",
+      "macOS": "26.6.1",
+      "swiftRegressions": 204,
+      "fixtureTests": 55,
+      "swiftCompilerWarnings": 0,
+      "nativeComponentAndWindowChecks": "passed",
+      "builtEditions": [
+        "universal",
+        "apple-silicon"
+      ],
+      "artifactContentsIndependentlyInspected": false
+    },
+    {
+      "id": 133679975867,
+      "name": "Swift apps (Apple Silicon (compatibility))",
+      "conclusion": "success",
+      "architecture": "arm64",
+      "xcode": "16.4",
+      "macOS": "15.8.2",
+      "swiftRegressions": 204,
+      "fixtureTests": 55,
+      "swiftCompilerWarnings": 0,
+      "nativeComponentAndWindowChecks": "passed",
+      "builtEditions": [
+        "universal",
+        "apple-silicon"
+      ],
+      "artifactContentsIndependentlyInspected": false
+    }
+  ],
+  "canonicalDownloads": {
+    "jobID": 133683042128,
+    "status": "queued",
+    "conclusion": null
+  },
+  "sourceReview": {
+    "baseline": "51f7cd2282b4415b58beaa7cbe3e2d0f5e16f570",
+    "compareURL": "https://github.com/koralatov/alphasync/compare/51f7cd2282b4415b58beaa7cbe3e2d0f5e16f570...42f643094e74ba0e4ac6a239dc7085c689c23996",
+    "changedProductionSources": [
+      "Sources/AlphaSyncUI/AppActions.swift",
+      "Sources/AlphaSyncUI/AppStore.swift",
+      "Sources/AlphaSyncUI/ConfirmationViews.swift",
+      "Sources/AlphaSyncUI/MainView.swift"
+    ],
+    "coreAndHardwareSourceUnchanged": true,
+    "buildWorkflowUnchanged": true
+  },
+  "protectedReferences": {
+    "passed": true,
+    "publicTags": [
+      "v2.0.4",
+      "v1.5.1"
+    ],
+    "retainedAssets": 18,
+    "versionTags": 12,
+    "frozenLegacy": "6cb821c9ab8073ff950414952bf2480eb4638c5d",
+    "latest": "v2.0.4"
+  },
+  "artifacts": [
+    {
+      "id": 14281271314,
+      "name": "AlphaSync-interface-and-logs-macos-15-42f643094e74ba0e4ac6a239dc7085c689c23996",
+      "size": 1752387,
+      "reportedDigest": "sha256:3b4341344ce372b5cda2c3f04a63fe0790ee0b7ae3f1109762b2d8c62f4cd8c2",
+      "downloadedDigestVerified": false
+    },
+    {
+      "id": 14280674257,
+      "name": "AlphaSync-packages-42f643094e74ba0e4ac6a239dc7085c689c23996",
+      "size": 21277732,
+      "reportedDigest": "sha256:40daa0432e00910e7d20d90dea6032c80eea4a732e950d6c71be7768ba83ef9e",
+      "downloadedDigestVerified": false
+    },
+    {
+      "id": 14280449761,
+      "name": "AlphaSync-interface-and-logs-macos-26-intel-42f643094e74ba0e4ac6a239dc7085c689c23996",
+      "size": 1791322,
+      "reportedDigest": "sha256:773581be519efcfe4dc1c208f49c7296a3dc8946383397048846604f131215f2",
+      "downloadedDigestVerified": false
+    }
+  ],
+  "checkedAt": "2026-11-16T23:12:19.686Z"
 }
