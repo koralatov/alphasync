@@ -374,12 +374,17 @@ public final class AppStore: ObservableObject {
             }
         }
     }
-    func confirmDictionaryImport(_ request: DictionaryImportRequest) async {
+    private func dismissConfirmation(_ id: UUID) -> Bool {
+        guard fileConfirmation?.id == id else { return false }
         fileConfirmation = nil
+        return true
+    }
+    func confirmDictionaryImport(_ request: DictionaryImportRequest) async {
+        guard dismissConfirmation(request.id) else { return }
         await importFiles(request.sources, to: request.target, dictionaryConsent: request.sourceText, previouslyCreated: request.completedFiles)
     }
     func cancelDictionaryImport(_ request: DictionaryImportRequest) {
-        fileConfirmation = nil
+        guard dismissConfirmation(request.id) else { return }
         if request.completedFiles > 0 {
             notice = AppNotice("Import stopped", request.completedFiles == 1 ? "One file was already added and verified. It has been kept on your Neo." : "\(request.completedFiles.formatted()) files were already added and verified. Those files have been kept on your Neo.")
         }
@@ -399,8 +404,11 @@ public final class AppStore: ObservableObject {
                                                            files: selected.isEmpty ? nil : selected, stop: stop)
         }
     }
+    func cancel(_ change: PreparedChange) {
+        _ = dismissConfirmation(change.id)
+    }
     public func confirm(_ change: PreparedChange, saveRecovery: Bool) async {
-        pendingChange = nil
+        guard dismissConfirmation(change.id) else { return }
         await run("Saving recovery copies and changing files…", completion: "Neo files changed.") { stop in
             let folder = saveRecovery ? try preferences.prepareBackupFolder() : preferences.backupFolder
             let scoped = saveRecovery && folder.startAccessingSecurityScopedResource()

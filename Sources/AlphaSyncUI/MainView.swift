@@ -57,7 +57,7 @@ public struct MainView: View {
             case .change(let change):
                 DestructiveConfirmation(title: change.title, action: change.action, explanation: change.explanation,
                                     names: change.items.map { $0.file.displayName }, saveRecovery: preferences.saveRecoveryCopies,
-                               cancel: { store.pendingChange = nil },
+                               cancel: { store.cancel(change) },
                                confirm: { choice in Task { await store.confirm(change, saveRecovery: choice) } })
             case .dictionary(let request):
                 DictionaryImportConfirmation(request: request, cancel: { store.cancelDictionaryImport(request) },

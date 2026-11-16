@@ -401,6 +401,90 @@ final class AppStoreTests: XCTestCase {
         return url
     }
 
+    func testRepeatedReplacementConfirmationDoesNotWriteOrReportAnErrorAgain() async throws {
+        let observations = SimulatedObservations()
+        let store = makeStore(observations: observations)
+        await store.refresh()
+        store.selection = [try XCTUnwrap(store.files.first?.id)]
+        store.beginImport()
+        await store.finishImport(.success([try sourceFile()]))?.value
+        let change = try XCTUnwrap(store.pendingChange)
+        await store.confirm(change, saveRecovery: false)
+        XCTAssertEqual(observations.writeCount, 1)
+        XCTAssertNil(store.pendingChange)
+        XCTAssertNil(store.notice)
+        await store.confirm(change, saveRecovery: false)
+        XCTAssertEqual(observations.writeCount, 1)
+        XCTAssertNil(store.notice)
+        await store.shutdown()
+    }
+
+    func testAnOldChangeCannotConfirmOrCancelANewerWarning() async throws {
+        let observations = SimulatedObservations()
+        let store = makeStore(observations: observations)
+        await store.refresh()
+        await store.requestClear()
+        let first = try XCTUnwrap(store.pendingChange)
+        store.cancel(first)
+        await store.requestClear()
+        let current = try XCTUnwrap(store.pendingChange)
+        XCTAssertNotEqual(first.id, current.id)
+        await store.confirm(first, saveRecovery: false)
+        store.cancel(first)
+        XCTAssertEqual(store.pendingChange?.id, current.id)
+        XCTAssertNil(store.notice)
+        XCTAssertEqual(observations.writeCount, 0)
+        store.cancel(current)
+        XCTAssertNil(store.pendingChange)
+        await store.shutdown()
+    }
+
+    func testAnOldDictionaryWarningCannotDismissItsReplacement() async throws {
+        let observations = SimulatedObservations()
+        let store = makeStore(SimulatedConfiguration(appletID: NeoApplet.dictionary), observations: observations)
+        await store.refresh()
+        store.selection = [try XCTUnwrap(store.files.first?.id)]
+        let source = try dictionarySource("cats a")
+        store.beginImport()
+        await store.finishImport(.success([source]))?.value
+        let first = try XCTUnwrap(store.pendingDictionaryImport)
+        try Data("dogs a".utf8).write(to: source)
+        await store.confirmDictionaryImport(first)
+        let current = try XCTUnwrap(store.pendingDictionaryImport)
+        XCTAssertNotEqual(first.id, current.id)
+        store.cancelDictionaryImport(first)
+        await store.confirmDictionaryImport(first)
+        XCTAssertEqual(store.pendingDictionaryImport?.id, current.id)
+        XCTAssertEqual(store.pendingDictionaryImport?.sourceText, "dogs a")
+        XCTAssertNil(store.pendingChange)
+        XCTAssertNil(store.notice)
+        XCTAssertEqual(observations.writeCount, 0)
+        store.cancelDictionaryImport(current)
+        XCTAssertNil(store.pendingDictionaryImport)
+        await store.shutdown()
+    }
+
+    func testCompletedDictionaryConsentCannotDismissTheReplaceWarning() async throws {
+        let observations = SimulatedObservations()
+        let store = makeStore(SimulatedConfiguration(appletID: NeoApplet.dictionary), observations: observations)
+        await store.refresh()
+        store.selection = [try XCTUnwrap(store.files.first?.id)]
+        store.beginImport()
+        await store.finishImport(.success([try dictionarySource("cats a")]))?.value
+        let warning = try XCTUnwrap(store.pendingDictionaryImport)
+        await store.confirmDictionaryImport(warning)
+        let replacement = try XCTUnwrap(store.pendingChange)
+        store.cancelDictionaryImport(warning)
+        await store.confirmDictionaryImport(warning)
+        XCTAssertEqual(store.pendingChange?.id, replacement.id)
+        XCTAssertNil(store.pendingDictionaryImport)
+        XCTAssertNil(store.notice)
+        XCTAssertEqual(observations.writeCount, 0)
+        await store.confirm(replacement, saveRecovery: false)
+        XCTAssertEqual(observations.writeCount, 1)
+        await store.shutdown()
+    }
+
     func testDictionaryOmissionsNeedReviewBeforeTheReplaceConfirmation() async throws {
         let observations = SimulatedObservations()
         let store = makeStore(SimulatedConfiguration(appletID: NeoApplet.dictionary), observations: observations)
