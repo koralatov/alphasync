@@ -1,0 +1,22 @@
+{
+  "version": "2.0.5",
+  "build": "167",
+  "status": "pending-verification",
+  "sourceCommit": null,
+  "sourceCommitPolicy": "Set the exact successful source before completion.",
+  "gates": {
+    "swiftRegressions": 212,
+    "fixtures": 56,
+    "capturedImagesToReview": 136
+  },
+  "saving": {
+    "ready": false
+  },
+  "email": {
+    "sent": false
+  },
+  "publication": {
+    "authorised": false,
+    "performed": false
+  }
+}

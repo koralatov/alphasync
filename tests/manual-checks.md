@@ -198,3 +198,15 @@ Open a multiple-file Clear warning using disposable files.  Check that each name
 Cancel a warning, open another, and check normal consent and cancellation.  Change an imported dictionary source while its omission warning is open; continuing must require a fresh review of the new source, then the usual Replace warning.  No completed or cancelled action should unexpectedly reopen a warning or repeat a file change.
 
 Keep a file selected while attaching another Neo where available.  Its preview must remain stable.  Explicit Refresh must show current text, including changes with the same file size.  Check Find after reloading and closing Readers with another control focused.  Continue the wider transfer, recovery, helper, Help, regional, accessibility, and oldest-runtime checks.  Hosted checks and physical limits are recorded separately in the [maintenance plan](../docs/maintenance-166.md).
+
+## Final build 167 checks before 2.1
+
+Install the new candidate and confirm **2.0.5 (167)** in About.  Start with a full backup, verify the saved files, and use disposable Neo text for changes.  Continue the earlier 2.1 checklist.
+
+- Open About’s Release notes link and confirm the private source notes open.  Check Licence through native Help Viewer.
+- Rename a disposable file to a valid accented name.  Invalid, unsupported, and overlong names must leave the Neo unchanged.  Import a text file with an overlong or unsupported base name and confirm the error, preserved source, and unchanged Neo inventory.
+- Cancel import, export, and backup-folder panels.  Confirm no operation begins.  If a real folder or provider access error occurs, confirm it is reported rather than silently discarded.
+- Check completed, stopped, and empty backups.  Check saved counts, preserved originals, readable and selectable errors and paths, Done with Return, and Open Backup Folder in Finder.  A stopped backup must retain already saved files and accurate logs.
+- With VoiceOver enabled, check dialog heading navigation, labels, announcements, recovery options, and safe Cancel focus.  Repeat keyboard selection, editing, Find, and Light and Dark appearance checks on the actual Mac.
+
+Hosted checks cannot establish physical Neo transfers, actual VoiceOver speech, final composited materials, macOS 13 runtime, Help Viewer, or Login Items approval.  Record tonight’s physical results before deciding on stable 2.1.  Keep further app changes focused on problems found by that testing.
