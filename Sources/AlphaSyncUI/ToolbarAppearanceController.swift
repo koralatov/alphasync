@@ -34,6 +34,7 @@ struct ToolbarAppearanceController: NSViewRepresentable {
         private let preferences: Preferences
         private weak var observedToolbar: NSToolbar?
         private var observation: NSKeyValueObservation?
+        private var windowObservation: NSKeyValueObservation?
         private var scheduled = false
 
         init(preferences: Preferences) {
@@ -46,6 +47,9 @@ struct ToolbarAppearanceController: NSViewRepresentable {
             super.viewDidMoveToWindow()
             observation = nil
             observedToolbar = nil
+            windowObservation = window?.observe(\.toolbar, options: [.new]) { [weak self] _, _ in
+                Task { @MainActor [weak self] in self?.scheduleUpdate() }
+            }
             scheduleUpdate()
         }
 

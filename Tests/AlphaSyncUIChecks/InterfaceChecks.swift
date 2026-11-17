@@ -241,6 +241,7 @@ struct InterfaceChecks {
         let snapshot = try sample()
         var confirmations: [[String: Any]] = []
         var backupResults: [[String: Any]] = []
+        var toolbarReplacements: [[String: Any]] = []
         store.devices = [snapshot]; store.sidebar = .device(snapshot.connection)
         store.selection = [snapshot.applets[0].files[0].id]
         try require(store.canImport && store.importApplet?.id == NeoApplet.alphaWord, "A selected file must retain its applet as an import destination")
@@ -383,6 +384,31 @@ struct InterfaceChecks {
             defer { privateClipboard.releaseGlobally() }
             try require(privateClipboard.setString(view.string, forType: .string) && privateClipboard.string(forType: .string) == text, "Clipboard text differs from the full preview")
             try capture(reader, "reader-" + label, to: output); reader.close()
+            preferences.toolbarAppearance = .iconAndText
+            let toolbarWindow = window(ToolbarAppearanceController(preferences: preferences, connected: true),
+                                       size: NSSize(width: 500, height: 100), title: "Toolbar replacement")
+            let original = NSToolbar(identifier: "Original-" + label)
+            toolbarWindow.toolbar = original
+            settle()
+            try require(original.displayMode == .iconAndLabel, "The original toolbar ignored the saved appearance")
+            let replacement = NSToolbar(identifier: "Replacement-" + label)
+            replacement.displayMode = .iconOnly
+            toolbarWindow.toolbar = replacement
+            settle()
+            try require(replacement.displayMode == .iconAndLabel && preferences.toolbarAppearance == .iconAndText,
+                        "A replacement toolbar lost the saved appearance")
+            original.displayMode = .labelOnly
+            settle()
+            try require(preferences.toolbarAppearance == .iconAndText, "A former toolbar changed the saved appearance")
+            replacement.displayMode = .iconOnly
+            settle()
+            try require(preferences.toolbarAppearance == .iconOnly, "The replacement toolbar did not save a native change")
+            preferences.toolbarAppearance = .iconAndText
+            settle()
+            try require(replacement.displayMode == .iconAndLabel, "The replacement toolbar ignored a preference change")
+            toolbarReplacements.append(["appearance": label, "replacementAppliedSavedMode": true,
+                "formerToolbarIgnored": true, "nativeSelectionSaved": true, "preferenceApplied": true])
+            toolbarWindow.close()
         }
         try require(confirmations.count == 8, "Missing native confirmation checks")
         try JSONSerialization.data(withJSONObject: confirmations, options: [.prettyPrinted, .sortedKeys])
@@ -390,6 +416,9 @@ struct InterfaceChecks {
         try require(backupResults.count == 6, "Missing native backup result checks")
         try JSONSerialization.data(withJSONObject: backupResults, options: [.prettyPrinted, .sortedKeys])
             .write(to: output.appendingPathComponent("backup-result-checks.json"), options: .atomic)
+        try require(toolbarReplacements.count == 2, "Missing native toolbar replacement checks")
+        try JSONSerialization.data(withJSONObject: toolbarReplacements, options: [.prettyPrinted, .sortedKeys])
+            .write(to: output.appendingPathComponent("toolbar-replacement-checks.json"), options: .atomic)
         try PerformanceChecks.run(to: output)
         print("Native component checks passed. No USB devices or login registrations were changed.")
     }
