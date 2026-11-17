@@ -23,7 +23,7 @@ public struct AboutView: View {
         VStack(spacing: 20) {
             Image(nsImage: bundledIcon).renderingMode(.original).resizable().scaledToFit().frame(width: 96, height: 96).accessibilityHidden(true)
             VStack(spacing: 6) {
-                Text("AlphaSync").font(.largeTitle.bold())
+                Text("AlphaSync").font(.largeTitle.bold()).accessibilityAddTraits(.isHeader)
                 Text("Version \(AppMetadata.version) (\(AppMetadata.build))")
                 Text(AppMetadata.compatibility).foregroundStyle(.secondary)
             }

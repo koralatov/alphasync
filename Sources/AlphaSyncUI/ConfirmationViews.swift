@@ -10,7 +10,7 @@ struct DictionaryImportConfirmation: View {
     @FocusState private var cancelFocused: Bool
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
-            Label("Some dictionary words cannot be imported", systemImage: "exclamationmark.triangle").font(.headline)
+            Label("Some dictionary words cannot be imported", systemImage: "exclamationmark.triangle").font(.headline).accessibilityAddTraits(.isHeader)
             Text(request.sources.first?.lastPathComponent ?? "Dictionary import").textSelection(.enabled)
             Text(request.report.explanation).textSelection(.enabled).fixedSize(horizontal: false, vertical: true)
             Text("Continue with only the valid words?  Replacing an existing file still requires the usual Replace confirmation.")
@@ -42,7 +42,7 @@ public struct DestructiveConfirmation: View {
     }
     public var body: some View {
         VStack(alignment: .leading, spacing: 18) {
-            Label(title, systemImage: "exclamationmark.triangle").font(.headline)
+            Label(title, systemImage: "exclamationmark.triangle").font(.headline).accessibilityAddTraits(.isHeader)
             Text(explanation).textSelection(.enabled).fixedSize(horizontal: false, vertical: true)
             if names.count > 1 {
                 ScrollView {
@@ -86,7 +86,7 @@ struct RenameFile: View {
     }
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Rename ‘\(file.displayName)’").font(.headline)
+            Text("Rename ‘\(file.displayName)’").font(.headline).accessibilityAddTraits(.isHeader)
             TextField("Name:", text: $name).focused($nameFocused)
                 .accessibilityLabel("File name").accessibilityHint(guidance)
             Text(guidance).font(.callout).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
@@ -109,15 +109,15 @@ struct BackupCompletion: View {
     }
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text(title).font(.headline)
-            Text("AlphaSync saved \(result.saved.formatted()) of \(result.expected.formatted()) files. The original files on your Neo have not been changed.")
-                .fixedSize(horizontal: false, vertical: true)
+            Text(title).font(.headline).accessibilityAddTraits(.isHeader)
+            Text("AlphaSync saved \(result.saved.formatted()) of \(result.expected.formatted()) \(result.expected == 1 ? "file" : "files").  The original files on your Neo have not been changed.")
+                .textSelection(.enabled).fixedSize(horizontal: false, vertical: true)
             if !result.failures.isEmpty {
                 ScrollView { Text(result.failures.joined(separator: "\n\n")).textSelection(.enabled).frame(maxWidth: .infinity, alignment: .leading) }
                     .frame(maxHeight: 140)
             }
             if !result.folders.isEmpty {
-                Text("Saved to:").font(.headline)
+                Text("Saved to:").font(.headline).accessibilityAddTraits(.isHeader)
                 ForEach(result.folders, id: \.self) { folder in Text(folder.path).textSelection(.enabled).fixedSize(horizontal: false, vertical: true) }
                 Text("Open the backup folder to view your saved files in Finder.").foregroundStyle(.secondary)
             }

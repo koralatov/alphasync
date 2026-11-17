@@ -3,6 +3,7 @@ import AppKit
 import QuartzCore
 import ServiceManagement
 @testable import AlphaSyncUI
+@testable import AlphaSyncHardware
 import AlphaSyncCore
 
 struct CheckFailure: Error, CustomStringConvertible { let description: String }
@@ -239,6 +240,7 @@ struct InterfaceChecks {
         let store = AppStore(preferences: preferences, monitoringEnabled: false)
         let snapshot = try sample()
         var confirmations: [[String: Any]] = []
+        var backupResults: [[String: Any]] = []
         store.devices = [snapshot]; store.sidebar = .device(snapshot.connection)
         store.selection = [snapshot.applets[0].files[0].id]
         try require(store.canImport && store.importApplet?.id == NeoApplet.alphaWord, "A selected file must retain its applet as an import destination")
@@ -332,6 +334,26 @@ struct InterfaceChecks {
                                 size: NSSize(width: 400, height: 210), title: "Rename")
             try capture(rename, "rename-" + label, to: output)
             rename.close()
+            let folder = URL(fileURLWithPath: "/Fixtures/Backups/Neo 2026-11-17", isDirectory: true)
+            for (name, result) in [
+                ("complete", BackupResult(saved: 1, expected: 1, folders: [folder], stopped: false, failures: [])),
+                ("stopped", BackupResult(saved: 1, expected: 2, folders: [folder], stopped: true,
+                    failures: ["‘File 2’ was not saved because the backup was stopped.  The saved file remains available."])),
+                ("empty", BackupResult(saved: 0, expected: 0, folders: [], stopped: false, failures: []))
+            ] {
+                var dismissed = 0
+                let completion = window(BackupCompletion(result: result, close: { dismissed += 1 }),
+                                        size: NSSize(width: 500, height: name == "stopped" ? 360 : 290), title: "Backup result")
+                try require(completion.defaultButtonCell?.title == "Done", "Only Done may be the backup result’s default action")
+                try capture(completion, "backup-" + name + "-" + label, to: output)
+                try require(dismissed == 0, "The backup result dismissed before user input")
+                try key("\r", code: 36, in: completion)
+                try require(dismissed == 1, "Return must dismiss the backup result using Done")
+                backupResults.append(["appearance": label, "result": name, "saved": result.saved,
+                                      "expected": result.expected, "complete": result.complete,
+                                      "defaultButton": "Done", "returnDismissed": true])
+                completion.close()
+            }
             let text = "A read-only preview\n\nAlphaSmart Neo text stays selectable.\n" + String(repeating: "More text for scrolling and Find.\n", count: 80)
             let reader = window(ReadOnlyText(text: text), size: NSSize(width: 660, height: 500), title: "File 1")
             guard let view = reader.contentView.flatMap({ descendants($0).first { $0 is NSTextView } }) as? NSTextView else {
@@ -366,6 +388,9 @@ struct InterfaceChecks {
         try require(confirmations.count == 8, "Missing native confirmation checks")
         try JSONSerialization.data(withJSONObject: confirmations, options: [.prettyPrinted, .sortedKeys])
             .write(to: output.appendingPathComponent("confirmation-checks.json"), options: .atomic)
+        try require(backupResults.count == 6, "Missing native backup result checks")
+        try JSONSerialization.data(withJSONObject: backupResults, options: [.prettyPrinted, .sortedKeys])
+            .write(to: output.appendingPathComponent("backup-result-checks.json"), options: .atomic)
         try PerformanceChecks.run(to: output)
         print("Native component checks passed. No USB devices or login registrations were changed.")
     }
