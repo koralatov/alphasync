@@ -68,3 +68,7 @@ Keep the existing file-list cache and locale-aware formatter reuse.  Do not add 
 ## Outcome
 
 Retain the verified build unchanged.  The Clear predicate is a worthwhile, contained cleanup for the next source milestone.  The Find change needs an API decision, and snapshot publication is clearer left explicit at its present size.  Any later implementation must use a new private build, preserve the relevant behavioural regressions and full package gates, and keep physical Neo testing separate from hosted verification before deciding on stable 2.1.
+
+## Implemented follow-up
+
+The user subsequently authorised all three findings.  Private build 166 implements the Clear predicate cleanup, explicit Find target, and shared snapshot publication with its distinct preview policies, together with obsolete-confirmation protection and selectable file details.  The [maintenance review](maintenance-166.md) and [verified record](../releases/verification/2.0.5-166/verification.json) retain the implementation, regression coverage, completed checks, and physical testing still required.

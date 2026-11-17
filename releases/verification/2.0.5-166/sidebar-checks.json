@@ -1,0 +1,162 @@
+{
+  "arm": [
+    {
+      "actual": 180,
+      "appearance": "light",
+      "canCollapse": false,
+      "kind": "width",
+      "requested": 180
+    },
+    {
+      "actual": 300,
+      "appearance": "light",
+      "canCollapse": false,
+      "kind": "width",
+      "requested": 300
+    },
+    {
+      "actual": 220,
+      "appearance": "light",
+      "canCollapse": false,
+      "kind": "width",
+      "requested": 220
+    },
+    {
+      "appearance": "light",
+      "kind": "size",
+      "value": "small",
+      "width": 220
+    },
+    {
+      "appearance": "light",
+      "kind": "size",
+      "value": "medium",
+      "width": 220
+    },
+    {
+      "appearance": "light",
+      "kind": "size",
+      "value": "large",
+      "width": 220
+    },
+    {
+      "actual": 180,
+      "appearance": "dark",
+      "canCollapse": false,
+      "kind": "width",
+      "requested": 180
+    },
+    {
+      "actual": 300,
+      "appearance": "dark",
+      "canCollapse": false,
+      "kind": "width",
+      "requested": 300
+    },
+    {
+      "actual": 220,
+      "appearance": "dark",
+      "canCollapse": false,
+      "kind": "width",
+      "requested": 220
+    },
+    {
+      "appearance": "dark",
+      "kind": "size",
+      "value": "small",
+      "width": 220
+    },
+    {
+      "appearance": "dark",
+      "kind": "size",
+      "value": "medium",
+      "width": 220
+    },
+    {
+      "appearance": "dark",
+      "kind": "size",
+      "value": "large",
+      "width": 220
+    }
+  ],
+  "intel": [
+    {
+      "actual": 180,
+      "appearance": "light",
+      "canCollapse": false,
+      "kind": "width",
+      "requested": 180
+    },
+    {
+      "actual": 300,
+      "appearance": "light",
+      "canCollapse": false,
+      "kind": "width",
+      "requested": 300
+    },
+    {
+      "actual": 220,
+      "appearance": "light",
+      "canCollapse": false,
+      "kind": "width",
+      "requested": 220
+    },
+    {
+      "appearance": "light",
+      "kind": "size",
+      "value": "small",
+      "width": 220
+    },
+    {
+      "appearance": "light",
+      "kind": "size",
+      "value": "medium",
+      "width": 220
+    },
+    {
+      "appearance": "light",
+      "kind": "size",
+      "value": "large",
+      "width": 220
+    },
+    {
+      "actual": 180,
+      "appearance": "dark",
+      "canCollapse": false,
+      "kind": "width",
+      "requested": 180
+    },
+    {
+      "actual": 300,
+      "appearance": "dark",
+      "canCollapse": false,
+      "kind": "width",
+      "requested": 300
+    },
+    {
+      "actual": 220,
+      "appearance": "dark",
+      "canCollapse": false,
+      "kind": "width",
+      "requested": 220
+    },
+    {
+      "appearance": "dark",
+      "kind": "size",
+      "value": "small",
+      "width": 220
+    },
+    {
+      "appearance": "dark",
+      "kind": "size",
+      "value": "medium",
+      "width": 220
+    },
+    {
+      "appearance": "dark",
+      "kind": "size",
+      "value": "large",
+      "width": 220
+    }
+  ]
+}

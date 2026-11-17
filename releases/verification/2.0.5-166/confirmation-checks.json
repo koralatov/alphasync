@@ -1,0 +1,150 @@
+{
+  "arm": [
+    {
+      "action": "Clear File",
+      "appearance": "light",
+      "defaultButton": false,
+      "enterChangedFiles": false,
+      "escapeCancelled": true,
+      "returnChangedFiles": false,
+      "spaceChangedFiles": false
+    },
+    {
+      "action": "Clear Selected Files",
+      "appearance": "light",
+      "defaultButton": false,
+      "enterChangedFiles": false,
+      "escapeCancelled": true,
+      "returnChangedFiles": false,
+      "spaceChangedFiles": false
+    },
+    {
+      "action": "Replace",
+      "appearance": "light",
+      "defaultButton": false,
+      "enterChangedFiles": false,
+      "escapeCancelled": true,
+      "returnChangedFiles": false,
+      "spaceChangedFiles": false
+    },
+    {
+      "action": "Dictionary import",
+      "appearance": "light",
+      "defaultButton": false,
+      "enterChangedFiles": false,
+      "escapeCancelled": true,
+      "returnChangedFiles": false,
+      "spaceChangedFiles": false
+    },
+    {
+      "action": "Clear File",
+      "appearance": "dark",
+      "defaultButton": false,
+      "enterChangedFiles": false,
+      "escapeCancelled": true,
+      "returnChangedFiles": false,
+      "spaceChangedFiles": false
+    },
+    {
+      "action": "Clear Selected Files",
+      "appearance": "dark",
+      "defaultButton": false,
+      "enterChangedFiles": false,
+      "escapeCancelled": true,
+      "returnChangedFiles": false,
+      "spaceChangedFiles": false
+    },
+    {
+      "action": "Replace",
+      "appearance": "dark",
+      "defaultButton": false,
+      "enterChangedFiles": false,
+      "escapeCancelled": true,
+      "returnChangedFiles": false,
+      "spaceChangedFiles": false
+    },
+    {
+      "action": "Dictionary import",
+      "appearance": "dark",
+      "defaultButton": false,
+      "enterChangedFiles": false,
+      "escapeCancelled": true,
+      "returnChangedFiles": false,
+      "spaceChangedFiles": false
+    }
+  ],
+  "intel": [
+    {
+      "action": "Clear File",
+      "appearance": "light",
+      "defaultButton": false,
+      "enterChangedFiles": false,
+      "escapeCancelled": true,
+      "returnChangedFiles": false,
+      "spaceChangedFiles": false
+    },
+    {
+      "action": "Clear Selected Files",
+      "appearance": "light",
+      "defaultButton": false,
+      "enterChangedFiles": false,
+      "escapeCancelled": true,
+      "returnChangedFiles": false,
+      "spaceChangedFiles": false
+    },
+    {
+      "action": "Replace",
+      "appearance": "light",
+      "defaultButton": false,
+      "enterChangedFiles": false,
+      "escapeCancelled": true,
+      "returnChangedFiles": false,
+      "spaceChangedFiles": false
+    },
+    {
+      "action": "Dictionary import",
+      "appearance": "light",
+      "defaultButton": false,
+      "enterChangedFiles": false,
+      "escapeCancelled": true,
+      "returnChangedFiles": false,
+      "spaceChangedFiles": false
+    },
+    {
+      "action": "Clear File",
+      "appearance": "dark",
+      "defaultButton": false,
+      "enterChangedFiles": false,
+      "escapeCancelled": true,
+      "returnChangedFiles": false,
+      "spaceChangedFiles": false
+    },
+    {
+      "action": "Clear Selected Files",
+      "appearance": "dark",
+      "defaultButton": false,
+      "enterChangedFiles": false,
+      "escapeCancelled": true,
+      "returnChangedFiles": false,
+      "spaceChangedFiles": false
+    },
+    {
+      "action": "Replace",
+      "appearance": "dark",
+      "defaultButton": false,
+      "enterChangedFiles": false,
+      "escapeCancelled": true,
+      "returnChangedFiles": false,
+      "spaceChangedFiles": false
+    },
+    {
+      "action": "Dictionary import",
+      "appearance": "dark",
+      "defaultButton": false,
+      "enterChangedFiles": false,
+      "escapeCancelled": true,
+      "returnChangedFiles": false,
+      "spaceChangedFiles": false
+    }
+  ]
+}

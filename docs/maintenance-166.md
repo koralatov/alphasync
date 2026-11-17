@@ -1,6 +1,6 @@
 # Maintenance in build 166
 
-Prepare private **2.0.5, build 166** under the user’s request to apply all three [simplification findings](simplification-review-165.md), make further useful improvements, build the result, and email the verified download link.  Preserve build 165, all earlier private copies, public 1.5.1 and 2.0.4, their eighteen assets and notes, all twelve version tags, and frozen legacy source.  No release publication or retirement is authorised.
+Private **2.0.5, build 166** is verified and ready for physical testing following the user’s request to apply all three [simplification findings](simplification-review-165.md), make further useful improvements, build the result, and email the verified download link.  Preserve build 165, all earlier private copies, public 1.5.1 and 2.0.4, their eighteen assets and notes, all twelve version tags, and frozen legacy source.  No release publication or retirement is authorised.
 
 ## Clear eligibility
 
@@ -75,3 +75,11 @@ The [pending record](../releases/verification/2.0.5-166/verification.json) separ
 Run `43975990868` passed at attempt 2 for exact source `42f643094e74ba0e4ac6a239dc7085c689c23996`.  The first native download job, `133683042128`, was cancelled without executing any steps.  Its native-only retry, `133703857905`, passed verification and execution of both exact canonical packages on Apple Silicon.  The successful host builds and their three artifacts were retained.  The fourth artifact contains the native package evidence.  Publication was skipped.
 
 Hosted checks are complete, and a fresh comparison confirms public 1.5.1 and 2.0.4, their eighteen assets and notes, all twelve tags, frozen legacy source, and latest 2.0.4 unchanged.  This does not complete independent artifact inspection or the review of 124 images.  The executor is explicitly unavailable, so extraction, independent hashing, visual review, and saving cannot be performed in this checkpoint.  The task is paused pending an available coding workspace.  The [record](../releases/verification/2.0.5-166/verification.json) remains blocked, with no saved test ZIP and no completion email.  Resume those remaining gates against the retained packages without rebuilding unchanged app source.
+
+## Completed verification on 17 November 2026
+
+Workspace access was restored, and the remaining gates were completed against exact source `42f643094e74ba0e4ac6a239dc7085c689c23996`.  All four downloaded artifact digests match GitHub’s metadata.  Independent checks of all twelve canonical assets match the native package manifest, both Help books have eighteen pages and eighty-three valid links, all twenty authored Help files match the source in each edition, and packaged app and helper metadata show 2.0.5 (166) with macOS 13.0 minimum.
+
+All 124 final-source captures were reviewed: sixty-two per host, including the new multi-file warnings in both appearances.  Each name appears on its own line, including a name containing a comma.  Explanations, recovery choices, and button order remain readable.  No new missing content, clipping, or geometry failure was found in the reviewed scope.  The existing Intel dark toolbar material masks and unbundled About fallback remain explicit capture limits.  Actual VoiceOver, keyboard focus and editing, and final system-composited appearance remain manual.
+
+The separate private Apple Silicon test ZIP is saved and its SHA-256 is recorded in the [verified record](../releases/verification/2.0.5-166/verification.json).  App source was not rebuilt or changed while completing these remaining checks.  Core, hardware, Reader, and native browser source match build 165 exactly.  Public releases and notes, eighteen assets, all twelve version tags, frozen legacy source, and latest 2.0.4 remain unchanged.  Physical Neo testing comes next before the decision on stable 2.1.  No release was published or retired.

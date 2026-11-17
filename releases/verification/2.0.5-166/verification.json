@@ -1,7 +1,7 @@
 {
   "version": "2.0.5",
   "build": "166",
-  "status": "hosted-checks-passed-independent-review-and-saving-blocked",
+  "status": "verified-private-test-build",
   "sourceCommit": "42f643094e74ba0e4ac6a239dc7085c689c23996",
   "implementationCommit": "bd5b31d1be35bbf9ac2916ff3b4d766c8d8e7493",
   "initialCandidate": {
@@ -35,25 +35,58 @@
   },
   "verification": {
     "allAutomatedChecksPassed": true,
-    "independentPackageInspectionComplete": false,
-    "capturedImageReviewComplete": false,
+    "independentPackageInspectionComplete": true,
+    "capturedImageReviewComplete": true,
     "protectedReferencesCompared": true,
-    "sourceReviewComplete": true
+    "sourceReviewComplete": true,
+    "artifactDigests": 4,
+    "assetHashes": 12,
+    "capturedImagesReviewed": 124,
+    "help": [
+      {
+        "edition": "universal",
+        "version": "2.0.5",
+        "build": "166",
+        "minimumDeployment": "13.0",
+        "appIdentity": "com.tsoniq.AlphaSync",
+        "helperIdentity": "com.tsoniq.AlphaSyncLauncher",
+        "authoredHelpFilesMatched": 20,
+        "searchIndexes": 1,
+        "helpPages": 18,
+        "helpLinks": 83,
+        "help": "passed",
+        "packagedIconBytes": 1260361
+      },
+      {
+        "edition": "apple-silicon",
+        "version": "2.0.5",
+        "build": "166",
+        "minimumDeployment": "13.0",
+        "appIdentity": "com.tsoniq.AlphaSync",
+        "helperIdentity": "com.tsoniq.AlphaSyncLauncher",
+        "authoredHelpFilesMatched": 20,
+        "searchIndexes": 1,
+        "helpPages": 18,
+        "helpLinks": 83,
+        "help": "passed",
+        "packagedIconBytes": 1748105
+      }
+    ],
+    "minimumDeployment": "13.0",
+    "signatures": "Ad hoc signing, hardened runtime, helper identities, architectures, native execution, and matching symbols passed on the exact canonical archives in the hosted native job.  The independently downloaded bytes match its asset manifest."
   },
   "saving": {
-    "ready": false,
-    "filename": "AlphaSync-2.0.5-166-macOS-13-apple-silicon.zip"
+    "ready": true,
+    "filename": "AlphaSync-2.0.5-166-macOS-13-apple-silicon.zip",
+    "size": 2955001,
+    "sha256": "8979f846cbef09280a574882b2a3a1809d002c096136fe9e59190be36a67322a",
+    "availability": "Separate private Apple Silicon test copy saved; earlier candidates retained."
   },
   "email": {
     "sent": false
   },
-  "pending": [
-    "Independent download and digest verification of all four artifacts and twelve assets remain required.",
-    "Both Help books and packaged metadata need independent inspection against the tested source.",
-    "All 124 new captures require visual review.",
-    "Save the separate Apple Silicon test ZIP after those checks, then send one completion email."
-  ],
-  "environment": "The executor is explicitly unavailable.  Hosted GitHub checks and protected-reference comparison are complete; local artifact inspection, visual review, and saving are blocked.",
+  "pending": [],
+  "environment": "Workspace access restored on 17 November 2026.  Independent package inspection, source comparison, all captured-image reviews, and saving are complete.",
   "stableGoal": "Physical Neo testing comes next before deciding on stable 2.1.",
   "plan": "../../../docs/maintenance-166.md",
   "sourceTree": "2a5e6f385a3502aa5cb1b63bb5a5b112a85083d6",
@@ -78,7 +111,16 @@
         "universal",
         "apple-silicon"
       ],
-      "artifactContentsIndependentlyInspected": false
+      "artifactContentsIndependentlyInspected": true,
+      "host": "intel",
+      "fixtures": 55,
+      "browserObservations": 32,
+      "toolbarRecords": 6,
+      "sidebarRecords": 12,
+      "findRecords": 12,
+      "confirmationRecords": 8,
+      "capturedImages": 62,
+      "latestAttemptJobID": 133703859875
     },
     {
       "id": 133679975867,
@@ -95,7 +137,16 @@
         "universal",
         "apple-silicon"
       ],
-      "artifactContentsIndependentlyInspected": false
+      "artifactContentsIndependentlyInspected": true,
+      "host": "arm",
+      "fixtures": 55,
+      "browserObservations": 32,
+      "toolbarRecords": 6,
+      "sidebarRecords": 12,
+      "findRecords": 12,
+      "confirmationRecords": 8,
+      "capturedImages": 62,
+      "latestAttemptJobID": 133703905249
     }
   ],
   "canonicalDownloads": {
@@ -129,11 +180,12 @@
       "v2.0.4",
       "v1.5.1"
     ],
+    "publicReleaseNotesAndAssetsUnchanged": true,
     "retainedAssets": 18,
-    "versionTags": 12,
-    "frozenLegacy": "6cb821c9ab8073ff950414952bf2480eb4638c5d",
+    "versionTagsUnchanged": 12,
+    "frozenLegacyUnchanged": true,
     "latest": "v2.0.4",
-    "checkedAt": "2026-11-16T23:53:48.269Z"
+    "checkedAt": "2026-11-17T07:36:46.467Z"
   },
   "artifacts": [
     {
@@ -141,31 +193,31 @@
       "name": "AlphaSync-arm64-package-verification-42f643094e74ba0e4ac6a239dc7085c689c23996",
       "size": 1263,
       "reportedDigest": "sha256:e71c755070e7cab1c0905f0f65e6da9b4940daebb3189fb4f00b353b3a754305",
-      "downloadedDigestVerified": false
+      "downloadedDigestVerified": true
     },
     {
       "id": 14281271314,
       "name": "AlphaSync-interface-and-logs-macos-15-42f643094e74ba0e4ac6a239dc7085c689c23996",
       "size": 1752387,
       "reportedDigest": "sha256:3b4341344ce372b5cda2c3f04a63fe0790ee0b7ae3f1109762b2d8c62f4cd8c2",
-      "downloadedDigestVerified": false
+      "downloadedDigestVerified": true
     },
     {
       "id": 14280674257,
       "name": "AlphaSync-packages-42f643094e74ba0e4ac6a239dc7085c689c23996",
       "size": 21277732,
       "reportedDigest": "sha256:40daa0432e00910e7d20d90dea6032c80eea4a732e950d6c71be7768ba83ef9e",
-      "downloadedDigestVerified": false
+      "downloadedDigestVerified": true
     },
     {
       "id": 14280449761,
       "name": "AlphaSync-interface-and-logs-macos-26-intel-42f643094e74ba0e4ac6a239dc7085c689c23996",
       "size": 1791322,
       "reportedDigest": "sha256:773581be519efcfe4dc1c208f49c7296a3dc8946383397048846604f131215f2",
-      "downloadedDigestVerified": false
+      "downloadedDigestVerified": true
     }
   ],
-  "checkedAt": "2026-11-16T23:54:52.474Z",
+  "checkedAt": "2026-11-17T07:40:41.031160+00:00",
   "canonicalDownloadAttempts": [
     {
       "runAttempt": 1,
@@ -187,10 +239,98 @@
     "releasePublished": false,
     "releaseRetired": false
   },
-  "blocker": {
+  "privateTestZIP": {
+    "ready": true,
+    "filename": "AlphaSync-2.0.5-166-macOS-13-apple-silicon.zip",
+    "size": 2955001,
+    "sha256": "8979f846cbef09280a574882b2a3a1809d002c096136fe9e59190be36a67322a",
+    "availability": "Separate private Apple Silicon test copy saved; earlier candidates retained."
+  },
+  "resolvedBlocker": {
     "kind": "executor-unavailable",
     "missingCapability": "An available coding workspace with filesystem and execution access is required for artifact extraction, independent hashing, image review, and saving the separate ZIP.",
     "notification": "No build-ready email or ready notification has been sent.",
-    "continuation": "Paused because the remaining work cannot be completed without a coding workspace.  Resume from the exact tested source and retained artifacts when one is available."
+    "continuation": "Paused because the remaining work cannot be completed without a coding workspace.  Resume from the exact tested source and retained artifacts when one is available.",
+    "resolvedAt": "2026-11-17T07:40:41.030947+00:00"
+  },
+  "changes": [
+    "Explicit Clear eligibility with one selected-file evaluation and all safety guards retained",
+    "Required native Find target with the unused responder-chain fallback removed",
+    "Shared synchronous snapshot publication with explicit preview-invalidation policy",
+    "Identity-checked confirmation callbacks reject obsolete or repeated consent and cancellation",
+    "Selectable explanations and one file name per line, preserving names containing commas"
+  ],
+  "regressionCoverage": {
+    "previousSwiftTests": 194,
+    "newTests": 10,
+    "totalSwiftTests": 204
+  },
+  "unverified": [
+    "Physical Neo transfers, target-change boundaries, recovery, and readback on the M2 Air",
+    "Actual VoiceOver speech, keyboard focus and editing, context menus, and regional settings",
+    "Final system-composited appearance, macOS 13 runtime, native Help Viewer, and Login Items approval"
+  ],
+  "captureLimits": [
+    "Layer captures do not establish final system-composited toolbar or sidebar materials.",
+    "The unbundled About fixture is not the packaged app.  USB is disabled in interface fixtures, so Inspector preview errors are expected.",
+    "Standard selectable Text, native labels, and keyboard assertions do not establish actual VoiceOver speech, text editing, or physical focus behaviour.  These remain manual."
+  ],
+  "files": {
+    "assets.json": {
+      "size": 2043,
+      "sha256": "d3aa0e9afc038b1c6251303b7a2762d9835a35e00f4e3033612bf0ca3fb35900"
+    },
+    "commits.json": {
+      "size": 1980,
+      "sha256": "82a6141d96c5248f007588139d8d721ca57fd878f04e0bdf6b423db38c7ab785"
+    },
+    "confirmation-checks.json": {
+      "size": 3843,
+      "sha256": "a45a5a90ab6009eeb2a8e27443c08441775b811215532ecd79afa581d36ae68a"
+    },
+    "find-command-checks.json": {
+      "size": 5375,
+      "sha256": "45c436c7b14c097f5a07b276aeca018462d43b1a4121b440638123d1234f6547"
+    },
+    "formatting-performance.json": {
+      "size": 1701,
+      "sha256": "4268891979e55e7db9b636f2560333f9c0863fce9dc69a126129291d2759e5d8"
+    },
+    "interface-layouts.json": {
+      "size": 43303,
+      "sha256": "1cb4a8ec19c766cb46147f60a15140ce4f0258f9dade7d33637df3d1a543d1b0"
+    },
+    "interface-review.json": {
+      "size": 34106,
+      "sha256": "e677ddace4aada16acc0950902a0f8775075ab06abdcdd498c33afee7967d580"
+    },
+    "package-verification.json": {
+      "size": 743,
+      "sha256": "0684fc63a0c6e45b3a1f85256b10a00a9b548f38589f89e3f85fecc807d76ab5"
+    },
+    "performance.json": {
+      "size": 683,
+      "sha256": "580e89b374df4c737816afe9ee996cacb532dee30d89954918538facbb05fc36"
+    },
+    "protected-comparison.json": {
+      "size": 271,
+      "sha256": "ac49badaa2c1ab4753479fb33d9908401ab33ef8bfafdf439573a69361829362"
+    },
+    "protected-reference-baseline.json": {
+      "size": 34259,
+      "sha256": "9431ac81fa400174ab12355184d37c74456f3483c4632e058379c6e4af57b302"
+    },
+    "sidebar-checks.json": {
+      "size": 2955,
+      "sha256": "5876183c1c89018494535d77fd5d70b63fde1d2de93078b95f919fa5e4e25cee"
+    },
+    "source-protection.json": {
+      "size": 501,
+      "sha256": "0e46f6c2aa53611a1de79612fc5413f99410a6e10cd8af580a1b535f34db2153"
+    },
+    "toolbar-checks.json": {
+      "size": 3449,
+      "sha256": "12984ab8f366a4cd11b1e4c2d7e30a5209a3d5393adb1a0b06a0f91d0a0c18dd"
+    }
   }
 }

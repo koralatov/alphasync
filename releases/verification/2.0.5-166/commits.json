@@ -3,88 +3,48 @@
     "sha": "19a3e6255b930d5b6a59b878dc5dc59b5fbcd598",
     "tree": "d6c47dabba7338439af1a1c603c734b92cb60217",
     "parent": "0dc28e982250f14014552b675c4f44b62b510064",
-    "title": "Make Clear eligibility explicit",
-    "paths": [
-      "Sources/AlphaSyncUI/AppStore.swift",
-      "Tests/AlphaSyncHardwareTests/AppStoreTests.swift",
-      "Tests/AlphaSyncHardwareTests/OperationLifetimeTests.swift"
-    ]
+    "title": "Make Clear eligibility explicit [skip ci]"
   },
   {
     "sha": "38218e716078d141037b892f573bd125fbe3194d",
     "tree": "1ccf7b87c75c41dd7437566f500c110a20f9a7d8",
     "parent": "19a3e6255b930d5b6a59b878dc5dc59b5fbcd598",
-    "title": "Centralise discovery snapshot publication",
-    "paths": [
-      "Sources/AlphaSyncUI/AppStore.swift",
-      "Tests/AlphaSyncHardwareTests/AppStoreTests.swift",
-      "Tests/AlphaSyncHardwareTests/AttachmentMonitoringTests.swift"
-    ]
+    "title": "Centralise discovery snapshot publication [skip ci]"
   },
   {
     "sha": "33a6f3b6d6138bf425df76da1a75717abf469ea2",
     "tree": "af1e21b6f99ba5ba738e0965c39186a3c0097423",
     "parent": "38218e716078d141037b892f573bd125fbe3194d",
-    "title": "Require an explicit native Find target",
-    "paths": [
-      "Sources/AlphaSyncUI/AppActions.swift"
-    ]
+    "title": "Require an explicit native Find target [skip ci]"
   },
   {
     "sha": "485841e649fe5824892ab9f59cc03ea440954e92",
     "tree": "bf58ad7fe1218a035f85855ffdc5770d6e263450",
     "parent": "33a6f3b6d6138bf425df76da1a75717abf469ea2",
-    "title": "Ignore callbacks from obsolete confirmations",
-    "paths": [
-      "Sources/AlphaSyncUI/AppStore.swift",
-      "Sources/AlphaSyncUI/MainView.swift",
-      "Tests/AlphaSyncHardwareTests/AppStoreTests.swift"
-    ]
+    "title": "Ignore callbacks from obsolete confirmations [skip ci]"
   },
   {
     "sha": "88c2565dc1299195235bd87525cde735aa5719a0",
     "tree": "2bc213cceeaa8cd9de363db0c407ce02d7f99cd6",
     "parent": "485841e649fe5824892ab9f59cc03ea440954e92",
-    "title": "Make confirmation details selectable and readable",
-    "paths": [
-      "Sources/AlphaSyncUI/ConfirmationViews.swift",
-      "Tests/AlphaSyncUIChecks/InterfaceChecks.swift"
-    ]
+    "title": "Make confirmation details selectable and readable [skip ci]"
   },
   {
     "sha": "fa3ce3cc93dfc7403e9c3c975f595c2291ec58cb",
     "tree": "0a2ef349de8f5388943fd250d32144376b6fd264",
     "parent": "88c2565dc1299195235bd87525cde735aa5719a0",
-    "title": "Prepare private build 166 for its full verification milestone",
-    "paths": [
-      "docs/maintenance-166.md",
-      "AlphaSync/Build/Version.xcconfig",
-      "README.md",
-      "TECHNICAL.md",
-      "releases/2.0.5.md",
-      "AGENTS.md",
-      "tests/manual-checks.md"
-    ]
+    "title": "Prepare private build 166 for its full verification milestone"
   },
   {
     "sha": "bd5b31d1be35bbf9ac2916ff3b4d766c8d8e7493",
     "tree": "a62322eb11e56bff5ba893c0af349b88fd6f3f4c",
     "parent": "fa3ce3cc93dfc7403e9c3c975f595c2291ec58cb",
-    "title": "Correct read-only and recovery regression fixtures",
-    "paths": [
-      "Tests/AlphaSyncHardwareTests/AppStoreTests.swift"
-    ]
+    "title": "Correct read-only and recovery regression fixtures [skip ci]"
   },
   {
     "sha": "42f643094e74ba0e4ac6a239dc7085c689c23996",
     "tree": "2a5e6f385a3502aa5cb1b63bb5a5b112a85083d6",
     "parent": "bd5b31d1be35bbf9ac2916ff3b4d766c8d8e7493",
-    "title": "Verify build 166 with corrected regression fixtures",
-    "paths": [
-      "docs/maintenance-166.md",
-      "AGENTS.md",
-      "releases/verification/2.0.5-166/protected-reference-baseline.json",
-      "releases/verification/2.0.5-166/verification.json"
-    ]
+    "title": "Verify build 166 with corrected regression fixtures"
   }
 ]

@@ -1,0 +1,30 @@
+[
+  {
+    "edition": "universal",
+    "version": "2.0.5",
+    "build": "166",
+    "minimumDeployment": "13.0",
+    "appIdentity": "com.tsoniq.AlphaSync",
+    "helperIdentity": "com.tsoniq.AlphaSyncLauncher",
+    "authoredHelpFilesMatched": 20,
+    "searchIndexes": 1,
+    "helpPages": 18,
+    "helpLinks": 83,
+    "help": "passed",
+    "packagedIconBytes": 1260361
+  },
+  {
+    "edition": "apple-silicon",
+    "version": "2.0.5",
+    "build": "166",
+    "minimumDeployment": "13.0",
+    "appIdentity": "com.tsoniq.AlphaSync",
+    "helperIdentity": "com.tsoniq.AlphaSyncLauncher",
+    "authoredHelpFilesMatched": 20,
+    "searchIndexes": 1,
+    "helpPages": 18,
+    "helpLinks": 83,
+    "help": "passed",
+    "packagedIconBytes": 1748105
+  }
+]

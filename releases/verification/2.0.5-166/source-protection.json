@@ -1,0 +1,12 @@
+{
+  "baseline": "0dc28e982250f14014552b675c4f44b62b510064",
+  "source": "42f643094e74ba0e4ac6a239dc7085c689c23996",
+  "changedProductionSources": [
+    "Sources/AlphaSyncUI/AppActions.swift",
+    "Sources/AlphaSyncUI/AppStore.swift",
+    "Sources/AlphaSyncUI/ConfirmationViews.swift",
+    "Sources/AlphaSyncUI/MainView.swift"
+  ],
+  "coreHardwareAndReaderSourceUnchanged": true,
+  "scope": "All core and hardware sources, Reader view and focus registry, and native browser match build 165 exactly."
+}
