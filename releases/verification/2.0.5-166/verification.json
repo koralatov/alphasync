@@ -83,7 +83,9 @@
     "availability": "Separate private Apple Silicon test copy saved; earlier candidates retained."
   },
   "email": {
-    "sent": false
+    "sent": true,
+    "completionRecordedAt": "2026-11-17T07:46:42.916Z",
+    "repeatNotifications": "Paused; send again only if the user requests it."
   },
   "pending": [],
   "environment": "Workspace access restored on 17 November 2026.  Independent package inspection, source comparison, all captured-image reviews, and saving are complete.",
