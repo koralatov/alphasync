@@ -1,0 +1,22 @@
+{
+  "arm": {
+    "cachedAccessSeconds": 0.00081325,
+    "configuration": "SwiftPM debug checker; same host and fixture; warm cache",
+    "fileCount": 64,
+    "iterations": 500,
+    "kind": "AlphaSyncFileListComparison",
+    "repeatedSortSeconds": 0.022696708,
+    "resultsMatched": true,
+    "timingThreshold": "none; diagnostic only"
+  },
+  "intel": {
+    "cachedAccessSeconds": 0.002339953,
+    "configuration": "SwiftPM debug checker; same host and fixture; warm cache",
+    "fileCount": 64,
+    "iterations": 500,
+    "kind": "AlphaSyncFileListComparison",
+    "repeatedSortSeconds": 0.108151421,
+    "resultsMatched": true,
+    "timingThreshold": "none; diagnostic only"
+  }
+}

@@ -1,22 +1,603 @@
 {
   "version": "2.0.5",
   "build": "167",
-  "status": "pending-verification",
-  "sourceCommit": null,
-  "sourceCommitPolicy": "Set the exact successful source before completion.",
-  "gates": {
-    "swiftRegressions": 212,
-    "fixtures": 56,
-    "capturedImagesToReview": 136
+  "status": "verified-private-test-build",
+  "sourceCommit": "1d8d2ba5ceeedd7caea7c4acf2769f01f7a56304",
+  "sourceTree": "e94ee22941a1a76d84b44c87c59865c3cd0aa143",
+  "run": {
+    "id": 44062779696,
+    "url": "https://github.com/koralatov/alphasync/actions/runs/44062779696",
+    "attempt": 1,
+    "conclusion": "success"
   },
+  "initialAttempt": {
+    "source": "d61546c9dfec5c143e96db32483bb5ee7b3b35f4",
+    "run": 44060811730,
+    "url": "https://github.com/koralatov/alphasync/actions/runs/44060811730",
+    "attempt": 1,
+    "result": "failed-native-fixture",
+    "hosts": [
+      {
+        "host": "Apple Silicon",
+        "jobID": 133961911312,
+        "swiftRegressions": 212,
+        "fixtures": 56
+      },
+      {
+        "host": "Intel",
+        "jobID": 133961912102,
+        "swiftRegressions": 212,
+        "fixtures": 56
+      }
+    ],
+    "failure": "The new fixture required a titled NSWindow.defaultButtonCell before testing a SwiftUI Return shortcut.",
+    "correction": "Check the actual Return event, require exactly one Done callback, retain no-dismissal-before-input checks, and keep all states and appearances.",
+    "productionSourceChanged": false,
+    "packaged": false,
+    "saved": false,
+    "notified": false
+  },
+  "toolbarAttempt": {
+    "source": "0dcc8b477d4a9dd2ab6824a92a0c5623c5440ca1",
+    "run": 44061454502,
+    "url": "https://github.com/koralatov/alphasync/actions/runs/44061454502",
+    "attempt": 1,
+    "result": "failed-native-toolbar-reconnection",
+    "intel": {
+      "jobID": 133964107317,
+      "swiftRegressions": 212,
+      "fixtures": 56,
+      "componentChecksPassed": true,
+      "backupResultRecords": 6,
+      "failure": "Dark reconnection showed native Icon Only with Icon and Text still saved."
+    },
+    "appleSilicon": {
+      "jobID": 133964106691,
+      "status": "cancelled",
+      "stepsExecuted": 0
+    },
+    "correction": "Observe NSWindow.toolbar replacement, preserve the existing reconnection assertion, and add direct native replacement and observer-lifetime checks in both appearances.",
+    "packaged": false,
+    "saved": false,
+    "notified": false,
+    "supersededByCorrectedSource": "1d8d2ba5ceeedd7caea7c4acf2769f01f7a56304"
+  },
+  "jobs": [
+    {
+      "id": 133968676865,
+      "name": "Swift apps (Apple Silicon (compatibility))",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 44062779696,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Select the pinned compiler",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Require the intended host architecture",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Check generated target definitions",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Compile Swift and run core, protocol, and file-protection regressions",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Check native interface behaviour and capture both appearances",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Build both native app targets",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8
+        },
+        {
+          "name": "Collect matching app editions",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 9
+        },
+        {
+          "name": "Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 11
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 22
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 23
+        }
+      ]
+    },
+    {
+      "id": 133968677103,
+      "name": "Swift apps (Intel (canonical))",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 44062779696,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Select the pinned compiler",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Require the intended host architecture",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Check generated target definitions",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Compile Swift and run core, protocol, and file-protection regressions",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Check native interface behaviour and capture both appearances",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Build both native app targets",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8
+        },
+        {
+          "name": "Collect matching app editions",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 22
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 23
+        }
+      ]
+    },
+    {
+      "id": 133973784074,
+      "name": "Verify downloaded apps on Apple Silicon",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 44062779696,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Select the compatibility compiler on a native arm64 host",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Run actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Verify and run both canonical app editions natively",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13
+        }
+      ]
+    },
+    {
+      "id": 133974109688,
+      "name": "Verify downloads and publish",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 44062779696,
+      "logs_url": null,
+      "steps": null
+    }
+  ],
+  "artifacts": [
+    {
+      "id": 14319871001,
+      "name": "AlphaSync-arm64-package-verification-1d8d2ba5ceeedd7caea7c4acf2769f01f7a56304",
+      "size_in_bytes": 1263,
+      "url": "https://api.github.com/repos/koralatov/alphasync/actions/artifacts/14319871001",
+      "archive_download_url": "https://api.github.com/repos/koralatov/alphasync/actions/artifacts/14319871001/zip",
+      "expired": false,
+      "created_at": "2026-11-17T10:23:20Z",
+      "expires_at": "2027-02-15T10:13:18Z",
+      "updated_at": "2026-11-17T10:23:20Z",
+      "digest": "sha256:d51e9010f9870ac923d9841e224f46e7c9d8ddcf1b2675f98dc56b7f11814f41",
+      "workflow_run": {
+        "id": 44062779696,
+        "repository_id": 324641385,
+        "head_repository_id": 324641385,
+        "head_branch": "master",
+        "head_sha": "1d8d2ba5ceeedd7caea7c4acf2769f01f7a56304"
+      }
+    },
+    {
+      "id": 14319666749,
+      "name": "AlphaSync-packages-1d8d2ba5ceeedd7caea7c4acf2769f01f7a56304",
+      "size_in_bytes": 21295126,
+      "url": "https://api.github.com/repos/koralatov/alphasync/actions/artifacts/14319666749",
+      "archive_download_url": "https://api.github.com/repos/koralatov/alphasync/actions/artifacts/14319666749/zip",
+      "expired": false,
+      "created_at": "2026-11-17T10:20:48Z",
+      "expires_at": "2027-02-15T10:13:18Z",
+      "updated_at": "2026-11-17T10:20:48Z",
+      "digest": "sha256:360dd1c0e9893f3d508e8fa97d3f3e2cd6f398480d004761ed6d8b5b8061dc4b",
+      "workflow_run": {
+        "id": 44062779696,
+        "repository_id": 324641385,
+        "head_repository_id": 324641385,
+        "head_branch": "master",
+        "head_sha": "1d8d2ba5ceeedd7caea7c4acf2769f01f7a56304"
+      }
+    },
+    {
+      "id": 14318863457,
+      "name": "AlphaSync-interface-and-logs-macos-15-1d8d2ba5ceeedd7caea7c4acf2769f01f7a56304",
+      "size_in_bytes": 1866205,
+      "url": "https://api.github.com/repos/koralatov/alphasync/actions/artifacts/14318863457",
+      "archive_download_url": "https://api.github.com/repos/koralatov/alphasync/actions/artifacts/14318863457/zip",
+      "expired": false,
+      "created_at": "2026-11-17T10:22:41Z",
+      "expires_at": "2027-02-15T10:13:18Z",
+      "updated_at": "2026-11-17T10:22:41Z",
+      "digest": "sha256:27c1816b7b16b707456a296a65627a7c0fbf5911e26e1af33c0455c39020022f",
+      "workflow_run": {
+        "id": 44062779696,
+        "repository_id": 324641385,
+        "head_repository_id": 324641385,
+        "head_branch": "master",
+        "head_sha": "1d8d2ba5ceeedd7caea7c4acf2769f01f7a56304"
+      }
+    },
+    {
+      "id": 14318749092,
+      "name": "AlphaSync-interface-and-logs-macos-26-intel-1d8d2ba5ceeedd7caea7c4acf2769f01f7a56304",
+      "size_in_bytes": 1904494,
+      "url": "https://api.github.com/repos/koralatov/alphasync/actions/artifacts/14318749092",
+      "archive_download_url": "https://api.github.com/repos/koralatov/alphasync/actions/artifacts/14318749092/zip",
+      "expired": false,
+      "created_at": "2026-11-17T10:20:45Z",
+      "expires_at": "2027-02-15T10:13:18Z",
+      "updated_at": "2026-11-17T10:20:45Z",
+      "digest": "sha256:1c9e7a2d1d53961a3e3aae70fa123818c06390b56594f18989141ad5f28bbcbf",
+      "workflow_run": {
+        "id": 44062779696,
+        "repository_id": 324641385,
+        "head_repository_id": 324641385,
+        "head_branch": "master",
+        "head_sha": "1d8d2ba5ceeedd7caea7c4acf2769f01f7a56304"
+      }
+    }
+  ],
+  "hosts": [
+    {
+      "host": "arm",
+      "swiftRegressions": 212,
+      "fixtures": 56,
+      "browserObservations": 32,
+      "toolbarRecords": 6,
+      "sidebarRecords": 12,
+      "findRecords": 12,
+      "confirmationRecords": 8,
+      "backupResultRecords": 6,
+      "toolbarReplacementRecords": 2,
+      "capturedImages": 68,
+      "swiftCompilerWarnings": 0
+    },
+    {
+      "host": "intel",
+      "swiftRegressions": 212,
+      "fixtures": 56,
+      "browserObservations": 32,
+      "toolbarRecords": 6,
+      "sidebarRecords": 12,
+      "findRecords": 12,
+      "confirmationRecords": 8,
+      "backupResultRecords": 6,
+      "toolbarReplacementRecords": 2,
+      "capturedImages": 68,
+      "swiftCompilerWarnings": 0
+    }
+  ],
+  "verification": {
+    "allAutomatedChecksPassed": true,
+    "independentPackageInspectionComplete": true,
+    "capturedImageReviewComplete": true,
+    "protectedReferencesCompared": true,
+    "sourceReviewComplete": true,
+    "artifactDigests": 4,
+    "assetHashes": 12,
+    "capturedImagesReviewed": 136,
+    "help": [
+      {
+        "edition": "universal",
+        "version": "2.0.5",
+        "build": "167",
+        "minimumDeployment": "13.0",
+        "appIdentity": "com.tsoniq.AlphaSync",
+        "helperIdentity": "com.tsoniq.AlphaSyncLauncher",
+        "privateReleaseNotesReference": "master",
+        "authoredHelpFilesMatched": 20,
+        "searchIndexes": 1,
+        "help": "passed",
+        "helpCheck": "Verified 18 offline Help pages and 83 links.",
+        "packagedIconBytes": 1260361
+      },
+      {
+        "edition": "apple-silicon",
+        "version": "2.0.5",
+        "build": "167",
+        "minimumDeployment": "13.0",
+        "appIdentity": "com.tsoniq.AlphaSync",
+        "helperIdentity": "com.tsoniq.AlphaSyncLauncher",
+        "privateReleaseNotesReference": "master",
+        "authoredHelpFilesMatched": 20,
+        "searchIndexes": 1,
+        "help": "passed",
+        "helpCheck": "Verified 18 offline Help pages and 83 links.",
+        "packagedIconBytes": 1748105
+      }
+    ],
+    "minimumDeployment": "13.0",
+    "signatures": "Both exact canonical apps and helpers passed architectures, signatures, hardened runtime, dependency checks, and matching symbols on the hosted native Apple Silicon job.  Both exact apps executed --version natively.  Independent downloads match that job’s twelve asset hashes."
+  },
+  "regressionCoverage": {
+    "previousSwiftTests": 204,
+    "newTests": 8,
+    "totalSwiftTests": 212,
+    "fixtures": 56,
+    "fixtureSuites": [
+      10,
+      23,
+      10,
+      13
+    ]
+  },
+  "changes": [
+    "Validate import and rename names at the service boundary before an engine write",
+    "Share domain-aware cancellation recognition so genuine file-panel errors stay visible",
+    "Link private notes to source before publication and reject that override during publication preflight",
+    "Make backup result summaries selectable and grammatical, mark dialog headings, and test all three native result states",
+    "Retain saved toolbar appearance through native toolbar replacement and ignore former toolbar events"
+  ],
   "saving": {
-    "ready": false
+    "ready": true,
+    "filename": "AlphaSync-2.0.5-167-macOS-13-apple-silicon.zip",
+    "size": 2958352,
+    "sha256": "efdfbf3b00f6c366a02f4c1eb7c48ca6e7621135cc60fca0c6e1c2de1131396b",
+    "availability": "Separate private Apple Silicon test copy saved.  Earlier candidates are retained."
   },
   "email": {
-    "sent": false
+    "sent": false,
+    "channel": "CalxGPT",
+    "duplicateCheckRequiredBeforeSending": true
   },
   "publication": {
     "authorised": false,
-    "performed": false
+    "performed": false,
+    "jobConclusion": "skipped",
+    "retirementPerformed": false
+  },
+  "protectedReferences": {
+    "passed": true,
+    "publicTags": [
+      "v2.0.4",
+      "v1.5.1"
+    ],
+    "publicReleaseNotesAndAssetsUnchanged": true,
+    "retainedAssets": 18,
+    "versionTagsUnchanged": 12,
+    "frozenLegacyUnchanged": true,
+    "latest": "v2.0.4",
+    "baselineSources": [
+      "0dc28e982250f14014552b675c4f44b62b510064",
+      "3d1d5957e245a8888ee2a977d1b9366971f41136"
+    ],
+    "checkedAt": "2026-11-17T10:25:00.006921+00:00"
+  },
+  "captureLimits": [
+    "Layer captures do not establish final system-composited toolbar or sidebar materials.  Intel Dark captures retain white toolbar material masks.",
+    "The unbundled About fixture is not the packaged app.  USB is disabled in interface fixtures, so Inspector loading or disconnected-preview states are expected.",
+    "Standard selectable text, semantic headings, and native keyboard assertions do not establish actual VoiceOver speech, text editing, or physical focus behaviour.  These remain manual."
+  ],
+  "unverified": [
+    "Physical Neo transfers, backup, recovery, renamed targets, and readback on the M2 Air",
+    "Actual VoiceOver speech, keyboard focus and editing, context menus, and regional settings",
+    "Final system-composited appearance, macOS 13 runtime, native Help Viewer, and Login Items approval"
+  ],
+  "nextStep": "Physical Neo testing comes next before deciding on stable 2.1.  Further app changes should respond to those results.",
+  "pending": [
+    "One-off completion email after the evidence commit"
+  ],
+  "checkedAt": "2026-11-17T10:26:43.554516+00:00",
+  "files": {
+    "assets.json": {
+      "size": 2043,
+      "sha256": "52712c42a12fe5acc23bf1896138a072d6a93d95111e03afb48316b1223477f2"
+    },
+    "backup-result-checks.json": {
+      "size": 2333,
+      "sha256": "790d9fb29dbfcc1f7b6b1e2108eea2080eb0a342babc389b61b2391000a20f3b"
+    },
+    "commits.json": {
+      "size": 2061,
+      "sha256": "d9c3f98076684f388bc0aafea24c48fc35be409c39f8184d4a6096881dcc3cdd"
+    },
+    "confirmation-checks.json": {
+      "size": 3843,
+      "sha256": "a45a5a90ab6009eeb2a8e27443c08441775b811215532ecd79afa581d36ae68a"
+    },
+    "find-command-checks.json": {
+      "size": 5375,
+      "sha256": "45c436c7b14c097f5a07b276aeca018462d43b1a4121b440638123d1234f6547"
+    },
+    "formatting-performance.json": {
+      "size": 1709,
+      "sha256": "20c716f4c47c803fe1c5f633a35a1e20df132c9c0a31bcfd3a3d1a5658c36626"
+    },
+    "initial-attempt.json": {
+      "size": 847,
+      "sha256": "58923cc434cc485101b3e780da79d8da9c2e0cb1f2ec51fb792d6604d55c1211"
+    },
+    "interface-layouts.json": {
+      "size": 43303,
+      "sha256": "46948731265d16fbbc1be31b95b542fe106f375e9595d25720cd50abae3287dc"
+    },
+    "interface-review.json": {
+      "size": 37450,
+      "sha256": "219a922b9f15da07753a3ea9072d7a3aa361ad25df191f505c753caa28150b55"
+    },
+    "package-verification.json": {
+      "size": 881,
+      "sha256": "074430b002626e9d80942a0d319ed209a50f26ed4fcc1522ba75d3988716dba9"
+    },
+    "performance.json": {
+      "size": 682,
+      "sha256": "bcae1248d8ddc2c28d35de6465a78c5670dd29b611c55beb5ae7771dc6b17bf1"
+    },
+    "protected-comparison.json": {
+      "size": 402,
+      "sha256": "0e09895b35a7cadb6c79a0569f1ca90ec1600078bf02141aba0f48184d95f4a3"
+    },
+    "protected-reference-baseline.json": {
+      "size": 34259,
+      "sha256": "18e6c96797323e252bf2d89739e4507dcc7b8e9b72d0c716ff47df41196430ae"
+    },
+    "sidebar-checks.json": {
+      "size": 2955,
+      "sha256": "5876183c1c89018494535d77fd5d70b63fde1d2de93078b95f919fa5e4e25cee"
+    },
+    "source-protection.json": {
+      "size": 852,
+      "sha256": "0a6115ec89749a51db566a2fe3833ad81cca8bd42089e60819662b57ddc6b6a9"
+    },
+    "toolbar-attempt.json": {
+      "size": 899,
+      "sha256": "98039614f74d93a1df3bf6886fb29bb242b0ad80fab91ea2204f66e88eed4b02"
+    },
+    "toolbar-checks.json": {
+      "size": 3449,
+      "sha256": "12984ab8f366a4cd11b1e4c2d7e30a5209a3d5393adb1a0b06a0f91d0a0c18dd"
+    },
+    "toolbar-replacement-checks.json": {
+      "size": 789,
+      "sha256": "cd7fbbf409b6da2b89170adcdc888da47c44572734f3ca736f085f8e7a7a40dc"
+    }
   }
 }

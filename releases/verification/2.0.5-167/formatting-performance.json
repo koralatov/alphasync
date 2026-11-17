@@ -1,0 +1,77 @@
+{
+  "kind": "Same-host diagnostics, with no speed threshold or USB throughput claim.",
+  "hosts": {
+    "arm": {
+      "configuration": "SwiftPM debug checker; same host, values, and locale; warm reused formatter",
+      "formatted": [
+        "0 bytes",
+        "1 byte",
+        "2 bytes",
+        "999 bytes",
+        "1 KB",
+        "1 KB",
+        "12 KB",
+        "51 KB",
+        "66 KB",
+        "379 KB",
+        "16,777 KB"
+      ],
+      "freshFormatterSeconds": 0.004224666,
+      "iterations": 100,
+      "kind": "AlphaSyncFileSizeFormattingComparison",
+      "locale": "en_US",
+      "resultsMatched": true,
+      "reusedFormatterSeconds": 0.003201125,
+      "sizes": [
+        0,
+        1,
+        2,
+        999,
+        1000,
+        1024,
+        12000,
+        51200,
+        65536,
+        378880,
+        16777215
+      ],
+      "timingThreshold": "none; diagnostic only"
+    },
+    "intel": {
+      "configuration": "SwiftPM debug checker; same host, values, and locale; warm reused formatter",
+      "formatted": [
+        "0 bytes",
+        "1 byte",
+        "2 bytes",
+        "999 bytes",
+        "1 KB",
+        "1 KB",
+        "12 KB",
+        "51 KB",
+        "66 KB",
+        "379 KB",
+        "16,777 KB"
+      ],
+      "freshFormatterSeconds": 0.023013497,
+      "iterations": 100,
+      "kind": "AlphaSyncFileSizeFormattingComparison",
+      "locale": "en_US",
+      "resultsMatched": true,
+      "reusedFormatterSeconds": 0.015017355,
+      "sizes": [
+        0,
+        1,
+        2,
+        999,
+        1000,
+        1024,
+        12000,
+        51200,
+        65536,
+        378880,
+        16777215
+      ],
+      "timingThreshold": "none; diagnostic only"
+    }
+  }
+}

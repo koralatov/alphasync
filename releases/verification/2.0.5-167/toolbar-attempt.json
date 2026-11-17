@@ -14,10 +14,12 @@
   },
   "appleSilicon": {
     "jobID": 133964106691,
-    "status": "pending-final-state"
+    "status": "cancelled",
+    "stepsExecuted": 0
   },
   "correction": "Observe NSWindow.toolbar replacement, preserve the existing reconnection assertion, and add direct native replacement and observer-lifetime checks in both appearances.",
   "packaged": false,
   "saved": false,
-  "notified": false
+  "notified": false,
+  "supersededByCorrectedSource": "1d8d2ba5ceeedd7caea7c4acf2769f01f7a56304"
 }

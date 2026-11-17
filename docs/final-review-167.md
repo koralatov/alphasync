@@ -1,6 +1,6 @@
 # Final review before physical testing
 
-Private **2.0.5, build 167** is being prepared following the user’s request for worthwhile improvements before tonight’s testing.  Build 166 remains verified, saved, and separately available.  No public release or retirement is authorised.
+Private **2.0.5, build 167** completes the user’s requested improvement pass and is verified and saved for tonight’s physical testing.  Build 166 remains verified, saved, and separately available.  No public release or retirement is authorised.
 
 ## Focused corrections
 
@@ -24,7 +24,7 @@ Retain the strict combined 120-second native interface deadline.  Capture ninete
 
 Require native execution of both exact canonical downloads on Apple Silicon; independent checks of four artifact digests and twelve asset hashes; architectures, minimum macOS 13, signatures, hardened runtime, helpers, matching symbols, and both Help books.  Confirm the packaged private notes reference.  Compare protected public releases and notes, eighteen assets, twelve tags, frozen legacy source, and latest 2.0.4 with the preserved build 165 and before-work baselines.
 
-Permanent evidence belongs in `releases/verification/2.0.5-167`.  All final-source build, review, saving, and notification gates remain pending at this milestone.  Save a separate canonical Apple Silicon ZIP only when those verification gates pass, commit final documentation, then send the authorised one-off CalxGPT email with its actual link.  Keep the existing completed automation paused.
+Permanent evidence belongs in `releases/verification/2.0.5-167`.  All final-source build, review, and saving gates are complete.  The one-off completion email follows the evidence commit.  Save a separate canonical Apple Silicon ZIP only when those verification gates pass, commit final documentation, then send the authorised one-off CalxGPT email with its actual link.  Keep the existing completed automation paused.
 
 ## Tonight’s decision
 
@@ -45,3 +45,13 @@ Initial source `d61546c9dfec5c143e96db32483bb5ee7b3b35f4` passed all 212 Swift r
 Corrected fixture source `0dcc8b477d4a9dd2ab6824a92a0c5623c5440ca1` passed the Intel 212 Swift regressions, 56 fixtures, all component checks, and the six actual backup Return checks in [run 44061454502](https://github.com/koralatov/alphasync/actions/runs/44061454502).  The existing real-window gate then found an Intel Dark reconnection mismatch: the native toolbar displayed icons only while the preference and stored choice remained Icon and Text.  Keep that failing assertion unchanged.
 
 A queued content update can precede SwiftUI’s installation of a replacement toolbar.  Observe the window’s public `toolbar` property and apply the saved appearance when it changes, retaining the existing active-toolbar mode observer.  New native checks in both appearances replace a toolbar, verify the saved choice, ignore changes from the former toolbar, save a current native choice, and apply a preference change.  Keep the strict combined 120-second deadline, all prior browser and toolbar gates, and 136 captured images.  Repeat the full milestone before packaging or saving.  This is a real UI reliability correction; USB and transfer safeguards remain unchanged.
+
+## Completed verification
+
+Exact source `1d8d2ba5ceeedd7caea7c4acf2769f01f7a56304` passed [run 44062779696](https://github.com/koralatov/alphasync/actions/runs/44062779696) at its first attempt.  Both pinned hosts passed all 212 Swift regressions, 56 fixtures, thirty-two browser observations, twelve sidebar records, six toolbar records, twelve Find records, eight safe confirmations, six backup result records, and two toolbar replacement records.  Both app editions and helpers built without Swift compiler warnings.  The real Intel reconnection gate and direct replacement checks pass with the correction.
+
+Both exact canonical downloads ran natively on Apple Silicon.  Four artifact digests and all twelve canonical assets match independent checks.  Each Help book has eighteen pages and eighty-three links, all twenty authored files match source, and its index is present.  Both bundles show 2.0.5 (167), macOS 13.0 minimum, the correct helper and edition identities, packaged icons, and the private source-notes reference.  Native signatures, hardened runtime, dependencies, architectures, and matching symbols passed on those exact bytes.
+
+All 136 final-source captures were reviewed, sixty-eight per host.  The new backup summaries, errors, paths, singular wording, and button order are readable in both appearances.  The earlier Intel dark layer-mask and unbundled About fallback limits remain explicit in the [evidence](../releases/verification/2.0.5-167/verification.json).  No new clipping or missing content was found in the reviewed scope.  The separate canonical Apple Silicon ZIP is saved; earlier candidates remain intact.
+
+Protected metadata matches the build 165 and before-work baselines: public 1.5.1 and 2.0.4, their eighteen assets and exact notes, twelve tags, frozen legacy source, and latest 2.0.4 are unchanged.  No release was published or retired.  Keep further changes focused on tonight’s physical results before deciding on stable 2.1.

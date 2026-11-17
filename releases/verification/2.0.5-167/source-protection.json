@@ -1,0 +1,15 @@
+{
+  "baseline": "42f643094e74ba0e4ac6a239dc7085c689c23996",
+  "source": "1d8d2ba5ceeedd7caea7c4acf2769f01f7a56304",
+  "changedProductionSources": [
+    "Sources/AlphaSyncHardware/FileOperations.swift",
+    "Sources/AlphaSyncUI/AppMetadata.swift",
+    "Sources/AlphaSyncUI/AppStore.swift",
+    "Sources/AlphaSyncUI/AuxiliaryViews.swift",
+    "Sources/AlphaSyncUI/ConfirmationViews.swift",
+    "Sources/AlphaSyncUI/FilePanelErrors.swift",
+    "Sources/AlphaSyncUI/ToolbarAppearanceController.swift"
+  ],
+  "coreUSBAndReaderSourceUnchanged": true,
+  "scope": "All core, low-level USB, serial executor, backup, atomic-file, recovery, native browser, and Reader sources retain build 166 behaviour.  The sole hardware source edit validates create and rename names before the engine call.  Committed-write completion and protocol safeguards are unchanged."
+}

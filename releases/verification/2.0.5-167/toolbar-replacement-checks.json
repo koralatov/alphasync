@@ -1,0 +1,34 @@
+{
+  "arm": [
+    {
+      "appearance": "light",
+      "formerToolbarIgnored": true,
+      "nativeSelectionSaved": true,
+      "preferenceApplied": true,
+      "replacementAppliedSavedMode": true
+    },
+    {
+      "appearance": "dark",
+      "formerToolbarIgnored": true,
+      "nativeSelectionSaved": true,
+      "preferenceApplied": true,
+      "replacementAppliedSavedMode": true
+    }
+  ],
+  "intel": [
+    {
+      "appearance": "light",
+      "formerToolbarIgnored": true,
+      "nativeSelectionSaved": true,
+      "preferenceApplied": true,
+      "replacementAppliedSavedMode": true
+    },
+    {
+      "appearance": "dark",
+      "formerToolbarIgnored": true,
+      "nativeSelectionSaved": true,
+      "preferenceApplied": true,
+      "replacementAppliedSavedMode": true
+    }
+  ]
+}

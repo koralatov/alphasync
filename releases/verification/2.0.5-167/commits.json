@@ -1,0 +1,50 @@
+[
+  {
+    "sha": "ccf98a9de7da8751e2795f5a29b904d108f39b30",
+    "tree": "c4ca8a4dffb7c2b77f63ea51346cda9ce8344faa",
+    "parent": "3d1d5957e245a8888ee2a977d1b9366971f41136",
+    "title": "Validate import and rename names before engine writes [skip ci]"
+  },
+  {
+    "sha": "0e354ae5bd59dde1057f3bcec9946897dba58176",
+    "tree": "05edbbe57744b3852b6844ac5ea62e1363573918",
+    "parent": "ccf98a9de7da8751e2795f5a29b904d108f39b30",
+    "title": "Keep genuine file-panel failures visible [skip ci]"
+  },
+  {
+    "sha": "3c9000c77f3d57281a2539323f6c0665b51e6aa5",
+    "tree": "03081bab872f34e28f5af9d54d3660c495cd527e",
+    "parent": "0e354ae5bd59dde1057f3bcec9946897dba58176",
+    "title": "Make private build release notes reachable before publication [skip ci]"
+  },
+  {
+    "sha": "1120adc6e0a38acc6b26446ba0d1cada22ac51a8",
+    "tree": "b3c32902a3f4a5b41c8a3cf77e5f0fd70b37fe6a",
+    "parent": "3c9000c77f3d57281a2539323f6c0665b51e6aa5",
+    "title": "Clarify backup results and mark native dialog headings [skip ci]"
+  },
+  {
+    "sha": "d61546c9dfec5c143e96db32483bb5ee7b3b35f4",
+    "tree": "8d0cfbafff9aca174c002487efbcdcaea260593b",
+    "parent": "1120adc6e0a38acc6b26446ba0d1cada22ac51a8",
+    "title": "Prepare private build 167 for the final full verification milestone"
+  },
+  {
+    "sha": "0dcc8b477d4a9dd2ab6824a92a0c5623c5440ca1",
+    "tree": "a2f70ff3dd90c045f4b173701222c8213c4f5877",
+    "parent": "d61546c9dfec5c143e96db32483bb5ee7b3b35f4",
+    "title": "Verify build 167 with behavioural backup shortcut checks"
+  },
+  {
+    "sha": "7d901646df89a5ec48fc28e07f220e111d2e04de",
+    "tree": "ee37f276c3009cdfb6392875a81c851966f93a87",
+    "parent": "0dcc8b477d4a9dd2ab6824a92a0c5623c5440ca1",
+    "title": "Retain the saved appearance when SwiftUI replaces its toolbar [skip ci]"
+  },
+  {
+    "sha": "1d8d2ba5ceeedd7caea7c4acf2769f01f7a56304",
+    "tree": "e94ee22941a1a76d84b44c87c59865c3cd0aa143",
+    "parent": "7d901646df89a5ec48fc28e07f220e111d2e04de",
+    "title": "Verify build 167 after the native toolbar replacement correction"
+  }
+]

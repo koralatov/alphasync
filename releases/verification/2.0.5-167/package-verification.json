@@ -1,0 +1,30 @@
+[
+  {
+    "edition": "universal",
+    "version": "2.0.5",
+    "build": "167",
+    "minimumDeployment": "13.0",
+    "appIdentity": "com.tsoniq.AlphaSync",
+    "helperIdentity": "com.tsoniq.AlphaSyncLauncher",
+    "privateReleaseNotesReference": "master",
+    "authoredHelpFilesMatched": 20,
+    "searchIndexes": 1,
+    "help": "passed",
+    "helpCheck": "Verified 18 offline Help pages and 83 links.",
+    "packagedIconBytes": 1260361
+  },
+  {
+    "edition": "apple-silicon",
+    "version": "2.0.5",
+    "build": "167",
+    "minimumDeployment": "13.0",
+    "appIdentity": "com.tsoniq.AlphaSync",
+    "helperIdentity": "com.tsoniq.AlphaSyncLauncher",
+    "privateReleaseNotesReference": "master",
+    "authoredHelpFilesMatched": 20,
+    "searchIndexes": 1,
+    "help": "passed",
+    "helpCheck": "Verified 18 offline Help pages and 83 links.",
+    "packagedIconBytes": 1748105
+  }
+]

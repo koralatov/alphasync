@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "publicTags": [
+    "v2.0.4",
+    "v1.5.1"
+  ],
+  "publicReleaseNotesAndAssetsUnchanged": true,
+  "retainedAssets": 18,
+  "versionTagsUnchanged": 12,
+  "frozenLegacyUnchanged": true,
+  "latest": "v2.0.4",
+  "baselineSources": [
+    "0dc28e982250f14014552b675c4f44b62b510064",
+    "3d1d5957e245a8888ee2a977d1b9366971f41136"
+  ],
+  "checkedAt": "2026-11-17T10:25:00.006921+00:00"
+}

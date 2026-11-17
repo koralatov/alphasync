@@ -1,0 +1,114 @@
+{
+  "arm": [
+    {
+      "appearance": "light",
+      "complete": true,
+      "expected": 1,
+      "result": "complete",
+      "returnAction": "Done",
+      "returnDismissed": true,
+      "saved": 1
+    },
+    {
+      "appearance": "light",
+      "complete": false,
+      "expected": 2,
+      "result": "stopped",
+      "returnAction": "Done",
+      "returnDismissed": true,
+      "saved": 1
+    },
+    {
+      "appearance": "light",
+      "complete": true,
+      "expected": 0,
+      "result": "empty",
+      "returnAction": "Done",
+      "returnDismissed": true,
+      "saved": 0
+    },
+    {
+      "appearance": "dark",
+      "complete": true,
+      "expected": 1,
+      "result": "complete",
+      "returnAction": "Done",
+      "returnDismissed": true,
+      "saved": 1
+    },
+    {
+      "appearance": "dark",
+      "complete": false,
+      "expected": 2,
+      "result": "stopped",
+      "returnAction": "Done",
+      "returnDismissed": true,
+      "saved": 1
+    },
+    {
+      "appearance": "dark",
+      "complete": true,
+      "expected": 0,
+      "result": "empty",
+      "returnAction": "Done",
+      "returnDismissed": true,
+      "saved": 0
+    }
+  ],
+  "intel": [
+    {
+      "appearance": "light",
+      "complete": true,
+      "expected": 1,
+      "result": "complete",
+      "returnAction": "Done",
+      "returnDismissed": true,
+      "saved": 1
+    },
+    {
+      "appearance": "light",
+      "complete": false,
+      "expected": 2,
+      "result": "stopped",
+      "returnAction": "Done",
+      "returnDismissed": true,
+      "saved": 1
+    },
+    {
+      "appearance": "light",
+      "complete": true,
+      "expected": 0,
+      "result": "empty",
+      "returnAction": "Done",
+      "returnDismissed": true,
+      "saved": 0
+    },
+    {
+      "appearance": "dark",
+      "complete": true,
+      "expected": 1,
+      "result": "complete",
+      "returnAction": "Done",
+      "returnDismissed": true,
+      "saved": 1
+    },
+    {
+      "appearance": "dark",
+      "complete": false,
+      "expected": 2,
+      "result": "stopped",
+      "returnAction": "Done",
+      "returnDismissed": true,
+      "saved": 1
+    },
+    {
+      "appearance": "dark",
+      "complete": true,
+      "expected": 0,
+      "result": "empty",
+      "returnAction": "Done",
+      "returnDismissed": true,
+      "saved": 0
+    }
+  ]
+}

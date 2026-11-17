@@ -1,0 +1,270 @@
+{
+  "arm": [
+    {
+      "appearance": "light",
+      "commands": [
+        "Find…",
+        "Find Next",
+        "Find Previous",
+        "Use Selection for Find"
+      ],
+      "enabled": false,
+      "stage": "browser"
+    },
+    {
+      "appearance": "light",
+      "commands": [
+        "Find…",
+        "Find Next",
+        "Find Previous",
+        "Use Selection for Find"
+      ],
+      "enabled": true,
+      "stage": "reader"
+    },
+    {
+      "appearance": "light",
+      "commands": [
+        "Find…",
+        "Find Next",
+        "Find Previous",
+        "Use Selection for Find"
+      ],
+      "enabled": false,
+      "stage": "reader-unloaded"
+    },
+    {
+      "appearance": "light",
+      "commands": [
+        "Find…",
+        "Find Next",
+        "Find Previous",
+        "Use Selection for Find"
+      ],
+      "enabled": true,
+      "stage": "reader-reloaded"
+    },
+    {
+      "appearance": "light",
+      "commands": [
+        "Find…",
+        "Find Next",
+        "Find Previous",
+        "Use Selection for Find"
+      ],
+      "enabled": true,
+      "stage": "reader-old-detached"
+    },
+    {
+      "appearance": "light",
+      "commands": [
+        "Find…",
+        "Find Next",
+        "Find Previous",
+        "Use Selection for Find"
+      ],
+      "enabled": false,
+      "stage": "reader-closed"
+    },
+    {
+      "appearance": "dark",
+      "commands": [
+        "Find…",
+        "Find Next",
+        "Find Previous",
+        "Use Selection for Find"
+      ],
+      "enabled": false,
+      "stage": "browser"
+    },
+    {
+      "appearance": "dark",
+      "commands": [
+        "Find…",
+        "Find Next",
+        "Find Previous",
+        "Use Selection for Find"
+      ],
+      "enabled": true,
+      "stage": "reader"
+    },
+    {
+      "appearance": "dark",
+      "commands": [
+        "Find…",
+        "Find Next",
+        "Find Previous",
+        "Use Selection for Find"
+      ],
+      "enabled": false,
+      "stage": "reader-unloaded"
+    },
+    {
+      "appearance": "dark",
+      "commands": [
+        "Find…",
+        "Find Next",
+        "Find Previous",
+        "Use Selection for Find"
+      ],
+      "enabled": true,
+      "stage": "reader-reloaded"
+    },
+    {
+      "appearance": "dark",
+      "commands": [
+        "Find…",
+        "Find Next",
+        "Find Previous",
+        "Use Selection for Find"
+      ],
+      "enabled": true,
+      "stage": "reader-old-detached"
+    },
+    {
+      "appearance": "dark",
+      "commands": [
+        "Find…",
+        "Find Next",
+        "Find Previous",
+        "Use Selection for Find"
+      ],
+      "enabled": false,
+      "stage": "reader-closed"
+    }
+  ],
+  "intel": [
+    {
+      "appearance": "light",
+      "commands": [
+        "Find…",
+        "Find Next",
+        "Find Previous",
+        "Use Selection for Find"
+      ],
+      "enabled": false,
+      "stage": "browser"
+    },
+    {
+      "appearance": "light",
+      "commands": [
+        "Find…",
+        "Find Next",
+        "Find Previous",
+        "Use Selection for Find"
+      ],
+      "enabled": true,
+      "stage": "reader"
+    },
+    {
+      "appearance": "light",
+      "commands": [
+        "Find…",
+        "Find Next",
+        "Find Previous",
+        "Use Selection for Find"
+      ],
+      "enabled": false,
+      "stage": "reader-unloaded"
+    },
+    {
+      "appearance": "light",
+      "commands": [
+        "Find…",
+        "Find Next",
+        "Find Previous",
+        "Use Selection for Find"
+      ],
+      "enabled": true,
+      "stage": "reader-reloaded"
+    },
+    {
+      "appearance": "light",
+      "commands": [
+        "Find…",
+        "Find Next",
+        "Find Previous",
+        "Use Selection for Find"
+      ],
+      "enabled": true,
+      "stage": "reader-old-detached"
+    },
+    {
+      "appearance": "light",
+      "commands": [
+        "Find…",
+        "Find Next",
+        "Find Previous",
+        "Use Selection for Find"
+      ],
+      "enabled": false,
+      "stage": "reader-closed"
+    },
+    {
+      "appearance": "dark",
+      "commands": [
+        "Find…",
+        "Find Next",
+        "Find Previous",
+        "Use Selection for Find"
+      ],
+      "enabled": false,
+      "stage": "browser"
+    },
+    {
+      "appearance": "dark",
+      "commands": [
+        "Find…",
+        "Find Next",
+        "Find Previous",
+        "Use Selection for Find"
+      ],
+      "enabled": true,
+      "stage": "reader"
+    },
+    {
+      "appearance": "dark",
+      "commands": [
+        "Find…",
+        "Find Next",
+        "Find Previous",
+        "Use Selection for Find"
+      ],
+      "enabled": false,
+      "stage": "reader-unloaded"
+    },
+    {
+      "appearance": "dark",
+      "commands": [
+        "Find…",
+        "Find Next",
+        "Find Previous",
+        "Use Selection for Find"
+      ],
+      "enabled": true,
+      "stage": "reader-reloaded"
+    },
+    {
+      "appearance": "dark",
+      "commands": [
+        "Find…",
+        "Find Next",
+        "Find Previous",
+        "Use Selection for Find"
+      ],
+      "enabled": true,
+      "stage": "reader-old-detached"
+    },
+    {
+      "appearance": "dark",
+      "commands": [
+        "Find…",
+        "Find Next",
+        "Find Previous",
+        "Use Selection for Find"
+      ],
+      "enabled": false,
+      "stage": "reader-closed"
+    }
+  ]
+}
