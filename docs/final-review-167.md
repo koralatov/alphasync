@@ -35,3 +35,7 @@ Follow the [physical checklist](../tests/manual-checks.md).  Hosted checks canno
 - [Cocoa error evaluation](https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/ErrorHandlingCocoa/CreateCustomizeNSError/CreateCustomizeNSError.html)
 - [SwiftUI accessibility traits](https://developer.apple.com/documentation/swiftui/accessibilitytraits)
 - [Text views](https://developer.apple.com/design/human-interface-guidelines/text-views)
+
+## Initial fixture correction
+
+Initial source `d61546c9dfec5c143e96db32483bb5ee7b3b35f4` passed all 212 Swift regressions and 56 fixtures on both hosts in [run 44060811730](https://github.com/koralatov/alphasync/actions/runs/44060811730), but the component checker stopped at a new AppKit default-button-cell assertion.  A SwiftUI keyboard shortcut need not expose a titled `NSWindow.defaultButtonCell`.  The corrected fixture tests the actual Return event and requires the Done callback exactly once, with no automatic dismissal before input.  It retains all three result states and both appearances.  Production source is unchanged by this correction.  The failed source is not packaged, saved, or ready for notification.  Repeat the full milestone on the corrected source.

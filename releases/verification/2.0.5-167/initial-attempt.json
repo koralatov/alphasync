@@ -1,0 +1,27 @@
+{
+  "source": "d61546c9dfec5c143e96db32483bb5ee7b3b35f4",
+  "run": 44060811730,
+  "url": "https://github.com/koralatov/alphasync/actions/runs/44060811730",
+  "attempt": 1,
+  "result": "failed-native-fixture",
+  "hosts": [
+    {
+      "host": "Apple Silicon",
+      "jobID": 133961911312,
+      "swiftRegressions": 212,
+      "fixtures": 56
+    },
+    {
+      "host": "Intel",
+      "jobID": 133961912102,
+      "swiftRegressions": 212,
+      "fixtures": 56
+    }
+  ],
+  "failure": "The new fixture required a titled NSWindow.defaultButtonCell before testing a SwiftUI Return shortcut.",
+  "correction": "Check the actual Return event, require exactly one Done callback, retain no-dismissal-before-input checks, and keep all states and appearances.",
+  "productionSourceChanged": false,
+  "packaged": false,
+  "saved": false,
+  "notified": false
+}

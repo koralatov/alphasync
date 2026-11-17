@@ -344,14 +344,13 @@ struct InterfaceChecks {
                 var dismissed = 0
                 let completion = window(BackupCompletion(result: result, close: { dismissed += 1 }),
                                         size: NSSize(width: 500, height: name == "stopped" ? 360 : 290), title: "Backup result")
-                try require(completion.defaultButtonCell?.title == "Done", "Only Done may be the backup result’s default action")
                 try capture(completion, "backup-" + name + "-" + label, to: output)
                 try require(dismissed == 0, "The backup result dismissed before user input")
                 try key("\r", code: 36, in: completion)
                 try require(dismissed == 1, "Return must dismiss the backup result using Done")
                 backupResults.append(["appearance": label, "result": name, "saved": result.saved,
                                       "expected": result.expected, "complete": result.complete,
-                                      "defaultButton": "Done", "returnDismissed": true])
+                                      "returnAction": "Done", "returnDismissed": true])
                 completion.close()
             }
             let text = "A read-only preview\n\nAlphaSmart Neo text stays selectable.\n" + String(repeating: "More text for scrolling and Find.\n", count: 80)
