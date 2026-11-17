@@ -1,0 +1,23 @@
+{
+  "source": "0dcc8b477d4a9dd2ab6824a92a0c5623c5440ca1",
+  "run": 44061454502,
+  "url": "https://github.com/koralatov/alphasync/actions/runs/44061454502",
+  "attempt": 1,
+  "result": "failed-native-toolbar-reconnection",
+  "intel": {
+    "jobID": 133964107317,
+    "swiftRegressions": 212,
+    "fixtures": 56,
+    "componentChecksPassed": true,
+    "backupResultRecords": 6,
+    "failure": "Dark reconnection showed native Icon Only with Icon and Text still saved."
+  },
+  "appleSilicon": {
+    "jobID": 133964106691,
+    "status": "pending-final-state"
+  },
+  "correction": "Observe NSWindow.toolbar replacement, preserve the existing reconnection assertion, and add direct native replacement and observer-lifetime checks in both appearances.",
+  "packaged": false,
+  "saved": false,
+  "notified": false
+}

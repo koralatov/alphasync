@@ -210,3 +210,5 @@ Install the new candidate and confirm **2.0.5 (167)** in About.  Start with a fu
 - With VoiceOver enabled, check dialog heading navigation, labels, announcements, recovery options, and safe Cancel focus.  Repeat keyboard selection, editing, Find, and Light and Dark appearance checks on the actual Mac.
 
 Hosted checks cannot establish physical Neo transfers, actual VoiceOver speech, final composited materials, macOS 13 runtime, Help Viewer, or Login Items approval.  Record tonight’s physical results before deciding on stable 2.1.  Keep further app changes focused on problems found by that testing.
+
+For build 167, choose each Toolbar Appearance, disconnect and reconnect the Neo, and confirm the chosen style is retained.  Repeat in both appearances and check the toolbar’s native context menu and View menu remain in agreement.
