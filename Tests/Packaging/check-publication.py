@@ -7,6 +7,7 @@ from pathlib import Path
 import subprocess
 import tempfile
 import unittest
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[2]
 spec = importlib.util.spec_from_file_location('publisher', ROOT / 'scripts/publish-release.py')
@@ -279,6 +280,16 @@ class PublicationTests(unittest.TestCase):
     def test_changed_local_asset_is_rejected_before_contacting_github(self):
         (self.assets / next(iter(self.manifest))).write_bytes(b'Changed after verification')
         self.rejected_before_mutation('asset has changed')
+
+    def test_private_notes_override_stops_publication_before_any_api_call(self):
+        settings = ('MARKETING_VERSION = 2.0.5\nCURRENT_PROJECT_VERSION = 167\n'
+                    'AS_RELEASE_CHANNEL = stable\nAS_RELEASE_TAG = v2.0.5\nAS_RELEASE_NOTES_REF = master\n')
+        with patch.dict(publisher.os.environ, {'GITHUB_SHA': SOURCE, 'GH_REPO': REPOSITORY, 'GITHUB_RUN_ID': '1'}), \
+                patch.object(publisher.Path, 'read_text', return_value=settings), \
+                patch.object(publisher, 'publish') as publish:
+            with self.assertRaisesRegex(ValueError, 'override must be cleared'):
+                publisher.main()
+            publish.assert_not_called()
 
 
 if __name__ == '__main__':

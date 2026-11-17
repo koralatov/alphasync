@@ -150,9 +150,11 @@ def main():
     source = os.environ['GITHUB_SHA']
     repository = os.environ['GH_REPO']
     run_id = os.environ['GITHUB_RUN_ID']
-    settings = dict(re.findall(r'^(MARKETING_VERSION|CURRENT_PROJECT_VERSION|AS_RELEASE_CHANNEL|AS_RELEASE_TAG) = (.+)$',
+    settings = dict(re.findall(r'^(MARKETING_VERSION|CURRENT_PROJECT_VERSION|AS_RELEASE_CHANNEL|AS_RELEASE_TAG|AS_RELEASE_NOTES_REF) = (.*)$',
                               Path('AlphaSync/Build/Version.xcconfig').read_text(), re.MULTILINE))
     version = settings['MARKETING_VERSION']
+    if settings.get('AS_RELEASE_NOTES_REF', '').strip():
+        raise ValueError('A private release-notes override must be cleared before publication.')
     if settings['AS_RELEASE_CHANNEL'] != 'stable' or not re.fullmatch(r'[0-9]+\.[0-9]+(?:\.[0-9]+)?', version):
         raise ValueError('Only a reviewed stable version can be published.')
     assets = Path('build/release-assets')

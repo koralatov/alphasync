@@ -8,7 +8,15 @@ public enum AppMetadata {
     public static var development: Bool { Bundle.main.object(forInfoDictionaryKey: "ASReleaseChannel") as? String != "stable" }
     public static var releaseTag: String { Bundle.main.object(forInfoDictionaryKey: "ASReleaseTag") as? String ?? "v" + version }
     public static var releaseNotes: URL {
-        development ? project.appendingPathComponent("blob/master/releases/" + version + ".md") : project.appendingPathComponent("releases/tag/" + releaseTag)
+        releaseNotesURL(version: version, tag: releaseTag, development: development,
+                        sourceRef: Bundle.main.object(forInfoDictionaryKey: "ASReleaseNotesRef") as? String)
+    }
+    static func releaseNotesURL(version: String, tag: String, development: Bool, sourceRef: String?) -> URL {
+        if let sourceRef, !sourceRef.isEmpty {
+            return project.appendingPathComponent("blob/" + sourceRef + "/releases/" + version + ".md")
+        }
+        return development ? project.appendingPathComponent("blob/master/releases/" + version + ".md")
+                           : project.appendingPathComponent("releases/tag/" + tag)
     }
     public static var licence: URL { project.appendingPathComponent(development ? "blob/master/LICENSE" : "blob/" + releaseTag + "/LICENSE") }
     public static var issues: URL {

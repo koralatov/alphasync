@@ -3,3 +3,6 @@ MARKETING_VERSION = 2.0.5
 CURRENT_PROJECT_VERSION = 166
 AS_RELEASE_CHANNEL = stable
 AS_RELEASE_TAG = v2.0.5
+// Private candidates link to reviewed source notes before a public tag exists.
+// Clear this override only when preparing an authorised public release.
+AS_RELEASE_NOTES_REF = master

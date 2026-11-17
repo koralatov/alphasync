@@ -36,6 +36,8 @@
 	<string>$(AS_RELEASE_CHANNEL)</string>
 	<key>ASReleaseTag</key>
 	<string>$(AS_RELEASE_TAG)</string>
+	<key>ASReleaseNotesRef</key>
+	<string>$(AS_RELEASE_NOTES_REF)</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
 	<key>NSHumanReadableCopyright</key>
