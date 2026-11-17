@@ -484,9 +484,12 @@
     "availability": "Separate private Apple Silicon test copy saved.  Earlier candidates are retained."
   },
   "email": {
-    "sent": false,
+    "sent": true,
     "channel": "CalxGPT",
-    "duplicateCheckRequiredBeforeSending": true
+    "duplicateCheckRequiredBeforeSending": true,
+    "sentAt": "2026-11-17T10:29:14.762Z",
+    "receiptRetainedPrivately": true,
+    "duplicateCheckCompleted": true
   },
   "publication": {
     "authorised": false,
@@ -522,9 +525,7 @@
     "Final system-composited appearance, macOS 13 runtime, native Help Viewer, and Login Items approval"
   ],
   "nextStep": "Physical Neo testing comes next before deciding on stable 2.1.  Further app changes should respond to those results.",
-  "pending": [
-    "One-off completion email after the evidence commit"
-  ],
+  "pending": [],
   "checkedAt": "2026-11-17T10:26:43.554516+00:00",
   "files": {
     "assets.json": {
@@ -599,5 +600,10 @@
       "size": 789,
       "sha256": "cd7fbbf409b6da2b89170adcdc888da47c44572734f3ca736f085f8e7a7a40dc"
     }
+  },
+  "completion": {
+    "complete": true,
+    "automationRemainsPaused": true,
+    "repeatNotifications": "Disabled.  A new request is required before another completion notification."
   }
 }
