@@ -326,7 +326,7 @@ public final class AppStore: ObservableObject {
         switch result {
         case .success(let urls): return Task { await importFiles(urls, to: target) }
         case .failure(let error):
-            if (error as NSError).code != NSUserCancelledError {
+            if !isFilePanelCancellation(error) {
                 notice = AppNotice("The file could not be opened", error.localizedDescription)
             }
             return nil
@@ -437,7 +437,7 @@ public final class AppStore: ObservableObject {
         switch result {
         case .success(let folder): return Task { await exportFiles(ids, to: folder) }
         case .failure(let error):
-            if (error as NSError).code != NSUserCancelledError {
+            if !isFilePanelCancellation(error) {
                 notice = AppNotice("The folder could not be opened", error.localizedDescription)
             }
             return nil

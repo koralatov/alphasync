@@ -293,6 +293,49 @@ final class AppStoreTests: XCTestCase {
         await store.shutdown()
     }
 
+    func testFilePanelCancellationRequiresTheCocoaErrorDomain() {
+        XCTAssertTrue(isFilePanelCancellation(CocoaError(.userCancelled)))
+        XCTAssertFalse(isFilePanelCancellation(NSError(domain: "OtherFileProvider", code: NSUserCancelledError)))
+        XCTAssertFalse(isFilePanelCancellation(CocoaError(.fileReadNoPermission)))
+        XCTAssertFalse(isFilePanelCancellation(CancellationError()))
+    }
+
+    func testImportPickerReportsUnrelatedCancellationCodesAndDiscardsTheRequest() async throws {
+        let observations = SimulatedObservations()
+        let store = makeStore(observations: observations)
+        await store.refresh()
+        store.selection = [try XCTUnwrap(store.files.first?.id)]
+        store.beginImport()
+        let error = NSError(domain: "OtherFileProvider", code: NSUserCancelledError,
+                            userInfo: [NSLocalizedDescriptionKey: "The file provider is unavailable."])
+        XCTAssertNil(store.finishImport(.failure(error)))
+        XCTAssertNotNil(store.notice)
+        XCTAssertFalse(store.showImporter)
+        XCTAssertNil(store.finishImport(.success([try sourceFile()])))
+        XCTAssertNil(store.pendingChange)
+        XCTAssertEqual(observations.writeCount, 0)
+        await store.shutdown()
+    }
+
+    func testExportPickerSilencesOnlyGenuineCancellationAndDiscardsTheRequest() async throws {
+        for domain in [NSCocoaErrorDomain, "OtherFileProvider"] {
+            let observations = SimulatedObservations()
+            let store = makeStore(observations: observations)
+            await store.refresh()
+            store.beginExport()
+            let error = NSError(domain: domain, code: NSUserCancelledError,
+                                userInfo: [NSLocalizedDescriptionKey: "The file provider is unavailable."])
+            XCTAssertNil(store.finishExport(.failure(error)))
+            XCTAssertEqual(store.notice == nil, domain == NSCocoaErrorDomain)
+            XCTAssertFalse(store.showExportFolder)
+            let destination = try temporaryFolder()
+            XCTAssertNil(store.finishExport(.success(destination)))
+            XCTAssertTrue(try FileManager.default.contentsOfDirectory(atPath: destination.path).isEmpty)
+            XCTAssertEqual(observations.writeCount, 0)
+            await store.shutdown()
+        }
+    }
+
     func testRowDropCapturesItsFileBeforeTheTaskStarts() async throws {
         let store = makeStore()
         await store.refresh()

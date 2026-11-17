@@ -91,7 +91,7 @@ public struct SettingsView: View {
                     defer { if scoped { url.stopAccessingSecurityScopedResource() } }
                     try preferences.selectBackupFolder(url)
                 } catch {
-                    if (error as NSError).code != NSUserCancelledError { folderError = error.localizedDescription }
+                    if !isFilePanelCancellation(error) { folderError = error.localizedDescription }
                 }
             }
             .alert("The backup folder could not be opened", isPresented: Binding(get: { folderError != nil }, set: { if !$0 { folderError = nil } })) {
