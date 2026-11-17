@@ -104,4 +104,62 @@ final class ChangeTargetTests: XCTestCase {
         XCTAssertEqual(observations.writeCount, 0)
         await service.shutdown()
     }
+
+    func testInvalidRenameNamesPreserveTheOriginalWithoutAWrite() async throws {
+        let observations = SimulatedObservations()
+        let service = DeviceService(discoveryFactory: { SimulatedDiscovery(SimulatedConfiguration(), observations) })
+        let discovery = try await service.scan()
+        let snapshot = try XCTUnwrap(discovery.devices.first)
+        let file = try XCTUnwrap(snapshot.applets.first?.files.first)
+        let original = try await service.read(file.id)
+        for name in ["", String(repeating: "a", count: 16), "Line\nBreak", "Neo 📝"] {
+            do {
+                _ = try await service.rename(file.id, to: name)
+                XCTFail("An invalid file name reached the simulated engine")
+            } catch {
+                let failure = try XCTUnwrap(error as? OperationFailure)
+                XCTAssertEqual(failure.completedFiles, 0)
+                XCTAssertFalse(failure.currentFileMayHaveChanged)
+                XCTAssertTrue(failure.localizedDescription.contains("1 to 15 supported characters"))
+            }
+        }
+        XCTAssertEqual(observations.writeCount, 0)
+        let refreshedDiscovery = try await service.refresh()
+        let refreshed = try XCTUnwrap(refreshedDiscovery.devices.first)
+        XCTAssertEqual(refreshed.applets, snapshot.applets)
+        let contents = try await service.read(file.id)
+        XCTAssertEqual(contents, original)
+        await service.shutdown()
+    }
+
+    func testInvalidImportNamesPreserveExistingFilesWithoutAWrite() async throws {
+        let observations = SimulatedObservations()
+        let service = DeviceService(discoveryFactory: { SimulatedDiscovery(SimulatedConfiguration(), observations) })
+        let discovery = try await service.scan()
+        let snapshot = try XCTUnwrap(discovery.devices.first)
+        let file = try XCTUnwrap(snapshot.applets.first?.files.first)
+        let original = try await service.read(file.id)
+        let destination = try folder()
+        for name in [String(repeating: "a", count: 16), "Line\nBreak", "Neo 📝"] {
+            let source = destination.appendingPathComponent(name + ".txt")
+            try Data("New text".utf8).write(to: source)
+            do {
+                _ = try await service.create(connection: snapshot.connection, appletID: NeoApplet.alphaWord, from: source)
+                XCTFail("An invalid import name reached the simulated engine")
+            } catch {
+                let failure = try XCTUnwrap(error as? OperationFailure)
+                XCTAssertEqual(failure.completedFiles, 0)
+                XCTAssertFalse(failure.currentFileMayHaveChanged)
+                XCTAssertTrue(failure.localizedDescription.contains("1 to 15 supported characters"))
+            }
+            XCTAssertEqual(try String(contentsOf: source, encoding: .utf8), "New text")
+        }
+        XCTAssertEqual(observations.writeCount, 0)
+        let refreshedDiscovery = try await service.refresh()
+        let refreshed = try XCTUnwrap(refreshedDiscovery.devices.first)
+        XCTAssertEqual(refreshed.applets, snapshot.applets)
+        let contents = try await service.read(file.id)
+        XCTAssertEqual(contents, original)
+        await service.shutdown()
+    }
 }

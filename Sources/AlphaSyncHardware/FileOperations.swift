@@ -140,11 +140,13 @@ extension DeviceService {
             var completed = 0
             do {
                 try access.checkCancellation(stop)
+                let name = source.deletingPathExtension().lastPathComponent
+                _ = try NeoFileAttributes(name: name)
                 let engine = try access.engine(for: connection)
                 let limits = try engine.fileLimits(applet: appletID)
                 let converted = try FileCodec.converted(TextFiles.read(source), applet: appletID, limits: limits, dictionaryConsent: dictionaryConsent)
                 try access.checkCancellation(stop)
-                _ = try engine.createFile(converted, name: source.deletingPathExtension().lastPathComponent, applet: appletID,
+                _ = try engine.createFile(converted, name: name, applet: appletID,
                                           checkingCancellationBeforeWrite: { try access.checkCancellation(stop) })
                 completed = 1
                 return try access.update(connection)
@@ -165,6 +167,7 @@ extension DeviceService {
                 guard let applet = snapshot.applets.first(where: { $0.id == file.applet }),
                       applet.files.contains(where: { $0.id == file }) else { throw NeoError.disconnected }
                 guard applet.canWrite else { throw NeoError.device("This applet’s files cannot be renamed by AlphaSync.") }
+                _ = try NeoFileAttributes(name: name)
                 try access.engine(for: file.connection).rename(applet: file.applet, index: file.index, to: name,
                                                                checkingCancellationBeforeWrite: { try access.checkCancellation(stop) })
                 completed = 1
