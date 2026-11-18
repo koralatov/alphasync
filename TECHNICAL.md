@@ -1,6 +1,6 @@
 # Technical guide
 
-The [post-167 corrections](docs/drop-and-find-follow-up.md) make drag imports replacement-only and remove Use Selection for Find.  Four new Swift regressions and revised native menu checks are written but unrun.  No build is authorised; use build 168 or later when the user requests one.
+The [post-167 corrections](docs/drop-and-find-follow-up.md) require confirmation before adding dropped files and remove Use Selection for Find.  The Swift regressions and revised native menu checks are written but unrun.  No build is authorised; use build 168 or later when the user requests one.
 
 Private **2.0.5, build 167** is verified and saved for tonight’s physical testing.  It rejects invalid names before engine writes, reports genuine file-panel errors, fixes private release-note links, retains toolbar appearance when the native toolbar is replaced, and improves backup result accessibility.  Both pinned hosts passed 212 Swift regressions, 56 fixtures, all native checks, and both app and helper builds without Swift compiler warnings in [run 44062779696](https://github.com/koralatov/alphasync/actions/runs/44062779696).  Both exact canonical apps ran on Apple Silicon.  Independent package, hash, Help, and 136-image checks passed.  The [final review](docs/final-review-167.md) and [record](releases/verification/2.0.5-167/verification.json) retain the fixture correction, toolbar diagnosis, capture limits, and physical checklist.  Physical Neo testing comes next before deciding on stable 2.1.
 

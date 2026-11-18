@@ -36,6 +36,13 @@ struct InspectorPreviewID: Hashable, Sendable {
     let revision: UUID
 }
 
+struct DroppedImportRequest: Identifiable {
+    let id = UUID()
+    let sources: [URL]
+    let target: ImportTarget
+    let destination: String
+}
+
 struct DictionaryImportRequest: Identifiable {
     let id = UUID()
     let sources: [URL]
@@ -47,9 +54,14 @@ struct DictionaryImportRequest: Identifiable {
 
 enum FileConfirmation: Identifiable {
     case change(PreparedChange)
+    case add(DroppedImportRequest)
     case dictionary(DictionaryImportRequest)
     var id: UUID {
-        switch self { case .change(let value): return value.id; case .dictionary(let value): return value.id }
+        switch self {
+        case .change(let value): return value.id
+        case .add(let value): return value.id
+        case .dictionary(let value): return value.id
+        }
     }
 }
 
@@ -333,11 +345,21 @@ public final class AppStore: ObservableObject {
         }
     }
     @discardableResult
-    func importDroppedFiles(_ urls: [URL], replacing file: NeoFileID? = nil) -> Task<Void, Never>? {
-        // A drop must name one existing file.  Adding files requires the explicit Import command.
-        guard urls.count == 1, let file, let target = importTarget(replacing: file) else { return nil }
+    func importDroppedFiles(_ urls: [URL], replacing file: NeoFileID) -> Task<Void, Never>? {
+        guard urls.count == 1, let target = importTarget(replacing: file) else { return nil }
         selection = [file]
         return Task { await importFiles(urls, to: target) }
+    }
+
+    func requestDroppedImport(_ urls: [URL]) -> Bool {
+        guard !busy, !showImporter, !showExportFolder, !urls.isEmpty, urls.allSatisfy(\.isFileURL),
+              case .applet(let connection, let appletID) = sidebar,
+              let device = devices.first(where: { $0.connection == connection }),
+              let applet = device.applets.first(where: { $0.id == appletID && $0.canWrite }) else { return false }
+        let target = ImportTarget(connection: connection, applet: appletID, file: nil)
+        fileConfirmation = .add(DroppedImportRequest(sources: urls, target: target,
+                                                     destination: "\(applet.name) on \(device.name)"))
+        return true
     }
     private func importFiles(_ urls: [URL], to target: ImportTarget, dictionaryConsent: String? = nil, previouslyCreated: Int = 0) async {
         let replacing = target.file != nil
@@ -379,6 +401,14 @@ public final class AppStore: ObservableObject {
         guard fileConfirmation?.id == id else { return false }
         fileConfirmation = nil
         return true
+    }
+    func confirmDroppedImport(_ id: UUID) async {
+        guard case .add(let request) = fileConfirmation, dismissConfirmation(id) else { return }
+        await importFiles(request.sources, to: request.target)
+    }
+    func cancelDroppedImport(_ id: UUID) {
+        guard case .add = fileConfirmation else { return }
+        _ = dismissConfirmation(id)
     }
     func confirmDictionaryImport(_ request: DictionaryImportRequest) async {
         guard dismissConfirmation(request.id) else { return }

@@ -219,8 +219,8 @@ Build 167 exact source `1d8d2ba5ceeedd7caea7c4acf2769f01f7a56304` passed [run 44
 
 These checks are deferred until a new build is requested.  The existing build 167 ZIP still has the reported behaviour.
 
-- Drop one text file over empty list space and the Neo or applet sidebar with no file selected, one selected, and several selected.  Every drop must be rejected, with no changed selection, new file, replacement warning, or device write.
-- Drop several text files over an existing file.  Reject the drop without changing selection or Neo contents.  Drops over absent, disconnected, or read-only targets must also do nothing.
+- Drop one or several text files into empty space in an editable applet’s file list, with and without selected files.  The Add prompt must identify the files and destination.  Cancel or Escape must leave the Neo unchanged.  Return must not add files.  Deliberate confirmation must add the named files without replacing existing contents.  Repeat in All Files and in a read-only applet to check rejection.
+- Drop several text files over an existing file.  No replacement may proceed.  Drops over absent, disconnected, or read-only targets must also do nothing.
 - Drop one text file directly onto a writable file’s name.  The warning must name that file.  Cancel must preserve its contents.  Deliberate consent with disposable data must replace only that file, retain the inventory, and preserve every other file.  Keep recovery enabled when checking retained originals.
 - Check that the Find menu has Find, Find Next, and Find Previous, with Use Selection for Find absent.  Repeat availability, native Find bar, unrelated focused field, Reader unload, reload, late cleanup, and close checks.
 

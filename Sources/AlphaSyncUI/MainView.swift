@@ -54,6 +54,9 @@ public struct MainView: View {
         }
         .sheet(item: $store.fileConfirmation) { confirmation in
             switch confirmation {
+            case .add(let request):
+                DroppedImportConfirmation(request: request, cancel: { store.cancelDroppedImport(request.id) },
+                                          confirm: { Task { await store.confirmDroppedImport(request.id) } })
             case .change(let change):
                 DestructiveConfirmation(title: change.title, action: change.action, explanation: change.explanation,
                                     names: change.items.map { $0.file.displayName }, saveRecovery: preferences.saveRecoveryCopies,
@@ -153,6 +156,9 @@ public struct MainView: View {
                 }
             }
         } primaryAction: { ids in openReaders(ids) }
+        .dropDestination(for: URL.self) { urls, _ in
+            store.requestDroppedImport(urls)
+        }
     }
     private func connectionWarning(_ issue: String) -> some View {
         VStack(spacing: 0) {

@@ -3,6 +3,32 @@ import AppKit
 import AlphaSyncCore
 import AlphaSyncHardware
 
+struct DroppedImportConfirmation: View {
+    let request: DroppedImportRequest
+    let cancel: () -> Void
+    let confirm: () -> Void
+    @FocusState private var cancelFocused: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            Text(request.sources.count == 1 ? "Add a new file?" : "Add \(request.sources.count.formatted()) new files?")
+                .font(.headline).accessibilityAddTraits(.isHeader)
+            Text("Add to \(request.destination).").fixedSize(horizontal: false, vertical: true)
+            ScrollView {
+                Text(request.sources.map(\.lastPathComponent).joined(separator: "\n"))
+                    .textSelection(.enabled).frame(maxWidth: .infinity, alignment: .leading)
+            }.frame(maxHeight: 140)
+            HStack {
+                Spacer()
+                Button("Cancel", role: .cancel, action: cancel)
+                    .keyboardShortcut(.cancelAction).focused($cancelFocused)
+                Button(request.sources.count == 1 ? "Add File" : "Add Files", action: confirm)
+            }
+        }.padding(24).frame(width: 450)
+            .defaultFocus($cancelFocused, true).onAppear { cancelFocused = true }
+    }
+}
+
 struct DictionaryImportConfirmation: View {
     let request: DictionaryImportRequest
     let cancel: () -> Void

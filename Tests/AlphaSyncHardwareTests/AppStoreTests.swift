@@ -360,26 +360,68 @@ final class AppStoreTests: XCTestCase {
         await store.shutdown()
     }
 
-    func testUntargetedDropsNeverCreateFilesOrReplaceTheSelection() async throws {
+    func testBackgroundDropRequiresConsentAndUsesTheCapturedApplet() async throws {
         let observations = SimulatedObservations()
+        observations.setAttached([1, 2])
         let store = makeStore(observations: observations)
         await store.refresh()
-        let connection = try XCTUnwrap(store.devices.first?.connection)
-        let ids = Set(store.files.map(\.id))
-        let first = try XCTUnwrap(store.files.first?.id)
+        let first = try XCTUnwrap(store.devices.first)
+        let other = try XCTUnwrap(store.devices.last)
+        XCTAssertNotEqual(first.connection, other.connection)
+        store.sidebar = .applet(first.connection, NeoApplet.alphaWord)
+        let original = try XCTUnwrap(store.files.first?.id)
+        store.selection = [original]
+        let originalBytes = try await store.service.read(original)
         let source = try sourceFile()
-        for sidebar in [SidebarSelection.device(connection), .applet(connection, NeoApplet.alphaWord)] {
-            store.sidebar = sidebar
-            for selection in [Set<NeoFileID>(), Set([first]), ids] {
-                store.selection = selection
-                XCTAssertNil(store.importDroppedFiles([source]))
-                XCTAssertEqual(store.selection, selection)
-                XCTAssertEqual(Set(store.files.map(\.id)), ids)
-                XCTAssertNil(store.fileConfirmation)
-                XCTAssertFalse(store.busy)
-                XCTAssertEqual(observations.writeCount, 0)
-            }
+        let second = try temporaryFolder().appendingPathComponent("Second note.txt")
+        try Data("Second text".utf8).write(to: second)
+
+        XCTAssertTrue(store.requestDroppedImport([source, second]))
+        guard case .add(let cancelled) = store.fileConfirmation else {
+            return XCTFail("Expected an Add Files confirmation")
         }
+        XCTAssertEqual(store.selection, [original])
+        XCTAssertEqual(observations.writeCount, 0)
+        XCTAssertTrue(store.busy)
+        store.cancelDroppedImport(cancelled.id)
+        XCTAssertNil(store.fileConfirmation)
+        XCTAssertEqual(observations.writeCount, 0)
+
+        XCTAssertTrue(store.requestDroppedImport([source, second]))
+        guard case .add(let confirmed) = store.fileConfirmation else {
+            return XCTFail("Expected a new Add Files confirmation")
+        }
+        await store.confirmDroppedImport(cancelled.id)
+        XCTAssertEqual(store.fileConfirmation?.id, confirmed.id)
+        XCTAssertEqual(observations.writeCount, 0)
+
+        store.sidebar = .applet(other.connection, NeoApplet.alphaWord)
+        await store.confirmDroppedImport(confirmed.id)
+        await store.confirmDroppedImport(confirmed.id)
+        XCTAssertEqual(observations.writeCount, 2)
+        let updated = try XCTUnwrap(store.devices.first { $0.connection == first.connection })
+        let names = try XCTUnwrap(updated.applets.first?.files.map(\.displayName))
+        XCTAssertEqual(Set(names), ["File 1", "File 2", "New note", "Second note"])
+        XCTAssertEqual(store.files.map(\.displayName), ["File 1", "File 2"])
+        let remaining = try await store.service.read(original)
+        XCTAssertEqual(remaining, originalBytes)
+        await store.shutdown()
+    }
+
+    func testBackgroundDropRejectsDeviceWideAndReadOnlyTargets() async throws {
+        let observations = SimulatedObservations()
+        let store = makeStore(SimulatedConfiguration(appletID: 0xb000), observations: observations)
+        store.preferences.filter = .allApplets
+        await store.refresh()
+        let connection = try XCTUnwrap(store.devices.first?.connection)
+        let source = try sourceFile()
+
+        store.sidebar = .device(connection)
+        XCTAssertFalse(store.requestDroppedImport([source]))
+        store.sidebar = .applet(connection, 0xb000)
+        XCTAssertFalse(store.requestDroppedImport([source]))
+        XCTAssertNil(store.fileConfirmation)
+        XCTAssertEqual(observations.writeCount, 0)
         await store.shutdown()
     }
 
