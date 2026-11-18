@@ -187,10 +187,13 @@ private final class WindowSceneDriver: ObservableObject {
             return menu.items + menu.items.compactMap(\.submenu).flatMap(items)
         }
         func check(_ enabled: Bool, stage: String) throws {
-            let titles: Set<String> = ["Find…", "Find Next", "Find Previous", "Use Selection for Find"]
-            let commands = NSApplication.shared.mainMenu.map(items)?.filter { titles.contains($0.title) } ?? []
+            let titles: Set<String> = ["Find…", "Find Next", "Find Previous"]
+            let menuItems = NSApplication.shared.mainMenu.map(items) ?? []
+            let commands = menuItems.filter { titles.contains($0.title) }
+            try InterfaceChecks.require(!menuItems.contains { $0.title == "Use Selection for Find" },
+                                        "The removed Use Selection for Find command returned")
             InterfaceChecks.checkpoint("Find availability during \(stage): key \(NSApplication.shared.keyWindow?.title ?? "none"), target \(ReaderFindRegistry.shared.active?.textView?.window?.title ?? "none"), items \(commands.map { "\($0.title)=\($0.isEnabled)" })")
-            try InterfaceChecks.require(commands.count == 4, "The Find menu lost its four commands")
+            try InterfaceChecks.require(commands.count == 3, "The Find menu lost one of its three commands")
             try InterfaceChecks.require(commands.allSatisfy { $0.isEnabled == enabled }, "Find commands have the wrong availability during " + stage)
             findChecks.append(["appearance": appearance, "stage": stage, "enabled": enabled, "commands": commands.map(\.title)])
         }

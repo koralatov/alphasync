@@ -31,8 +31,6 @@ public struct AlphaSyncCommands: Commands {
                     .disabled(readerFind.active == nil)
                 Button("Find Previous") { readerFind.active?.perform(.previous) }.keyboardShortcut("g", modifiers: [.command, .shift])
                     .disabled(readerFind.active == nil)
-                Button("Use Selection for Find") { readerFind.active?.perform(.setFindString) }.keyboardShortcut("e")
-                    .disabled(readerFind.active == nil)
             }
         }
         CommandGroup(replacing: .sidebar) {
