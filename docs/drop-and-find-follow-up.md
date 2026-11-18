@@ -29,3 +29,7 @@ This procedure is documented in Renaissance’s [NEO 1 and NEO 2 manual, printed
 Code and diffs were reviewed only.  No compilation, automated tests, native checks, package generation, new ZIP, or email occurred.  All routine commits use `[skip ci]`.  Keep the verified build 167 package and its historical evidence intact, with the newly reported issues recorded separately from its completed hosted checks.
 
 When the user requests a build, use a fresh build number, at least 168, and run the full applicable milestone against that exact source.  Verify confirmed additions and confirmed row replacement on the actual interface, the remaining Find commands and Reader reload checks, Help, and all established package and data-integrity gates.  Do not claim that the saved build 167 contains these fixes.
+
+## Build 168
+
+Build 168 is the private test candidate for the confirmed file-drop flow, the Find menu correction, and the Keyboard Setup Assistant guidance.  Its build and verification are pending.  The reported AlphaWord file-attribute rejection still needs a repeatable test before any protocol change.

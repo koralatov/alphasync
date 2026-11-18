@@ -1,6 +1,6 @@
 // Shared release version for both apps and their launch helpers.
 MARKETING_VERSION = 2.0.5
-CURRENT_PROJECT_VERSION = 167
+CURRENT_PROJECT_VERSION = 168
 AS_RELEASE_CHANNEL = stable
 AS_RELEASE_TAG = v2.0.5
 // Private candidates link to reviewed source notes before a public tag exists.
