@@ -19,7 +19,7 @@
 
 ## Build handoff
 
-- When handing off a new AlphaSync build, email Mike the exact download link using the CalxGPT Gmail account.  Use the established personal recipient and a plain-text message.  Check Sent before sending and send only once per build.  State any pending checks clearly, and use readiness language only after all required verification is complete.  Use the saved Apple Silicon ZIP when available, or the exact GitHub package link for a build explicitly handed off with verification pending.  This applies to user-facing builds and does not authorise building or publishing without a request.
+- When handing off a new AlphaSync build, email Mike the exact download link using the CalxGPT Gmail account.  Use the established personal recipient, a plain-text message, and a subject without the ‘[CalxGPT]’ prefix.  Check Sent before sending and send only once per build.  State any pending checks clearly, and use readiness language only after all required verification is complete.  Use the saved Apple Silicon ZIP when available, or the exact GitHub package link for a build explicitly handed off with verification pending.  This applies to user-facing builds and does not authorise building or publishing without a request.
 
 ## Frozen legacy release
 
