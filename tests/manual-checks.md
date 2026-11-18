@@ -55,7 +55,7 @@ Use known-good independent backups and disposable Neo files for writing checks. 
 ## Reading and file actions
 
 - Double-click a file’s name, icon, and Size cell. Each action should open one independent read-only window with the complete file. Empty space and applet selection must not open a file.
-- Read a long and an empty file. Resize, scroll, select, copy, and use the native Find bar, Find Next, Find Previous, and Use Selection for Find. Typing, paste, cut, delete, and dropped text must not change the preview or Neo.
+- Read a long and an empty file. Resize, scroll, select, copy, and use the native Find bar, Find Next, and Find Previous.  Use Selection for Find must be absent from the menu.  Typing, paste, cut, delete, and dropped text must not change the preview or Neo.
 - Switch between Regular and Monospaced. Confirm system fonts and default size, preserved text and selection, independent open windows, and the remembered choice for newly opened windows.
 - Copy to Clipboard must copy all loaded text, including text beyond the visible window, without changing selection or scroll. Check its disabled states for loading, empty files, and failed reads. Check the native symbol beside Read-only.
 - Disconnect during a read, and close a loading window. Failed reads should explain the failure; closed windows must stay closed. Successfully loaded text must remain readable and copyable after disconnection.
@@ -214,3 +214,14 @@ Hosted checks cannot establish physical Neo transfers, actual VoiceOver speech, 
 For build 167, choose each Toolbar Appearance, disconnect and reconnect the Neo, and confirm the chosen style is retained.  Repeat in both appearances and check the toolbar’s native context menu and View menu remain in agreement.
 
 Build 167 exact source `1d8d2ba5ceeedd7caea7c4acf2769f01f7a56304` passed [run 44062779696](https://github.com/koralatov/alphasync/actions/runs/44062779696) with 212 Swift regressions, 56 fixtures, all native checks, and both editions on both pinned hosts.  Both exact packages ran on Apple Silicon.  Independent hashes, both Help books, and 136-image review are complete, and the separate test ZIP is saved.  The [permanent record](../releases/verification/2.0.5-167/verification.json) preserves earlier failed attempts, corrections, and capture limits.  These hosted results leave tonight’s physical checks open.
+
+## Unbuilt drop and Find corrections after build 167
+
+These checks are deferred until a new build is requested.  The existing build 167 ZIP still has the reported behaviour.
+
+- Drop one text file over empty list space and the Neo or applet sidebar with no file selected, one selected, and several selected.  Every drop must be rejected, with no changed selection, new file, replacement warning, or device write.
+- Drop several text files over an existing file.  Reject the drop without changing selection or Neo contents.  Drops over absent, disconnected, or read-only targets must also do nothing.
+- Drop one text file directly onto a writable file’s name.  The warning must name that file.  Cancel must preserve its contents.  Deliberate consent with disposable data must replace only that file, retain the inventory, and preserve every other file.  Keep recovery enabled when checking retained originals.
+- Check that the Find menu has Find, Find Next, and Find Previous, with Use Selection for Find absent.  Repeat availability, native Find bar, unrelated focused field, Reader unload, reload, late cleanup, and close checks.
+
+The [follow-up record](../docs/drop-and-find-follow-up.md) includes the source corrections and the Neo’s own single-file deletion procedure.  No new build or physical result is claimed.

@@ -1,7 +1,7 @@
 {
   "version": "2.0.5",
   "build": "167",
-  "status": "verified-private-test-build",
+  "status": "verified-private-test-build-with-reported-issues",
   "sourceCommit": "1d8d2ba5ceeedd7caea7c4acf2769f01f7a56304",
   "sourceTree": "e94ee22941a1a76d84b44c87c59865c3cd0aa143",
   "run": {
@@ -605,5 +605,27 @@
     "complete": true,
     "automationRemainsPaused": true,
     "repeatNotifications": "Disabled.  A new request is required before another completion notification."
+  },
+  "physicalFeedback": {
+    "reportedAt": "2026-11-18",
+    "issues": [
+      "An accidental untargeted file drop creates a new named Neo file.",
+      "Use Selection for Find does not work."
+    ],
+    "unbuiltCorrections": [
+      {
+        "commit": "9c4e00ea03e553e2d620ed701667b6a30771a976",
+        "change": "Reject untargeted and multiple-file drops; retain explicit row replacement confirmation."
+      },
+      {
+        "commit": "1f31bdea06659fa5414e181406de56ae2cfab0b2",
+        "change": "Remove Use Selection for Find and its shortcut."
+      }
+    ],
+    "correctionBuilt": false,
+    "correctionTestsRun": false,
+    "existingZIPUnchanged": true,
+    "nextBuildMinimum": 168,
+    "followUp": "docs/drop-and-find-follow-up.md"
   }
 }

@@ -1,5 +1,7 @@
 # AlphaSync
 
+Source corrections after build 167 reject accidental background drops and remove Use Selection for Find.  They are committed but unbuilt at the user’s request.  The saved build 167 ZIP does not contain them.  See the [follow-up](docs/drop-and-find-follow-up.md).
+
 AlphaSync copies text files between your Mac and an AlphaSmart Neo. It can also back up your Neo and open automatically when you connect it.
 
 ## Connection fixes in testing
