@@ -225,3 +225,7 @@ These checks are deferred until a new build is requested.  The existing build 16
 - Check that the Find menu has Find, Find Next, and Find Previous, with Use Selection for Find absent.  Repeat availability, native Find bar, unrelated focused field, Reader unload, reload, late cleanup, and close checks.
 
 The [follow-up record](../docs/drop-and-find-follow-up.md) includes the source corrections and the Neo’s own single-file deletion procedure.  No new build or physical result is claimed.
+
+## Keyboard Setup Assistant on first connection
+
+Iain reported an exclusive-access error while macOS Keyboard Setup Assistant was open.  Closing the assistant let the Neo connect.  If the prompt appears during testing, check that AlphaSync suggests closing it and that Try Again remains visible in the compact window.  Close the assistant and choose Try Again.  Confirm that the Neo’s file list appears and the warning clears.  The USB handover and retry policy are unchanged by the message and layout fixes.

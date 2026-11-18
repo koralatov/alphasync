@@ -87,12 +87,21 @@ enum USBDiscovery {
                 try NeoModeSwitch.perform(USBModeSwitchConnection(service: device.service))
                 state.recordSuccess(id)
             } catch {
-                let error = error as NSError
-                state.recordFailure(id, message: "The Neo could not switch from keyboard mode to file-transfer mode. " +
-                    "Close other Neo software and choose Try Again, or reconnect it.\n\n" +
-                    "\(error.localizedDescription) (\(error.domain), \(error.code))")
+                state.recordFailure(id, message: modeSwitchFailureMessage(error as NSError))
             }
         }
         return state.issue
+    }
+
+    static func modeSwitchFailureMessage(_ error: NSError) -> String {
+        // kIOReturnExclusiveAccess, represented as a signed IOReturn in NSError.
+        let exclusiveAccess = Int(Int32(bitPattern: 0xe00002c5))
+        let guidance: String
+        if error.domain == "IOUSBHostErrorDomain", error.code == exclusiveAccess {
+            guidance = "macOS could not get exclusive access to the Neo.  Close Keyboard Setup Assistant if it is open, or quit other Neo software, then choose Try Again."
+        } else {
+            guidance = "The Neo could not switch from keyboard mode to file-transfer mode.  Close other Neo software and choose Try Again, or reconnect it."
+        }
+        return "\(guidance)\n\n\(error.localizedDescription) (\(error.domain), \(error.code))"
     }
 }

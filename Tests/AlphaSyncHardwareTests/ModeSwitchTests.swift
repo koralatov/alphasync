@@ -2,6 +2,23 @@ import XCTest
 @testable import AlphaSyncHardware
 
 final class ModeSwitchTests: XCTestCase {
+    func testUSBExclusiveAccessErrorSuggestsClosingKeyboardSetupAssistant() {
+        let domain = "IOUSBHostErrorDomain"
+        let code = -536870203
+        let error = NSError(domain: domain, code: code, userInfo: [NSLocalizedDescriptionKey: "Failed to create IOUSBHostObject."])
+        let message = USBDiscovery.modeSwitchFailureMessage(error)
+        XCTAssertTrue(message.contains("Close Keyboard Setup Assistant"))
+        XCTAssertTrue(message.contains("Try Again"))
+        XCTAssertTrue(message.contains("Failed to create IOUSBHostObject."))
+        XCTAssertTrue(message.contains("(IOUSBHostErrorDomain, -536870203)"))
+
+        for other in [NSError(domain: "OtherDomain", code: code), NSError(domain: domain, code: -1)] {
+            let generalMessage = USBDiscovery.modeSwitchFailureMessage(other)
+            XCTAssertFalse(generalMessage.contains("Keyboard Setup Assistant"))
+            XCTAssertTrue(generalMessage.contains("could not switch from keyboard mode"))
+        }
+    }
+
     func testFailedDeviceWaitsForExplicitRetryAndKeepsItsError() {
         var state = ModeSwitchState()
         state.retainAttached([1])

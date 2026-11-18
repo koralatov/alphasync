@@ -86,12 +86,17 @@ public struct MainView: View {
 
     private var waiting: some View {
         VStack(spacing: 14) {
-            Image(systemName: "cable.connector").font(.system(size: 42)).foregroundStyle(.secondary).accessibilityHidden(true)
-            Text("No Neo connected").font(.title2.weight(.semibold))
-            Text(store.connectionIssue ?? "Connect your AlphaSmart Neo with a USB cable. Its files will appear here.")
-                .multilineTextAlignment(.center).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
-            if store.connectionIssue != nil {
+            if let issue = store.connectionIssue {
+                Text("Neo connection problem").font(.title2.weight(.semibold)).accessibilityAddTraits(.isHeader)
+                ScrollView {
+                    Text(issue).textSelection(.enabled).frame(maxWidth: .infinity, alignment: .leading)
+                }
                 Button("Try Again") { Task { await store.refresh() } }.disabled(store.busy)
+            } else {
+                Image(systemName: "cable.connector").font(.system(size: 42)).foregroundStyle(.secondary).accessibilityHidden(true)
+                Text("No Neo connected").font(.title2.weight(.semibold))
+                Text("Connect your AlphaSmart Neo with a USB cable. Its files will appear here.")
+                    .multilineTextAlignment(.center).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
             }
         }.padding(24)
     }
