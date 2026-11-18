@@ -32,4 +32,4 @@ When the user requests a build, use a fresh build number, at least 168, and run 
 
 ## Build 168
 
-Build 168 is the private test candidate for the confirmed file-drop flow, the Find menu correction, and the Keyboard Setup Assistant guidance.  Its build and verification are pending.  The reported AlphaWord file-attribute rejection still needs a repeatable test before any protocol change.
+Build 168 is the private test candidate for the confirmed file-drop flow, the Find menu correction, and the Keyboard Setup Assistant guidance.  Both editions were built on the canonical Intel host, which passed 218 Swift regressions and 56 fixtures.  Apple Silicon hosted checks and native execution of the exact downloads are pending.  See the [build 168 verification record](../releases/verification/2.0.5-168/verification.json).  The reported AlphaWord file-attribute rejection still needs a repeatable test before any protocol change.

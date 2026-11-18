@@ -1,0 +1,126 @@
+{
+  "version": "2.0.5",
+  "build": 168,
+  "status": "built-apple-silicon-verification-pending",
+  "sourceCommit": "035958121b5f9218253fcb22f7ee018ded189981",
+  "sourceTree": "dfa5c29dd2cd5c59c560a6ca2532cb82a5f8547f",
+  "workflow": {
+    "url": "https://github.com/koralatov/alphasync/actions/runs/44272889254",
+    "attempt": 2,
+    "status": "completed",
+    "conclusion": "failure",
+    "jobs": [
+      {
+        "id": 134701931009,
+        "name": "Swift apps (Apple Silicon (compatibility))",
+        "status": "completed",
+        "conclusion": "cancelled"
+      },
+      {
+        "id": 134701932731,
+        "name": "Swift apps (Intel (canonical))",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 134709964590,
+        "name": "Verify downloaded apps on Apple Silicon",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 134709965836,
+        "name": "Verify downloads and publish",
+        "status": "completed",
+        "conclusion": "skipped"
+      }
+    ],
+    "priorAttempts": [
+      {
+        "attempt": 1,
+        "cancelledJob": 134693645169,
+        "steps": 0,
+        "intelJob": 134693644658,
+        "packageExecution": "skipped",
+        "publication": "skipped"
+      },
+      {
+        "attempt": 2,
+        "cancelledJob": 134701931009,
+        "steps": 0,
+        "intelJob": 134701932731,
+        "packageExecution": "skipped",
+        "publication": "skipped",
+        "createdAt": "2026-11-18T09:22:44Z",
+        "completedAt": "2026-11-18T09:37:45Z"
+      }
+    ]
+  },
+  "intel": {
+    "swiftRegressions": 218,
+    "fixtures": 56,
+    "nativeInterface": "passed",
+    "reviewedImages": 68,
+    "swiftCompilerWarnings": 0
+  },
+  "packages": {
+    "editionsBuilt": [
+      "Universal",
+      "Apple Silicon"
+    ],
+    "assetHashesChecked": 12,
+    "independentArtifactDigests": 2,
+    "help": [
+      {
+        "edition": "universal",
+        "version": "2.0.5",
+        "build": "168",
+        "minimumDeployment": "13.0",
+        "appIdentity": "com.tsoniq.AlphaSync",
+        "helperIdentity": "com.tsoniq.AlphaSyncLauncher",
+        "privateReleaseNotesReference": "master",
+        "authoredHelpFilesMatched": 20,
+        "searchIndexes": 1,
+        "help": "passed",
+        "helpCheck": "Verified 18 offline Help pages and 83 links.",
+        "packagedIconBytes": 1260361
+      },
+      {
+        "edition": "apple-silicon",
+        "version": "2.0.5",
+        "build": "168",
+        "minimumDeployment": "13.0",
+        "appIdentity": "com.tsoniq.AlphaSync",
+        "helperIdentity": "com.tsoniq.AlphaSyncLauncher",
+        "privateReleaseNotesReference": "master",
+        "authoredHelpFilesMatched": 20,
+        "searchIndexes": 1,
+        "help": "passed",
+        "helpCheck": "Verified 18 offline Help pages and 83 links.",
+        "packagedIconBytes": 1748105
+      }
+    ],
+    "appleSilicon": {
+      "filename": "AlphaSync-2.0.5-168-macOS-13-apple-silicon.zip",
+      "sha256": "eeced2912abdc40efa4824d72cb5ddd87dd113bc98c6868b0351d4a0fa9fa536",
+      "savedSeparately": false
+    }
+  },
+  "protectedReferences": {
+    "passed": true,
+    "releases": [
+      "v2.0.4",
+      "v1.5.1"
+    ],
+    "assets": 18,
+    "tags": 12,
+    "legacy": "6cb821c9ab8073ff950414952bf2480eb4638c5d",
+    "latest": "v2.0.4"
+  },
+  "pending": [
+    "Apple Silicon compatibility job and review of its captures.",
+    "Execution of both exact downloads on Apple Silicon.",
+    "Full independent verification and saving the separate test ZIP."
+  ],
+  "publication": "skipped"
+}
