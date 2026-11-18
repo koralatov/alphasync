@@ -337,13 +337,100 @@ final class AppStoreTests: XCTestCase {
     }
 
     func testRowDropCapturesItsFileBeforeTheTaskStarts() async throws {
-        let store = makeStore()
+        let observations = SimulatedObservations()
+        let store = makeStore(observations: observations)
         await store.refresh()
         let original = store.files[0].id
+        let other = store.files[1].id
+        let unchanged = try await store.service.read(other)
+        let ids = Set(store.files.map(\.id))
         let task = store.importDroppedFiles([try sourceFile()], replacing: original)
-        store.selection = [store.files[1].id]
+        store.selection = [other]
         await task?.value
-        XCTAssertEqual(store.pendingChange?.items.first?.file.id, original)
+        let change = try XCTUnwrap(store.pendingChange)
+        XCTAssertEqual(change.items.first?.file.id, original)
+        XCTAssertEqual(observations.writeCount, 0)
+        await store.confirm(change, saveRecovery: false)
+        XCTAssertEqual(observations.writeCount, 1)
+        XCTAssertEqual(Set(store.files.map(\.id)), ids)
+        let replaced = try await store.readText(original)
+        XCTAssertEqual(replaced, "Replacement text")
+        let remaining = try await store.service.read(other)
+        XCTAssertEqual(remaining, unchanged)
+        await store.shutdown()
+    }
+
+    func testUntargetedDropsNeverCreateFilesOrReplaceTheSelection() async throws {
+        let observations = SimulatedObservations()
+        let store = makeStore(observations: observations)
+        await store.refresh()
+        let connection = try XCTUnwrap(store.devices.first?.connection)
+        let ids = Set(store.files.map(\.id))
+        let first = try XCTUnwrap(store.files.first?.id)
+        let source = try sourceFile()
+        for sidebar in [SidebarSelection.device(connection), .applet(connection, NeoApplet.alphaWord)] {
+            store.sidebar = sidebar
+            for selection in [Set<NeoFileID>(), Set([first]), ids] {
+                store.selection = selection
+                XCTAssertNil(store.importDroppedFiles([source]))
+                XCTAssertEqual(store.selection, selection)
+                XCTAssertEqual(Set(store.files.map(\.id)), ids)
+                XCTAssertNil(store.fileConfirmation)
+                XCTAssertFalse(store.busy)
+                XCTAssertEqual(observations.writeCount, 0)
+            }
+        }
+        await store.shutdown()
+    }
+
+    func testRowDropRejectsMultipleSourcesWithoutChangingTheSelection() async throws {
+        let observations = SimulatedObservations()
+        let store = makeStore(observations: observations)
+        await store.refresh()
+        let target = store.files[0].id
+        let selection = Set([store.files[1].id])
+        store.selection = selection
+        XCTAssertNil(store.importDroppedFiles([try sourceFile(), try sourceFile()], replacing: target))
+        XCTAssertEqual(store.selection, selection)
+        XCTAssertNil(store.fileConfirmation)
+        XCTAssertFalse(store.busy)
+        XCTAssertEqual(observations.writeCount, 0)
+        await store.shutdown()
+    }
+
+    func testRowDropRejectsReadOnlyAndMissingTargetsWithoutWriting() async throws {
+        for configuration in [SimulatedConfiguration(), SimulatedConfiguration(appletID: 0xb000)] {
+            let observations = SimulatedObservations()
+            let store = makeStore(configuration, observations: observations)
+            store.preferences.filter = .allApplets
+            await store.refresh()
+            let file = try XCTUnwrap(store.files.first?.id)
+            let missing = NeoFileID(connection: file.connection, applet: file.applet, index: 200)
+            let targets = configuration.appletID == NeoApplet.alphaWord ? [missing] : [file, missing]
+            let source = try sourceFile()
+            store.selection = [file]
+            for target in targets {
+                XCTAssertNil(store.importDroppedFiles([source], replacing: target))
+                XCTAssertEqual(store.selection, [file])
+                XCTAssertNil(store.fileConfirmation)
+                XCTAssertFalse(store.busy)
+                XCTAssertEqual(observations.writeCount, 0)
+            }
+            await store.shutdown()
+        }
+    }
+
+    func testRowDropRejectsAnEmptySourceListWithoutChangingTheSelection() async throws {
+        let observations = SimulatedObservations()
+        let store = makeStore(observations: observations)
+        await store.refresh()
+        let target = store.files[0].id
+        let selection = Set([store.files[1].id])
+        store.selection = selection
+        XCTAssertNil(store.importDroppedFiles([], replacing: target))
+        XCTAssertEqual(store.selection, selection)
+        XCTAssertNil(store.fileConfirmation)
+        XCTAssertEqual(observations.writeCount, 0)
         await store.shutdown()
     }
 

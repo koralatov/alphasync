@@ -334,8 +334,9 @@ public final class AppStore: ObservableObject {
     }
     @discardableResult
     func importDroppedFiles(_ urls: [URL], replacing file: NeoFileID? = nil) -> Task<Void, Never>? {
-        guard !urls.isEmpty, let target = importTarget(replacing: file) else { return nil }
-        if let file { selection = [file] }
+        // A drop must name one existing file.  Adding files requires the explicit Import command.
+        guard urls.count == 1, let file, let target = importTarget(replacing: file) else { return nil }
+        selection = [file]
         return Task { await importFiles(urls, to: target) }
     }
     private func importFiles(_ urls: [URL], to target: ImportTarget, dictionaryConsent: String? = nil, previouslyCreated: Int = 0) async {

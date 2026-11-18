@@ -153,9 +153,6 @@ public struct MainView: View {
                 }
             }
         } primaryAction: { ids in openReaders(ids) }
-        .dropDestination(for: URL.self) { urls, _ in
-            store.importDroppedFiles(urls) != nil
-        }
     }
     private func connectionWarning(_ issue: String) -> some View {
         VStack(spacing: 0) {
